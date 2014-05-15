@@ -17,7 +17,7 @@ namespace MSGorilla.WebApi
     {
         NotificationManager _notifManager = new NotificationManager();
 
-        [HttpGet, BasicAuthAttribute]
+        [HttpGet]
         public List<Reply> Replies()
         {
             return _notifManager.GetNewReplies(whoami());

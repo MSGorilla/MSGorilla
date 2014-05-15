@@ -17,7 +17,8 @@ namespace MSGorilla.Library.Models.AzureModels
 
         public UserLineTweetEntity(Tweet tweet, int retweetCount = 0, int replyCount = 0)
         {
-            this.PartitionKey = tweet.User;    //Partition key
+            this.PartitionKey = string.Format("{0}_{1}", tweet.User,
+                Utils.ToAzureStorageDayBasedString(tweet.PostTime.ToUniversalTime()));    //Partition key
             this.RowKey = tweet.ID;
             TweetContent = tweet.ToJsonString();
             RetweetCount = retweetCount;

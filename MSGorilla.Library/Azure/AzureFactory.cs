@@ -26,7 +26,8 @@ namespace MSGorilla.Library.Azure
         private static Dictionary<TweetTable, string> _dict;
         static AzureFactory()
         {
-            _storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
+            string connectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
+            _storageAccount = CloudStorageAccount.Parse(connectionString);
             _dict = new Dictionary<TweetTable, string>();
 
             _dict.Add(TweetTable.HomelineTweet, "HomelineTweet");

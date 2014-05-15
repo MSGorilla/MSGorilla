@@ -19,7 +19,8 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
         public HomeLineTweetEntity(string user,
                                     Tweet tweet)
         {
-            this.PartitionKey = user;
+            this.PartitionKey = string.Format("{0}_{1}", user, 
+                Utils.ToAzureStorageDayBasedString(tweet.PostTime.ToUniversalTime()));
             this.RowKey = string.Format(
                     "{0}_{1}",
                     Utils.ToAzureStorageSecondBasedString(tweet.PostTime.ToUniversalTime()),

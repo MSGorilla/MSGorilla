@@ -41,5 +41,10 @@ namespace MSGorilla.Library
         {
             return timestamp.ToUniversalTime().ToString("yyyyMMddHHmmss");
         }
+
+        public static string ToAzureStorageDayBasedString(DateTime timestamp)
+        {
+            return timestamp.ToUniversalTime().ToString("yyyyMMdd");
+        }
     }
 }

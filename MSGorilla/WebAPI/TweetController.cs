@@ -18,44 +18,44 @@ namespace MSGorilla.WebApi
         TweetManager _tweetManager = new TweetManager();
         PostManager _postManager = new PostManager();
 
-        [HttpGet, BasicAuthAttribute]
+        [HttpGet]
         public List<Tweet> UserLine()
         {
             return _tweetManager.UserLine(whoami());
         }
-        [HttpGet, BasicAuthAttribute]
+        [HttpGet]
         public List<Tweet> UserLine(DateTime before, DateTime after)
         {
             return _tweetManager.UserLine(whoami(), before, after);
         }
-        [HttpGet, BasicAuthAttribute]
+        [HttpGet]
         public List<Tweet> HomeLine()
         {
             return _tweetManager.HomeLine(whoami());
         }
-        [HttpGet, BasicAuthAttribute]
+        [HttpGet]
         public List<Tweet> HomeLine(DateTime before, DateTime after)
         {
             return _tweetManager.HomeLine(whoami(), before, after);
         }
-        [HttpGet, BasicAuthAttribute]
+        [HttpGet]
         public TweetDetail GetTweet(string userid, string tweetID)
         {
             return _tweetManager.GetTweetDetail(userid, tweetID);
         }
-        [HttpGet, BasicAuthAttribute]
+        [HttpGet]
         public ActionResult PostTweet(string type, string message, string url = "")
         {
             _postManager.PostTweet(whoami(), type, message, DateTime.UtcNow, url);
             return new ActionResult();
         }
-        [HttpGet, BasicAuthAttribute]
+        [HttpGet]
         public ActionResult PostRetweet(string tweetUser, string tweetID)
         {
             _postManager.PostRetweet(whoami(), tweetUser, tweetID, DateTime.UtcNow);
             return new ActionResult();
         }
-        [HttpGet, BasicAuthAttribute]
+        [HttpGet]
         public ActionResult PostReply(string to, string message, string tweetUser, string tweetID)
         {
             _postManager.PostReply(whoami(), to, message, DateTime.UtcNow, tweetUser, tweetID);

@@ -15,7 +15,8 @@ namespace MSGorilla.Controllers
     public class HomeController : Controller
     {
         AccountManager _accManager = new AccountManager();
-        
+
+        [TokenAuthAttribute]
         public ActionResult Index()
         {
             ViewBag.Message = "Server is running....";

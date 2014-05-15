@@ -46,7 +46,20 @@ namespace MSGorilla.Library
                 after = before.AddDays(0 - DefaultTimelineQueryDayRange);
             }
 
-            string query = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userid);
+            string query = TableQuery.GenerateFilterCondition(
+                "PartitionKey", 
+                QueryComparisons.LessThanOrEqual, 
+                string.Format("{0}_{1}", userid, Utils.ToAzureStorageDayBasedString(before)));
+
+            query = TableQuery.CombineFilters(
+                query,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition(
+                    "PartitionKey",
+                    QueryComparisons.GreaterThanOrEqual,
+                    Utils.ToAzureStorageDayBasedString(after))
+            );
+
             query = TableQuery.CombineFilters(
                 query,
                 TableOperators.And,
@@ -55,6 +68,7 @@ namespace MSGorilla.Library
                     QueryComparisons.LessThan,
                     Utils.ToAzureStorageSecondBasedString(before))
             );
+
             query = TableQuery.CombineFilters(
                 query,
                 TableOperators.And,
