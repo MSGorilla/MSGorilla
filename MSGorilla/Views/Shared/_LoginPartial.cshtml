@@ -1,0 +1,26 @@
+﻿@if (Session["userid"] != null && !string.IsNullOrEmpty(Session["userid"].ToString()))
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li><a>Hello, @Session["userid"].ToString()</a></li>
+        <li><a href="~/home/logout">Log out</a></li>
+    </ul>
+}
+else
+{
+    <button onclick="location.href='home/login'" class=" btn btn-success navbar-nav navbar-right">Sign in</button>
+
+    @*<form class="navbar-form navbar-right" role="form">
+        <div class="form-group">
+            <input type="text" placeholder="userid" class="form-control">
+        </div>
+        <div class="form-group">
+            <input type="password" placeholder="Password" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-success">Sign in</button>
+    </form>*@
+}
+
+
+
+
+

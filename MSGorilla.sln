@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla", "MSGorilla\MSGorilla.csproj", "{47634D5A-C567-4EDB-963E-A0F9B79F27E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.Library", "MSGorilla.Library\MSGorilla.Library.csproj", "{AD407F7A-F82C-4C44-98F9-C2145A5F4A50}"
+EndProject
+Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "MSGorilla.Azure", "MSGorilla.Azure\MSGorilla.Azure.ccproj", "{EDD1F231-0E54-4449-A9EE-0EDD51B33EBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.Woker", "MSGorilla.Woker\MSGorilla.Woker.csproj", "{A054E07C-849A-44A4-9300-FF892E2F4479}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{47634D5A-C567-4EDB-963E-A0F9B79F27E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47634D5A-C567-4EDB-963E-A0F9B79F27E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47634D5A-C567-4EDB-963E-A0F9B79F27E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47634D5A-C567-4EDB-963E-A0F9B79F27E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD407F7A-F82C-4C44-98F9-C2145A5F4A50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD407F7A-F82C-4C44-98F9-C2145A5F4A50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD407F7A-F82C-4C44-98F9-C2145A5F4A50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD407F7A-F82C-4C44-98F9-C2145A5F4A50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDD1F231-0E54-4449-A9EE-0EDD51B33EBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDD1F231-0E54-4449-A9EE-0EDD51B33EBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDD1F231-0E54-4449-A9EE-0EDD51B33EBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDD1F231-0E54-4449-A9EE-0EDD51B33EBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A054E07C-849A-44A4-9300-FF892E2F4479}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A054E07C-849A-44A4-9300-FF892E2F4479}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A054E07C-849A-44A4-9300-FF892E2F4479}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A054E07C-849A-44A4-9300-FF892E2F4479}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
