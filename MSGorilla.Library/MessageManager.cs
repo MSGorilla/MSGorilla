@@ -29,9 +29,9 @@ namespace MSGorilla.Library
 
         public MessageManager()
         {
-            _homelineTweet = AzureFactory.GetTable(AzureFactory.TweetTable.HomelineTweet);
-            _userlineTweet = AzureFactory.GetTable(AzureFactory.TweetTable.UserlineTweet);
-            _reply = AzureFactory.GetTable(AzureFactory.TweetTable.Reply);
+            _homelineTweet = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Homeline);
+            _userlineTweet = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Userline);
+            _reply = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Reply);
         }
 
         static string GenerateTimestampConditionQuery(string userid, DateTime before, DateTime after)
@@ -91,7 +91,7 @@ namespace MSGorilla.Library
             List<Message> tweets = new List<Message>();
             foreach (UserLineEntity entity in _userlineTweet.ExecuteQuery(rangeQuery))
             {
-                tweets.Add(JsonConvert.DeserializeObject<Message>(entity.TweetContent));
+                tweets.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
             return tweets;
         }
@@ -111,7 +111,7 @@ namespace MSGorilla.Library
             List<Message> tweets = new List<Message>();
             foreach (HomeLineEntity entity in _homelineTweet.ExecuteQuery(rangeQuery))
             {
-                tweets.Add(JsonConvert.DeserializeObject<Message>(entity.MessageContent));
+                tweets.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
             return tweets;
         }
@@ -126,17 +126,17 @@ namespace MSGorilla.Library
             string pk = Message.ToMessagePK(userid, messageID);
             TableOperation retrieveOperation = TableOperation.Retrieve<UserLineEntity>(pk, messageID);
 
-            MessageDetail tweet = null;
+            MessageDetail msg = null;
             TableResult retrievedResult = _userlineTweet.Execute(retrieveOperation);
             if (retrievedResult.Result != null)
             {
                 UserLineEntity entity = (UserLineEntity)retrievedResult.Result;
-                tweet = new MessageDetail(JsonConvert.DeserializeObject<Message>(entity.TweetContent));
-                tweet.ReplyCount = entity.ReplyCount;
-                tweet.RetweetCount = entity.RetweetCount;
-                tweet.Replies = GetAllReplies(entity.RowKey);
+                msg = new MessageDetail(JsonConvert.DeserializeObject<Message>(entity.Content));
+                msg.ReplyCount = entity.ReplyCount;
+                //tweet.RetweetCount = entity.RetweetCount;
+                msg.Replies = GetAllReplies(entity.RowKey);
             }
-            return tweet;
+            return msg;
         }
 
         public List<Reply> GetAllReplies(string tweetID)

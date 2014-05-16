@@ -26,7 +26,7 @@ namespace MSGorilla.Library
 
         public NotificationManager()
         {
-            _replyNotification = AzureFactory.GetTable(AzureFactory.TweetTable.ReplyNotification);
+            _replyNotification = AzureFactory.GetTable(AzureFactory.MSGorillaTable.ReplyNotification);
         }
 
         public List<Reply> GetNewReplies(string userid)

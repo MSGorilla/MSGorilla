@@ -78,20 +78,27 @@
   <ItemGroup>
     <Compile Include="AccountManager.cs" />
     <Compile Include="Azure\AzureFactory.cs" />
-    <Compile Include="DAL\AccountContext.cs" />
+    <Compile Include="DAL\MSGorillaContext.cs" />
     <Compile Include="MException\MException.cs" />
     <Compile Include="Migrations\201405160325585_initialcreate.cs" />
     <Compile Include="Migrations\201405160325585_initialcreate.Designer.cs">
       <DependentUpon>201405160325585_initialcreate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201405160901559_add_schema.cs" />
+    <Compile Include="Migrations\201405160901559_add_schema.Designer.cs">
+      <DependentUpon>201405160901559_add_schema.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActionResult.cs" />
+    <Compile Include="Models\AzureModels\Entity\EventLineEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\HomeLineEntity.cs" />
+    <Compile Include="Models\AzureModels\Entity\PublicSquareLineEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\ReplyEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\ReplyNotificationEntifity.cs" />
     <Compile Include="Models\AzureModels\Entity\UserLineEntity.cs" />
     <Compile Include="Models\AzureModels\Queue\QueueMessage.cs" />
     <Compile Include="Models\Reply.cs" />
+    <Compile Include="Models\SqlModels\Schema.cs" />
     <Compile Include="Models\SqlModels\Subscription.cs" />
     <Compile Include="Models\SqlModels\UserProfile.cs" />
     <Compile Include="Models\Message.cs" />
@@ -112,6 +119,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201405160325585_initialcreate.resx">
       <DependentUpon>201405160325585_initialcreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201405160901559_add_schema.resx">
+      <DependentUpon>201405160901559_add_schema.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

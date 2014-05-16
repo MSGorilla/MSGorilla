@@ -4,19 +4,23 @@ using System.Linq;
 using System.Web;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using MSGorilla.Library.Models.SqlModels;
 
-namespace MSGorilla.Library.Models.SqlModels
+namespace MSGorilla.Library.DAL
 {
-    public class AccountContext : DbContext
+    public class MSGorillaContext : DbContext
     {
         public DbSet<UserProfile> Users { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
+
+        public DbSet<Schema> Schemas { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
         }
 
-        public AccountContext()
+        public MSGorillaContext()
         {
             base.Configuration.ProxyCreationEnabled = false;
         }

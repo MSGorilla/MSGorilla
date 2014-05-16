@@ -15,9 +15,11 @@ namespace MSGorilla.Library.Azure
 {
     public static class AzureFactory
     {
-        public enum TweetTable{
-            HomelineTweet,
-            UserlineTweet,
+        public enum MSGorillaTable{
+            Homeline,
+            Userline,
+            PublicSquareLine,
+            EventLine,
             Reply,
             ReplyNotification
         }
@@ -25,21 +27,23 @@ namespace MSGorilla.Library.Azure
         public const string QueueName = "messagequeue";
 
         private static CloudStorageAccount _storageAccount;
-        private static Dictionary<TweetTable, string> _dict;
+        private static Dictionary<MSGorillaTable, string> _dict;
         static AzureFactory()
         {
             string connectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
             //string connectionString = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
             _storageAccount = CloudStorageAccount.Parse(connectionString);
-            _dict = new Dictionary<TweetTable, string>();
+            _dict = new Dictionary<MSGorillaTable, string>();
 
-            _dict.Add(TweetTable.HomelineTweet, "HomelineTweet");
-            _dict.Add(TweetTable.UserlineTweet, "UserlineTweet");
-            _dict.Add(TweetTable.Reply, "Reply");
-            _dict.Add(TweetTable.ReplyNotification, "ReplyNotification");
+            _dict.Add(MSGorillaTable.Homeline, "Homeline");
+            _dict.Add(MSGorillaTable.Userline, "Userline");
+            _dict.Add(MSGorillaTable.EventLine, "EventlineTweet");
+            _dict.Add(MSGorillaTable.PublicSquareLine, "PublicSquareline");
+            _dict.Add(MSGorillaTable.Reply, "Reply");
+            _dict.Add(MSGorillaTable.ReplyNotification, "ReplyNotification");
         }
 
-        public static CloudTable GetTable(TweetTable table)
+        public static CloudTable GetTable(MSGorillaTable table)
         {
             var client = _storageAccount.CreateCloudTableClient();
             var aztable = client.GetTableReference(_dict[table]);

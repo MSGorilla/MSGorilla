@@ -9,27 +9,27 @@ namespace MSGorilla.Library.Models.AzureModels
 {
     public class UserLineEntity : TableEntity
     {
-        public string TweetContent { get; set; }
+        public string Content { get; set; }
 
-        public int RetweetCount { get; set; }
+        //public int RetweetCount { get; set; }
 
         public int ReplyCount { get; set; }
 
-        public UserLineEntity(Message tweet, int retweetCount = 0, int replyCount = 0)
+        public UserLineEntity(Message msg, int replyCount = 0)
         {
-            this.PartitionKey = string.Format("{0}_{1}", tweet.User,
-                Utils.ToAzureStorageDayBasedString(tweet.PostTime.ToUniversalTime()));    //Partition key
-            this.RowKey = tweet.ID;
-            TweetContent = tweet.ToJsonString();
-            RetweetCount = retweetCount;
+            this.PartitionKey = string.Format("{0}_{1}", msg.User,
+                Utils.ToAzureStorageDayBasedString(msg.PostTime.ToUniversalTime()));    //Partition key
+            this.RowKey = msg.ID;
+            Content = msg.ToJsonString();
+            //RetweetCount = retweetCount;
             ReplyCount = replyCount;
         }
 
-        public UserLineEntity(string userid, string tweetID)
-        {
-            this.PartitionKey = userid;
-            this.RowKey = tweetID;
-        }
+        //public UserLineEntity(string userid, string tweetID)
+        //{
+        //    this.PartitionKey = userid;
+        //    this.RowKey = tweetID;
+        //}
 
         public UserLineEntity() { }
     }

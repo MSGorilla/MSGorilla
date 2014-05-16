@@ -58,18 +58,18 @@ namespace MSGorilla.WebApi
             return _messageManager.GetMessageDetail(userid, tweetID);
         }
         [HttpGet]
-        public ActionResult PostMessage(string type, string message, string url = "")
+        public ActionResult PostMessage(string eventID, string schemaID, string message)
         {
-            _postManager.PostTweet(whoami(), type, message, DateTime.UtcNow, url);
+            _postManager.PostMessage(whoami(), eventID, schemaID, message, DateTime.UtcNow);
             return new ActionResult();
         }
 
-        [HttpGet]
-        public ActionResult PostRetweet(string tweetUser, string tweetID)
-        {
-            _postManager.PostRetweet(whoami(), tweetUser, tweetID, DateTime.UtcNow);
-            return new ActionResult();
-        }
+        //[HttpGet]
+        //public ActionResult PostRetweet(string tweetUser, string tweetID)
+        //{
+        //    _postManager.PostRetweet(whoami(), tweetUser, tweetID, DateTime.UtcNow);
+        //    return new ActionResult();
+        //}
 
         [HttpGet]
         public ActionResult PostReply(string to, string message, string messageUser, string messageID)

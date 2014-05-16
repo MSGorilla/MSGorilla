@@ -69,9 +69,9 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
-    public class TweetNotFoundException : TwitterBaseException
+    public class MessageNotFoundException : TwitterBaseException
     {
-        public TweetNotFoundException()
+        public MessageNotFoundException()
         {
             Description = "The specified tweed doesn't exist.";
             Code = 3002;

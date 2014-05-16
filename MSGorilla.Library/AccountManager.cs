@@ -8,14 +8,15 @@ using System.Diagnostics;
 using MSGorilla.Library.Models;
 using MSGorilla.Library.Models.SqlModels;
 using MSGorilla.Library.Exceptions;
+using MSGorilla.Library.DAL;
 
 namespace MSGorilla.Library
 {
     public class AccountManager
     {
-        private AccountContext _accountCtx;
+        private MSGorillaContext _accountCtx;
         public AccountManager(){
-            _accountCtx = new AccountContext();
+            _accountCtx = new MSGorillaContext();
         }
 
         public List<UserProfile> GetAllUsers(){

@@ -25,8 +25,10 @@ namespace MSGorilla.Library
     public class PostManager
     {
         private CloudQueue _queue;
-        private CloudTable _homelineTweet;
-        private CloudTable _userlineTweet;
+        private CloudTable _homeline;
+        private CloudTable _userline;
+        private CloudTable _eventline;
+        private CloudTable _publicSquareline;
         private CloudTable _reply;
         private CloudTable _replyNotification;
 
@@ -34,17 +36,19 @@ namespace MSGorilla.Library
 
         public PostManager(){
             _queue = AzureFactory.GetQueue();
-            _homelineTweet = AzureFactory.GetTable(AzureFactory.TweetTable.HomelineTweet);
-            _userlineTweet = AzureFactory.GetTable(AzureFactory.TweetTable.UserlineTweet);
-            _reply = AzureFactory.GetTable(AzureFactory.TweetTable.Reply);
-            _replyNotification = AzureFactory.GetTable(AzureFactory.TweetTable.ReplyNotification);
+            _homeline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Homeline);
+            _userline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Userline);
+            _eventline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.EventLine);
+            _publicSquareline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.PublicSquareLine);
+            _reply = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Reply);
+            _replyNotification = AzureFactory.GetTable(AzureFactory.MSGorillaTable.ReplyNotification);
 
             _accManager = new AccountManager();
         }
 
-        public void PostTweet(string userid, string tweetType, string message, DateTime timestamp, string url = "")
+        public void PostMessage(string userid, string eventID, string schemaID, string message, DateTime timestamp)
         {
-            if (message.Length > 256)
+            if (message.Length > 2048)
             {
                 throw new MessageTooLongException();
             }
@@ -54,52 +58,60 @@ namespace MSGorilla.Library
             }
 
 
-            Message tweet = new Message(tweetType, userid, message, timestamp);
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID);
             //insert into Userline
-            TableOperation insertOperation = TableOperation.Insert(new UserLineEntity(tweet));
-            _userlineTweet.Execute(insertOperation);
+            TableOperation insertOperation = TableOperation.Insert(new UserLineEntity(msg));
+            _userline.Execute(insertOperation);
+
+            //insert into Eventline
+            insertOperation = TableOperation.Insert(new EventLineEntity(msg));
+            _eventline.Execute(insertOperation);
+
+            //insert into PublicSquareLine
+            insertOperation = TableOperation.Insert(new PublicSquareLineEntity(msg));
+            _publicSquareline.Execute(insertOperation);
 
             //insert into QueueMessage
-            QueueMessage queueMessage = new QueueMessage(QueueMessage.TypeTweet, tweet.ToJsonString());
+            QueueMessage queueMessage = new QueueMessage(QueueMessage.TypeTweet, msg.ToJsonString());
             _queue.AddMessage(queueMessage.toAzureCloudQueueMessage());
         }
 
-        public void PostRetweet(string userid, string originTweetUser, string originTweetID, DateTime timestamp)
-        {
-            if (_accManager.FindUser(userid) == null)
-            {
-                throw new UserNotFoundException(userid);
-            }
+        //public void PostRetweet(string userid, string originTweetUser, string originTweetID, DateTime timestamp)
+        //{
+        //    if (_accManager.FindUser(userid) == null)
+        //    {
+        //        throw new UserNotFoundException(userid);
+        //    }
 
-            TableOperation retreiveOperation = TableOperation.Retrieve<UserLineEntity>(originTweetUser, originTweetID);
-            TableResult retreiveResult = _userlineTweet.Execute(retreiveOperation);
-            UserLineEntity originTweet = ((UserLineEntity)retreiveResult.Result);
+        //    TableOperation retreiveOperation = TableOperation.Retrieve<UserLineEntity>(originTweetUser, originTweetID);
+        //    TableResult retreiveResult = _userline.Execute(retreiveOperation);
+        //    UserLineEntity originTweet = ((UserLineEntity)retreiveResult.Result);
 
-            if (originTweet == null)
-            {
-                throw new TweetNotFoundException();
-            }
+        //    if (originTweet == null)
+        //    {
+        //        throw new TweetNotFoundException();
+        //    }
 
-            JObject oTweet = JObject.Parse(originTweet.TweetContent);
-            if (Message.TweetTypeRetweet.Equals(oTweet["Type"]))
-            {
-                throw new RetweetARetweetException();
-            }
+        //    JObject oTweet = JObject.Parse(originTweet.Content);
+        //    if (Message.TweetTypeRetweet.Equals(oTweet["Type"]))
+        //    {
+        //        throw new RetweetARetweetException();
+        //    }
 
-            Message tweet = new Message(Message.TweetTypeRetweet, userid, originTweet.TweetContent, timestamp);
-            //insert into Userline
-            TableOperation insertOperation = TableOperation.Insert(new UserLineEntity(tweet));
-            _userlineTweet.Execute(insertOperation);
+        //    Message tweet = new Message(Message.TweetTypeRetweet, userid, originTweet.Content, timestamp);
+        //    //insert into Userline
+        //    TableOperation insertOperation = TableOperation.Insert(new UserLineEntity(tweet));
+        //    _userline.Execute(insertOperation);
 
-            //insert into QueueMessage
-            QueueMessage queueMessage = new QueueMessage(QueueMessage.TypeTweet, tweet.ToJsonString());
-            _queue.AddMessage(queueMessage.toAzureCloudQueueMessage());
+        //    //insert into QueueMessage
+        //    QueueMessage queueMessage = new QueueMessage(QueueMessage.TypeTweet, tweet.ToJsonString());
+        //    _queue.AddMessage(queueMessage.toAzureCloudQueueMessage());
 
-            //update retweet count
-            originTweet.RetweetCount++;
-            TableOperation updateOperation = TableOperation.Replace(originTweet);
-            _userlineTweet.Execute(updateOperation);
-        }
+        //    //update retweet count
+        //    originTweet.RetweetCount++;
+        //    TableOperation updateOperation = TableOperation.Replace(originTweet);
+        //    _userline.Execute(updateOperation);
+        //}
 
         public void SpreadTweet(Message tweet)
         {
@@ -111,7 +123,7 @@ namespace MSGorilla.Library
             {
                 HomeLineEntity entity = new HomeLineEntity(user.Userid, tweet);
                 TableOperation insertOperation = TableOperation.Insert(entity);
-                _homelineTweet.Execute(insertOperation);
+                _homeline.Execute(insertOperation);
             }
         }
 
@@ -138,12 +150,12 @@ namespace MSGorilla.Library
 
             string pk = Message.ToMessagePK(originMessageUser, originMessageID);
             TableOperation retreiveOperation = TableOperation.Retrieve<UserLineEntity>(pk, originMessageID);
-            TableResult retreiveResult = _userlineTweet.Execute(retreiveOperation);
-            UserLineEntity originTweet = ((UserLineEntity)retreiveResult.Result);
+            TableResult retreiveResult = _userline.Execute(retreiveOperation);
+            UserLineEntity originMsg = ((UserLineEntity)retreiveResult.Result);
 
-            if (originTweet == null)
+            if (originMsg == null)
             {
-                throw new TweetNotFoundException();
+                throw new MessageNotFoundException();
             }
 
             Reply reply = new Reply(fromUser, toUser, content, timestamp, originMessageUser, originMessageID);
@@ -153,9 +165,9 @@ namespace MSGorilla.Library
             _reply.Execute(insertOperation);
 
             //update reply count
-            originTweet.ReplyCount++;
-            TableOperation updateOperation = TableOperation.Replace(originTweet);
-            _userlineTweet.Execute(updateOperation);
+            originMsg.ReplyCount++;
+            TableOperation updateOperation = TableOperation.Replace(originMsg);
+            _userline.Execute(updateOperation);
 
             //notif user as well as the tweet publisher
             ReplyNotificationEntifity notifUserEntity = new ReplyNotificationEntifity(reply);

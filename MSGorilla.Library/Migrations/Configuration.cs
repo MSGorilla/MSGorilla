@@ -5,14 +5,14 @@ namespace MSGorilla.Library.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<MSGorilla.Library.Models.SqlModels.AccountContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<MSGorilla.Library.DAL.MSGorillaContext>
     {
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
         }
 
-        protected override void Seed(MSGorilla.Library.Models.SqlModels.AccountContext context)
+        protected override void Seed(MSGorilla.Library.DAL.MSGorillaContext context)
         {
             //  This method will be called after migrating to the latest version.
 
