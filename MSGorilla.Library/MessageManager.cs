@@ -20,14 +20,14 @@ using Newtonsoft.Json.Converters;
 
 namespace MSGorilla.Library
 {
-    public class TweetManager
+    public class MessageManager
     {
-        private const int DefaultTimelineQueryDayRange = 7;
+        private const int DefaultTimelineQueryDayRange = 3;
         private CloudTable _homelineTweet;
         private CloudTable _userlineTweet;
         private CloudTable _reply;
 
-        public TweetManager()
+        public MessageManager()
         {
             _homelineTweet = AzureFactory.GetTable(AzureFactory.TweetTable.HomelineTweet);
             _userlineTweet = AzureFactory.GetTable(AzureFactory.TweetTable.UserlineTweet);
@@ -57,7 +57,7 @@ namespace MSGorilla.Library
                 TableQuery.GenerateFilterCondition(
                     "PartitionKey",
                     QueryComparisons.GreaterThanOrEqual,
-                    Utils.ToAzureStorageDayBasedString(after))
+                    string.Format("{0}_{1}", userid, Utils.ToAzureStorageDayBasedString(after)))
             );
 
             query = TableQuery.CombineFilters(
@@ -121,7 +121,7 @@ namespace MSGorilla.Library
             return HomeLine(userid, DateTime.UtcNow, DateTime.UtcNow.AddDays(0 - DefaultTimelineQueryDayRange));
         }
 
-        public TweetDetail GetTweetDetail(string userid, string tweetID)
+        public TweetDetail GetMessageDetail(string userid, string tweetID)
         {
             TableOperation retrieveOperation = TableOperation.Retrieve<UserLineTweetEntity>(userid, tweetID);
 

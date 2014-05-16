@@ -9,6 +9,8 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Microsoft.WindowsAzure.Storage.Queue;
 
+using System.Configuration;
+
 namespace MSGorilla.Library.Azure
 {
     public static class AzureFactory
@@ -27,6 +29,7 @@ namespace MSGorilla.Library.Azure
         static AzureFactory()
         {
             string connectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
+            //string connectionString = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
             _storageAccount = CloudStorageAccount.Parse(connectionString);
             _dict = new Dictionary<TweetTable, string>();
 
