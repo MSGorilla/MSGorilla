@@ -28,6 +28,20 @@ namespace MSGorilla.WebApi
         {
             return _messageManager.UserLine(whoami(), before, after);
         }
+
+        [HttpGet]
+        public List<Message> UserLine(string userid)
+        {
+            string me = whoami();
+            return _messageManager.UserLine(userid);
+        }
+        [HttpGet]
+        public List<Message> UserLine(string userid, DateTime before, DateTime after)
+        {
+            string me = whoami();
+            return _messageManager.UserLine(userid, before, after);
+        }
+
         [HttpGet]
         public List<Message> HomeLine()
         {
