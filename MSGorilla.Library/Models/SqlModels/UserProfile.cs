@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 
 namespace MSGorilla.Library.Models.SqlModels
 {
-    [KnownType(typeof(Friendship))]
+    [KnownType(typeof(Subscription))]
     [Serializable, DataContract]
     public class UserProfile
     {
@@ -34,6 +34,6 @@ namespace MSGorilla.Library.Models.SqlModels
 
         public string Password { get; set; }
         
-        public virtual ICollection<Friendship> followings { get; set; }
+        public virtual ICollection<Subscription> followings { get; set; }
     }
 }

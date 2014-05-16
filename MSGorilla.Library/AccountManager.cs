@@ -82,15 +82,15 @@ namespace MSGorilla.Library
                 throw new UserNotFoundException(string.Format("{0} or {1}", userid, followingUserid));
             }
 
-            if(_accountCtx.Friendships.Where(f => f.Userid == userid && f.FollowingUserid == followingUserid).ToList().Count > 0){
+            if(_accountCtx.Subscriptions.Where(f => f.Userid == userid && f.FollowingUserid == followingUserid).ToList().Count > 0){
                 return true;
             }
 
-            Friendship follow = new Friendship();
+            Subscription follow = new Subscription();
             follow.Userid = userid;
             follow.FollowingUserid = followingUserid;
             follow.FollowingUserDisplayName = "";
-            _accountCtx.Friendships.Add(follow);
+            _accountCtx.Subscriptions.Add(follow);
 
             user.FollowingsCount++;
             followingUser.FollowersCount++;
@@ -101,9 +101,9 @@ namespace MSGorilla.Library
 
         public async Task<Boolean> UnFollow(string userid, string followingUserid)
         {
-            Friendship f = _accountCtx.Friendships.Where(ff => ff.Userid == userid && ff.FollowingUserid == followingUserid).First();
+            Subscription f = _accountCtx.Subscriptions.Where(ff => ff.Userid == userid && ff.FollowingUserid == followingUserid).First();
             if(f != null){
-                _accountCtx.Friendships.Remove(f);
+                _accountCtx.Subscriptions.Remove(f);
 
                 UserProfile user = _accountCtx.Users.Find(userid);
                 UserProfile followingUser = _accountCtx.Users.Find(followingUserid);

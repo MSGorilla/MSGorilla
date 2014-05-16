@@ -10,7 +10,7 @@ namespace MSGorilla.Library.Models.SqlModels
     public class AccountContext : DbContext
     {
         public DbSet<UserProfile> Users { get; set; }
-        public DbSet<Friendship> Friendships { get; set; }
+        public DbSet<Subscription> Subscriptions { get; set; }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();

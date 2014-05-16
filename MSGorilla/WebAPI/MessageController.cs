@@ -19,27 +19,27 @@ namespace MSGorilla.WebApi
         PostManager _postManager = new PostManager();
 
         [HttpGet]
-        public List<Tweet> UserLine()
+        public List<Message> UserLine()
         {
             return _messageManager.UserLine(whoami());
         }
         [HttpGet]
-        public List<Tweet> UserLine(DateTime before, DateTime after)
+        public List<Message> UserLine(DateTime before, DateTime after)
         {
             return _messageManager.UserLine(whoami(), before, after);
         }
         [HttpGet]
-        public List<Tweet> HomeLine()
+        public List<Message> HomeLine()
         {
             return _messageManager.HomeLine(whoami());
         }
         [HttpGet]
-        public List<Tweet> HomeLine(DateTime before, DateTime after)
+        public List<Message> HomeLine(DateTime before, DateTime after)
         {
             return _messageManager.HomeLine(whoami(), before, after);
         }
         [HttpGet]
-        public TweetDetail GetMessage(string userid, string tweetID)
+        public MessageDetail GetMessage(string userid, string tweetID)
         {
             return _messageManager.GetMessageDetail(userid, tweetID);
         }
@@ -58,9 +58,9 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public ActionResult PostReply(string to, string message, string tweetUser, string tweetID)
+        public ActionResult PostReply(string to, string message, string messageUser, string messageID)
         {
-            _postManager.PostReply(whoami(), to, message, DateTime.UtcNow, tweetUser, tweetID);
+            _postManager.PostReply(whoami(), to, message, DateTime.UtcNow, messageUser, messageID);
             return new ActionResult();
         }
     }

@@ -46,7 +46,7 @@ namespace MSGorilla.Woker
 
                     QueueMessage mess = JsonConvert.DeserializeObject<QueueMessage>(message.AsString);
                     string content = (string)mess.Content;
-                    Tweet tweet = JsonConvert.DeserializeObject<Tweet>(content);
+                    Message tweet = JsonConvert.DeserializeObject<Message>(content);
 
                     manager.SpreadTweet(tweet);
                     _queue.DeleteMessage(message);

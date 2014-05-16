@@ -54,9 +54,9 @@ namespace MSGorilla.Library
             }
 
 
-            Tweet tweet = new Tweet(tweetType, userid, message, timestamp);
+            Message tweet = new Message(tweetType, userid, message, timestamp);
             //insert into Userline
-            TableOperation insertOperation = TableOperation.Insert(new UserLineTweetEntity(tweet));
+            TableOperation insertOperation = TableOperation.Insert(new UserLineEntity(tweet));
             _userlineTweet.Execute(insertOperation);
 
             //insert into QueueMessage
@@ -71,9 +71,9 @@ namespace MSGorilla.Library
                 throw new UserNotFoundException(userid);
             }
 
-            TableOperation retreiveOperation = TableOperation.Retrieve<UserLineTweetEntity>(originTweetUser, originTweetID);
+            TableOperation retreiveOperation = TableOperation.Retrieve<UserLineEntity>(originTweetUser, originTweetID);
             TableResult retreiveResult = _userlineTweet.Execute(retreiveOperation);
-            UserLineTweetEntity originTweet = ((UserLineTweetEntity)retreiveResult.Result);
+            UserLineEntity originTweet = ((UserLineEntity)retreiveResult.Result);
 
             if (originTweet == null)
             {
@@ -81,14 +81,14 @@ namespace MSGorilla.Library
             }
 
             JObject oTweet = JObject.Parse(originTweet.TweetContent);
-            if (Tweet.TweetTypeRetweet.Equals(oTweet["Type"]))
+            if (Message.TweetTypeRetweet.Equals(oTweet["Type"]))
             {
                 throw new RetweetARetweetException();
             }
 
-            Tweet tweet = new Tweet(Tweet.TweetTypeRetweet, userid, originTweet.TweetContent, timestamp);
+            Message tweet = new Message(Message.TweetTypeRetweet, userid, originTweet.TweetContent, timestamp);
             //insert into Userline
-            TableOperation insertOperation = TableOperation.Insert(new UserLineTweetEntity(tweet));
+            TableOperation insertOperation = TableOperation.Insert(new UserLineEntity(tweet));
             _userlineTweet.Execute(insertOperation);
 
             //insert into QueueMessage
@@ -101,7 +101,7 @@ namespace MSGorilla.Library
             _userlineTweet.Execute(updateOperation);
         }
 
-        public void SpreadTweet(Tweet tweet)
+        public void SpreadTweet(Message tweet)
         {
             List<UserProfile> followers = _accManager.Followers(tweet.User);
             //speed tweet to followers
@@ -109,7 +109,7 @@ namespace MSGorilla.Library
             //todo: BatchInsert
             foreach (UserProfile user in followers)
             {
-                HomeLineTweetEntity entity = new HomeLineTweetEntity(user.Userid, tweet);
+                HomeLineEntity entity = new HomeLineEntity(user.Userid, tweet);
                 TableOperation insertOperation = TableOperation.Insert(entity);
                 _homelineTweet.Execute(insertOperation);
             }
@@ -120,8 +120,8 @@ namespace MSGorilla.Library
                                 string toUser, 
                                 string content, 
                                 DateTime timestamp,
-                                string originTweetUser, 
-                                string originTweetID)
+                                string originMessageUser, 
+                                string originMessageID)
         {
             if (_accManager.FindUser(fromUser) == null)
             {
@@ -131,21 +131,22 @@ namespace MSGorilla.Library
             {
                 throw new UserNotFoundException(toUser);
             }
-            if (_accManager.FindUser(originTweetUser) == null)
+            if (_accManager.FindUser(originMessageUser) == null)
             {
-                throw new UserNotFoundException(originTweetUser);
+                throw new UserNotFoundException(originMessageUser);
             }
 
-            TableOperation retreiveOperation = TableOperation.Retrieve<UserLineTweetEntity>(originTweetUser, originTweetID);
+            string pk = Message.ToMessagePK(originMessageUser, originMessageID);
+            TableOperation retreiveOperation = TableOperation.Retrieve<UserLineEntity>(pk, originMessageID);
             TableResult retreiveResult = _userlineTweet.Execute(retreiveOperation);
-            UserLineTweetEntity originTweet = ((UserLineTweetEntity)retreiveResult.Result);
+            UserLineEntity originTweet = ((UserLineEntity)retreiveResult.Result);
 
             if (originTweet == null)
             {
                 throw new TweetNotFoundException();
             }
 
-            Reply reply = new Reply(fromUser, toUser, content, timestamp, originTweetUser, originTweetID);
+            Reply reply = new Reply(fromUser, toUser, content, timestamp, originMessageUser, originMessageID);
             //insert reply
             ReplyEntity replyEntity = new ReplyEntity(reply);
             TableOperation insertOperation = TableOperation.Insert(replyEntity);

@@ -81,56 +81,57 @@ namespace MSGorilla.Library
             return query;
         } 
 
-        public List<Tweet> UserLine(string userid, DateTime before, DateTime after)
+        public List<Message> UserLine(string userid, DateTime before, DateTime after)
         {
-            TableQuery<UserLineTweetEntity> rangeQuery =
-                new TableQuery<UserLineTweetEntity>().Where(
+            TableQuery<UserLineEntity> rangeQuery =
+                new TableQuery<UserLineEntity>().Where(
                     GenerateTimestampConditionQuery(userid, before, after)
                 );
 
-            List<Tweet> tweets = new List<Tweet>();
-            foreach (UserLineTweetEntity entity in _userlineTweet.ExecuteQuery(rangeQuery))
+            List<Message> tweets = new List<Message>();
+            foreach (UserLineEntity entity in _userlineTweet.ExecuteQuery(rangeQuery))
             {
-                tweets.Add(JsonConvert.DeserializeObject<Tweet>(entity.TweetContent));
+                tweets.Add(JsonConvert.DeserializeObject<Message>(entity.TweetContent));
             }
             return tweets;
         }
 
-        public List<Tweet> UserLine(string userid)
+        public List<Message> UserLine(string userid)
         {
             return UserLine(userid, DateTime.UtcNow, DateTime.UtcNow.AddDays(0 - DefaultTimelineQueryDayRange));
         }
 
-        public List<Tweet> HomeLine(string userid, DateTime before, DateTime after)
+        public List<Message> HomeLine(string userid, DateTime before, DateTime after)
         {
-            TableQuery<HomeLineTweetEntity> rangeQuery =
-                new TableQuery<HomeLineTweetEntity>().Where(
+            TableQuery<HomeLineEntity> rangeQuery =
+                new TableQuery<HomeLineEntity>().Where(
                     GenerateTimestampConditionQuery(userid, before, after)
                 );
 
-            List<Tweet> tweets = new List<Tweet>();
-            foreach (HomeLineTweetEntity entity in _homelineTweet.ExecuteQuery(rangeQuery))
+            List<Message> tweets = new List<Message>();
+            foreach (HomeLineEntity entity in _homelineTweet.ExecuteQuery(rangeQuery))
             {
-                tweets.Add(JsonConvert.DeserializeObject<Tweet>(entity.TweetContent));
+                tweets.Add(JsonConvert.DeserializeObject<Message>(entity.MessageContent));
             }
             return tweets;
         }
 
-        public List<Tweet> HomeLine(string userid)
+        public List<Message> HomeLine(string userid)
         {
             return HomeLine(userid, DateTime.UtcNow, DateTime.UtcNow.AddDays(0 - DefaultTimelineQueryDayRange));
         }
 
-        public TweetDetail GetMessageDetail(string userid, string tweetID)
+        public MessageDetail GetMessageDetail(string userid, string messageID)
         {
-            TableOperation retrieveOperation = TableOperation.Retrieve<UserLineTweetEntity>(userid, tweetID);
+            string pk = Message.ToMessagePK(userid, messageID);
+            TableOperation retrieveOperation = TableOperation.Retrieve<UserLineEntity>(pk, messageID);
 
-            TweetDetail tweet = null;
+            MessageDetail tweet = null;
             TableResult retrievedResult = _userlineTweet.Execute(retrieveOperation);
             if (retrievedResult.Result != null)
             {
-                UserLineTweetEntity entity = (UserLineTweetEntity)retrievedResult.Result;
-                tweet = new TweetDetail(JsonConvert.DeserializeObject<Tweet>(entity.TweetContent));
+                UserLineEntity entity = (UserLineEntity)retrievedResult.Result;
+                tweet = new MessageDetail(JsonConvert.DeserializeObject<Message>(entity.TweetContent));
                 tweet.ReplyCount = entity.ReplyCount;
                 tweet.RetweetCount = entity.RetweetCount;
                 tweet.Replies = GetAllReplies(entity.RowKey);
