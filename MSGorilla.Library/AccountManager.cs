@@ -127,14 +127,25 @@ namespace MSGorilla.Library
             return _accountCtx.Users.SqlQuery(
                 @"select FollowingUserid as Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from (
 	                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from 
-		                [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[Subscription] f
+		                Subscription f
 		                join
-		                [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[UserProfile] u
+		                UserProfile u
 		                on f.FollowingUserid = u.Userid 
 		                ) ff 
 	                where ff.userid = {0}",
                     new object[] { userid }
                 ).ToList();
+//            return _accountCtx.Users.SqlQuery(
+//                @"select FollowingUserid as Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from (
+//	                            select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from 
+//		                            [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[Subscription] f
+//		                            join
+//		                            [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[UserProfile] u
+//		                            on f.FollowingUserid = u.Userid 
+//		                            ) ff 
+//	                            where ff.userid = {0}",
+//                    new object[] { userid }
+//                ).ToList();
         }
 
         public List<UserProfile> Followers(string userid)
@@ -148,14 +159,25 @@ namespace MSGorilla.Library
             return _accountCtx.Users.SqlQuery(
                 @"select Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from (
 		                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from 
-			                [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[Subscription] f
+			                Subscription f
 			                join
-			                [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[UserProfile] u
+			                UserProfile u
 			                on f.Userid = u.Userid 
 	                ) ff 
 	                where ff.FollowingUserid = {0}",
                     new object[] { userid }
                 ).ToList();
+//            return _accountCtx.Users.SqlQuery(
+//                @"select Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from (
+//		                            select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from 
+//			                            [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[Subscription] f
+//			                            join
+//			                            [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[UserProfile] u
+//			                            on f.Userid = u.Userid 
+//	                            ) ff 
+//	                            where ff.FollowingUserid = {0}",
+//                    new object[] { userid }
+//                ).ToList();
         }
     }
 }
