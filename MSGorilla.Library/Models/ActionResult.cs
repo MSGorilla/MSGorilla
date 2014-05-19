@@ -23,7 +23,7 @@ namespace MSGorilla.Library.Models
             Message = message;
         }
 
-        public ActionResult(TwitterBaseException e){
+        public ActionResult(MSGorillaBaseException e){
             ActionResultCode = e.Code;
             Message = e.Message;
         }

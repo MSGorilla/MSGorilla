@@ -7,13 +7,13 @@ namespace MSGorilla.Library.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.0-30225")]
-    public sealed partial class add_schema : IMigrationMetadata
+    public sealed partial class initialCreate : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(add_schema));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(initialCreate));
         
         string IMigrationMetadata.Id
         {
-            get { return "201405160901559_add_schema"; }
+            get { return "201405190317263_initialCreate"; }
         }
         
         string IMigrationMetadata.Source

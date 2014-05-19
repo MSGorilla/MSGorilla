@@ -23,33 +23,37 @@ namespace MSGorilla.Library
     public class MessageManager
     {
         private const int DefaultTimelineQueryDayRange = 3;
-        private CloudTable _homelineTweet;
-        private CloudTable _userlineTweet;
+        private CloudTable _homeline;
+        private CloudTable _userline;
+        private CloudTable _eventline;
+        private CloudTable _publicSquareLine;
         private CloudTable _reply;
 
         public MessageManager()
         {
-            _homelineTweet = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Homeline);
-            _userlineTweet = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Userline);
+            _homeline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Homeline);
+            _userline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Userline);
+            _eventline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.EventLine);
+            _publicSquareLine = AzureFactory.GetTable(AzureFactory.MSGorillaTable.PublicSquareLine);
             _reply = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Reply);
         }
 
-        static string GenerateTimestampConditionQuery(string userid, DateTime before, DateTime after)
+        static string GenerateTimestampConditionQuery(string userid, DateTime start, DateTime end)
         {
-            if (before == null)
+            if (end == null)
             {
-                before = DateTime.UtcNow;
+                end = DateTime.UtcNow;
             }
 
-            if (after == null)
+            if (start == null)
             {
-                after = before.AddDays(0 - DefaultTimelineQueryDayRange);
+                start = end.AddDays(0 - DefaultTimelineQueryDayRange);
             }
 
             string query = TableQuery.GenerateFilterCondition(
                 "PartitionKey", 
-                QueryComparisons.LessThanOrEqual, 
-                string.Format("{0}_{1}", userid, Utils.ToAzureStorageDayBasedString(before)));
+                QueryComparisons.LessThan, 
+                string.Format("{0}_{1}", userid, Utils.NextKeyString(Utils.ToAzureStorageDayBasedString(end))));
 
             query = TableQuery.CombineFilters(
                 query,
@@ -57,7 +61,7 @@ namespace MSGorilla.Library
                 TableQuery.GenerateFilterCondition(
                     "PartitionKey",
                     QueryComparisons.GreaterThanOrEqual,
-                    string.Format("{0}_{1}", userid, Utils.ToAzureStorageDayBasedString(after)))
+                    string.Format("{0}_{1}", userid, Utils.ToAzureStorageDayBasedString(start)))
             );
 
             query = TableQuery.CombineFilters(
@@ -66,7 +70,7 @@ namespace MSGorilla.Library
                 TableQuery.GenerateFilterCondition(
                     "RowKey",
                     QueryComparisons.LessThan,
-                    Utils.ToAzureStorageSecondBasedString(before))
+                    Utils.NextKeyString(Utils.ToAzureStorageSecondBasedString(end)))
             );
 
             query = TableQuery.CombineFilters(
@@ -75,51 +79,136 @@ namespace MSGorilla.Library
                 TableQuery.GenerateFilterCondition(
                     "RowKey",
                     QueryComparisons.GreaterThan,
-                    Utils.ToAzureStorageSecondBasedString(after))
+                    Utils.ToAzureStorageSecondBasedString(start))
             );
 
             return query;
-        } 
+        }
 
-        public List<Message> UserLine(string userid, DateTime before, DateTime after)
+        public List<Message> UserLine(string userid, DateTime start, DateTime end)
         {
             TableQuery<UserLineEntity> rangeQuery =
                 new TableQuery<UserLineEntity>().Where(
-                    GenerateTimestampConditionQuery(userid, before, after)
+                    GenerateTimestampConditionQuery(userid, start, end)
                 );
 
-            List<Message> tweets = new List<Message>();
-            foreach (UserLineEntity entity in _userlineTweet.ExecuteQuery(rangeQuery))
+            List<Message> msgs = new List<Message>();
+            foreach (UserLineEntity entity in _userline.ExecuteQuery(rangeQuery))
             {
-                tweets.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
-            return tweets;
+            msgs.Reverse();
+            return msgs;
         }
 
-        public List<Message> UserLine(string userid)
-        {
-            return UserLine(userid, DateTime.UtcNow, DateTime.UtcNow.AddDays(0 - DefaultTimelineQueryDayRange));
-        }
+        //public List<Message> UserLine(string userid)
+        //{
+        //    return UserLine(userid, DateTime.UtcNow, DateTime.UtcNow.AddDays(0 - DefaultTimelineQueryDayRange));
+        //}
 
-        public List<Message> HomeLine(string userid, DateTime before, DateTime after)
+        public List<Message> HomeLine(string userid, DateTime start, DateTime end)
         {
             TableQuery<HomeLineEntity> rangeQuery =
                 new TableQuery<HomeLineEntity>().Where(
-                    GenerateTimestampConditionQuery(userid, before, after)
+                    GenerateTimestampConditionQuery(userid, start, end)
                 );
 
-            List<Message> tweets = new List<Message>();
-            foreach (HomeLineEntity entity in _homelineTweet.ExecuteQuery(rangeQuery))
+            List<Message> msgs = new List<Message>();
+            foreach (HomeLineEntity entity in _homeline.ExecuteQuery(rangeQuery))
             {
-                tweets.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
-            return tweets;
+            msgs.Reverse();
+            return msgs;
         }
 
-        public List<Message> HomeLine(string userid)
+        //public List<Message> HomeLine(string userid)
+        //{
+        //    return HomeLine(userid, DateTime.UtcNow, DateTime.UtcNow.AddDays(0 - DefaultTimelineQueryDayRange));
+        //}
+
+        public List<Message> EventLine(string eventID)
         {
-            return HomeLine(userid, DateTime.UtcNow, DateTime.UtcNow.AddDays(0 - DefaultTimelineQueryDayRange));
+            string query = TableQuery.GenerateFilterCondition(
+                "PartitionKey",
+                QueryComparisons.LessThan,
+                Utils.NextKeyString(eventID));
+
+            query = TableQuery.CombineFilters(
+                query,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition(
+                    "PartitionKey",
+                    QueryComparisons.GreaterThanOrEqual,
+                    eventID
+                )
+            );
+
+            TableQuery<EventLineEntity> rangeQuery = new TableQuery<EventLineEntity>().Where(query);
+
+            List<Message> msgs = new List<Message>();
+            foreach (EventLineEntity entity in _eventline.ExecuteQuery(rangeQuery))
+            {
+                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+            }
+            msgs.Reverse();
+            return msgs;
         }
+
+        public List<Message> PublicSquareLine(DateTime start, DateTime end)
+        {
+            if (end == null)
+            {
+                end = DateTime.UtcNow;
+            }
+            if (start == null)
+            {
+                start = end.AddDays(0 - 1);
+            }
+
+            string query = TableQuery.GenerateFilterCondition(
+                "PartitionKey",
+                QueryComparisons.LessThan,
+                Utils.NextKeyString(Utils.ToAzureStorageDayBasedString(end)));
+
+            query = TableQuery.CombineFilters(
+                query,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition(
+                    "PartitionKey",
+                    QueryComparisons.GreaterThanOrEqual,
+                    Utils.ToAzureStorageDayBasedString(start))
+            );
+
+            query = TableQuery.CombineFilters(
+                query,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition(
+                    "RowKey",
+                    QueryComparisons.LessThan,
+                    Utils.NextKeyString(Utils.ToAzureStorageSecondBasedString(end)))
+            );
+
+            query = TableQuery.CombineFilters(
+                query,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition(
+                    "RowKey",
+                    QueryComparisons.GreaterThanOrEqual,
+                    Utils.ToAzureStorageSecondBasedString(start))
+            );
+
+            TableQuery<PublicSquareLineEntity> rangeQuery = new TableQuery<PublicSquareLineEntity>().Where(query);
+
+            List<Message> msgs = new List<Message>();
+            foreach (PublicSquareLineEntity entity in  _publicSquareLine.ExecuteQuery(rangeQuery))
+            {
+                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+            }
+            msgs.Reverse();
+            return msgs;
+        }
+
 
         public MessageDetail GetMessageDetail(string userid, string messageID)
         {
@@ -127,7 +216,7 @@ namespace MSGorilla.Library
             TableOperation retrieveOperation = TableOperation.Retrieve<UserLineEntity>(pk, messageID);
 
             MessageDetail msg = null;
-            TableResult retrievedResult = _userlineTweet.Execute(retrieveOperation);
+            TableResult retrievedResult = _userline.Execute(retrieveOperation);
             if (retrievedResult.Result != null)
             {
                 UserLineEntity entity = (UserLineEntity)retrievedResult.Result;
@@ -139,9 +228,9 @@ namespace MSGorilla.Library
             return msg;
         }
 
-        public List<Reply> GetAllReplies(string tweetID)
+        public List<Reply> GetAllReplies(string msgID)
         {
-            TableQuery<ReplyEntity> query = new TableQuery<ReplyEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, tweetID));
+            TableQuery<ReplyEntity> query = new TableQuery<ReplyEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, msgID));
 
             List<Reply> replies = new List<Reply>();
             // Print the fields for each customer.

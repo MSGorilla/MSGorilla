@@ -3,10 +3,19 @@ namespace MSGorilla.Library.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class initialcreate : DbMigration
+    public partial class initialCreate : DbMigration
     {
         public override void Up()
         {
+            CreateTable(
+                "dbo.Schema",
+                c => new
+                    {
+                        SchemaID = c.String(nullable: false, maxLength: 128),
+                        SchemaContent = c.String(),
+                    })
+                .PrimaryKey(t => t.SchemaID);
+            
             CreateTable(
                 "dbo.Subscription",
                 c => new
@@ -42,6 +51,7 @@ namespace MSGorilla.Library.Migrations
             DropIndex("dbo.Subscription", new[] { "Userid" });
             DropTable("dbo.UserProfile");
             DropTable("dbo.Subscription");
+            DropTable("dbo.Schema");
         }
     }
 }

@@ -11,6 +11,8 @@ Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "MSGorilla.Azure", "MSGorill
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.Woker", "MSGorilla.Woker\MSGorilla.Woker.csproj", "{A054E07C-849A-44A4-9300-FF892E2F4479}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{FD75AC46-5E4A-42A6-BB46-4BE66E7EE31A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{A054E07C-849A-44A4-9300-FF892E2F4479}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A054E07C-849A-44A4-9300-FF892E2F4479}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A054E07C-849A-44A4-9300-FF892E2F4479}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD75AC46-5E4A-42A6-BB46-4BE66E7EE31A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD75AC46-5E4A-42A6-BB46-4BE66E7EE31A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD75AC46-5E4A-42A6-BB46-4BE66E7EE31A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD75AC46-5E4A-42A6-BB46-4BE66E7EE31A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

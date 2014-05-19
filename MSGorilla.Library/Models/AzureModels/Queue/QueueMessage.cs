@@ -11,7 +11,7 @@ namespace MSGorilla.Library.Models.AzureModels
 {
     public class QueueMessage
     {
-        public const string TypeTweet = "tweet";
+        public const string TypeMessage = "tweet";
         public const string TypeReply = "reply";
 
         public QueueMessage(string type, string content)

@@ -70,7 +70,7 @@ namespace MSGorilla.WebApi
             return u;            
         }
 
-        [HttpGet]
+        [HttpGet, HttpPost]
         public async Task<ActionResult> Follow(string userid)
         {
             string me = whoami();
@@ -86,10 +86,10 @@ namespace MSGorilla.WebApi
             {
                 return new ActionResult();
             }
-            return new TwitterBaseException().toActionResult();
+            return new MSGorillaBaseException().toActionResult();
         }
 
-        [HttpGet]
+        [HttpGet, HttpPost]
         public async Task<ActionResult> UnFollow(string userid)
         {
             string me = whoami();
@@ -105,7 +105,7 @@ namespace MSGorilla.WebApi
             {
                 return new ActionResult();
             }
-            return new TwitterBaseException().toActionResult();
+            return new MSGorillaBaseException().toActionResult();
         }
 
         [HttpGet]

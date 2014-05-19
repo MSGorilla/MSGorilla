@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Microsoft.WindowsAzure.Storage.Queue;
 
 namespace MSGorilla.Library.Models
 {
@@ -36,6 +37,11 @@ namespace MSGorilla.Library.Models
         public static string ToMessagePK(string userid, string messageID)
         {
             return string.Format("{0}_{1}", userid, messageID.Substring(0, 8));
+        }
+
+        public CloudQueueMessage toAzureCloudQueueMessage()
+        {
+            return new CloudQueueMessage(JsonConvert.SerializeObject(this));
         }
     }
 }

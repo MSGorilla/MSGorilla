@@ -7,12 +7,12 @@ using MSGorilla.Library.Models;
 
 namespace MSGorilla.Library.Exceptions
 {
-    public class TwitterBaseException : System.Exception
+    public class MSGorillaBaseException : System.Exception
     {
         public string Description { get; set; }
         public int Code { get; set; }
 
-        public TwitterBaseException()
+        public MSGorillaBaseException()
         {
             Description = "Unknown Exception.";
             Code = 1000;
@@ -24,7 +24,7 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
-    public class UserNotFoundException : TwitterBaseException
+    public class UserNotFoundException : MSGorillaBaseException
     {
         public UserNotFoundException(string userid)
         {
@@ -33,7 +33,7 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
-    public class UserAlreadyExistException : TwitterBaseException
+    public class UserAlreadyExistException : MSGorillaBaseException
     {
         public UserAlreadyExistException(string userid)
         {
@@ -42,7 +42,7 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
-    public class LoginFailException : TwitterBaseException
+    public class LoginFailException : MSGorillaBaseException
     {
         public LoginFailException()
         {
@@ -51,7 +51,7 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
-    public class AccessDenyException : TwitterBaseException
+    public class AccessDenyException : MSGorillaBaseException
     {
         public AccessDenyException()
         {
@@ -60,7 +60,7 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
-    public class MessageTooLongException : TwitterBaseException
+    public class MessageTooLongException : MSGorillaBaseException
     {
         public MessageTooLongException()
         {
@@ -69,21 +69,38 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
-    public class MessageNotFoundException : TwitterBaseException
+    public class MessageNotFoundException : MSGorillaBaseException
     {
         public MessageNotFoundException()
         {
-            Description = "The specified tweed doesn't exist.";
+            Description = "The specified message doesn't exist.";
             Code = 3002;
         }
     }
 
-    public class RetweetARetweetException : TwitterBaseException
+    //public class RetweetARetweetException : TwitterBaseException
+    //{
+    //    public RetweetARetweetException()
+    //    {
+    //        Description = "Can't retweet a retweet.";
+    //        Code = 3003;
+    //    }
+    //}
+    public class SchemaNotFoundException : MSGorillaBaseException
     {
-        public RetweetARetweetException()
+        public SchemaNotFoundException()
         {
-            Description = "Can't retweet a retweet.";
-            Code = 3003;
+            Description = "The specified schema doesn't exist.";
+            Code = 4001;
+        }
+    }
+
+    public class SchemaAlreadyExistException : MSGorillaBaseException
+    {
+        public SchemaAlreadyExistException()
+        {
+            Description = "The specified schema already exists. Change the schema ID";
+            Code = 4002;
         }
     }
 }

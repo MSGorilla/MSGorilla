@@ -15,7 +15,7 @@ namespace MSGorilla.Library.Models.AzureModels
         public ReplyEntity() { }
         public ReplyEntity(Reply reply)
         {
-            this.PartitionKey = reply.TweetID;
+            this.PartitionKey = reply.MessageID;
             this.RowKey = string.Format("{0}_{1}", 
                 Utils.ToAzureStorageSecondBasedString(reply.PostTime.ToUniversalTime()),
                 Guid.NewGuid().ToString());

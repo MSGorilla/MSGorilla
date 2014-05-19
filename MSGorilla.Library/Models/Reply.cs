@@ -13,17 +13,17 @@ namespace MSGorilla.Library.Models
         public string ToUser { get; set; }
         public string Message { get; set; }
         public DateTime PostTime { get; set; }
-        public string TweetUser { get; set; }
-        public string TweetID { get; set; }
+        public string MessageUser { get; set; }
+        public string MessageID { get; set; }
 
-        public Reply(string fromUser, string toUser, string message, DateTime timestamp, string tweetUser, string tweetID)
+        public Reply(string fromUser, string toUser, string message, DateTime timestamp, string messageUser, string messageID)
         {
             FromUser = fromUser;
             ToUser = toUser;
             Message = message;
             PostTime = timestamp.ToUniversalTime();
-            TweetUser = tweetUser;
-            TweetID = tweetID;
+            MessageUser = messageUser;
+            MessageID = messageID;
         }
         public string toJsonString(){
             return JsonConvert.SerializeObject(this);

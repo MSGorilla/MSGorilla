@@ -41,14 +41,14 @@ namespace MSGorilla.Woker
                         message = _queue.GetMessage();
                     }
                     _queue.UpdateMessage(message,
-                        TimeSpan.FromSeconds(600.0),  // Make it visible immediately.
+                        TimeSpan.FromSeconds(60.0),  // Make it visible immediately.
                         MessageUpdateFields.Visibility);
 
-                    QueueMessage mess = JsonConvert.DeserializeObject<QueueMessage>(message.AsString);
-                    string content = (string)mess.Content;
-                    Message tweet = JsonConvert.DeserializeObject<Message>(content);
+                    Message msg = JsonConvert.DeserializeObject<Message>(message.AsString);
+                    //string content = (string)mess.Content;
+                    //Message tweet = JsonConvert.DeserializeObject<Message>(content);
 
-                    manager.SpreadTweet(tweet);
+                    manager.SpreadMessage(msg);
                     _queue.DeleteMessage(message);
                 }
                 catch (Exception e)

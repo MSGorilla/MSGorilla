@@ -21,43 +21,60 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public List<Message> UserLine()
         {
-            return _messageManager.UserLine(whoami());
+            return _messageManager.UserLine(whoami(), DateTime.UtcNow.AddDays(-3), DateTime.UtcNow);
         }
         [HttpGet]
-        public List<Message> UserLine(DateTime before, DateTime after)
+        public List<Message> UserLine(DateTime end, DateTime start)
         {
-            return _messageManager.UserLine(whoami(), before, after);
+            return _messageManager.UserLine(whoami(), end, start);
         }
 
         [HttpGet]
         public List<Message> UserLine(string userid)
         {
             string me = whoami();
-            return _messageManager.UserLine(userid);
+            return _messageManager.UserLine(userid, DateTime.UtcNow.AddDays(-3), DateTime.UtcNow);
         }
         [HttpGet]
-        public List<Message> UserLine(string userid, DateTime before, DateTime after)
+        public List<Message> UserLine(string userid, DateTime end, DateTime start)
         {
             string me = whoami();
-            return _messageManager.UserLine(userid, before, after);
+            return _messageManager.UserLine(userid, end, start);
         }
 
         [HttpGet]
         public List<Message> HomeLine()
         {
-            return _messageManager.HomeLine(whoami());
+            return _messageManager.HomeLine(whoami(), DateTime.UtcNow.AddDays(-3), DateTime.UtcNow);
         }
         [HttpGet]
-        public List<Message> HomeLine(DateTime before, DateTime after)
+        public List<Message> HomeLine(DateTime end, DateTime start)
         {
-            return _messageManager.HomeLine(whoami(), before, after);
+            return _messageManager.HomeLine(whoami(), start, end);
         }
         [HttpGet]
-        public MessageDetail GetMessage(string userid, string tweetID)
+        public List<Message> EventLine(string eventID)
         {
-            return _messageManager.GetMessageDetail(userid, tweetID);
+            return _messageManager.EventLine(eventID);
         }
         [HttpGet]
+        public List<Message> PublicSquareLine(DateTime start, DateTime end)
+        {
+            return _messageManager.PublicSquareLine(start, end);
+        }
+        [HttpGet]
+        public List<Message> PublicSquareLine()
+        {
+            DateTime end = DateTime.UtcNow;
+            DateTime start = end.AddDays(-1);
+            return _messageManager.PublicSquareLine(start, end);
+        }
+        [HttpGet]
+        public MessageDetail GetMessage(string userid, string messageID)
+        {
+            return _messageManager.GetMessageDetail(userid, messageID);
+        }
+        [HttpGet, HttpPost]
         public ActionResult PostMessage(string eventID, string schemaID, string message)
         {
             _postManager.PostMessage(whoami(), eventID, schemaID, message, DateTime.UtcNow);
@@ -71,7 +88,7 @@ namespace MSGorilla.WebApi
         //    return new ActionResult();
         //}
 
-        [HttpGet]
+        [HttpGet, HttpPost]
         public ActionResult PostReply(string to, string message, string messageUser, string messageID)
         {
             _postManager.PostReply(whoami(), to, message, DateTime.UtcNow, messageUser, messageID);

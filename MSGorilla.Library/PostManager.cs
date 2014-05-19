@@ -33,6 +33,7 @@ namespace MSGorilla.Library
         private CloudTable _replyNotification;
 
         private AccountManager _accManager;
+        private SchemaManager _schemaManager;
 
         public PostManager(){
             _queue = AzureFactory.GetQueue();
@@ -44,6 +45,7 @@ namespace MSGorilla.Library
             _replyNotification = AzureFactory.GetTable(AzureFactory.MSGorillaTable.ReplyNotification);
 
             _accManager = new AccountManager();
+            _schemaManager = new SchemaManager();
         }
 
         public void PostMessage(string userid, string eventID, string schemaID, string message, DateTime timestamp)
@@ -57,6 +59,10 @@ namespace MSGorilla.Library
                 throw new UserNotFoundException(userid);
             }
 
+            if (!_schemaManager.Contain(schemaID))
+            {
+                throw new SchemaNotFoundException();
+            }
 
             Message msg = new Message(userid, message, timestamp, eventID, schemaID);
             //insert into Userline
@@ -72,8 +78,8 @@ namespace MSGorilla.Library
             _publicSquareline.Execute(insertOperation);
 
             //insert into QueueMessage
-            QueueMessage queueMessage = new QueueMessage(QueueMessage.TypeTweet, msg.ToJsonString());
-            _queue.AddMessage(queueMessage.toAzureCloudQueueMessage());
+            //QueueMessage queueMessage = new QueueMessage(QueueMessage.TypeMessage, msg.ToJsonString());
+            _queue.AddMessage(msg.toAzureCloudQueueMessage());
         }
 
         //public void PostRetweet(string userid, string originTweetUser, string originTweetID, DateTime timestamp)
@@ -113,15 +119,16 @@ namespace MSGorilla.Library
         //    _userline.Execute(updateOperation);
         //}
 
-        public void SpreadTweet(Message tweet)
+        public void SpreadMessage(Message message)
         {
-            List<UserProfile> followers = _accManager.Followers(tweet.User);
+            List<UserProfile> followers = _accManager.Followers(message.User);
+            followers.Add(_accManager.FindUser(message.User));
             //speed tweet to followers
 
             //todo: BatchInsert
             foreach (UserProfile user in followers)
             {
-                HomeLineEntity entity = new HomeLineEntity(user.Userid, tweet);
+                HomeLineEntity entity = new HomeLineEntity(user.Userid, message);
                 TableOperation insertOperation = TableOperation.Insert(entity);
                 _homeline.Execute(insertOperation);
             }
@@ -169,14 +176,14 @@ namespace MSGorilla.Library
             TableOperation updateOperation = TableOperation.Replace(originMsg);
             _userline.Execute(updateOperation);
 
-            //notif user as well as the tweet publisher
+            //notif user as well as the message publisher
             ReplyNotificationEntifity notifUserEntity = new ReplyNotificationEntifity(reply);
             TableBatchOperation batchInsert = new TableBatchOperation();
             batchInsert.Insert(notifUserEntity);
-            if (!reply.ToUser.Equals(reply.TweetUser))
+            if (!reply.ToUser.Equals(reply.MessageUser))
             {
-                ReplyNotificationEntifity notifTweetPublisherEntity = new ReplyNotificationEntifity(reply.TweetUser, reply);
-                batchInsert.Insert(notifTweetPublisherEntity);
+                ReplyNotificationEntifity notifMsgPublisherEntity = new ReplyNotificationEntifity(reply.MessageUser, reply);
+                batchInsert.Insert(notifMsgPublisherEntity);
             }            
             _replyNotification.ExecuteBatch(batchInsert);
         }

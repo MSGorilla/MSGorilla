@@ -46,5 +46,29 @@ namespace MSGorilla.Library
         {
             return timestamp.ToUniversalTime().ToString("yyyyMMdd");
         }
+
+        public static string NextKeyString(string current)
+        {
+            if (string.IsNullOrEmpty(current))
+            {
+                return "";
+            }
+
+            char[] array = current.ToCharArray();
+            array[array.Length - 1]++;
+            return new string(array);
+        }
+
+
+        //todo ID checker
+        //public static bool IsValidID(string id)
+        //{
+        //    if (string.IsNullOrEmpty(id))
+        //    {
+        //        return false;
+        //    }
+
+        //    id.con
+        //}
     }
 }

@@ -20,13 +20,13 @@ namespace MSGorilla.Filters
 
             Exception e = actionExecutedContext.Exception;
             ActionResult result;
-            if (e is TwitterBaseException)
+            if (e is MSGorillaBaseException)
             {
-                result = ((TwitterBaseException)e).toActionResult();
+                result = ((MSGorillaBaseException)e).toActionResult();
             }
             else
             {
-                result = new TwitterBaseException().toActionResult();
+                result = new MSGorillaBaseException().toActionResult();
                 Trace.TraceError("Server internal error.", e);
             }
 

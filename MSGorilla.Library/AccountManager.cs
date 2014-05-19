@@ -127,9 +127,9 @@ namespace MSGorilla.Library
             return _accountCtx.Users.SqlQuery(
                 @"select FollowingUserid as Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from (
 	                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from 
-		                [MSGorilla.Library.Models.SqlModels.AccountContext].[dbo].[Friendship] f
+		                [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[Subscription] f
 		                join
-		                [MSGorilla.Library.Models.SqlModels.AccountContext].[dbo].[UserProfile] u
+		                [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[UserProfile] u
 		                on f.FollowingUserid = u.Userid 
 		                ) ff 
 	                where ff.userid = {0}",
@@ -148,9 +148,9 @@ namespace MSGorilla.Library
             return _accountCtx.Users.SqlQuery(
                 @"select Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from (
 		                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from 
-			                [MSGorilla.Library.Models.SqlModels.AccountContext].[dbo].[Friendship] f
+			                [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[Subscription] f
 			                join
-			                [MSGorilla.Library.Models.SqlModels.AccountContext].[dbo].[UserProfile] u
+			                [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[UserProfile] u
 			                on f.Userid = u.Userid 
 	                ) ff 
 	                where ff.FollowingUserid = {0}",
