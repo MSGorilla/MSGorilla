@@ -64,6 +64,11 @@ namespace MSGorilla.Library
                 throw new SchemaNotFoundException();
             }
 
+            if (!Utils.IsValidID(eventID))
+            {
+                throw new InvalidIDException("Event");
+            }
+
             Message msg = new Message(userid, message, timestamp, eventID, schemaID);
             //insert into Userline
             TableOperation insertOperation = TableOperation.Insert(new UserLineEntity(msg));
