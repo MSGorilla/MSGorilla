@@ -1,9 +1,23 @@
-﻿@*<!DOCTYPE html>
-<html>
-    <head>
-        <title></title>
-    </head>
-    <body>*@
-        <h1>@ViewBag.Message</h1>
-@*</body>
-    </html>*@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<script>
+    $(function () {
+        $.ajax({
+            type: "post",
+            url: "~/api/message/homeline",
+            dataType: "json",
+            success: function (data) {
+                $.each(data, function (index, item) {
+                    $("#userlist").append("<li>" + item.Name + "</li>");
+                })
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    });
+</script>
+<h4 >aaaaa</h4>
+<ul id="userlist"></ul>
+<h4>bbbbb</h4>
