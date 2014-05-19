@@ -47,6 +47,7 @@ namespace MSGorilla.Library
                 
                 if((count % 100) == 0){
                     _replyNotification.ExecuteBatch(batchOperation);
+                    batchOperation = new TableBatchOperation();
                     count = 0;
                 }
             }
