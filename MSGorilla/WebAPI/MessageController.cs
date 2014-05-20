@@ -74,7 +74,7 @@ namespace MSGorilla.WebApi
             return _messageManager.GetMessageDetail(userid, messageID);
         }
         [HttpGet, HttpPost]
-        public ActionResult PostMessage(string eventID, string schemaID, string message)
+        public ActionResult PostMessage(string message, string schemaID = "none", string eventID = "none")
         {
             _messageManager.PostMessage(whoami(), eventID, schemaID, message, DateTime.UtcNow);
             return new ActionResult();

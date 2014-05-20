@@ -17,6 +17,13 @@ namespace MSGorilla.Library
         public SchemaManager()
         {
             _gorillaCtx = new MSGorillaContext();
+            Schema defaultSchema = _gorillaCtx.Schemas.Find("none");
+            if (defaultSchema == null)
+            {
+                defaultSchema = new Schema("none", "");
+                _gorillaCtx.Schemas.Add(defaultSchema);
+                _gorillaCtx.SaveChanges();
+            }
         }
 
         public bool Contain(string schemaID)
