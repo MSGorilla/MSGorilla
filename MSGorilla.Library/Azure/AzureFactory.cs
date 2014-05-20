@@ -21,7 +21,8 @@ namespace MSGorilla.Library.Azure
             PublicSquareLine,
             EventLine,
             Reply,
-            ReplyNotification
+            ReplyNotification,
+            ReplyArchive
         }
 
         public const string QueueName = "messagequeue";
@@ -41,6 +42,7 @@ namespace MSGorilla.Library.Azure
             _dict.Add(MSGorillaTable.PublicSquareLine, "PublicSquareline");
             _dict.Add(MSGorillaTable.Reply, "Reply");
             _dict.Add(MSGorillaTable.ReplyNotification, "ReplyNotification");
+            _dict.Add(MSGorillaTable.ReplyArchive, "ReplyArchive");
         }
 
         public static CloudTable GetTable(MSGorillaTable table)

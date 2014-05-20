@@ -34,5 +34,10 @@ namespace MSGorilla.Library.Models.AzureModels
 
             Content = reply.toJsonString();
         }
+
+        public ReplyNotificationEntifity()
+        {
+
+        }
     }
 }

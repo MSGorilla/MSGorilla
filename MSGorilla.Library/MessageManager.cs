@@ -29,6 +29,11 @@ namespace MSGorilla.Library
         private CloudTable _publicSquareLine;
         private CloudTable _reply;
 
+        private CloudQueue _queue;
+
+        private AccountManager _accManager;
+        private SchemaManager _schemaManager;
+
         public MessageManager()
         {
             _homeline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Homeline);
@@ -36,6 +41,11 @@ namespace MSGorilla.Library
             _eventline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.EventLine);
             _publicSquareLine = AzureFactory.GetTable(AzureFactory.MSGorillaTable.PublicSquareLine);
             _reply = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Reply);
+
+            _queue = AzureFactory.GetQueue();
+
+            _accManager = new AccountManager();
+            _schemaManager = new SchemaManager();
         }
 
         static string GenerateTimestampConditionQuery(string userid, DateTime start, DateTime end)
@@ -239,6 +249,61 @@ namespace MSGorilla.Library
                 replies.Add(JsonConvert.DeserializeObject<Reply>(entity.Content));
             }
             return replies;
+        }
+
+
+        public void PostMessage(string userid, string eventID, string schemaID, string message, DateTime timestamp)
+        {
+            if (message.Length > 2048)
+            {
+                throw new MessageTooLongException();
+            }
+            if (_accManager.FindUser(userid) == null)
+            {
+                throw new UserNotFoundException(userid);
+            }
+
+            if (!_schemaManager.Contain(schemaID))
+            {
+                throw new SchemaNotFoundException();
+            }
+
+            if (!Utils.IsValidID(eventID))
+            {
+                throw new InvalidIDException("Event");
+            }
+
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID);
+            //insert into Userline
+            TableOperation insertOperation = TableOperation.Insert(new UserLineEntity(msg));
+            _userline.Execute(insertOperation);
+
+            //insert into Eventline
+            insertOperation = TableOperation.Insert(new EventLineEntity(msg));
+            _eventline.Execute(insertOperation);
+
+            //insert into PublicSquareLine
+            insertOperation = TableOperation.Insert(new PublicSquareLineEntity(msg));
+            _publicSquareLine.Execute(insertOperation);
+
+            //insert into QueueMessage
+            //QueueMessage queueMessage = new QueueMessage(QueueMessage.TypeMessage, msg.ToJsonString());
+            _queue.AddMessage(msg.toAzureCloudQueueMessage());
+        }
+
+        public void SpreadMessage(Message message)
+        {
+            List<UserProfile> followers = _accManager.Followers(message.User);
+            followers.Add(_accManager.FindUser(message.User));
+            //speed tweet to followers
+
+            //todo: BatchInsert
+            foreach (UserProfile user in followers)
+            {
+                HomeLineEntity entity = new HomeLineEntity(user.Userid, message);
+                TableOperation insertOperation = TableOperation.Insert(entity);
+                _homeline.Execute(insertOperation);
+            }
         }
     }
 }
