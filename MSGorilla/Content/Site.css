@@ -1,61 +1,97 @@
 ﻿body {
-    font-size: .85em;
-    font-family: "Segoe UI", Verdana, Helvetica, Sans-Serif;
-    color: #232323;
-    background-color: #fff;
+    padding-top: 50px;
+    padding-bottom: 20px;
 }
 
-header, footer, nav, section {
-    display: block;
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    display:block;
 }
 
-
-/* Styles for basic forms
------------------------------------------------------------*/
-fieldset {
-    border: 1px solid #ddd;
-    padding: 0 1.4em 1.4em 1.4em;
-    margin: 0 0 1.5em 0;
-}
-
-legend {
-    font-size: 1.2em;
-    font-weight: bold;
-}
-
+/* Set width on the form input elements since they're 100% wide by default */
+/*input,
+select,
 textarea {
-    min-height: 75px;
-}
+    max-width: 500px;
+}*/
 
-.editor-label {
-    margin: 1em 0 0 0;
-}
-
-.editor-field {
-    margin: 0.5em 0 0 0;
-}
-
-
-/* Styles for validation helpers
------------------------------------------------------------*/
+/* styles for validation helpers */
 .field-validation-error {
-    color: #f00;
+    color: #b94a48;
 }
 
 .field-validation-valid {
     display: none;
 }
 
-.input-validation-error {
-    border: 1px solid #f00;
-    background-color: #fee;
+input.input-validation-error {
+    border: 1px solid #b94a48;
+}
+
+input[type="checkbox"].input-validation-error {
+    border: 0 none;
 }
 
 .validation-summary-errors {
-    font-weight: bold;
-    color: #f00;
+    color: #b94a48;
 }
 
 .validation-summary-valid {
     display: none;
 }
+
+/* added */
+.main-container {
+    content:normal;
+    display:block;
+    min-height:1000px;
+}
+
+.posts-container {
+    float:left;
+    min-height:800px;
+    overflow:hidden;
+    padding-bottom:30px;
+    padding-top:30px;
+    padding-left:0px;
+    padding-right:0px;
+    width: 620px;
+    position:relative;
+}
+
+.tools-container {
+    float:right;
+    overflow:hidden;
+    padding-bottom:0px;
+    padding-top:20px;
+    padding-left:0px;
+    padding-right:0px;
+    width: 320px;
+    position:relative;
+}
+
+.posts-newpost {
+    display:block;
+}
+
+.newpost-header {
+    margin-bottom:10px;
+}
+
+.newpost-input {
+    margin-bottom:10px;
+}
+.newpost-footer {
+    text-align:right;
+}
+
+.posts-notification {
+    display: block;
+}
+
+.posts-feeds {
+    display: block;
+}
+
