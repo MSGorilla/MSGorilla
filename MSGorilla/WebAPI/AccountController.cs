@@ -64,6 +64,41 @@ namespace MSGorilla.WebApi
             return u;            
         }
 
+        [HttpGet]
+        public async Task<UserProfile> Update(string DisplayName, string Description, string portraitUrl)
+        {
+            string userid = whoami();
+            UserProfile user = _accountManager.FindUser(userid);
+            user.DisplayName = DisplayName;
+            user.Description = Description;
+            user.PortraitUrl = portraitUrl;
+            bool success = await _accountManager.UpdateUser(user);
+            if (success)
+            {
+                return user;
+            }
+            else
+            {
+                throw new MSGorillaBaseException();
+            }
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> UpdatePassword(string password)
+        {
+            UserProfile user = _accountManager.FindUser(whoami());
+            user.Password = Utils.MD5Encoding(password);
+            bool success = await _accountManager.UpdateUser(user);
+            if (success)
+            {
+                return new ActionResult();
+            }
+            else
+            {
+                throw new MSGorillaBaseException();
+            }
+        }
+
         public class RegisterModel
         {
             public string Username { get; set; }

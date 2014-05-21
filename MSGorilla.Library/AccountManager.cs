@@ -63,7 +63,7 @@ namespace MSGorilla.Library
             return  _accountCtx.Users.Find(user.Userid);
         }
 
-        public async Task<Boolean> UpdateUser(UserProfile user)
+        public async Task<bool> UpdateUser(UserProfile user)
         {
             UserProfile originUser = _accountCtx.Users.Find(user.Userid);
             if (originUser == null)
