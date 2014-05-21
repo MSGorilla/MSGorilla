@@ -40,11 +40,7 @@ namespace MSGorilla.Controllers
             return View();
         }
 
-        //public ActionResult Login()
-        //{
-        //    return View();
-        //}
-        public ActionResult Login(string userid, string password)
+        public ActionResult Login(string userid, string password = "")
         {
             try
             {

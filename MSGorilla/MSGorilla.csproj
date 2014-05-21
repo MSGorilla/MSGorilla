@@ -208,7 +208,7 @@
     <Compile Include="WebAPI\MessageController.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="WebAPI\NotificationController.cs" />
+    <Compile Include="WebAPI\ReplyController.cs" />
     <Compile Include="WebAPI\SchemaController.cs" />
   </ItemGroup>
   <ItemGroup>
