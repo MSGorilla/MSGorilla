@@ -15,8 +15,6 @@ namespace MSGorilla.Controllers
     public class HomeController : Controller
     {
         AccountManager _accManager = new AccountManager();
-        MessageManager _messageManager = new MessageManager();
-
 
         [TokenAuthAttribute]
         public ActionResult Index()

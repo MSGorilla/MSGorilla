@@ -2,188 +2,11 @@
     ViewBag.Title = "Home";
 }
 
+<script src="~/Scripts/common.js"></script>
 <script>
+    $(LoadUserInfo());
     $(LoadFeeds("homeline"));
-
-    function ShowError(msg) {
-        var msghtml = "<div class='alert alert-dismissable alert-warning'><button class='close' type='button' data-dismiss='alert'>×</button><p>" + msg + "</p></div>";
-        $("#notifications").html(msghtml);
-    }
-
-    function PostMessage(eventID, schemaID) {
-        var message = $("#textArea").val().trim();
-
-        if (message.length === 0) {
-            return;
-        }
-
-        $.ajax({
-            type: "post",
-            url: "/api/message/postmessage?" + "eventID=" + eventID + "&schemaID=" + schemaID + "&message=" + message,
-            //url: "/api/message/postmessage",
-            //data: "{ eventID: "+eventID+", schemaID: " + schemaID+", message: "+ message+" }",
-            success: function (data) {
-                var code = data.ActionResultCode;
-                var msg = data.Message;
-                if (code == "0") {
-                    $("#textArea").val("");
-                    alert(msg);
-                    LoadFeeds("homeline");
-                }
-                else {
-                    ShowError(msg);
-                }
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                ShowError(textStatus + ": " + errorThrown);
-            }
-        });
-    }
-
-    function LoadFeeds(category) {
-        $.ajax({
-            type: "get",
-            url: "/api/message/" + category,
-            dataType: "json",
-            success: function (data) {
-                if (data.length == 0) {
-                    $("#feeds").append("<span class='help-block'>No feed found.</span>");
-                }
-                else {
-                    // create feed list
-                    $("#feedlist").empty();
-                    $.each(data, function (index, item) {
-                        $("#feedlist").append(createFeed(item));
-                    })
-                }
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                ShowError(textStatus + ": " + errorThrown);
-            }
-        });
-    }
-
-    function createFeed(postData) {
-        var output = "";
-        var user = postData.User;
-        var mid = postData.ID;
-        var sid = postData.SchemaID;
-        var eid = postData.EventID;
-        var msg = postData.MessageContent;
-        var posttime = postData.PostTime;
-        var username = user;
-        var picurl = "";
-
-        $.getJSON("/api/account/User", "userid=" + user, function (data) {
-            username = data.DisplayName;
-            picurl = data.PortraitUrl;
-        });
-
-        output = "<li class='list-group-item'>" + "\n";
-        output += "  <div class='newpost-header'><a class='list-group-item-heading lead' href='/profile/index?user=" + user + "'>" + username + "</a>";
-        output += "    <small>" + posttime + "</small></div>";
-        output += "  <div class='newpost-input'><p>" + encodeHtml(msg) + "</p></div>";
-        output += "  <div class='newpost-footer'><button id='btn_reply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Comment</button></div>";
-        output += "  <div id='reply_" + mid + "'></div>";
-        output += "  <input type='hidden' id='hd_" + mid + "' value='false'/>";
-        output += "</li>";
-        return output;
-    }
-
-    function ShowReplies(user, mid) {
-        var show = $("#hd_" + mid);
-        var replydiv = $("#reply_" + mid);
-        if (show.val() == "false") {
-            // show replies
-            show.val("true");
-            // show reply
-            LoadReplies(user, mid);
-        }
-        else {
-            // clear replies
-            show.val("false");
-            replydiv.html("");
-        }
-    }
-
-    function LoadReplies(user, mid) {
-        var replydiv = $("#reply_" + mid);
-        var html = "";
-        var replies = [];
-        var mid;
-
-        $.ajax({
-            type: "get",
-            url: "/api/message/getmessage",
-            data: "userid=" + user + "&messageId=" + mid,
-            success: function (data) {
-                replies = data.Replies;
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                ShowError(textStatus + ": " + errorThrown);
-            }
-        });
-
-        html = "<div class='replies-container well'>";
-
-        // add reply box
-        html += "  <div class='input-group'>";
-        //html += "     <span class='input-group-addon'>$</span>";
-        html += "     <input class='form-control' type='text'>";
-        html += "     <span class='input-group-btn'>";
-        html += "       <button class='btn btn-default' type='button'>Reply</button>";
-        html += "     </span>";
-        html += "  </div>";
-        // add replies
-        html += "  <div class='replies-feeds'>";
-        html += "    <ul id='replylist' class='list-group'>";
-
-        $.each(replies, function (index, item) {
-            html +=createReply(item);
-        })
-
-        html += "    </ul>";
-        html += "  </div>";
-
-        html += "</div>";
-
-        replydiv.html(html);
-    }
-
-    function createReply(replyData) {
-        var output = "";
-        var user = replyData.FromUser;
-        var msg = replyData.Message;
-        var posttime = postData.PostTime;
-        var username = user;
-        var picurl = "";
-
-        $.getJSON("/api/account/User", "userid=" + user, function (data) {
-            username = data.DisplayName;
-            picurl = data.PortraitUrl;
-        });
-
-        output = "<li class='list-group-item'>" + "\n";
-        output += "  <a class='lead' href='/profile/index?user=" + user + "'>" + username + "</a>";
-        output += " : " + encodeHtml(msg) + "";
-        output += "    <small>(" + posttime + ")</small>";
-        output += "</li>";
-        return output;
-    }
-
-    function encodeHtml(code) {
-        code = code.replace(/&/mg, '&#38;');
-        code = code.replace(/</mg, '&#60;');
-        code = code.replace(/>/mg, '&#62;');
-        code = code.replace(/\"/mg, '&#34;');
-        code = code.replace(/\t/g, '  ');
-        code = code.replace(/\r?\n/g, '<br>');
-        code = code.replace(/<br><br>/g, '<br>');
-        code = code.replace(/ /g, '&nbsp;');
-        return code;
-    }
 </script>
-
 
 <div class="main-container">
     <div class="posts-container">
@@ -215,11 +38,24 @@
     </div>
 
     <div class="tools-container">
-        <div class="well">
-            Look, I'm in a well!
-            <span class="help-block">A longer block of help text that breaks onto a new line and may extend beyond one line.</span>
-            <p>following:1</p>
-            <p>follow:1</p>
+        <div class="user-container ">
+            <div class="user-info ">
+                <div>
+                    <img class="img-rounded" id="user_pic" src="/Content/Images/default_avatar.jpg" width="150" height="150" />
+                </div>
+                <div>
+                    <a class="lead" id="user_name"></a>
+                </div>
+                <div>
+                    <span id="user_id"></span>
+                </div>
+            </div>
+            <div class="user-postinfo">
+                <div class="btn-group btn-group-justified">
+                    <a class="btn btn-default">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
+                    <a class="btn btn-default">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
+                </div>
+            </div>
         </div>
     </div>
 
