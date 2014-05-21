@@ -29,7 +29,7 @@ namespace MSGorilla.WebApi
             return _replyManager.GetReplyNotif(whoami());
         }
 
-        [HttpPost]
+        [HttpGet]
         public ActionResult PostReply(string to, string message, string messageUser, string messageID)
         {
             _replyManager.PostReply(whoami(), to, message, DateTime.UtcNow, messageUser, messageID);
