@@ -24,6 +24,21 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
+    public class InvalidIDException : MSGorillaBaseException
+    {
+        public InvalidIDException()
+        {
+            Description = "Invalid ID. ID should be [0-9a-zA-Z]+ .";
+            Code = 1001;
+        }
+
+        public InvalidIDException(string type)
+        {
+            Description = string.Format("Invalid {0} ID. {0} ID should be [0-9a-zA-Z]+ .", type);
+            Code = 1001;
+        }
+    }
+
     public class UserNotFoundException : MSGorillaBaseException
     {
         public UserNotFoundException(string userid)

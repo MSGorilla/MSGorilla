@@ -15,12 +15,12 @@ namespace MSGorilla.WebApi
 {
     public class NotificationController : BaseController
     {
-        NotificationManager _notifManager = new NotificationManager();
+        //NotificationManager _notifManager = new NotificationManager();
 
-        [HttpGet]
-        public List<Reply> Replies()
-        {
-            return _notifManager.GetNewReplies(whoami());
-        }
+        //[HttpGet]
+        //public List<Reply> Replies()
+        //{
+        //    return _notifManager.GetNewReplies(whoami());
+        //}
     }
 }

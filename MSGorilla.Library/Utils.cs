@@ -61,14 +61,20 @@ namespace MSGorilla.Library
 
 
         //todo ID checker
-        //public static bool IsValidID(string id)
-        //{
-        //    if (string.IsNullOrEmpty(id))
-        //    {
-        //        return false;
-        //    }
+        public static bool IsValidID(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return false;
+            }
 
-        //    id.con
-        //}
+            for(int i = 0; i < id.Length; i++){
+                if (!char.IsLetterOrDigit(id, i))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

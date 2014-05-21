@@ -21,7 +21,8 @@ namespace MSGorilla.Library.Azure
             PublicSquareLine,
             EventLine,
             Reply,
-            ReplyNotification
+            ReplyNotification,
+            ReplyArchive
         }
 
         public const string QueueName = "messagequeue";
@@ -30,8 +31,8 @@ namespace MSGorilla.Library.Azure
         private static Dictionary<MSGorillaTable, string> _dict;
         static AzureFactory()
         {
-            string connectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
-            //string connectionString = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
+            //string connectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
+            string connectionString = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
             _storageAccount = CloudStorageAccount.Parse(connectionString);
             _dict = new Dictionary<MSGorillaTable, string>();
 
@@ -41,6 +42,7 @@ namespace MSGorilla.Library.Azure
             _dict.Add(MSGorillaTable.PublicSquareLine, "PublicSquareline");
             _dict.Add(MSGorillaTable.Reply, "Reply");
             _dict.Add(MSGorillaTable.ReplyNotification, "ReplyNotification");
+            _dict.Add(MSGorillaTable.ReplyArchive, "ReplyArchive");
         }
 
         public static CloudTable GetTable(MSGorillaTable table)

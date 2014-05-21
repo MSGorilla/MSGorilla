@@ -49,6 +49,10 @@ namespace MSGorilla.Library
 
         public async Task<UserProfile> AddUser(UserProfile user)
         {
+            if (!Utils.IsValidID(user.Userid))
+            {
+                throw new InvalidIDException("User");
+            }
             UserProfile temp = _accountCtx.Users.Find(user.Userid);
             if (temp != null)
             {
@@ -127,9 +131,9 @@ namespace MSGorilla.Library
             return _accountCtx.Users.SqlQuery(
                 @"select FollowingUserid as Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from (
 	                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from 
-		                Subscription f
+		                [Subscription] f
 		                join
-		                UserProfile u
+		                [UserProfile] u
 		                on f.FollowingUserid = u.Userid 
 		                ) ff 
 	                where ff.userid = {0}",
@@ -159,9 +163,9 @@ namespace MSGorilla.Library
             return _accountCtx.Users.SqlQuery(
                 @"select Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from (
 		                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from 
-			                Subscription f
+			                [Subscription] f
 			                join
-			                UserProfile u
+			                [UserProfile] u
 			                on f.Userid = u.Userid 
 	                ) ff 
 	                where ff.FollowingUserid = {0}",

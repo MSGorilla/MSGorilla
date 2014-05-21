@@ -16,7 +16,6 @@ namespace MSGorilla.WebApi
     public class MessageController : BaseController
     {
         MessageManager _messageManager = new MessageManager();
-        PostManager _postManager = new PostManager();
 
         [HttpGet]
         public List<Message> UserLine()
@@ -74,10 +73,11 @@ namespace MSGorilla.WebApi
         {
             return _messageManager.GetMessageDetail(userid, messageID);
         }
-        [HttpGet, HttpPost]
+
+        [HttpPost]
         public ActionResult PostMessage(string eventID, string schemaID, string message)
         {
-            _postManager.PostMessage(whoami(), eventID, schemaID, message, DateTime.UtcNow);
+            _messageManager.PostMessage(whoami(), eventID, schemaID, message, DateTime.UtcNow);
             return new ActionResult();
         }
 
@@ -87,12 +87,5 @@ namespace MSGorilla.WebApi
         //    _postManager.PostRetweet(whoami(), tweetUser, tweetID, DateTime.UtcNow);
         //    return new ActionResult();
         //}
-
-        [HttpGet, HttpPost]
-        public ActionResult PostReply(string to, string message, string messageUser, string messageID)
-        {
-            _postManager.PostReply(whoami(), to, message, DateTime.UtcNow, messageUser, messageID);
-            return new ActionResult();
-        }
     }
 }
