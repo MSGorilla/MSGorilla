@@ -278,6 +278,10 @@ namespace MSGorilla.Library
             TableOperation insertOperation = TableOperation.Insert(new UserLineEntity(msg));
             _userline.Execute(insertOperation);
 
+            //insert into owner's homeline
+            insertOperation = TableOperation.Insert(new HomeLineEntity(msg.User, msg));
+            _homeline.Execute(insertOperation);
+
             //insert into Eventline
             insertOperation = TableOperation.Insert(new EventLineEntity(msg));
             _eventline.Execute(insertOperation);
@@ -294,7 +298,7 @@ namespace MSGorilla.Library
         public void SpreadMessage(Message message)
         {
             List<UserProfile> followers = _accManager.Followers(message.User);
-            followers.Add(_accManager.FindUser(message.User));
+            //followers.Add(_accManager.FindUser(message.User));
             //speed tweet to followers
 
             //todo: BatchInsert
