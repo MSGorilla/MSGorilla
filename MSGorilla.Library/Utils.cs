@@ -11,6 +11,11 @@ namespace MSGorilla.Library
     {
         public static string MD5Encoding(string rawPass)
         {
+            if (string.IsNullOrEmpty(rawPass))
+            {
+                return "d41d8cd98f00b204e9800998ecf8427e";
+            }
+
             MD5 md5 = MD5.Create();
             byte[] bs = Encoding.UTF8.GetBytes(rawPass);
             byte[] hs = md5.ComputeHash(bs);
