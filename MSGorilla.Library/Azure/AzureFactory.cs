@@ -31,8 +31,8 @@ namespace MSGorilla.Library.Azure
         private static Dictionary<MSGorillaTable, string> _dict;
         static AzureFactory()
         {
-            //string connectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
-            string connectionString = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
+            string connectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
+            //string connectionString = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
             _storageAccount = CloudStorageAccount.Parse(connectionString);
             _dict = new Dictionary<MSGorillaTable, string>();
 
