@@ -129,8 +129,8 @@ namespace MSGorilla.Library
             }
 
             return _accountCtx.Users.SqlQuery(
-                @"select FollowingUserid as Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from (
-	                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from 
+                @"select FollowingUserid as Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from (
+	                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from 
 		                [Subscription] f
 		                join
 		                [UserProfile] u
@@ -161,8 +161,8 @@ namespace MSGorilla.Library
             }
 
             return _accountCtx.Users.SqlQuery(
-                @"select Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from (
-		                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from 
+                @"select Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from (
+		                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from 
 			                [Subscription] f
 			                join
 			                [UserProfile] u

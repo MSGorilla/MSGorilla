@@ -12,7 +12,7 @@
     <AssemblyName>MSGorilla.Azure</AssemblyName>
     <StartDevelopmentStorage>True</StartDevelopmentStorage>
     <Name>MSGorilla.Azure</Name>
-    <PackageEnableRemoteDebugger>False</PackageEnableRemoteDebugger>
+    <PackageEnableRemoteDebugger>True</PackageEnableRemoteDebugger>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,6 +40,7 @@
   <ItemGroup>
     <Folder Include="MSGorilla.WokerContent\" />
     <Folder Include="MSGorillaContent\" />
+    <Folder Include="Profiles" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="MSGorilla.WokerContent\diagnostics.wadcfg">
@@ -66,6 +67,9 @@
       <RoleName>MSGorilla</RoleName>
       <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PublishProfile Include="Profiles\MSGorillaProduction1.azurePubxml" />
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>

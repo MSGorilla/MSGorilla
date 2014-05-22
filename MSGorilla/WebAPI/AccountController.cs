@@ -154,11 +154,22 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
+        public List<UserProfile> Followings()
+        {
+            return _accountManager.Followings(whoami());
+        }
+
+        [HttpGet]
         public List<UserProfile> Followings(string userid)
         {
             return _accountManager.Followings(userid);
         }
 
+        [HttpGet]
+        public List<UserProfile> Followers()
+        {
+            return _accountManager.Followers(whoami());
+        }
         [HttpGet]
         public List<UserProfile> Followers(string userid)
         {

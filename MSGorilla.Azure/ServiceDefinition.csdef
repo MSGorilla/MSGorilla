@@ -3,6 +3,8 @@
   <WorkerRole name="MSGorilla.Woker" vmsize="Small">
     <Imports>
       <Import moduleName="Diagnostics" />
+      <Import moduleName="RemoteAccess" />
+      <Import moduleName="RemoteForwarder" />
     </Imports>
     <ConfigurationSettings>
       <Setting name="StorageConnectionString" />
@@ -17,10 +19,11 @@
       </Site>
     </Sites>
     <Endpoints>
-      <InputEndpoint name="Endpoint1" protocol="http" port="88" />
+      <InputEndpoint name="Endpoint1" protocol="http" port="80" />
     </Endpoints>
     <Imports>
       <Import moduleName="Diagnostics" />
+      <Import moduleName="RemoteAccess" />
     </Imports>
     <ConfigurationSettings>
       <Setting name="StorageConnectionString" />
