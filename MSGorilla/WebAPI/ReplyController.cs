@@ -35,5 +35,19 @@ namespace MSGorilla.WebApi
             _replyManager.PostReply(whoami(), to, message, DateTime.UtcNow, messageUser, messageID);
             return new ActionResult();
         }
+
+        public class ReplyModel
+        {
+            public string To { get; set; }
+            public string Message { get; set; }
+            public string MessageUser { get; set; }
+            public string MessageID { get; set; }
+        }
+
+        [HttpPost]
+        public ActionResult PostReply(ReplyModel reply)
+        {
+            return PostReply(reply.To, reply.Message, reply.MessageUser, reply.MessageID);
+        }
     }
 }

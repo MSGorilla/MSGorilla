@@ -31,7 +31,8 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public List<Message> UserLine(string userid)
         {
-            string me = whoami();
+            if(string.IsNullOrEmpty(userid))
+                userid = whoami();
             return _messageManager.UserLine(userid, DateTime.UtcNow.AddDays(-3), DateTime.UtcNow);
         }
         [HttpGet]
@@ -74,18 +75,42 @@ namespace MSGorilla.WebApi
             return _messageManager.GetMessageDetail(userid, messageID);
         }
 
-        [HttpPost]
-        public ActionResult PostMessage(string eventID, string schemaID, string message)
+        [HttpGet]
+        public List<Reply> GetMessageReply(string msgID)
+        {
+            return _messageManager.GetAllReplies(msgID);
+        }
+
+        [HttpGet, HttpPost]
+        public ActionResult PostMessage(string message, string schemaID = "none", string eventID = "none")
         {
             _messageManager.PostMessage(whoami(), eventID, schemaID, message, DateTime.UtcNow);
             return new ActionResult();
         }
 
-        //[HttpGet]
-        //public ActionResult PostRetweet(string tweetUser, string tweetID)
-        //{
-        //    _postManager.PostRetweet(whoami(), tweetUser, tweetID, DateTime.UtcNow);
-        //    return new ActionResult();
-        //}
+        public class MessageModel
+        {
+            public string Message { get; set; }
+            public string SchemaID { get; set; }
+            public string EventID { get; set; }
+        };
+
+        [HttpPost]
+        public ActionResult PostMessage(MessageModel msg){
+            if (string.IsNullOrEmpty(msg.Message))
+            {
+                throw new MessageNullException();
+            }
+            if (string.IsNullOrEmpty(msg.SchemaID))
+            {
+                msg.SchemaID = "none";
+            }
+            if (string.IsNullOrEmpty(msg.EventID))
+            {
+                msg.EventID = "none";
+            }
+            _messageManager.PostMessage(whoami(), msg.EventID, msg.SchemaID, msg.Message, DateTime.UtcNow);
+            return new ActionResult();
+        }
     }
 }

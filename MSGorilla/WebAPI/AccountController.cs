@@ -42,20 +42,29 @@ namespace MSGorilla.WebApi
             if (user == null)
             {
                 throw new UserNotFoundException(userid);
-                //UserProfile newuser = new UserProfile { Userid = userid, DisplayName = userid, PortraitUrl = "" };
-                //await _accountManager.AddUser(newuser);
-                //return _accountManager.FindUser(userid);
             }
             else
             {
                 return user;
-            }            
+            }
         }
 
-        
+        [HttpGet]
+        public UserProfile Me()
+        {
+            string userid = whoami();
+            var user = _accountManager.FindUser(userid);
+            if (user == null)
+            {
+                throw new UserNotFoundException(userid);
+            }
+            else
+            {
+                return user;
+            }
+        }
 
-
-        [AcceptVerbs("GET", "POST")]
+        [HttpGet]
         public async Task<object> Register(string Username, string DisplayName, string Password, string Description)
         {
             UserProfile user = new UserProfile();
@@ -70,7 +79,20 @@ namespace MSGorilla.WebApi
             return u;            
         }
 
-        [HttpGet, HttpPost]
+        public class RegisterModel
+        {
+            public string Username { get; set; }
+            public string DisplayName { get; set; }
+            public string Password { get; set; }
+            public string Description { get; set; }
+        }
+        [HttpPost]
+        public Task<object> Register(RegisterModel registerModel)
+        {
+            return Register(registerModel.Username, registerModel.DisplayName, registerModel.Password, registerModel.Description);
+        }
+
+        [HttpGet]
         public async Task<ActionResult> Follow(string userid)
         {
             string me = whoami();
@@ -89,7 +111,7 @@ namespace MSGorilla.WebApi
             return new MSGorillaBaseException().toActionResult();
         }
 
-        [HttpGet, HttpPost]
+        [HttpGet]
         public async Task<ActionResult> UnFollow(string userid)
         {
             string me = whoami();
@@ -119,34 +141,5 @@ namespace MSGorilla.WebApi
         {
             return _accountManager.Followers(userid);
         }
-
-
-        //[HttpGet]
-        //public object user()
-        //{
-        //    try
-        //    {
-        //        return db.users.ToList();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine(e.ToString());
-        //        return null;
-        //    }            
-        //}
-
-        //[HttpGet]
-        //public object user(int id)
-        //{
-        //    try
-        //    {
-        //        return db.users.Find(id);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine(e.ToString());
-        //        return null;
-        //    }
-        //}
     }
 }

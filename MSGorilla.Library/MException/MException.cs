@@ -93,6 +93,15 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
+    public class MessageNullException : MSGorillaBaseException
+    {
+        public MessageNullException()
+        {
+            Description = "Message can't be null";
+            Code = 3003;
+        }
+    }
+
     //public class RetweetARetweetException : TwitterBaseException
     //{
     //    public RetweetARetweetException()

@@ -1,6 +1,7 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
+    background-color: #eeeeee;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -54,7 +55,7 @@ input[type="checkbox"].input-validation-error {
     min-height:800px;
     overflow:hidden;
     padding-bottom:30px;
-    padding-top:30px;
+    padding-top:20px;
     padding-left:0px;
     padding-right:0px;
     width: 620px;
@@ -68,8 +69,9 @@ input[type="checkbox"].input-validation-error {
     padding-top:20px;
     padding-left:0px;
     padding-right:0px;
-    width: 320px;
+    width: 300px;
     position:relative;
+    margin-left:20px;
 }
 
 .posts-newpost {
@@ -82,6 +84,9 @@ input[type="checkbox"].input-validation-error {
 
 .newpost-input {
     margin-bottom:10px;
+    text-wrap:normal;
+    white-space:normal;
+    word-wrap:break-word;
 }
 .newpost-footer {
     text-align:right;
@@ -95,3 +100,58 @@ input[type="checkbox"].input-validation-error {
     display: block;
 }
 
+.replies-container {
+    display:block;
+
+}
+
+.replies-feeds {
+    display: block;
+}
+
+.reply-input {
+    margin-bottom:10px;
+    text-wrap:normal;
+    white-space:normal;
+    word-wrap:break-word;
+}
+
+.user-container {
+    background-color:#333333;
+}
+
+.user-info {
+    padding:15px;
+    text-align :center;
+    color:white;
+
+}
+    .user-info a {
+        color:white;
+        font-weight:bolder;
+    }
+
+.user-postinfo {
+}
+
+.feed-pic {
+    float:left;
+    padding:10px;
+}
+
+.feed-content {
+    margin-left:120px;
+    padding:10px;
+    min-height:150px;
+}
+
+.reply-pic {
+    float:left;
+    padding:5px;
+}
+
+.reply-content {
+    margin-left:70px;
+    padding:5px;
+    min-height:60px;
+}
