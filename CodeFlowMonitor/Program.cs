@@ -14,11 +14,11 @@ namespace CodeFlowMonitor
     {
         static void Main(string[] args)
         {
-            CodeFlowMonitorService service = new CodeFlowMonitorService();
-            CodeFlowMonitorService.OnTimedEvent(null, null);
+            //CodeFlowMonitorService service = new CodeFlowMonitorService();
+            //CodeFlowMonitorService.OnTimedEvent(null, null);
 
             //ServiceBase.Run(new CodeFlowMonitorService());
-            /*
+            
             GorillaWebAPI webapi = new GorillaWebAPI("CFMonitor", "User@123");
             
             //Post Message
@@ -34,7 +34,7 @@ namespace CodeFlowMonitor
             foreach (var a in webapi.HomeLine(DateTime.UtcNow.AddDays(-1), DateTime.UtcNow))
             {
                 Console.WriteLine(a.ToJsonString());
-            }*/
+            }
             
         }
     }

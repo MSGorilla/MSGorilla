@@ -3,15 +3,15 @@
   <Role name="MSGorilla.Woker">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
-      <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=msgorilla;AccountKey=f8toNh5GMBwO4oKADTElMZqeOvoTORrovoraVsx9TMbhxdszV2fRARIRMuXHe2q7WIDeZCuwpDWa5yrlj68p8Q==" />
+      <Setting name="StorageConnectionString" value="DefaultEndpointsProtocol=https;AccountName=msgorilla;AccountKey=f8toNh5GMBwO4oKADTElMZqeOvoTORrovoraVsx9TMbhxdszV2fRARIRMuXHe2q7WIDeZCuwpDWa5yrlj68p8Q==" />
     </ConfigurationSettings>
   </Role>
   <Role name="MSGorilla">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
-      <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=msgorilla;AccountKey=f8toNh5GMBwO4oKADTElMZqeOvoTORrovoraVsx9TMbhxdszV2fRARIRMuXHe2q7WIDeZCuwpDWa5yrlj68p8Q==" />
+      <Setting name="StorageConnectionString" value="DefaultEndpointsProtocol=https;AccountName=msgorilla;AccountKey=f8toNh5GMBwO4oKADTElMZqeOvoTORrovoraVsx9TMbhxdszV2fRARIRMuXHe2q7WIDeZCuwpDWa5yrlj68p8Q==" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
