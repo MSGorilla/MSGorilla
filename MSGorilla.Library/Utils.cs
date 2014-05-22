@@ -64,8 +64,6 @@ namespace MSGorilla.Library
             return new string(array);
         }
 
-
-        //todo ID checker
         public static bool IsValidID(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -73,12 +71,18 @@ namespace MSGorilla.Library
                 return false;
             }
 
-            for(int i = 0; i < id.Length; i++){
-                if (!char.IsLetterOrDigit(id, i))
-                {
-                    return false;
-                }
+            if (id.Contains('\\') || 
+                id.Contains(' ') || 
+                id.Contains('?') || 
+                id.Contains('/') || 
+                id.Contains('#') ||
+                id.Contains('\t') ||
+                id.Contains('\n') ||
+                id.Contains('\r'))
+            {
+                return false;
             }
+
             return true;
         }
     }

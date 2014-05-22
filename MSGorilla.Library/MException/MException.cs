@@ -34,7 +34,7 @@ namespace MSGorilla.Library.Exceptions
 
         public InvalidIDException(string type)
         {
-            Description = string.Format("Invalid {0} ID. {0} ID should be [0-9a-zA-Z]+ .", type);
+            Description = string.Format("Invalid {0} ID. Please refer to http://msdn.microsoft.com/library/azure/dd179338.aspx", type);
             Code = 1001;
         }
     }
