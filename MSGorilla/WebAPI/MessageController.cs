@@ -53,6 +53,11 @@ namespace MSGorilla.WebApi
             return _messageManager.HomeLine(whoami(), start, end);
         }
         [HttpGet]
+        public List<Message> EventLine()
+        {
+            return _messageManager.EventLine("none");
+        }
+        [HttpGet]
         public List<Message> EventLine(string eventID)
         {
             return _messageManager.EventLine(eventID);
