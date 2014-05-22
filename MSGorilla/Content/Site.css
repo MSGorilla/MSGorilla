@@ -164,3 +164,7 @@ input[type="checkbox"].input-validation-error {
     padding-left:30px;
     padding-right:30px;
 }
+
+.bold {
+    font-weight:bold;
+}

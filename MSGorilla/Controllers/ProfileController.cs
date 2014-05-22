@@ -14,11 +14,10 @@ namespace MSGorilla.Controllers
     {
         AccountManager _accManager = new AccountManager();
 
-        // GET: Profile
         [TokenAuthAttribute]
         public ActionResult Index(string user)
         {
-            string myid = this.Session["userid"].ToString();
+            string myid = this.Session["userid"].ToString().ToLower();
             UserProfile me = _accManager.FindUser(myid);
 
             ViewBag.Myid = myid;
@@ -26,28 +25,19 @@ namespace MSGorilla.Controllers
 
             if (string.IsNullOrEmpty(user))
             {
-                user = myid;
+                user = "";
             }
-            ViewBag.UserId = user;
-            ViewBag.IsFollowing = false;
-
-            if (user == myid)
+            user = user.ToLower();
+            if (user == "" || user == myid)
             {
                 ViewBag.IsMe = true;
+                user = "";
             }
             else{
                 ViewBag.IsMe = false;
-
-                var myfollowers = _accManager.Followers(myid);
-                foreach (var u in myfollowers)
-                {
-                    if (u.Userid == user)
-                    {
-                        ViewBag.IsFollowing = true;
-                        break;
-                    }
-                }
             }
+
+            ViewBag.UserId = user;
 
             return View();
         }

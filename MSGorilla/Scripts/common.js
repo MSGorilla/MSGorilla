@@ -19,6 +19,34 @@ function isNullOrEmpty(strVal) {
     }
 }
 
+function DateFormat(datestring) {
+    var date = new Date(datestring);
+    var format = date.toUTCString();
+    return format;
+}
+
+function Time2Now(datestring) {
+    var date = new Date(datestring);
+    var now = new Date();
+    var diff = (now - date)/1000;
+
+    var sec = 1;
+    var min = 60 * sec;
+    var hour = 60 * min;
+    var day = 24 * hour;
+    if (diff / day > 1) {
+        return date.toDateString();
+    }
+    else if (diff / hour > 1) {
+        return Math.ceil(diff / hour) + "h";
+    }
+    else if (diff / min > 1) {
+        return Math.ceil(diff / min) + "m";
+    }
+    else if (diff / sec > 1) {
+        return Math.ceil(diff / sec) + "s";
+    }
+}
 
 /* notification function */
 function ShowError(msg) {
@@ -45,7 +73,7 @@ function LoadMyInfo() {
 
             $("#my_id").html("@" + userid);
             $("#my_name").html(username);
-            $("my_name").attr("href", "/profile/index?user=" + username);
+            $("my_name").attr("href", "/profile");
             if (!isNullOrEmpty(picurl)) {
                 $("#my_pic").attr("src", picurl);
             }
@@ -83,7 +111,7 @@ function LoadUserInfo(user) {
 
             $("#user_id").html("@" + userid);
             $("#user_name").html(username);
-            $("#user_name").attr("href", "/profile/index?user=" + username);
+            $("#user_name").attr("href", "/profile/index?user=" + userid);
             if (!isNullOrEmpty(picurl)) {
                 $("#user_pic").attr("src", picurl);
             }
@@ -103,19 +131,105 @@ function LoadUserFollowBtn(user) {
     if (btn == undefined) {
         return;
     }
-    
+
     $.get("/api/account/isfollowing", "followingUserID=" + user, function (data) {
-        var btn = $("#btn_user_follow");
         if (data == false) {
-            btn.attr("class", "btn btn-success");
-            btn.text("Follow");
+            SetFollowBtn(user);
         } else {
-            btn.attr("class", "btn btn-danger");
-            btn.text("Unollow");
+            SetUnfollowBtn(user);
         }
     });
 }
 
+function SetUnfollowBtn(user) {
+    var btn = $("#btn_user_follow");
+    if (btn == undefined) {
+        return;
+    }
+
+    btn.text("Following");
+    btn.attr("class", "btn btn-success");
+    btn.attr("onclick", "Unfollow('" + user + "');");
+    btn.attr("onmouseover", "UnfollowBtnMouseOver();")
+    btn.attr("onmouseout", "UnfollowBtnMouseOut();")
+}
+
+function UnfollowBtnMouseOver() {
+    var btn = $("#btn_user_follow");
+    if (btn == undefined) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-danger");
+    btn.text("Unfollow");
+}
+
+function UnfollowBtnMouseOut() {
+    var btn = $("#btn_user_follow");
+    if (btn == undefined) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-success");
+    btn.text("Following");
+}
+
+function SetFollowBtn(user) {
+    var btn = $("#btn_user_follow");
+    if (btn == undefined) {
+        return;
+    }
+
+    btn.text("Follow");
+    btn.attr("class", "btn btn-primary");
+    btn.attr("onclick", "Follow('" + user + "');");
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
+}
+
+function Follow(user) {
+    $.ajax({
+        type: "get",
+        url: "/api/account/follow",
+        data: "userid=" + user,
+        success: function (data) {
+            var code = data.ActionResultCode;
+            var msg = data.Message;
+            if (code == "0") {
+                LoadUserInfo(user);
+                LoadMyInfo();
+            }
+            else {
+                ShowError(msg);
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+function Unfollow(user) {
+    $.ajax({
+        type: "get",
+        url: "/api/account/unfollow",
+        data: "userid=" + user,
+        success: function (data) {
+            var code = data.ActionResultCode;
+            var msg = data.Message;
+            if (code == "0") {
+                LoadUserInfo(user);
+                LoadMyInfo();
+            }
+            else {
+                ShowError(msg);
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
 
 /* post page function */
 function PostMessage(eventID, schemaID) {
@@ -196,7 +310,18 @@ function LoadFeeds(category) {
                 $("#feedlist").empty();
                 $.each(data, function (index, item) {
                     $("#feedlist").append(createFeed(item));
+                    $.getJSON("/api/account/User", "userid=" + item.User, function (data) {
+                        var mid = item.ID;
+                        var username = data.DisplayName;
+                        var picurl = data.PortraitUrl;
+                        if (isNullOrEmpty(picurl)) {
+                            picurl = "/Content/Images/default_avatar.jpg";
+                        }
+                        $("#user_pic_" + mid).attr("src", picurl);
+                        $("#username_" + mid).text(username);
+                    });
                 })
+
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -213,29 +338,18 @@ function createFeed(postData) {
     var eid = postData.EventID;
     var msg = postData.MessageContent;
     var posttime = postData.PostTime;
-    var username = user;
-    var picurl = "";
 
-    $.getJSON("/api/account/User", "userid=" + user, function (data) {
-        username = data.DisplayName;
-        picurl = data.PortraitUrl;
-    });
-
-    if (isNullOrEmpty(picurl)) {
-        picurl = "/Content/Images/default_avatar.jpg";
-    }
     output = " <li class='list-group-item'>";
     output += "  <div>"
     output += "    <div class='feed-pic'>";
-    output += "      <img class='img-rounded' id='user_pic' src='" + picurl + "' width='100' height='100' />";
+    output += "      <img class='img-rounded' id='user_pic_" + mid + "' src='/Content/Images/default_avatar.jpg' width='100' height='100' />";
     output += "    </div>";
     output += "    <div class='feed-content'>";
-    output += "      <div class='newpost-header'><a class='list-group-item-heading lead' href='/profile/index?user=" + user + "'>" + username + "</a>";
-    output += "      <small>(" + posttime + ")</small></div>";
+    output += "      <div class='newpost-header'><a id='username_" + mid + "' class='list-group-item-heading bold' href='/profile/index?user=" + user + "'>" + user + "</a>";
+    output += "      &nbsp;<span class='badge'>-&nbsp;" + Time2Now(posttime) + "</span></div>";
     output += "      <div class='newpost-input'><p>" + encodeHtml(msg) + "</p></div>";
     output += "      <div class='newpost-footer'><button id='btn_reply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Comment</button></div>";
     output += "    </div>";
-    output += "    <div class='clearfix'></div>";
     output += "  </div>";
     output += "  <div id='reply_" + mid + "'></div>";
     output += "  <input type='hidden' id='hd_" + mid + "' value='false'/>";
@@ -287,8 +401,19 @@ function LoadReplies(user, mid) {
         success: function (data) {
             // create reply list
             $("#replylist_" + mid).empty();
+            var i = 0;
             $.each(data, function (index, item) {
-                $("#replylist_" + mid).append(createReply(item));
+                $("#replylist_" + mid).append(createReply(item, ++i));
+                var rid = mid + "_" + i;
+                $.getJSON("/api/account/User", "userid=" + item.FromUser, function (data) {
+                    var username = data.DisplayName;
+                    var picurl = data.PortraitUrl;
+                    if (isNullOrEmpty(picurl)) {
+                        picurl = "/Content/Images/default_avatar.jpg111";
+                    }
+                    $("#reply_user_pic_" + rid).attr("src", picurl);
+                    $("#reply_username_" + rid).text(username);
+                });
             })
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -297,31 +422,23 @@ function LoadReplies(user, mid) {
     });
 }
 
-function createReply(replyData) {
+function createReply(replyData, no) {
     var output = "";
     var user = replyData.FromUser;
     var msg = replyData.Message;
     var posttime = replyData.PostTime;
-    var username = user;
-    var picurl = "";
+    var rid = replyData.MessageID + "_" + no;
 
-    $.getJSON("/api/account/User", "userid=" + user, function (data) {
-        username = data.DisplayName;
-        picurl = data.PortraitUrl;
-    });
-
-    if (isNullOrEmpty(picurl)) {
-        picurl = "/Content/Images/default_avatar.jpg";
-    }
     output = "<li class='list-group-item'>";
     output += "  <div>"
     output += "    <div class='reply-pic'>";
-    output += "      <img class='img-rounded' id='user_pic' src='" + picurl + "' width='50' height='50' />";
+    output += "      <img class='img-rounded' id='reply_user_pic" + rid + "' src='/Content/Images/default_avatar.jpg' width='50' height='50' />";
     output += "    </div>";
     output += "    <div class='reply-content'>";
     output += "      <div class='reply-input'>";
-    output += "        <a href='/profile/index?user=" + user + "'>" + username + "</a>&nbsp;:&nbsp;" + encodeHtml(msg);
-    output += "        <small>(" + posttime + ")</small>";
+    output += "        <a id='reply_username_" + rid + "' href='/profile/index?user=" + user + "'>" + user + "</a>";
+    output += "        &nbsp;<span class='badge'>-&nbsp;" + Time2Now(posttime) + "</span>&nbsp;";
+    output += "        " + encodeHtml(msg);
     output += "      </div>";
     output += "  </div>";
     output += "</li>";
