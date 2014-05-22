@@ -46,7 +46,22 @@ namespace MSGorilla.WebApi
             else
             {
                 return user;
-            }            
+            }
+        }
+
+        [HttpGet]
+        public UserProfile Me()
+        {
+            string userid = whoami();
+            var user = _accountManager.FindUser(userid);
+            if (user == null)
+            {
+                throw new UserNotFoundException(userid);
+            }
+            else
+            {
+                return user;
+            }
         }
 
         [HttpGet]

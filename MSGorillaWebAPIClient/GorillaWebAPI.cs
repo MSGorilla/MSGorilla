@@ -73,15 +73,15 @@ namespace MSGorilla.WebAPI.Client
 
         public string PostMessage(string message, string schemaID = "none", string eventID = "none")
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriPostMessage, message, schemaID, eventID));
-            //request.Method = "POST";
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + Constant.UriPostMessage);
+            request.Method = "POST";
             request.Headers["Authorization"] = _authHeader;
-            //request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
+            request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
 
-            //using (var writer = new StreamWriter(request.GetRequestStream()))
-            //{
-            //    writer.Write(string.Format("message={0}&schemaId={0}&eventID={0}", message, schemaID, eventID));
-            //}
+            using (var writer = new StreamWriter(request.GetRequestStream()))
+            {
+                writer.Write(string.Format("Message={0}&SchemaID={1}&EventID={2}", message, schemaID, eventID));
+            }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return _readResponseContent(response);
         }
@@ -112,9 +112,15 @@ namespace MSGorilla.WebAPI.Client
 
         public string PostReply(string toUserId, string message, string originMessageUserId, string originMessageID)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri +
-                string.Format(Constant.UriPostReply, toUserId, message, originMessageID, originMessageID));
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + Constant.UriPostReply);
+            request.Method = "POST";
             request.Headers["Authorization"] = _authHeader;
+            request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
+
+            using (var writer = new StreamWriter(request.GetRequestStream()))
+            {
+                writer.Write(string.Format("To={0}&Message={1}&MessageID={2}&MessageUser", toUserId, message, originMessageID, originMessageID));
+            }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return _readResponseContent(response);
         }
