@@ -1,0 +1,28 @@
+﻿<div class="user-container ">
+    <div class="user-info ">
+        <div>
+            @if (string.IsNullOrEmpty(ViewBag.Me.PortraitUrl))
+            {
+                <img class="img-rounded" id="my_pic" src="/Content/Images/default_avatar.jpg" width="150" height="150" />
+            }
+            else
+            {
+                <img class="img-rounded" id="my_pic" src="@ViewBag.Me.PortraitUrl" width="150" height="150" />
+            }
+        </div>
+        <div>
+            <a class="lead" id="my_name" href="/profile/index?user=@ViewBag.Me.Userid">@ViewBag.Me.DisplayName</a>
+        </div>
+        <div>
+            <span id="my_id">@ViewBag.Me.Userid</span>
+        </div>
+    </div>
+    <div class="user-postinfo">
+        <div class="btn-group btn-group-justified">
+            <a class="btn btn-default btn-sm" href="/profile/index?user=@ViewBag.Me.Userid">POSTS <br /><span id="my_posts" class="badge">@ViewBag.Me.MessageCount</span></a>
+            <a class="btn btn-default btn-sm">FOLLOWING <br /><span id="my_following" class="badge">@ViewBag.Me.FollowingsCount</span></a>
+            <a class="btn btn-default btn-sm">FOLLOWERS <br /><span id="my_followers" class="badge">@ViewBag.Me.FollowersCount</span></a>
+        </div>
+    </div>
+</div>
+

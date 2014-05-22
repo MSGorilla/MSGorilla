@@ -28,12 +28,8 @@ function ShowError(msg) {
 
 
 /* user infor function */
-function LoadUserInfo(user) {
-    var apiurl = "";
-    if (isNullOrEmpty(user))
-        apiurl = "/api/account/me";
-    else
-        apiurl = "/api/account/user?userid=" + user;
+function LoadMyInfo() {
+    var apiurl = "/api/account/me";
 
     $.ajax({
         type: "get",
@@ -43,6 +39,45 @@ function LoadUserInfo(user) {
             var username = data.DisplayName;
             var picurl = data.PortraitUrl;
             var desp = data.Description;
+            var postscount = data.MessageCount;
+            var followingcount = data.FollowingsCount;
+            var followerscount = data.FollowersCount;
+
+            $("#my_id").html("@" + userid);
+            $("#my_name").html(username);
+            $("my_name").attr("href", "/profile/index?user=" + username);
+            if (!isNullOrEmpty(picurl)) {
+                $("#my_pic").attr("src", picurl);
+            }
+            $("#my_posts").html(postscount);
+            $("#my_following").html(followingcount);
+            $("#my_followers").html(followerscount);
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+function LoadUserInfo(user) {
+    var apiurl = "";
+    if (isNullOrEmpty(user)) {
+        apiurl = "/api/account/me";
+    }
+    else {
+        apiurl = "/api/account/user?userid=" + user;
+        LoadUserFollowBtn(user);
+    }
+
+    $.ajax({
+        type: "get",
+        url: apiurl,
+        success: function (data) {
+            var userid = data.Userid;
+            var username = data.DisplayName;
+            var picurl = data.PortraitUrl;
+            var desp = data.Description;
+            var postscount = data.MessageCount;
             var followingcount = data.FollowingsCount;
             var followerscount = data.FollowersCount;
 
@@ -52,11 +87,30 @@ function LoadUserInfo(user) {
             if (!isNullOrEmpty(picurl)) {
                 $("#user_pic").attr("src", picurl);
             }
+            $("#user_desp").html(desp);
+            $("#user_posts").html(postscount);
             $("#user_following").html(followingcount);
             $("#user_followers").html(followerscount);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+function LoadUserFollowBtn(user) {
+    var btn = $("#btn_user_follow");
+    if (btn == undefined) {
+        return;
+    }
+    
+    $.get("/api/account/followings", user, function(data) {
+        if (data == "0") {
+            btn.attr("class", "btn btn-success");
+            btn.val("Follow");
+        } else {
+            btn.attr("class", "btn btn-danger");
+            btn.val("Unollow");
         }
     });
 }
@@ -123,7 +177,7 @@ function LoadFeeds(category) {
     var apiurl = "";
     if (isNullOrEmpty(category))
         apiurl = "/api/message/userline";
-    if (category == "homeline")
+    else if (category == "homeline")
         apiurl = "/api/message/homeline";
     else
         apiurl = "/api/message/userline?userid=" + category;

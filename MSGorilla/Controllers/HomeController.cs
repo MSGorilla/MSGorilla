@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 using MSGorilla.Filters;
 using MSGorilla.Library;
+using MSGorilla.Library.Models.SqlModels;
 
 namespace MSGorilla.Controllers
 {
@@ -19,7 +20,11 @@ namespace MSGorilla.Controllers
         [TokenAuthAttribute]
         public ActionResult Index()
         {
-            ViewBag.Message = "Server is running....";
+            string myid = this.Session["userid"].ToString();
+            UserProfile me = _accManager.FindUser(myid);
+
+            ViewBag.Myid = myid;
+            ViewBag.Me = me;
 
             return View();
         }

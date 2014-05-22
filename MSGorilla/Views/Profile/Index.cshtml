@@ -13,7 +13,7 @@
         <div class="user-container ">
             <div class="user-info ">
                 <div>
-                    <img class="img-rounded" id="user_pic" src="/Content/Images/default_avatar.jpg" width="150" height="150" />
+                    <img class="img-rounded" id="user_pic" src="/Content/Images/default_avatar.jpg" width="200" height="200" />
                 </div>
                 <div>
                     <a class="lead" id="user_name">&nbsp;</a>
@@ -21,11 +21,19 @@
                 <div>
                     <span id="user_id">&nbsp;</span>
                 </div>
+                <div class="userdesp-input">
+                    <span id="user_desp">&nbsp;</span>
+                </div>
             </div>
             <div class="user-postinfo">
                 <div class="btn-group btn-group-justified">
+                    <a class="btn btn-default">POSTS &nbsp;<span id="user_posts" class="badge">0</span></a>
                     <a class="btn btn-default">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
                     <a class="btn btn-default">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
+                    @if (!ViewBag.IsMe)
+                    {
+                        <a class="btn btn-default" id="btn_user_follow" onclick="Unfollow('@ViewBag.Me.Userid', '@ViewBag.UserId');"></a>
+                    }
                 </div>
             </div>
         </div>
@@ -44,6 +52,7 @@
     </div>
 
     <div class="tools-container">
+        @Html.Partial("_MePartial")
     </div>
 
 </div>
