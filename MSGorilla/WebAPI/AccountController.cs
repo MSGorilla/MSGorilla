@@ -162,6 +162,7 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public List<UserProfile> Followings(string userid)
         {
+            string me = whoami();
             return _accountManager.Followings(userid);
         }
 
@@ -173,7 +174,21 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public List<UserProfile> Followers(string userid)
         {
+            string me = whoami();
             return _accountManager.Followers(userid);
+        }
+
+        [HttpGet]
+        public bool IsFollowing(string followingUserID)
+        {
+            return _accountManager.IsFollowing(whoami(), followingUserID);
+        }
+
+        [HttpGet]
+        public bool IsFollowing(string userid, string followingUserID)
+        {
+            string me = whoami();
+            return _accountManager.IsFollowing(userid, followingUserID);
         }
     }
 }

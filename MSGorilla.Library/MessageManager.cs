@@ -276,20 +276,12 @@ namespace MSGorilla.Library
 
             Message msg = new Message(userid, message, timestamp, eventID, schemaID);
             //insert into Userline
-            TableOperation insertOperation = TableOperation.Insert(new UserLineEntity(msg));
+            TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);
 
             //insert into owner's homeline
-            insertOperation = TableOperation.Insert(new HomeLineEntity(msg.User, msg));
+            insertOperation = TableOperation.InsertOrReplace(new HomeLineEntity(msg.User, msg));
             _homeline.Execute(insertOperation);
-
-            //insert into Eventline
-            insertOperation = TableOperation.Insert(new EventLineEntity(msg));
-            _eventline.Execute(insertOperation);
-
-            //insert into PublicSquareLine
-            insertOperation = TableOperation.Insert(new PublicSquareLineEntity(msg));
-            _publicSquareLine.Execute(insertOperation);
 
             //insert into QueueMessage
             //QueueMessage queueMessage = new QueueMessage(QueueMessage.TypeMessage, msg.ToJsonString());
@@ -301,15 +293,21 @@ namespace MSGorilla.Library
 
         public void SpreadMessage(Message message)
         {
+            //insert into Eventline
+            TableOperation insertOperation = TableOperation.InsertOrReplace(new EventLineEntity(message));
+            _eventline.Execute(insertOperation);
+
+            //insert into PublicSquareLine
+            insertOperation = TableOperation.InsertOrReplace(new PublicSquareLineEntity(message));
+            _publicSquareLine.Execute(insertOperation);
+
             List<UserProfile> followers = _accManager.Followers(message.User);
             //followers.Add(_accManager.FindUser(message.User));
             //speed tweet to followers
-
-            //todo: BatchInsert
             foreach (UserProfile user in followers)
             {
                 HomeLineEntity entity = new HomeLineEntity(user.Userid, message);
-                TableOperation insertOperation = TableOperation.Insert(entity);
+                insertOperation = TableOperation.InsertOrReplace(entity);
                 _homeline.Execute(insertOperation);
             }
         }

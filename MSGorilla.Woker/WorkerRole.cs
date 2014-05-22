@@ -53,7 +53,7 @@ namespace MSGorilla.Woker
                 }
                 catch (Exception e)
                 {
-                    Trace.TraceError("Exception in worker role", e);
+                    Trace.TraceError("Exception in worker role", e.StackTrace);
                 }
             }
         }

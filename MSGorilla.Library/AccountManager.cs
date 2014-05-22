@@ -183,5 +183,14 @@ namespace MSGorilla.Library
 //                    new object[] { userid }
 //                ).ToList();
         }
+
+        public bool IsFollowing(string userid, string followingUserID)
+        {
+            if (_accountCtx.Subscriptions.Where(f => f.Userid == userid && f.FollowingUserid == followingUserID).ToList().Count > 0)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }
