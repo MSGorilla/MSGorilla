@@ -65,38 +65,26 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public async Task<UserProfile> Update(string DisplayName, string Description, string portraitUrl)
+        public UserProfile Update(string DisplayName, string Description, string portraitUrl)
         {
             string userid = whoami();
             UserProfile user = _accountManager.FindUser(userid);
             user.DisplayName = DisplayName;
             user.Description = Description;
             user.PortraitUrl = portraitUrl;
-            bool success = await _accountManager.UpdateUser(user);
-            if (success)
-            {
-                return user;
-            }
-            else
-            {
-                throw new MSGorillaBaseException();
-            }
+            _accountManager.UpdateUser(user);
+            return user;
+
         }
 
         [HttpGet]
-        public async Task<ActionResult> UpdatePassword(string password)
+        public ActionResult UpdatePassword(string password)
         {
             UserProfile user = _accountManager.FindUser(whoami());
             user.Password = Utils.MD5Encoding(password);
-            bool success = await _accountManager.UpdateUser(user);
-            if (success)
-            {
-                return new ActionResult();
-            }
-            else
-            {
-                throw new MSGorillaBaseException();
-            }
+            _accountManager.UpdateUser(user);
+            return new ActionResult();
+
         }
 
         public class RegisterModel

@@ -58,12 +58,13 @@ namespace MSGorilla.Library
             {
                 throw new UserAlreadyExistException(user.Userid);
             }
+            user.MessageCount = 0;
             _accountCtx.Users.Add(user);
             await _accountCtx.SaveChangesAsync();
             return  _accountCtx.Users.Find(user.Userid);
         }
 
-        public async Task<bool> UpdateUser(UserProfile user)
+        public void UpdateUser(UserProfile user)
         {
             UserProfile originUser = _accountCtx.Users.Find(user.Userid);
             if (originUser == null)
@@ -74,8 +75,7 @@ namespace MSGorilla.Library
             originUser.DisplayName = user.DisplayName;
             originUser.PortraitUrl = user.PortraitUrl;
             originUser.Description = user.Description;
-            await _accountCtx.SaveChangesAsync();
-            return true;
+            _accountCtx.SaveChanges();
         }
 
         public async Task<Boolean> Follow(string userid, string followingUserid)

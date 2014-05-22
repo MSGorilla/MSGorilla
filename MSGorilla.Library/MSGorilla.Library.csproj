@@ -84,6 +84,10 @@
     <Compile Include="Migrations\201405190317263_initialCreate.Designer.cs">
       <DependentUpon>201405190317263_initialCreate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201405210816592_addMessageCountPostedByUser.cs" />
+    <Compile Include="Migrations\201405210816592_addMessageCountPostedByUser.Designer.cs">
+      <DependentUpon>201405210816592_addMessageCountPostedByUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActionResult.cs" />
     <Compile Include="Models\AzureModels\Entity\EventLineEntity.cs">
@@ -117,6 +121,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201405190317263_initialCreate.resx">
       <DependentUpon>201405190317263_initialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201405210816592_addMessageCountPostedByUser.resx">
+      <DependentUpon>201405210816592_addMessageCountPostedByUser.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

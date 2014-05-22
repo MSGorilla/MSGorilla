@@ -258,7 +258,8 @@ namespace MSGorilla.Library
             {
                 throw new MessageTooLongException();
             }
-            if (_accManager.FindUser(userid) == null)
+            UserProfile user = _accManager.FindUser(userid);
+            if (user == null)
             {
                 throw new UserNotFoundException(userid);
             }
@@ -293,6 +294,9 @@ namespace MSGorilla.Library
             //insert into QueueMessage
             //QueueMessage queueMessage = new QueueMessage(QueueMessage.TypeMessage, msg.ToJsonString());
             _queue.AddMessage(msg.toAzureCloudQueueMessage());
+
+            user.MessageCount++;
+            _accManager.UpdateUser(user);
         }
 
         public void SpreadMessage(Message message)

@@ -32,6 +32,9 @@ namespace MSGorilla.Library.Models.SqlModels
         [DataMember]
         public int FollowersCount { get; set; }
 
+        [DataMember]
+        public int MessageCount { get; set; }
+
         public string Password { get; set; }
         
         public virtual ICollection<Subscription> followings { get; set; }
