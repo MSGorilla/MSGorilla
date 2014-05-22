@@ -15,7 +15,7 @@ namespace CodeFlowMonitor
     public class CodeFlowMonitorService: ServiceBase
     {
         private static System.Timers.Timer serviceTimer = null;
-        private static string _statusFileName = "MonitorStatus.xml";
+        private static string _statusFileName = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "MonitorStatus.xml");
         private static List<string> _userlist = null;
         private static object _lockobj = new object();
 
@@ -28,14 +28,19 @@ namespace CodeFlowMonitor
 
         protected override void OnStart(string[] args)
         {
+            Logger.WriteInfo("---------------------------------------------");
+            Logger.WriteInfo("Start service...");
             base.OnStart(args);
 
             //Init monitorReviewDict
-            using (StreamReader sr = new StreamReader(_statusFileName))
+            Logger.WriteInfo("Init monitorReviewDict");
+            if (File.Exists(_statusFileName))
             {
-                _MonitoredReviewDict = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, int>>>(sr.ReadToEnd());
-            }  
-
+                using (StreamReader sr = new StreamReader(_statusFileName))
+                {
+                    _MonitoredReviewDict = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, int>>>(sr.ReadToEnd());
+                }
+            }
 
             // Create a timer to periodically trigger an action
             serviceTimer = new Timer();
@@ -44,15 +49,16 @@ namespace CodeFlowMonitor
             serviceTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             serviceTimer.AutoReset = true;
 
-            //Set run interval as 10 minutes
-            serviceTimer.Interval = 600000;
+            serviceTimer.Interval = 10000;
             serviceTimer.Start();
+
+            Logger.WriteInfo("Service started");
         }
 
         protected override void OnStop()
         {
-            base.OnStop();
             serviceTimer.Enabled = false;
+            base.OnStop();
         }
 
         private static void _initMonitorUserList()
@@ -75,6 +81,7 @@ namespace CodeFlowMonitor
         {
             lock (_lockobj)
             {
+                Logger.WriteInfo("RecordMonitorStatus");
                 using (StreamWriter sw = new StreamWriter(_statusFileName))
                 {
                     sw.Write(JsonConvert.SerializeObject(_MonitoredReviewDict));
@@ -85,61 +92,77 @@ namespace CodeFlowMonitor
 
         public static void OnTimedEvent(object obj, ElapsedEventArgs args)
         {
-            _initMonitorUserList();
+            //Set run interval as 10 minutes
+            serviceTimer.Interval = 600000;
 
-            bool isNew = false;
-            ReviewServiceClient client = new ReviewServiceClient();
+            Logger.WriteInfo("OnTime event, start query active reviews");
 
-            GorillaWebAPI webapi = new GorillaWebAPI("CFMonitor", "User@123");
-            foreach (string username in _userlist)
+            try
             {
-                if (!_MonitoredReviewDict.Keys.Contains(username))
-                {
-                    _MonitoredReviewDict.Add(username, new Dictionary<string, int>());
-                    isNew = true;
-                }
-                //get all active reviews
+                _initMonitorUserList();
 
-                CodeReviewSummary[] reviews = client.GetActiveReviewsForAuthor(username);
+                bool isNew = false;
+                ReviewServiceClient client = new ReviewServiceClient();
 
-                if (reviews != null)
+                GorillaWebAPI webapi = new GorillaWebAPI("CFMonitor", "User@123");
+                foreach (string username in _userlist)
                 {
-                    //scan each review
-                    foreach (var codeReviewSummary in reviews)
+                    if (!_MonitoredReviewDict.Keys.Contains(username))
                     {
-                        CodeReview r = client.GetReview(codeReviewSummary.Key);
+                        _MonitoredReviewDict.Add(username, new Dictionary<string, int>());
+                        isNew = true;
+                    }
+                    //get all active reviews
 
-                        if (!_MonitoredReviewDict[username].Keys.Contains(r.Key))
-                        {
-                            _MonitoredReviewDict[username].Add(r.Key, 0);
-                            isNew = true;
-                        }
+                    CodeReviewSummary[] reviews = client.GetActiveReviewsForAuthor(username);
 
-                        if (_MonitoredReviewDict[username][r.Key] < r.codePackages.Length)
+                    if (reviews != null)
+                    {
+                        //scan each review
+                        foreach (var codeReviewSummary in reviews)
                         {
-                            isNew = true;
-                        }
+                            CodeReview r = client.GetReview(codeReviewSummary.Key);
 
-                        if (isNew)
-                        {
-                            for (int i = _MonitoredReviewDict[username][r.Key]; i < r.codePackages.Length; i++)
+                            if (!_MonitoredReviewDict[username].Keys.Contains(r.Key))
                             {
-                                CodePackage pkg = r.codePackages[i];
-                                StringBuilder reviewers = new StringBuilder();
-                                foreach (var reviewer in r.reviewers)
-                                    reviewers.Append(string.Format("{0},", reviewer.DisplayName));
-                                string message = string.Format("CodeReview {0}Iteration {2} {4}\nAuthor: {1}\nReviewer: {3}",
-                                    pkg.Description, pkg.Author, pkg.Revision, reviewers.ToString().TrimEnd(new char[] { ',' }), pkg.IterationComment);
-                                Console.WriteLine(message);
-                                Console.WriteLine();
-
-                                webapi.PostMessage(message, "none", r.Key);
+                                _MonitoredReviewDict[username].Add(r.Key, 0);
+                                isNew = true;
                             }
-                            _MonitoredReviewDict[username][r.Key] = r.codePackages.Length;
-                        }
 
+                            if (_MonitoredReviewDict[username][r.Key] < r.codePackages.Length)
+                            {
+                                isNew = true;
+                            }
+
+                            if (isNew)
+                            {
+                                for (int i = _MonitoredReviewDict[username][r.Key]; i < r.codePackages.Length; i++)
+                                {
+                                    CodePackage pkg = r.codePackages[i];
+                                    StringBuilder reviewers = new StringBuilder();
+                                    foreach (var reviewer in r.reviewers)
+                                        reviewers.Append(string.Format("{0},", reviewer.DisplayName));
+                                    string message = string.Format("CodeReview {0}Iteration {2} {4}\nAuthor: {1}\nReviewer: {3}",
+                                        pkg.Description, pkg.Author, pkg.Revision, reviewers.ToString().TrimEnd(new char[] { ',' }), pkg.IterationComment);
+                                    Logger.WriteInfo(message);
+
+                                    webapi.PostMessage(message, "none", r.Key.Replace('-', '0'));
+                                }
+                                _MonitoredReviewDict[username][r.Key] = r.codePackages.Length;
+                            }
+                            else
+                            {
+                                Logger.WriteInfo("no new reviews for user " + username);
+                            }
+
+                        }
                     }
                 }
+            }
+            catch(Exception e)
+            {
+                Logger.WriteInfo("Exception happened, try get the codeflow info in next run");
+                Logger.WriteInfo(e.Message);
             }
             _recordMonitorStatus();
         }

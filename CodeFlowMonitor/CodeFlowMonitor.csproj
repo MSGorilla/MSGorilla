@@ -54,6 +54,7 @@
     <Compile Include="CodeFlowMonitorService.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Logger.cs" />
     <Compile Include="MemberShipHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
