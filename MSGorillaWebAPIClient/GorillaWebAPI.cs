@@ -80,13 +80,7 @@ namespace MSGorilla.WebAPI.Client
 
             using (var writer = new StreamWriter(request.GetRequestStream()))
             {
-                writer.Write(JsonConvert.SerializeObject(new MessageModel()
-                    {
-                        Message = message,
-                        SchemaID = schemaID,
-                        EventID = eventID
-                    })
-                    );
+                writer.Write(string.Format("Message={0}&SchemaID={1}&EventID={2}", message, schemaID, eventID));
             }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return _readResponseContent(response);
@@ -125,14 +119,7 @@ namespace MSGorilla.WebAPI.Client
 
             using (var writer = new StreamWriter(request.GetRequestStream()))
             {
-                writer.Write(JsonConvert.SerializeObject(new ReplyModel()
-                {
-                    To = toUserId,
-                    Message = message,
-                    MessageID = originMessageID,
-                    MessageUser = originMessageUserId
-                })
-                    );
+                writer.Write(string.Format("To={0}&Message={1}&MessageID={2}&MessageUser", toUserId, message, originMessageID, originMessageID));
             }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return _readResponseContent(response);
