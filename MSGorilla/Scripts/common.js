@@ -104,13 +104,14 @@ function LoadUserFollowBtn(user) {
         return;
     }
     
-    $.get("/api/account/followings", user, function(data) {
-        if (data == "0") {
+    $.get("/api/account/isfollowing", "followingUserID=" + user, function (data) {
+        var btn = $("#btn_user_follow");
+        if (data == false) {
             btn.attr("class", "btn btn-success");
-            btn.val("Follow");
+            btn.text("Follow");
         } else {
             btn.attr("class", "btn btn-danger");
-            btn.val("Unollow");
+            btn.text("Unollow");
         }
     });
 }
