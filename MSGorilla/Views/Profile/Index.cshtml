@@ -1,0 +1,49 @@
+﻿@{
+    ViewBag.Title = "Home";
+}
+
+<script src="~/Scripts/common.js"></script>
+<script>
+    $(LoadUserInfo('@ViewBag.UserId'));
+    $(LoadFeeds('@ViewBag.UserId'));
+</script>
+
+<div class="main-container">
+    <div class="posts-container">
+        <div class="user-container ">
+            <div class="user-info ">
+                <div>
+                    <img class="img-rounded" id="user_pic" src="/Content/Images/default_avatar.jpg" width="150" height="150" />
+                </div>
+                <div>
+                    <a class="lead" id="user_name">&nbsp;</a>
+                </div>
+                <div>
+                    <span id="user_id">&nbsp;</span>
+                </div>
+            </div>
+            <div class="user-postinfo">
+                <div class="btn-group btn-group-justified">
+                    <a class="btn btn-default">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
+                    <a class="btn btn-default">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
+                </div>
+            </div>
+        </div>
+
+        <div id="notifications" class="posts-notification">
+            @*<div class="alert alert-dismissable alert-warning">
+                    <button class="close" type="button" data-dismiss="alert">×</button>
+                    <p><a class="alert-link" href="#">You have new messages.</a></p>
+                </div>*@
+        </div>
+
+        <div class="posts-feeds">
+            <ul id="feedlist" class="list-group"></ul>
+        </div>
+
+    </div>
+
+    <div class="tools-container">
+    </div>
+
+</div>

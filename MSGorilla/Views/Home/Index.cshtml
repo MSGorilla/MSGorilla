@@ -16,7 +16,7 @@
                     <span class="help-block">What's on your mind?</span>
                 </div>
                 <div class="newpost-input">
-                    <textarea class="form-control" id="textArea" rows="3"></textarea>
+                    <textarea class="form-control" id="postmessage" rows="3"></textarea>
                 </div>
                 <div class="newpost-footer">
                     <button id="btn_post" onclick="PostMessage(1, 'schema1');" class="btn btn-primary" type="button" data-original-title="Post" data-toggle="tooltip" data-placement="top">Post</button>
@@ -31,7 +31,7 @@
                 </div>*@
         </div>
 
-        <div id="feeds" class="posts-feeds">
+        <div class="posts-feeds">
             <ul id="feedlist" class="list-group"></ul>
         </div>
 
@@ -44,10 +44,10 @@
                     <img class="img-rounded" id="user_pic" src="/Content/Images/default_avatar.jpg" width="150" height="150" />
                 </div>
                 <div>
-                    <a class="lead" id="user_name"></a>
+                    <a class="lead" id="user_name">&nbsp;</a>
                 </div>
                 <div>
-                    <span id="user_id"></span>
+                    <span id="user_id">&nbsp;</span>
                 </div>
             </div>
             <div class="user-postinfo">

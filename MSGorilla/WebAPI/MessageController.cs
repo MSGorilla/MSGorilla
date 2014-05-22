@@ -31,7 +31,8 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public List<Message> UserLine(string userid)
         {
-            string me = whoami();
+            if(string.IsNullOrEmpty(userid))
+                userid = whoami();
             return _messageManager.UserLine(userid, DateTime.UtcNow.AddDays(-3), DateTime.UtcNow);
         }
         [HttpGet]
@@ -80,7 +81,7 @@ namespace MSGorilla.WebApi
             return _messageManager.GetAllReplies(msgID);
         }
 
-        [HttpGet]
+        [HttpGet, HttpPost]
         public ActionResult PostMessage(string message, string schemaID = "none", string eventID = "none")
         {
             _messageManager.PostMessage(whoami(), eventID, schemaID, message, DateTime.UtcNow);
