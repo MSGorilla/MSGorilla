@@ -29,7 +29,14 @@
                     {
                         <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     }
-                    <li class="disabled">@Html.ActionLink("Notifications", "Index", "Home")</li>
+                    @if (ViewBag.Title == "Notifications")
+                    {
+                        <li class="active">@Html.ActionLink("Notifications", "Index", "Home")</li>
+                    }
+                    else
+                    {
+                        <li class="disabled">@Html.ActionLink("Notifications", "Index", "Home")</li>
+                    }
                     @if (ViewBag.Title == "Me")
                     {
                         <li class="active">@Html.ActionLink("Me", "Index", "Profile")</li>
@@ -39,8 +46,8 @@
                         <li>@Html.ActionLink("Me", "Index", "Profile")</li>
                     }
                 </ul>
-                <form class="navbar-form navbar-left">
-                    <input class="form-control col-lg-8" type="text" placeholder="Search">
+                <form class="navbar-form navbar-left" method="get" action="/profile/index">
+                    <input class="form-control col-lg-8" type="text" placeholder="Search for people, event and things" name="user">
                 </form>
                 @Html.Partial("_LoginPartial")
             </div>

@@ -32,7 +32,10 @@ namespace MSGorilla.Library.Azure
         static AzureFactory()
         {
             string connectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
-            //string connectionString = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                connectionString = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
+            }
             _storageAccount = CloudStorageAccount.Parse(connectionString);
             _dict = new Dictionary<MSGorillaTable, string>();
 

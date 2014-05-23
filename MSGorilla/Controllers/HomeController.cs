@@ -20,10 +20,10 @@ namespace MSGorilla.Controllers
         [TokenAuthAttribute]
         public ActionResult Index()
         {
-            string myid = this.Session["userid"].ToString().ToLower();
+            string myid = this.Session["userid"].ToString();
             UserProfile me = _accManager.FindUser(myid);
 
-            ViewBag.Myid = myid;
+            ViewBag.Myid = me.Userid;
             ViewBag.Me = me;
 
             return View();

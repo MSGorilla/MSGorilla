@@ -1,7 +1,7 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
-    background-color: #eeeeee;
+    background-color: #e0f0ff;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -52,14 +52,28 @@ input[type="checkbox"].input-validation-error {
 
 .posts-container {
     float:left;
-    min-height:800px;
     overflow:hidden;
-    padding-bottom:30px;
+    padding-bottom:0px;
     padding-top:20px;
     padding-left:0px;
     padding-right:0px;
-    width: 620px;
     position:relative;
+    width:400px;
+}
+@media (min-width: 768px) {
+  .posts-container {
+    width: 400px;
+  }
+}
+@media (min-width: 992px) {
+  .posts-container {
+    width: 620px;
+  }
+}
+@media (min-width: 1200px) {
+  .posts-container {
+    width: 820px;
+  }
 }
 
 .tools-container {
@@ -117,10 +131,11 @@ input[type="checkbox"].input-validation-error {
 }
 
 .user-container {
-    background-color:#333333;
+    margin-bottom:20px;
 }
 
 .user-info {
+    background-color:#333333;
     padding:15px;
     text-align :center;
     color:white;
@@ -128,7 +143,7 @@ input[type="checkbox"].input-validation-error {
 }
     .user-info a {
         color:white;
-        font-weight:bolder;
+        font-weight:bold;
     }
 
 .user-postinfo {
@@ -167,4 +182,8 @@ input[type="checkbox"].input-validation-error {
 
 .bold {
     font-weight:bold;
+}
+
+.quote {
+  background-color:  aliceblue;
 }

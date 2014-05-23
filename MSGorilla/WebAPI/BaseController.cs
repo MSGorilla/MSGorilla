@@ -42,7 +42,7 @@ namespace MSGorilla.WebApi
                         string password = userpass[1];
                         if (_accountManager.AuthenticateUser(user, password))
                         {
-                            return user.ToLower();
+                            return user;
                         }
                     }
                 }
@@ -58,7 +58,7 @@ namespace MSGorilla.WebApi
                     newUser.FollowersCount = newUser.FollowingsCount = 0;
                     _accountManager.AddUser(newUser).Wait();
                 }
-                return System.Web.HttpContext.Current.User.Identity.Name.ToLower();
+                return System.Web.HttpContext.Current.User.Identity.Name;
             }
 
             throw new AccessDenyException();            
