@@ -20,6 +20,12 @@ using Newtonsoft.Json.Converters;
 
 namespace MSGorilla.Library
 {
+    public class MessagePagination
+    {
+        public List<Message> msgs {get; set;}
+        public TableContinuationToken continuationToken { get; set; }
+    }
+
     public class MessageManager
     {
         private const int DefaultTimelineQueryDayRange = 3;
@@ -111,6 +117,35 @@ namespace MSGorilla.Library
             return msgs;
         }
 
+        public MessagePagination Userline(string userid, int count = 25, TableContinuationToken continuationToken = null)
+        {
+            string query = TableQuery.GenerateFilterCondition(
+                "PartitionKey",
+                QueryComparisons.LessThan,
+                Utils.NextKeyString(userid));
+
+            query = TableQuery.CombineFilters(
+                query,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition(
+                    "PartitionKey",
+                    QueryComparisons.GreaterThanOrEqual,
+                    userid
+                )
+            );
+
+            TableQuery<UserLineEntity> tableQuery = new TableQuery<UserLineEntity>().Where(query).Take(count);
+            TableQuerySegment<UserLineEntity> queryResult = _userline.ExecuteQuerySegmented(tableQuery, continuationToken);
+
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = queryResult.ContinuationToken;
+            ret.msgs = new List<Message>();
+            foreach (UserLineEntity entity in queryResult)
+            {
+                ret.msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+            }
+            return ret;
+        }
         //public List<Message> UserLine(string userid)
         //{
         //    return UserLine(userid, DateTime.UtcNow, DateTime.UtcNow.AddDays(0 - DefaultTimelineQueryDayRange));
@@ -130,6 +165,44 @@ namespace MSGorilla.Library
             }
             msgs.Reverse();
             return msgs;
+        }
+
+        public MessagePagination HomeLine(string userid, int count, string token)
+        {
+            TableContinuationToken tok = null;
+            if(!string.IsNullOrEmpty(token)){
+                tok = JsonConvert.DeserializeObject<TableContinuationToken>(token);
+            }             
+            return HomeLine(userid, count, tok);
+        }
+        public MessagePagination HomeLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
+        {
+            string query = TableQuery.GenerateFilterCondition(
+                "PartitionKey",
+                QueryComparisons.LessThan,
+                Utils.NextKeyString(userid));
+
+            query = TableQuery.CombineFilters(
+                query,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition(
+                    "PartitionKey",
+                    QueryComparisons.GreaterThanOrEqual,
+                    userid
+                )
+            );
+
+            TableQuery<HomeLineEntity> tableQuery = new TableQuery<HomeLineEntity>().Where(query).Take(count);
+            TableQuerySegment<HomeLineEntity> queryResult = _userline.ExecuteQuerySegmented(tableQuery, continuationToken);
+
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = queryResult.ContinuationToken;
+            ret.msgs = new List<Message>();
+            foreach (HomeLineEntity entity in queryResult)
+            {
+                ret.msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+            }
+            return ret;
         }
 
         //public List<Message> HomeLine(string userid)

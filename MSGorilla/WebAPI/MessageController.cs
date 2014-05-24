@@ -11,6 +11,9 @@ using MSGorilla.Library.Models;
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.SqlModels;
 
+using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.Storage.Table;
+
 namespace MSGorilla.WebApi
 {
     public class MessageController : BaseController
@@ -26,6 +29,29 @@ namespace MSGorilla.WebApi
         public List<Message> UserLine(DateTime end, DateTime start)
         {
             return _messageManager.UserLine(whoami(), end, start);
+        }
+
+        public class Token
+        {
+            public string NextPartitionKey { get; set; }
+            public string NextRowKey { get; set; }
+            public string NextTableName { get; set; }
+            //public int TargetLocation;
+        }
+        [HttpGet]
+        public MessagePagination UserLine(string userid, int count, [FromUri]Token token = null)
+        {
+            TableContinuationToken tok = null;
+            if (token != null)
+            {
+                tok = new TableContinuationToken();
+                tok.NextPartitionKey = token.NextPartitionKey;
+                tok.NextRowKey = token.NextRowKey;
+                tok.NextTableName = token.NextTableName;
+                //tok.TargetLocation = token.TargetLocation;
+            }
+            
+            return _messageManager.HomeLine(userid, count, tok);
         }
 
         [HttpGet]
@@ -52,6 +78,7 @@ namespace MSGorilla.WebApi
         {
             return _messageManager.HomeLine(whoami(), start, end);
         }
+
         [HttpGet]
         public List<Message> EventLine()
         {
