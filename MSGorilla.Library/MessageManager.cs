@@ -32,6 +32,7 @@ namespace MSGorilla.Library
         private CloudTable _homeline;
         private CloudTable _userline;
         private CloudTable _eventline;
+        private CloudTable _ownerline;
         private CloudTable _publicSquareLine;
         private CloudTable _reply;
 
@@ -46,6 +47,7 @@ namespace MSGorilla.Library
             _userline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Userline);
             _eventline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.EventLine);
             _publicSquareLine = AzureFactory.GetTable(AzureFactory.MSGorillaTable.PublicSquareLine);
+            _ownerline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.OwnerLine);
             _reply = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Reply);
 
             _queue = AzureFactory.GetQueue();
@@ -146,10 +148,22 @@ namespace MSGorilla.Library
             }
             return ret;
         }
-        //public List<Message> UserLine(string userid)
-        //{
-        //    return UserLine(userid, DateTime.UtcNow, DateTime.UtcNow.AddDays(0 - DefaultTimelineQueryDayRange));
-        //}
+
+        public List<Message> OwnerLine(string userid, DateTime start, DateTime end)
+        {
+            TableQuery<UserLineEntity> rangeQuery =
+                new TableQuery<UserLineEntity>().Where(
+                    GenerateTimestampConditionQuery(userid, start, end)
+                );
+
+            List<Message> msgs = new List<Message>();
+            foreach (UserLineEntity entity in _ownerline.ExecuteQuery(rangeQuery))
+            {
+                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+            }
+            msgs.Reverse();
+            return msgs;
+        }
 
         public List<Message> HomeLine(string userid, DateTime start, DateTime end)
         {
@@ -325,7 +339,7 @@ namespace MSGorilla.Library
         }
 
 
-        public void PostMessage(string userid, string eventID, string schemaID, string message, DateTime timestamp)
+        public void PostMessage(string userid, string eventID, string schemaID, string owner, string message, DateTime timestamp)
         {
             if (message.Length > 2048)
             {
@@ -347,7 +361,7 @@ namespace MSGorilla.Library
                 throw new InvalidIDException("Event");
             }
 
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID);
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner);
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);
@@ -373,6 +387,12 @@ namespace MSGorilla.Library
             //insert into PublicSquareLine
             insertOperation = TableOperation.InsertOrReplace(new PublicSquareLineEntity(message));
             _publicSquareLine.Execute(insertOperation);
+
+            if (!string.IsNullOrEmpty(message.Owner) && Utils.IsValidID(message.Owner))
+            {
+                insertOperation = TableOperation.InsertOrReplace(new OwnerLineEntity(message));
+                _ownerline.Execute(insertOperation);
+            }
 
             List<UserProfile> followers = _accManager.Followers(message.User);
             //followers.Add(_accManager.FindUser(message.User));

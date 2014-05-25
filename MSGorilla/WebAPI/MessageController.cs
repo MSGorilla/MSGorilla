@@ -80,6 +80,17 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
+        public List<Message> OwnerLine()
+        {
+            return _messageManager.OwnerLine(whoami(), DateTime.UtcNow.AddDays(-3), DateTime.UtcNow);
+        }
+        [HttpGet]
+        public List<Message> OwnerLine(DateTime end, DateTime start)
+        {
+            return _messageManager.OwnerLine(whoami(), start, end);
+        }
+
+        [HttpGet]
         public List<Message> EventLine()
         {
             return _messageManager.EventLine("none");
@@ -114,9 +125,9 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet, HttpPost]
-        public ActionResult PostMessage(string message, string schemaID = "none", string eventID = "none")
+        public ActionResult PostMessage(string message, string schemaID = "none", string eventID = "none", string owner = "")
         {
-            _messageManager.PostMessage(whoami(), eventID, schemaID, message, DateTime.UtcNow);
+            _messageManager.PostMessage(whoami(), eventID, schemaID, owner, message, DateTime.UtcNow);
             return new ActionResult();
         }
 
@@ -125,6 +136,7 @@ namespace MSGorilla.WebApi
             public string Message { get; set; }
             public string SchemaID { get; set; }
             public string EventID { get; set; }
+            public string Owner { get; set; }
         };
 
         [HttpPost]
@@ -141,7 +153,7 @@ namespace MSGorilla.WebApi
             {
                 msg.EventID = "none";
             }
-            _messageManager.PostMessage(whoami(), msg.EventID, msg.SchemaID, msg.Message, DateTime.UtcNow);
+            _messageManager.PostMessage(whoami(), msg.EventID, msg.SchemaID, msg.Owner, msg.Message, DateTime.UtcNow);
             return new ActionResult();
         }
     }
