@@ -15,6 +15,7 @@ namespace MSGorilla.Library.Models
         public DateTime PostTime { get; set; }
         public string MessageUser { get; set; }
         public string MessageID { get; set; }
+        public string ReplyID { get; set; }
 
         public Reply(string fromUser, string toUser, string message, DateTime timestamp, string messageUser, string messageID)
         {
@@ -24,6 +25,9 @@ namespace MSGorilla.Library.Models
             PostTime = timestamp.ToUniversalTime();
             MessageUser = messageUser;
             MessageID = messageID;
+            ReplyID = string.Format("{0}_{1}",
+                Utils.ToAzureStorageSecondBasedString(PostTime.ToUniversalTime()),
+                Guid.NewGuid().ToString());
         }
         public string toJsonString(){
             return JsonConvert.SerializeObject(this);

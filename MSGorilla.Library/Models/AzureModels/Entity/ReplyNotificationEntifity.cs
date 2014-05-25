@@ -14,11 +14,7 @@ namespace MSGorilla.Library.Models.AzureModels
         public ReplyNotificationEntifity(Reply reply)
         {
             this.PartitionKey = reply.ToUser;
-            this.RowKey = string.Format(
-                    "{0}_{1}",
-                    Utils.ToAzureStorageSecondBasedString(reply.PostTime.ToUniversalTime()),
-                    Guid.NewGuid().ToString()
-                );
+            this.RowKey = reply.ReplyID;
 
             Content = reply.toJsonString();
         }
@@ -26,11 +22,7 @@ namespace MSGorilla.Library.Models.AzureModels
         public ReplyNotificationEntifity(string userid, Reply reply)
         {
             this.PartitionKey = userid;
-            this.RowKey = string.Format(
-                    "{0}_{1}",
-                    Utils.ToAzureStorageSecondBasedString(reply.PostTime.ToUniversalTime()),
-                    Guid.NewGuid().ToString()
-                );
+            this.RowKey = reply.ReplyID;
 
             Content = reply.toJsonString();
         }
