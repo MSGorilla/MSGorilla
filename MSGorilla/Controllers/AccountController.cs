@@ -9,12 +9,16 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using MSGorilla.Models;
+using MSGorilla.Filters;
+using MSGorilla.Library;
+using MSGorilla.Library.Models.SqlModels;
 
 namespace MSGorilla.Controllers
 {
-    [Authorize]
     public class AccountController : Controller
     {
+        AccountManager _accManager = new AccountManager();
+
         public AccountController()
             : this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext())))
         {
@@ -45,15 +49,36 @@ namespace MSGorilla.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindAsync(model.UserName, model.Password);
-                if (user != null)
+            //    var user = await UserManager.FindAsync(model.Userid, model.Password);
+            //    if (user != null)
+            //    {
+            //        await SignInAsync(user, model.RememberMe);
+            //        return RedirectToLocal(returnUrl);
+            //    }
+            //    else
+            //    {
+            //        ModelState.AddModelError("", "Invalid username or password.");
+            //    }
+
+                try
                 {
-                    await SignInAsync(user, model.RememberMe);
-                    return RedirectToLocal(returnUrl);
+                    string userid = model.UserName.ToLower();
+                    string password = model.Password;
+                    if (_accManager.AuthenticateUser(userid, Utils.MD5Encoding(password)))
+                    {
+                        var user = _accManager.FindUser(userid);
+                        SignIn(user, true);
+
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Invalid username or password.");
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    ModelState.AddModelError("", "Invalid username or password.");
+                    ModelState.AddModelError("", e.Message);
                 }
             }
 
@@ -78,16 +103,42 @@ namespace MSGorilla.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser() { UserName = model.UserName };
-                var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+                //var user = new ApplicationUser() { UserName = model.UserName };
+                //var result = await UserManager.CreateAsync(user, model.Password);
+                //if (result.Succeeded)
+                //{
+                //    await SignInAsync(user, isPersistent: false);
+                //    return RedirectToAction("Index", "Home");
+                //}
+                //else
+                //{
+                //    AddErrors(result);
+                //}
+
+                try
                 {
-                    await SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+                    string userid = model.UserName.ToLower();
+                    string password = model.Password;
+                    var newUser =  new UserProfile();
+                    newUser.Userid = newUser.DisplayName = newUser.Description = userid;
+                    newUser.FollowersCount = newUser.FollowingsCount = newUser.MessageCount = 0;
+                    newUser.Password = Utils.MD5Encoding(password);
+                    newUser.PortraitUrl = "/Content/Images/default_avatar.jpg";
+
+                    var result = await _accManager.AddUser(newUser);
+                    if (result != null)
+                    {
+                        SignIn(result, true);
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Failed to register user. Please try again.");
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    AddErrors(result);
+                    ModelState.AddModelError("", e.Message);
                 }
             }
 
@@ -116,6 +167,7 @@ namespace MSGorilla.Controllers
 
         //
         // GET: /Account/Manage
+        [TokenAuthAttribute]
         public ActionResult Manage(ManageMessageId? message)
         {
             ViewBag.StatusMessage =
@@ -133,6 +185,7 @@ namespace MSGorilla.Controllers
         // POST: /Account/Manage
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [TokenAuthAttribute]
         public async Task<ActionResult> Manage(ManageUserViewModel model)
         {
             bool hasPassword = HasPassword();
@@ -140,18 +193,52 @@ namespace MSGorilla.Controllers
             ViewBag.ReturnUrl = Url.Action("Manage");
             if (hasPassword)
             {
+            //    if (ModelState.IsValid)
+            //    {
+            //        IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
+            //        if (result.Succeeded)
+            //        {
+            //            return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
+            //        }
+            //        else
+            //        {
+            //            AddErrors(result);
+            //        }
+            //    }
                 if (ModelState.IsValid)
                 {
-                    IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
-                    if (result.Succeeded)
+                    try
                     {
-                        return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
+                        string userid = Session["userid"].ToString();
+                        string oldpassword = model.OldPassword;
+                        string newpassword = model.NewPassword;
+
+                        if (_accManager.AuthenticateUser(userid, Utils.MD5Encoding(oldpassword)))
+                        {
+                            var user = _accManager.FindUser(userid);
+                            user.Password = Utils.MD5Encoding(newpassword);
+
+                            var result = _accManager.UpdateUser(user);
+                            if (result != null)
+                            {
+                                SignIn(result, true);
+                                return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
+                            }
+                            else
+                            {
+                                ModelState.AddModelError("", "Failed to update user information. Please try again.");
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("", "Invalid old password.");
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        AddErrors(result);
+                        ModelState.AddModelError("", e.Message);
                     }
-                }
+                }          
             }
             else
             {
@@ -164,17 +251,43 @@ namespace MSGorilla.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    IdentityResult result = await UserManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
-                    if (result.Succeeded)
+            //        IdentityResult result = await UserManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
+            //        if (result.Succeeded)
+            //        {
+            //            return RedirectToAction("Manage", new { Message = ManageMessageId.SetPasswordSuccess });
+            //        }
+            //        else
+            //        {
+            //            AddErrors(result);
+            //        }
+
+                    try
                     {
-                        return RedirectToAction("Manage", new { Message = ManageMessageId.SetPasswordSuccess });
+                        string userid = Session["userid"].ToString();
+                        string newpassword = model.NewPassword;
+
+                        var user = _accManager.FindUser(userid);
+                        user.Password = Utils.MD5Encoding(newpassword);
+
+                        var result = _accManager.UpdateUser(user);
+                        if (result != null)
+                        {
+                            SignIn(result, true);
+                            return RedirectToAction("Manage", new { Message = ManageMessageId.SetPasswordSuccess });
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("", "Failed to update user information. Please try again.");
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        AddErrors(result);
+                        ModelState.AddModelError("", e.Message);
                     }
-                }
+              }
             }
+
+
 
             // If we got this far, something failed, redisplay form
             return View(model);
@@ -285,12 +398,25 @@ namespace MSGorilla.Controllers
 
         //
         // POST: /Account/LogOff
+        
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [TokenAuthAttribute]
         public ActionResult LogOff()
         {
-            AuthenticationManager.SignOut();
-            return RedirectToAction("Index", "Home");
+            //AuthenticationManager.SignOut();
+            try
+            {
+                this.Session.Abandon();
+                if (Request.Cookies["Authorization"] != null)
+                {
+                    HttpCookie myCookie = new HttpCookie("Authorization");
+                    myCookie.Expires = DateTime.Now.AddDays(-1d);
+                    Response.Cookies.Add(myCookie);
+                }
+            }
+            catch {}
+
+            return RedirectToAction("Login", "Account");
         }
 
         //
@@ -338,6 +464,27 @@ namespace MSGorilla.Controllers
             AuthenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
         }
 
+        private void SignIn(UserProfile user, bool isPersistent)
+        {
+            string userid = user.Userid;
+            string password = user.Password;
+
+            // add userid to session.
+            this.Session.Add("userid", userid);
+
+            // remember me?
+            if (isPersistent)
+            {
+                HttpCookie cookie = new HttpCookie("Authorization",
+                    "basic " + Utils.EncodeBase64(string.Format("{0}:{1}", userid, password)));
+                cookie.HttpOnly = true;
+                cookie.Expires = DateTime.UtcNow.AddDays(1);
+                cookie.Path = "/";
+
+                this.HttpContext.Response.Cookies.Add(cookie);
+            }
+        }
+
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
@@ -348,11 +495,26 @@ namespace MSGorilla.Controllers
 
         private bool HasPassword()
         {
-            var user = UserManager.FindById(User.Identity.GetUserId());
-            if (user != null)
+            //var user = UserManager.FindById(User.Identity.GetUserId());
+            //if (user != null)
+            //{
+            //    return user.PasswordHash != null;
+            //}
+            //return false;
+
+            string userid = Session["userid"].ToString();
+            try
             {
-                return user.PasswordHash != null;
+                var user = _accManager.FindUser(userid);
+                if (user != null)
+                {
+                    return user.Password != null;
+                }
             }
+            catch {
+                return false;
+            }
+
             return false;
         }
 
@@ -378,7 +540,8 @@ namespace MSGorilla.Controllers
 
         private class ChallengeResult : HttpUnauthorizedResult
         {
-            public ChallengeResult(string provider, string redirectUri) : this(provider, redirectUri, null)
+            public ChallengeResult(string provider, string redirectUri)
+                : this(provider, redirectUri, null)
             {
             }
 

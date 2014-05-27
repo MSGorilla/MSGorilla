@@ -1,4 +1,11 @@
 ﻿/* common function */
+function ScrollTo(itemname) {
+    var scroll_offset = $("#" + itemname).offset();
+    $("body,html").animate({
+        scrollTop: scroll_offset.top
+    }, 0);
+}
+
 function encodeHtml(code) {
     code = code.replace(/&/mg, '&#38;');
     code = code.replace(/</mg, '&#60;');
@@ -28,7 +35,7 @@ function DateFormat(datestring) {
 function Time2Now(datestring) {
     var date = new Date(datestring);
     var now = new Date();
-    var diff = (now - date)/1000;
+    var diff = (now - date) / 1000;
 
     var sec = 1;
     var min = 60 * sec;
@@ -438,15 +445,14 @@ function LoadReplies(mid) {
         success: function (data) {
             // create reply list
             $("#replylist_" + mid).empty();
-            var i = 0;
             $.each(data, function (index, item) {
-                $("#replylist_" + mid).append(CreateReply(item, ++i));
-                var rid = mid + "_" + i;
+                $("#replylist_" + mid).append(CreateReply(item));
+                var rid = item.ReplyID;
                 $.getJSON("/api/account/User", "userid=" + item.FromUser, function (data) {
                     var username = data.DisplayName;
                     var picurl = data.PortraitUrl;
                     if (isNullOrEmpty(picurl)) {
-                        picurl = "/Content/Images/default_avatar.jpg111";
+                        picurl = "/Content/Images/default_avatar.jpg";
                     }
                     $("#reply_user_pic_" + rid).attr("src", picurl);
                     $("#reply_username_" + rid).text(username);
@@ -459,17 +465,17 @@ function LoadReplies(mid) {
     });
 }
 
-function CreateReply(replyData, no) {
+function CreateReply(replyData) {
     var output = "";
     var user = replyData.FromUser;
     var msg = replyData.Message;
     var posttime = replyData.PostTime;
-    var rid = replyData.MessageID + "_" + no;
+    var rid = replyData.ReplyID;
 
     output = "<li class='list-group-item'>";
     output += "  <div>"
     output += "    <div class='reply-pic'>";
-    output += "      <img class='img-rounded' id='reply_user_pic" + rid + "' src='/Content/Images/default_avatar.jpg' width='50' height='50' />";
+    output += "      <img class='img-rounded' id='reply_user_pic_" + rid + "' src='/Content/Images/default_avatar.jpg' width='50' height='50' />";
     output += "    </div>";
     output += "    <div class='reply-content'>";
     output += "      <div class='reply-input'>";
@@ -496,7 +502,7 @@ function ShowEvents(mid, eid) {
         // show events
         show.val("true");
         // show events
-        LoadEvents(mid,eid);
+        LoadEvents(mid, eid);
     }
     else {
         // clear events
@@ -526,6 +532,16 @@ function LoadEvents(mid, eid) {
                     return true;
                 }
                 eventdiv.append(CreateEvent(item));
+                var id = item.EventID;
+                $.getJSON("/api/account/User", "userid=" + item.User, function (data) {
+                    var username = data.DisplayName;
+                    var picurl = data.PortraitUrl;
+                    if (isNullOrEmpty(picurl)) {
+                        picurl = "/Content/Images/default_avatar.jpg";
+                    }
+                    $("#event_user_pic_" + id).attr("src", picurl);
+                    $("#event_username_" + id).text(username);
+                });
             })
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -546,10 +562,10 @@ function CreateEvent(postData) {
     output += "  <li class='list-group-item quote'>";
     output += "    <div>"
     output += "      <div class='feed-pic'>";
-    output += "        <img class='img-rounded' id='user_pic_" + mid + "_" + eid + "' src='/Content/Images/default_avatar.jpg' width='100' height='100' />";
+    output += "        <img class='img-rounded' id='event_user_pic_" + eid + "' src='/Content/Images/default_avatar.jpg' width='100' height='100' />";
     output += "      </div>";
     output += "      <div class='feed-content'>";
-    output += "        <div class='newpost-header'><a id='username_" + mid + "_" + eid + "' class='list-group-item-heading bold' href='/profile/index?user=" + user + "'>" + user + "</a>";
+    output += "        <div class='newpost-header'><a id='event_username_" + eid + "' class='list-group-item-heading bold' href='/profile/index?user=" + user + "'>" + user + "</a>";
     output += "        &nbsp;<span class='badge'>-&nbsp;" + Time2Now(posttime) + "</span></div>";
     output += "        <div class='newpost-input'><p>" + encodeHtml(msg) + "</p></div>";
     //output += "        <div class='newpost-footer'>";
@@ -563,4 +579,3 @@ function CreateEvent(postData) {
 
     return output;
 }
-

@@ -64,7 +64,7 @@ namespace MSGorilla.Library
             return  _accountCtx.Users.Find(user.Userid);
         }
 
-        public void UpdateUser(UserProfile user)
+        public UserProfile UpdateUser(UserProfile user)
         {
             UserProfile originUser = _accountCtx.Users.Find(user.Userid);
             if (originUser == null)
@@ -72,10 +72,13 @@ namespace MSGorilla.Library
                 throw new UserNotFoundException(user.Userid);
             }
 
+            originUser.Password = user.Password;
             originUser.DisplayName = user.DisplayName;
-            originUser.PortraitUrl = user.PortraitUrl;
             originUser.Description = user.Description;
+            originUser.PortraitUrl = user.PortraitUrl;
             _accountCtx.SaveChanges();
+
+            return _accountCtx.Users.Find(user.Userid);
         }
 
         public async Task<Boolean> Follow(string userid, string followingUserid)
