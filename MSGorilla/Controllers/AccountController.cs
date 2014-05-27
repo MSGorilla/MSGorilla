@@ -67,7 +67,7 @@ namespace MSGorilla.Controllers
                     if (_accManager.AuthenticateUser(userid, Utils.MD5Encoding(password)))
                     {
                         var user = _accManager.FindUser(userid);
-                        SignIn(user, true);
+                        SignIn(user, model.RememberMe);
 
                         return RedirectToAction("Index", "Home");
                     }
@@ -128,7 +128,7 @@ namespace MSGorilla.Controllers
                     var result = await _accManager.AddUser(newUser);
                     if (result != null)
                     {
-                        SignIn(result, true);
+                        SignIn(result, false);
                         return RedirectToAction("Index", "Home");
                     }
                     else
@@ -221,7 +221,7 @@ namespace MSGorilla.Controllers
                             var result = _accManager.UpdateUser(user);
                             if (result != null)
                             {
-                                SignIn(result, true);
+                                SignIn(result, false);
                                 return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
                             }
                             else
@@ -272,7 +272,7 @@ namespace MSGorilla.Controllers
                         var result = _accManager.UpdateUser(user);
                         if (result != null)
                         {
-                            SignIn(result, true);
+                            SignIn(result, false);
                             return RedirectToAction("Manage", new { Message = ManageMessageId.SetPasswordSuccess });
                         }
                         else
@@ -464,7 +464,7 @@ namespace MSGorilla.Controllers
             AuthenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
         }
 
-        private void SignIn(UserProfile user, bool isPersistent)
+        private void SignIn(UserProfile user, bool isPersistent = false)
         {
             string userid = user.Userid;
             string password = user.Password;
@@ -473,16 +473,18 @@ namespace MSGorilla.Controllers
             this.Session.Add("userid", userid);
 
             // remember me?
+            int days = 1;
             if (isPersistent)
             {
-                HttpCookie cookie = new HttpCookie("Authorization",
-                    "basic " + Utils.EncodeBase64(string.Format("{0}:{1}", userid, password)));
-                cookie.HttpOnly = true;
-                cookie.Expires = DateTime.UtcNow.AddDays(1);
-                cookie.Path = "/";
-
-                this.HttpContext.Response.Cookies.Add(cookie);
+                days = 30;
             }
+            HttpCookie cookie = new HttpCookie("Authorization",
+                "basic " + Utils.EncodeBase64(string.Format("{0}:{1}", userid, password)));
+            cookie.HttpOnly = true;
+            cookie.Expires = DateTime.UtcNow.AddDays(days);
+            cookie.Path = "/";
+
+            this.HttpContext.Response.Cookies.Add(cookie);
         }
 
         private void AddErrors(IdentityResult result)

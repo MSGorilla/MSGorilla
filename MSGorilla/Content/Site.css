@@ -8,14 +8,15 @@
 .body-content {
     padding-top: 10px;
     padding-bottom: 10px;
-    display:block;
+    display: block;
 }
 
 /* Set width on the form input elements since they're 100% wide by default */
-input,
-select {
+/*input,
+select,
+textarea {
     max-width: 500px;
-}
+}*/
 
 /* styles for validation helpers */
 .field-validation-error {
@@ -44,65 +45,69 @@ input[type="checkbox"].input-validation-error {
 
 /* added */
 .main-container {
-    content:normal;
-    display:block;
-    min-height:1000px;
+    content: normal;
+    display: block;
+    min-height: 1000px;
 }
 
 .posts-container {
-    float:left;
-    overflow:hidden;
-    padding-bottom:0px;
-    padding-top:20px;
-    padding-left:0px;
-    padding-right:0px;
-    position:relative;
-    width:400px;
-}
-@media (min-width: 768px) {
-  .posts-container {
+    float: left;
+    overflow: hidden;
+    padding-bottom: 0px;
+    padding-top: 20px;
+    padding-left: 0px;
+    padding-right: 0px;
+    position: relative;
     width: 400px;
-  }
 }
+
+@media (min-width: 768px) {
+    .posts-container {
+        width: 400px;
+    }
+}
+
 @media (min-width: 992px) {
-  .posts-container {
-    width: 620px;
-  }
+    .posts-container {
+        width: 620px;
+    }
 }
+
 @media (min-width: 1200px) {
-  .posts-container {
-    width: 820px;
-  }
+    .posts-container {
+        width: 820px;
+    }
 }
 
 .tools-container {
-    float:right;
-    overflow:hidden;
-    padding-bottom:0px;
-    padding-top:20px;
-    padding-left:0px;
-    padding-right:0px;
+    float: right;
+    overflow: hidden;
+    padding-bottom: 0px;
+    padding-top: 20px;
+    padding-left: 0px;
+    padding-right: 0px;
     width: 300px;
-    position:relative;
-    margin-left:20px;
+    position: relative;
+    margin-left: 20px;
 }
 
 .posts-newpost {
-    display:block;
+    display: block;
 }
 
 .newpost-header {
-    margin-bottom:10px;
+    margin-bottom: 10px;
 }
 
 .newpost-input {
-    margin-bottom:10px;
-    text-wrap:normal;
-    white-space:normal;
-    word-wrap:break-word;
+    margin-bottom: 10px;
+    text-wrap: normal;
+    white-space: normal;
+    word-wrap: break-word;
 }
+
 .newpost-footer {
-    text-align:right;
+    text-align: right;
 }
 
 .posts-notification {
@@ -114,75 +119,79 @@ input[type="checkbox"].input-validation-error {
 }
 
 .replies-container {
-    display:block;
-
+    display: block;
 }
 
 .replies-feeds {
+    margin-top:10px;
     display: block;
 }
 
 .reply-input {
-    margin-bottom:10px;
-    text-wrap:normal;
-    white-space:normal;
-    word-wrap:break-word;
+    margin-bottom: 10px;
+    text-wrap: normal;
+    white-space: normal;
+    word-wrap: break-word;
 }
 
 .user-container {
-    margin-bottom:20px;
+    margin-bottom: 20px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    background-color: #333333;
 }
 
 .user-info {
-    background-color:#333333;
-    padding:15px;
-    text-align :center;
-    color:white;
-
+    padding: 15px;
+    text-align: center;
+    color: white;
 }
+
     .user-info a {
-        color:white;
-        font-weight:bold;
+        color: white;
+        font-weight: bold;
     }
 
 .user-postinfo {
 }
 
 .feed-pic {
-    float:left;
-    padding:10px;
+    float: left;
+    padding: 10px;
 }
 
 .feed-content {
-    margin-left:120px;
-    padding:10px;
-    min-height:150px;
+    margin-left: 120px;
+    padding: 10px;
+    min-height: 150px;
 }
 
 .reply-pic {
-    float:left;
-    padding:5px;
+    float: left;
+    padding: 5px;
 }
 
 .reply-content {
-    margin-left:70px;
-    padding:5px;
-    min-height:60px;
+    margin-left: 70px;
+    padding: 5px;
+    min-height: 60px;
 }
 
 .userdesp-input {
-    margin-bottom:10px;
-    text-wrap:normal;
-    white-space:normal;
-    word-wrap:break-word;
-    padding-left:30px;
-    padding-right:30px;
+    margin-bottom: 10px;
+    text-wrap: normal;
+    white-space: normal;
+    word-wrap: break-word;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
 .bold {
-    font-weight:bold;
+    font-weight: bold;
 }
 
 .quote {
-  background-color:  aliceblue;
+    background-color: aliceblue;
 }
+
