@@ -39,18 +39,9 @@ namespace MSGorilla.WebApi
             //public int TargetLocation;
         }
         [HttpGet]
-        public MessagePagination UserLine(string userid, int count, [FromUri]Token token = null)
+        public MessagePagination UserLine(string userid, int count, string token = null)
         {
-            TableContinuationToken tok = null;
-            if (token != null)
-            {
-                tok = new TableContinuationToken();
-                tok.NextPartitionKey = token.NextPartitionKey;
-                tok.NextRowKey = token.NextRowKey;
-                tok.NextTableName = token.NextTableName;
-                //tok.TargetLocation = token.TargetLocation;
-            }
-            
+            TableContinuationToken tok = Utils.String2Token(token);
             return _messageManager.HomeLine(userid, count, tok);
         }
 

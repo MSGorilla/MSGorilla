@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
+
 namespace MSGorilla.Library
 {
     public class Utils
@@ -84,6 +87,38 @@ namespace MSGorilla.Library
             }
 
             return true;
+        }
+
+        public static string Token2String(TableContinuationToken token)
+        {
+            if (token == null)
+            {
+                return "null";
+            }
+            string ret = (token.NextPartitionKey == null ? "" : token.NextPartitionKey) + ";";
+            ret += (token.NextRowKey == null ? "" : token.NextRowKey) + ";";
+            ret += (token.NextTableName == null ? "" : token.NextTableName) + ";";
+            ret += (token.TargetLocation == StorageLocation.Primary ? "Primary" : "Secondary") + ";";
+            return ret;
+        }
+
+        public static TableContinuationToken String2Token(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return null;
+            }
+            string[] parts = token.Split(';');
+            if (parts.Length < 4)
+            {
+                return null;
+            }
+            TableContinuationToken ret = new TableContinuationToken();
+            ret.NextPartitionKey = parts[0];
+            ret.NextRowKey = parts[1];
+            ret.NextTableName = string.IsNullOrEmpty(parts[2]) ? null : parts[2];
+            ret.TargetLocation = "Primary".Equals(parts[3]) ? StorageLocation.Primary : StorageLocation.Secondary;
+            return ret;
         }
     }
 }

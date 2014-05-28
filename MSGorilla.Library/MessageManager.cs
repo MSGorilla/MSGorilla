@@ -23,7 +23,7 @@ namespace MSGorilla.Library
     public class MessagePagination
     {
         public List<Message> msgs {get; set;}
-        public TableContinuationToken continuationToken { get; set; }
+        public string continuationToken { get; set; }
     }
 
     public class MessageManager
@@ -140,7 +140,7 @@ namespace MSGorilla.Library
             TableQuerySegment<UserLineEntity> queryResult = _userline.ExecuteQuerySegmented(tableQuery, continuationToken);
 
             MessagePagination ret = new MessagePagination();
-            ret.continuationToken = queryResult.ContinuationToken;
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
             ret.msgs = new List<Message>();
             foreach (UserLineEntity entity in queryResult)
             {
@@ -210,7 +210,7 @@ namespace MSGorilla.Library
             TableQuerySegment<HomeLineEntity> queryResult = _userline.ExecuteQuerySegmented(tableQuery, continuationToken);
 
             MessagePagination ret = new MessagePagination();
-            ret.continuationToken = queryResult.ContinuationToken;
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
             ret.msgs = new List<Message>();
             foreach (HomeLineEntity entity in queryResult)
             {
