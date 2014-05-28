@@ -179,16 +179,28 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public bool IsFollowing(string followingUserID)
+        public int IsFollowing(string followingUserID)
         {
-            return _accountManager.IsFollowing(whoami(), followingUserID);
+            return IsFollowing(whoami(), followingUserID);
         }
 
         [HttpGet]
-        public bool IsFollowing(string userid, string followingUserID)
+        public int IsFollowing(string userid, string followingUserID)
         {
-            string me = whoami();
-            return _accountManager.IsFollowing(userid, followingUserID);
+            // 0: not following, 1: following, -1: myself
+            if (userid.Equals(followingUserID, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return -1;
+            }
+
+            return _accountManager.IsFollowing(userid, followingUserID) ? 1 : 0;
+        }
+
+        [HttpGet]
+        public List<UserProfile> SearchUser(string keyword)
+        {
+            var users = _accountManager.SearchUser(keyword);
+            return users;
         }
     }
 }

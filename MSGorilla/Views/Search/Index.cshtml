@@ -1,0 +1,33 @@
+﻿@{
+    ViewBag.Title = "Search";
+}
+
+<script src="~/Scripts/common.js"></script>
+<script>
+    $(SearchUser('@ViewBag.SearchKeyword'));
+</script>
+
+<div class="main-container">
+    <div class="contents-container">
+        <div id="notifications" class="posts-notification">
+            @*<div class="alert alert-dismissable alert-warning">
+                    <button class="close" type="button" data-dismiss="alert">×</button>
+                    <p><a class="alert-link" href="#">You have new messages.</a></p>
+                </div>*@
+        </div>
+
+        <div class="users-cards">
+            <div>
+                <span class="help-block bold">People</span>
+            </div>
+            <div id="userlist">
+                @*autofill by js*@
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+    <div class="tools-container">
+        @Html.Partial("_MePartial")
+    </div>
+
+</div>

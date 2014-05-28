@@ -208,6 +208,7 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="WebAPI\AccountController.cs" />
     <Compile Include="WebAPI\BaseController.cs" />
     <Compile Include="WebAPI\MessageController.cs">
@@ -266,6 +267,7 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Profile\Index.cshtml" />
     <Content Include="Views\Shared\_MePartial.cshtml" />
+    <Content Include="Views\Search\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
