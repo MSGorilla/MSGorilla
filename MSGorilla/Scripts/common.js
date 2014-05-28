@@ -19,7 +19,7 @@ function encodeHtml(code) {
 }
 
 function isNullOrEmpty(strVal) {
-    if (strVal == '' || strVal == null || strVal == undefined) {
+    if (strVal == null || strVal == undefined || strVal == '') {
         return true;
     } else {
         return false;
@@ -101,7 +101,6 @@ function LoadUserInfo(user) {
     }
     else {
         apiurl = "/api/account/user?userid=" + user;
-        LoadUserFollowBtn(user);
     }
 
     $.ajax({
@@ -126,6 +125,8 @@ function LoadUserInfo(user) {
             $("#user_posts").html(postscount);
             $("#user_following").html(followingcount);
             $("#user_followers").html(followerscount);
+
+            LoadUserFollowBtn(userid);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowError(textStatus + ": " + errorThrown);
@@ -134,36 +135,55 @@ function LoadUserInfo(user) {
 }
 
 function LoadUserFollowBtn(user) {
-    var btn = $("#btn_user_follow");
-    if (btn == undefined) {
+    var btn = $("#btn_user_follow_" + user);
+    if (btn.length == 0) {
         return;
     }
 
     $.get("/api/account/isfollowing", "followingUserID=" + user, function (data) {
-        if (data == false) {
-            SetFollowBtn(user);
-        } else {
-            SetUnfollowBtn(user);
+        if (data == 0) {
+            SetFollowBtn(user, true);
+        } else if(data == 1) {
+            SetUnfollowBtn(user, true);
+        }
+        else {  // -1: myself
+            SetEditProfileBtn(user);
         }
     });
 }
 
-function SetUnfollowBtn(user) {
-    var btn = $("#btn_user_follow");
-    if (btn == undefined) {
+function SetEditProfileBtn(user) {
+    var btn = $("#btn_user_follow_" + user);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Edit profile");
+    btn.attr("class", "btn btn-info");
+    btn.attr("href", "/account/manage");
+}
+
+function SetUnfollowBtn(user, enabled) {
+    var btn = $("#btn_user_follow_" + user);
+    if (btn.length == 0) {
         return;
     }
 
     btn.text("Following");
     btn.attr("class", "btn btn-success");
-    btn.attr("onclick", "Unfollow('" + user + "');");
-    btn.attr("onmouseover", "UnfollowBtnMouseOver();")
-    btn.attr("onmouseout", "UnfollowBtnMouseOut();")
+    if (enabled) {
+        btn.attr("onclick", "Unfollow('" + user + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "UnfollowBtnMouseOver('" + user + "');")
+    btn.attr("onmouseout", "UnfollowBtnMouseOut('" + user + "');")
 }
 
-function UnfollowBtnMouseOver() {
-    var btn = $("#btn_user_follow");
-    if (btn == undefined) {
+function UnfollowBtnMouseOver(user) {
+    var btn = $("#btn_user_follow_" + user);
+    if (btn.length == 0) {
         return;
     }
 
@@ -171,9 +191,9 @@ function UnfollowBtnMouseOver() {
     btn.text("Unfollow");
 }
 
-function UnfollowBtnMouseOut() {
-    var btn = $("#btn_user_follow");
-    if (btn == undefined) {
+function UnfollowBtnMouseOut(user) {
+    var btn = $("#btn_user_follow_" + user);
+    if (btn.length == 0) {
         return;
     }
 
@@ -181,20 +201,26 @@ function UnfollowBtnMouseOut() {
     btn.text("Following");
 }
 
-function SetFollowBtn(user) {
-    var btn = $("#btn_user_follow");
-    if (btn == undefined) {
+function SetFollowBtn(user, enabled) {
+    var btn = $("#btn_user_follow_" + user);
+    if (btn.length == 0) {
         return;
     }
 
     btn.text("Follow");
     btn.attr("class", "btn btn-primary");
-    btn.attr("onclick", "Follow('" + user + "');");
+    if (enabled) {
+        btn.attr("onclick", "Follow('" + user + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
     btn.attr("onmouseover", "")
     btn.attr("onmouseout", "")
 }
 
 function Follow(user) {
+    SetUnfollowBtn(user, false);
     $.ajax({
         type: "get",
         url: "/api/account/follow",
@@ -217,6 +243,7 @@ function Follow(user) {
 }
 
 function Unfollow(user) {
+    SetFollowBtn(user, false);
     $.ajax({
         type: "get",
         url: "/api/account/unfollow",
@@ -494,7 +521,7 @@ function ShowEvents(mid, eid) {
     var newerdiv = $("#event_newer_" + mid);
     var olderdiv = $("#event_older_" + mid);
 
-    if (show == undefined) {
+    if (show.length == 0) {
         return;
     }
 
@@ -576,6 +603,75 @@ function CreateEvent(postData) {
     //output += "    <div id='reply_" + mid + "'></div>";
     //output += "    <input type='hidden' id='isshowreplies_" + mid + "' value='false'/>";
     output += "  </li>";
+
+    return output;
+}
+
+
+// search function
+function SearchUser(keyword) {
+    var apiurl = "";
+    if (isNullOrEmpty(keyword))
+        apiurl = "/api/account/user";
+    else
+        apiurl = "/api/account/searchuser?keyword=" + keyword;
+
+    $.ajax({
+        type: "get",
+        url: apiurl,
+        dataType: "json",
+        success: function (data) {
+            if (data.length == 0) {
+                ShowError("No user found.");
+            }
+            else {
+                // create user list
+                $("#userlist").empty();
+                $.each(data, function (index, item) {
+                    $("#userlist").append(CreateUserCard(item));
+                    LoadUserFollowBtn(item.Userid);
+                })
+
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+function CreateUserCard(data) {
+    var output = "";
+    var userid = data.Userid;
+    var username = data.DisplayName;
+    var picurl = data.PortraitUrl;
+    var desp = data.Description;
+    var postscount = data.MessageCount;
+    var followingcount = data.FollowingsCount;
+    var followerscount = data.FollowersCount;
+
+    if (isNullOrEmpty(picurl)) {
+        picurl = "/Content/Images/default_avatar.jpg";
+    }
+
+    output = "  <div class='user-card'>"
+           + "    <div class='user-card-info '>"
+           + "      <div class='ma-btm-10'>"
+           + "        <img class='img-rounded' id='user_pic_" + userid + "' src='" + picurl + "' width='100' height='100' />"
+           + "      </div>"
+           + "      <div>"
+           + "        <a class='' id='user_name_" + userid + "' href='/profile/index?user=" + userid + "'>" + username + "</a>"
+           + "      </div>"
+           + "      <div>"
+           + "        <span id='user_id_" + userid + "'>" + userid + "</span>"
+           + "      </div>"
+           + "    </div>"
+           + "    <div class='user-card-postinfo'>"
+           + "      <div class='btn-group btn-group-justified'>"
+           + "        <a class='btn btn-primary' id='btn_user_follow_" + userid + "'>Follow</a>"
+           + "      </div>"
+           + "    </div>"
+           + "  </div>";
 
     return output;
 }

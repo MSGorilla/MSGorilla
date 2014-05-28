@@ -12,11 +12,11 @@
 }
 
 /* Set width on the form input elements since they're 100% wide by default */
-/*input,
+input,
 select,
 textarea {
-    max-width: 500px;
-}*/
+    min-width: 300px;
+}
 
 /* styles for validation helpers */
 .field-validation-error {
@@ -50,7 +50,7 @@ input[type="checkbox"].input-validation-error {
     min-height: 1000px;
 }
 
-.posts-container {
+.contents-container {
     float: left;
     overflow: hidden;
     padding-bottom: 0px;
@@ -58,23 +58,23 @@ input[type="checkbox"].input-validation-error {
     padding-left: 0px;
     padding-right: 0px;
     position: relative;
-    width: 400px;
+    width: 420px;
 }
 
 @media (min-width: 768px) {
-    .posts-container {
-        width: 400px;
+    .contents-container {
+        width: 420px;
     }
 }
 
 @media (min-width: 992px) {
-    .posts-container {
+    .contents-container {
         width: 620px;
     }
 }
 
 @media (min-width: 1200px) {
-    .posts-container {
+    .contents-container {
         width: 820px;
     }
 }
@@ -187,11 +187,58 @@ input[type="checkbox"].input-validation-error {
     padding-right: 30px;
 }
 
+.ma-5 {
+    margin:5px;
+}
+
+.ma-10 {
+    margin:10px;
+}
+
+.ma-btm-10 {
+    margin-bottom:10px;
+}
+
 .bold {
     font-weight: bold;
 }
 
 .quote {
     background-color: aliceblue;
+}
+
+.users-cards {
+    margin-bottom: 20px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    background-color: white;
+    padding:10px;
+    border:1px solid lightgray;
+}
+
+.user-card {
+    float: left;
+    width: 178px;
+    margin:10px 10px 20px 10px;
+    padding:0px 0px 20px 0px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    background-color: #f4f8f9;
+    border:1px solid lightgray;
+}
+
+.user-card-info {
+    padding: 15px;
+    color: darkgray;
+}
+
+    .user-card-info a {
+        color: #292f33;
+        font-weight: bold;
+    }
+
+.user-card-postinfo {
 }
 

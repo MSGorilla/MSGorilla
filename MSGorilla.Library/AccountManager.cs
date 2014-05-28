@@ -47,6 +47,12 @@ namespace MSGorilla.Library
             return _accountCtx.Users.Find(userid);
         }
 
+        public List<UserProfile> SearchUser(string keyword)
+        {
+            var users =_accountCtx.Users.Where(u => u.Userid.Contains(keyword));
+            return users.ToList<UserProfile>();
+        }
+
         public async Task<UserProfile> AddUser(UserProfile user)
         {
             if (!Utils.IsValidID(user.Userid))

@@ -16,10 +16,10 @@
 </script>
 
 <div class="main-container">
-    <div class="posts-container">
+    <div class="contents-container">
         <div class="user-container ">
             <div class="user-info ">
-                <div>
+                <div class="ma-btm-10">
                     <img class="img-rounded" id="user_pic" src="/Content/Images/default_avatar.jpg" width="200" height="200" />
                 </div>
                 <div>
@@ -39,7 +39,10 @@
                     <a class="btn btn-default">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
                     @if (!ViewBag.IsMe)
                     {
-                        <a class="btn btn-default" id="btn_user_follow"></a>
+                        <a class='btn btn-primary' id='btn_user_follow_@ViewBag.UserId'>Follow</a>
+                    }
+                    else{
+                        <a class='btn btn-primary' id='btn_user_follow_@ViewBag.Me.Userid'>Follow</a>
                     }
                 </div>
             </div>
@@ -61,7 +64,7 @@
     <div class="tools-container">
     @if (!ViewBag.IsMe)
     {
-        @Html.Partial("_MePartial");
+        @Html.Partial("_MePartial")
     }
     </div>
 
