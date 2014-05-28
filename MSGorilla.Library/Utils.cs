@@ -47,12 +47,14 @@ namespace MSGorilla.Library
 
         public static string ToAzureStorageSecondBasedString(DateTime timestamp)
         {
-            return timestamp.ToUniversalTime().ToString("yyyyMMddHHmmss");
+            return ((long)DateTime.MaxValue.Subtract(timestamp.ToUniversalTime()).TotalMilliseconds).ToString();
+            //return timestamp.ToUniversalTime().ToString("yyyyMMddHHmmss");
         }
 
         public static string ToAzureStorageDayBasedString(DateTime timestamp)
         {
-            return timestamp.ToUniversalTime().ToString("yyyyMMdd");
+            return ((long)DateTime.MaxValue.Subtract(timestamp.ToUniversalTime()).TotalDays).ToString();
+            //return timestamp.ToUniversalTime().ToString("yyyyMMdd");
         }
 
         public static string NextKeyString(string current)

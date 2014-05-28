@@ -102,6 +102,16 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
+    public class InvalidMessageIDException : MSGorillaBaseException
+    {
+        public InvalidMessageIDException()
+        {
+            Description = "Invalid Message ID";
+            Code = 3004;
+        }
+    }
+
+
     //public class RetweetARetweetException : TwitterBaseException
     //{
     //    public RetweetARetweetException()

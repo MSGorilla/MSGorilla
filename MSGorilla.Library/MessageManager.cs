@@ -71,7 +71,7 @@ namespace MSGorilla.Library
             string query = TableQuery.GenerateFilterCondition(
                 "PartitionKey", 
                 QueryComparisons.LessThan, 
-                string.Format("{0}_{1}", userid, Utils.NextKeyString(Utils.ToAzureStorageDayBasedString(end))));
+                string.Format("{0}_{1}", userid, Utils.NextKeyString(Utils.ToAzureStorageDayBasedString(start))));
 
             query = TableQuery.CombineFilters(
                 query,
@@ -79,7 +79,7 @@ namespace MSGorilla.Library
                 TableQuery.GenerateFilterCondition(
                     "PartitionKey",
                     QueryComparisons.GreaterThanOrEqual,
-                    string.Format("{0}_{1}", userid, Utils.ToAzureStorageDayBasedString(start)))
+                    string.Format("{0}_{1}", userid, Utils.ToAzureStorageDayBasedString(end)))
             );
 
             query = TableQuery.CombineFilters(
@@ -88,7 +88,7 @@ namespace MSGorilla.Library
                 TableQuery.GenerateFilterCondition(
                     "RowKey",
                     QueryComparisons.LessThan,
-                    Utils.NextKeyString(Utils.ToAzureStorageSecondBasedString(end)))
+                    Utils.NextKeyString(Utils.ToAzureStorageSecondBasedString(start)))
             );
 
             query = TableQuery.CombineFilters(
@@ -97,9 +97,28 @@ namespace MSGorilla.Library
                 TableQuery.GenerateFilterCondition(
                     "RowKey",
                     QueryComparisons.GreaterThan,
-                    Utils.ToAzureStorageSecondBasedString(start))
+                    Utils.ToAzureStorageSecondBasedString(end))
             );
 
+            return query;
+        }
+
+        static string GeneratePKStartWithConditionQuery(string startWith)
+        {
+            string query = TableQuery.GenerateFilterCondition(
+                "PartitionKey",
+                QueryComparisons.LessThan,
+                Utils.NextKeyString(startWith));
+
+            query = TableQuery.CombineFilters(
+                query,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition(
+                    "PartitionKey",
+                    QueryComparisons.GreaterThanOrEqual,
+                    startWith
+                )
+            );
             return query;
         }
 
@@ -115,26 +134,12 @@ namespace MSGorilla.Library
             {
                 msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
-            msgs.Reverse();
             return msgs;
         }
 
-        public MessagePagination Userline(string userid, int count = 25, TableContinuationToken continuationToken = null)
+        public MessagePagination UserLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
         {
-            string query = TableQuery.GenerateFilterCondition(
-                "PartitionKey",
-                QueryComparisons.LessThan,
-                Utils.NextKeyString(userid));
-
-            query = TableQuery.CombineFilters(
-                query,
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition(
-                    "PartitionKey",
-                    QueryComparisons.GreaterThanOrEqual,
-                    userid
-                )
-            );
+            string query = GeneratePKStartWithConditionQuery(userid);
 
             TableQuery<UserLineEntity> tableQuery = new TableQuery<UserLineEntity>().Where(query).Take(count);
             TableQuerySegment<UserLineEntity> queryResult = _userline.ExecuteQuerySegmented(tableQuery, continuationToken);
@@ -161,7 +166,6 @@ namespace MSGorilla.Library
             {
                 msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
-            msgs.Reverse();
             return msgs;
         }
 
@@ -177,34 +181,12 @@ namespace MSGorilla.Library
             {
                 msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
-            msgs.Reverse();
             return msgs;
         }
 
-        public MessagePagination HomeLine(string userid, int count, string token)
-        {
-            TableContinuationToken tok = null;
-            if(!string.IsNullOrEmpty(token)){
-                tok = JsonConvert.DeserializeObject<TableContinuationToken>(token);
-            }             
-            return HomeLine(userid, count, tok);
-        }
         public MessagePagination HomeLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
         {
-            string query = TableQuery.GenerateFilterCondition(
-                "PartitionKey",
-                QueryComparisons.LessThan,
-                Utils.NextKeyString(userid));
-
-            query = TableQuery.CombineFilters(
-                query,
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition(
-                    "PartitionKey",
-                    QueryComparisons.GreaterThanOrEqual,
-                    userid
-                )
-            );
+            string query = GeneratePKStartWithConditionQuery(userid);
 
             TableQuery<HomeLineEntity> tableQuery = new TableQuery<HomeLineEntity>().Where(query).Take(count);
             TableQuerySegment<HomeLineEntity> queryResult = _userline.ExecuteQuerySegmented(tableQuery, continuationToken);
@@ -226,20 +208,7 @@ namespace MSGorilla.Library
 
         public List<Message> EventLine(string eventID)
         {
-            string query = TableQuery.GenerateFilterCondition(
-                "PartitionKey",
-                QueryComparisons.LessThan,
-                Utils.NextKeyString(eventID));
-
-            query = TableQuery.CombineFilters(
-                query,
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition(
-                    "PartitionKey",
-                    QueryComparisons.GreaterThanOrEqual,
-                    eventID
-                )
-            );
+            string query = GeneratePKStartWithConditionQuery(eventID);
 
             TableQuery<EventLineEntity> rangeQuery = new TableQuery<EventLineEntity>().Where(query);
 
@@ -248,9 +217,25 @@ namespace MSGorilla.Library
             {
                 msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
-            msgs.Reverse();
             return msgs;
         }
+
+        public MessagePagination PublicSquareLine(int count = 25, TableContinuationToken continuationToken = null)
+        {
+            TableQuery<PublicSquareLineEntity> tableQuery =
+                new TableQuery<PublicSquareLineEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThan, "")).Take(count);
+
+            TableQuerySegment<PublicSquareLineEntity> queryResult = _publicSquareLine.ExecuteQuerySegmented(tableQuery, continuationToken);
+
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
+            ret.msgs = new List<Message>();
+            foreach (PublicSquareLineEntity entity in queryResult)
+            {
+                ret.msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+            }
+            return ret;
+        } 
 
         public List<Message> PublicSquareLine(DateTime start, DateTime end)
         {
@@ -266,7 +251,7 @@ namespace MSGorilla.Library
             string query = TableQuery.GenerateFilterCondition(
                 "PartitionKey",
                 QueryComparisons.LessThan,
-                Utils.NextKeyString(Utils.ToAzureStorageDayBasedString(end)));
+                Utils.NextKeyString(Utils.ToAzureStorageDayBasedString(start)));
 
             query = TableQuery.CombineFilters(
                 query,
@@ -274,7 +259,7 @@ namespace MSGorilla.Library
                 TableQuery.GenerateFilterCondition(
                     "PartitionKey",
                     QueryComparisons.GreaterThanOrEqual,
-                    Utils.ToAzureStorageDayBasedString(start))
+                    Utils.ToAzureStorageDayBasedString(end))
             );
 
             query = TableQuery.CombineFilters(
@@ -283,7 +268,7 @@ namespace MSGorilla.Library
                 TableQuery.GenerateFilterCondition(
                     "RowKey",
                     QueryComparisons.LessThan,
-                    Utils.NextKeyString(Utils.ToAzureStorageSecondBasedString(end)))
+                    Utils.NextKeyString(Utils.ToAzureStorageSecondBasedString(start)))
             );
 
             query = TableQuery.CombineFilters(
@@ -292,7 +277,7 @@ namespace MSGorilla.Library
                 TableQuery.GenerateFilterCondition(
                     "RowKey",
                     QueryComparisons.GreaterThanOrEqual,
-                    Utils.ToAzureStorageSecondBasedString(start))
+                    Utils.ToAzureStorageSecondBasedString(end))
             );
 
             TableQuery<PublicSquareLineEntity> rangeQuery = new TableQuery<PublicSquareLineEntity>().Where(query);
@@ -302,10 +287,8 @@ namespace MSGorilla.Library
             {
                 msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
-            msgs.Reverse();
             return msgs;
         }
-
 
         public MessageDetail GetMessageDetail(string userid, string messageID)
         {
@@ -337,7 +320,6 @@ namespace MSGorilla.Library
             }
             return replies;
         }
-
 
         public void PostMessage(string userid, string eventID, string schemaID, string owner, string message, DateTime timestamp)
         {

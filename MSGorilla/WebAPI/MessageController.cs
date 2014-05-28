@@ -21,37 +21,23 @@ namespace MSGorilla.WebApi
         MessageManager _messageManager = new MessageManager();
 
         [HttpGet]
-        public List<Message> UserLine()
+        public MessagePagination UserLine()
         {
-            return _messageManager.UserLine(whoami(), DateTime.UtcNow.AddDays(-3), DateTime.UtcNow);
-        }
-        [HttpGet]
-        public List<Message> UserLine(DateTime end, DateTime start)
-        {
-            return _messageManager.UserLine(whoami(), end, start);
+            return UserLine(whoami());
         }
 
-        public class Token
-        {
-            public string NextPartitionKey { get; set; }
-            public string NextRowKey { get; set; }
-            public string NextTableName { get; set; }
-            //public int TargetLocation;
-        }
         [HttpGet]
-        public MessagePagination UserLine(string userid, int count, string token = null)
+        public MessagePagination UserLine(string userid, int count = 25, string token = null)
         {
+            string me = whoami();
+            if (string.IsNullOrEmpty(userid))
+            {
+                userid = me;
+            }
             TableContinuationToken tok = Utils.String2Token(token);
-            return _messageManager.HomeLine(userid, count, tok);
+            return _messageManager.UserLine(userid, count, tok);
         }
 
-        [HttpGet]
-        public List<Message> UserLine(string userid)
-        {
-            if(string.IsNullOrEmpty(userid))
-                userid = whoami();
-            return _messageManager.UserLine(userid, DateTime.UtcNow.AddDays(-3), DateTime.UtcNow);
-        }
         [HttpGet]
         public List<Message> UserLine(string userid, DateTime end, DateTime start)
         {
@@ -60,14 +46,28 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public List<Message> HomeLine()
+        public MessagePagination HomeLine()
         {
-            return _messageManager.HomeLine(whoami(), DateTime.UtcNow.AddDays(-3), DateTime.UtcNow);
+            return HomeLine(whoami());
         }
+
         [HttpGet]
-        public List<Message> HomeLine(DateTime end, DateTime start)
+        public MessagePagination HomeLine(string userid, int count = 25, string token = null)
         {
-            return _messageManager.HomeLine(whoami(), start, end);
+            string me = whoami();
+            if (string.IsNullOrEmpty(userid))
+            {
+                userid = me;
+            }
+            TableContinuationToken tok = Utils.String2Token(token);
+            return _messageManager.HomeLine(userid, count, tok);
+        }
+
+        [HttpGet]
+        public List<Message> HomeLine(string userid, DateTime end, DateTime start)
+        {
+            whoami();
+            return _messageManager.HomeLine(userid, start, end);
         }
 
         [HttpGet]
@@ -97,11 +97,11 @@ namespace MSGorilla.WebApi
             return _messageManager.PublicSquareLine(start, end);
         }
         [HttpGet]
-        public List<Message> PublicSquareLine()
+        public MessagePagination PublicSquareLine(int count = 25, string token = null)
         {
-            DateTime end = DateTime.UtcNow;
-            DateTime start = end.AddDays(-1);
-            return _messageManager.PublicSquareLine(start, end);
+            string me = whoami();
+            TableContinuationToken tok = Utils.String2Token(token);
+            return _messageManager.PublicSquareLine(count, tok);
         }
         [HttpGet]
         public MessageDetail GetMessage(string userid, string messageID)

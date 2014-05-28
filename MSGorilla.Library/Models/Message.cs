@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Microsoft.WindowsAzure.Storage.Queue;
 
+using MSGorilla.Library.Exceptions;
+
 namespace MSGorilla.Library.Models
 {
     public class Message
@@ -38,7 +40,17 @@ namespace MSGorilla.Library.Models
 
         public static string ToMessagePK(string userid, string messageID)
         {
-            return string.Format("{0}_{1}", userid, messageID.Substring(0, 8));
+            try
+            {
+                double timespan = Double.Parse(messageID.Split('_')[0]);
+                DateTime timestamp = DateTime.MaxValue.AddMilliseconds(0 - timespan);
+
+                return string.Format("{0}_{1}", userid, Utils.ToAzureStorageDayBasedString(timestamp));
+            }
+            catch
+            {
+                throw new InvalidMessageIDException();
+            }
         }
 
         public CloudQueueMessage toAzureCloudQueueMessage()
