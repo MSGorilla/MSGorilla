@@ -77,7 +77,7 @@ namespace MSGorilla.Library
             {
                 replies.Add(JsonConvert.DeserializeObject<Reply>(entity.Content));
             }
-
+            replies.Reverse();
             return replies;
         }
 
