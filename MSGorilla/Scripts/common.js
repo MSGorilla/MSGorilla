@@ -326,15 +326,15 @@ function PostReply(user, mid) {
 function LoadFeeds(category) {
     var apiurl = "";
     if (isNullOrEmpty(category))
-        apiurl = "/api/message/userline";
+        apiurl = "/api/message/userline?count=25";
     else if (category == "homeline")
-        apiurl = "/api/message/homeline";
+        apiurl = "/api/message/homeline?count=25";
     else if(category == "ownerline")
-        apiurl = "api/message/ownerline";
+        apiurl = "api/message/ownerline?count=25";
     else if (category == "publicsquareline")
-        apiurl = "api/message/publicsquareline";
+        apiurl = "api/message/publicsquareline?count=25";
     else
-        apiurl = "/api/message/userline?userid=" + category;
+        apiurl = "/api/message/userline??count=25&userid=" + category;
 
     $.ajax({
         type: "get",
