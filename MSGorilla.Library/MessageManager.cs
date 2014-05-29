@@ -22,7 +22,7 @@ namespace MSGorilla.Library
 {
     public class MessagePagination
     {
-        public List<Message> msgs {get; set;}
+        public List<Message> message {get; set;}
         public string continuationToken { get; set; }
     }
 
@@ -146,10 +146,10 @@ namespace MSGorilla.Library
 
             MessagePagination ret = new MessagePagination();
             ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
-            ret.msgs = new List<Message>();
+            ret.message = new List<Message>();
             foreach (UserLineEntity entity in queryResult)
             {
-                ret.msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
             return ret;
         }
@@ -177,10 +177,10 @@ namespace MSGorilla.Library
 
             MessagePagination ret = new MessagePagination();
             ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
-            ret.msgs = new List<Message>();
+            ret.message = new List<Message>();
             foreach (OwnerLineEntity entity in queryResult)
             {
-                ret.msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
             return ret;
         }
@@ -209,10 +209,10 @@ namespace MSGorilla.Library
 
             MessagePagination ret = new MessagePagination();
             ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
-            ret.msgs = new List<Message>();
+            ret.message = new List<Message>();
             foreach (HomeLineEntity entity in queryResult)
             {
-                ret.msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
             return ret;
         }
@@ -245,10 +245,10 @@ namespace MSGorilla.Library
 
             MessagePagination ret = new MessagePagination();
             ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
-            ret.msgs = new List<Message>();
+            ret.message = new List<Message>();
             foreach (PublicSquareLineEntity entity in queryResult)
             {
-                ret.msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
             return ret;
         } 

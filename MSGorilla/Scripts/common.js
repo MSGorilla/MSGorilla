@@ -329,6 +329,10 @@ function LoadFeeds(category) {
         apiurl = "/api/message/userline";
     else if (category == "homeline")
         apiurl = "/api/message/homeline";
+    else if(category == "ownerline")
+        apiurl = "api/message/ownerline";
+    else if (category == "publicsquareline")
+        apiurl = "api/message/publicsquareline";
     else
         apiurl = "/api/message/userline?userid=" + category;
 
@@ -337,6 +341,9 @@ function LoadFeeds(category) {
         url: apiurl,
         dataType: "json",
         success: function (data) {
+            token = data.token
+            data = data.message
+            //ShowError(data);
             if (data.length == 0) {
                 ShowError("No feed found.");
             }
