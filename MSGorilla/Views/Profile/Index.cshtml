@@ -37,13 +37,7 @@
                     <a class="btn btn-default">POSTS &nbsp;<span id="user_posts" class="badge">0</span></a>
                     <a class="btn btn-default">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
                     <a class="btn btn-default">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
-                    @if (!ViewBag.IsMe)
-                    {
-                        <a class='btn btn-primary' id='btn_user_follow_@ViewBag.UserId'>Follow</a>
-                    }
-                    else{
-                        <a class='btn btn-primary' id='btn_user_follow_@ViewBag.Me.Userid'>Follow</a>
-                    }
+                    <a class='btn btn-primary' id='btn_user_follow_@ViewBag.UserId'>Follow</a>
                 </div>
             </div>
         </div>
@@ -59,8 +53,20 @@
             @*autofill by js*@
         </div>
 
-        <div>
-            <button id="Click2SeeMore" type="button" class="btn btn-primary btn-lg btn-block">Click to See More</button>
+        <div class="txtaln-c">
+            <span id="lbl_seemore" class="help-block">Loading more...</span>
+            <input id="hd_token" type="hidden" value="" />
+
+            <script type="text/javascript">
+                $(window).scroll(function () {
+                    var documentTop = $(document).scrollTop();
+                    var windowHeight = $(window).height();
+                    var documentHeight = $(document).height();
+                    if (documentTop >= (documentHeight - windowHeight)) {
+                        LoadFeeds("homeline");
+                    }
+                })
+            </script>
         </div>
 
     </div>

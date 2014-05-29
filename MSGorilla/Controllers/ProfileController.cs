@@ -23,15 +23,10 @@ namespace MSGorilla.Controllers
             ViewBag.Myid = me.Userid;
             ViewBag.Me = me;
 
-            if (string.IsNullOrEmpty(user))
-            {
-                user = "";
-            }
-            //user = user.ToLower();
-            if (user == "" || user.Equals(myid, StringComparison.CurrentCultureIgnoreCase))
+            if (string.IsNullOrEmpty(user) || user.Equals(myid, StringComparison.CurrentCultureIgnoreCase))
             {
                 ViewBag.IsMe = true;
-                user = "";
+                user = myid;
             }
             else{
                 ViewBag.IsMe = false;

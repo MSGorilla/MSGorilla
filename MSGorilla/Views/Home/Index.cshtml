@@ -18,7 +18,7 @@
                     <textarea class="form-control" id="postmessage" rows="3"></textarea>
                 </div>
                 <div class="newpost-footer">
-                    <button id="btn_post" onclick="PostMessage();" class="btn btn-primary" type="button" data-original-title="Post" data-toggle="tooltip" data-placement="top">Post</button>
+                    <button id="btn_post" onclick="PostMessage();" class="btn btn-primary" type="button" data-loading-text="Posting...">Post</button>
                 </div>
             </div>
         </div>
@@ -34,10 +34,21 @@
             @*autofill by js*@
         </div>
 
-        <div>
-            <button id="Click2SeeMore" type="button" class="btn btn-primary btn-lg btn-block">Click to See More</button>
-        </div>
+        <div class="txtaln-c">
+            <span id="lbl_seemore" class="help-block">Loading more...</span>
+            <input id="hd_token" type="hidden" value=""/>
 
+            <script type="text/javascript">
+                $(window).scroll(function () {
+                    var documentTop = $(document).scrollTop();
+                    var windowHeight = $(window).height();
+                    var documentHeight = $(document).height();
+                    if (documentTop >= (documentHeight - windowHeight)) {
+                        LoadFeeds("homeline");
+                    }
+                })
+            </script>
+        </div>
     </div>
 
     <div class="tools-container">
