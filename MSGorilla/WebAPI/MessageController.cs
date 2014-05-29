@@ -21,11 +21,10 @@ namespace MSGorilla.WebApi
         MessageManager _messageManager = new MessageManager();
 
         [HttpGet]
-        public MessagePagination UserLine()
+        public MessagePagination UserLine(int count = 25, string token = null)
         {
-            return UserLine(whoami());
+            return UserLine(whoami(), count, token);
         }
-
         [HttpGet]
         public MessagePagination UserLine(string userid, int count = 25, string token = null)
         {
@@ -46,9 +45,9 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public MessagePagination HomeLine()
+        public MessagePagination HomeLine(int count = 25, string token = null)
         {
-            return HomeLine(whoami());
+            return HomeLine(whoami(), count, token);
         }
 
         [HttpGet]
@@ -71,13 +70,25 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public List<Message> OwnerLine()
+        public MessagePagination OwnerLine(int count = 25, string token = null)
         {
-            return _messageManager.OwnerLine(whoami(), DateTime.UtcNow.AddDays(-3), DateTime.UtcNow);
+            return OwnerLine(whoami(), count, token);
         }
         [HttpGet]
-        public List<Message> OwnerLine(DateTime end, DateTime start)
+        public MessagePagination OwnerLine(string userid, int count = 25, string token = null)
         {
+            string me = whoami();
+            if (string.IsNullOrEmpty(userid))
+            {
+                userid = me;
+            }
+            TableContinuationToken tok = Utils.String2Token(token);
+            return _messageManager.OwnerLine(userid, count, tok);
+        }
+        [HttpGet]
+        public List<Message> OwnerLine(string userid, DateTime end, DateTime start)
+        {
+            whoami();
             return _messageManager.OwnerLine(whoami(), start, end);
         }
 

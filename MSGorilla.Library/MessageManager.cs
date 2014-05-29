@@ -169,6 +169,22 @@ namespace MSGorilla.Library
             return msgs;
         }
 
+        public MessagePagination OwnerLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
+        {
+            string query = GeneratePKStartWithConditionQuery(userid);
+            TableQuery<OwnerLineEntity> tableQuery = new TableQuery<OwnerLineEntity>().Where(query).Take(count);
+            TableQuerySegment<OwnerLineEntity> queryResult = _ownerline.ExecuteQuerySegmented(tableQuery, continuationToken);
+
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
+            ret.msgs = new List<Message>();
+            foreach (OwnerLineEntity entity in queryResult)
+            {
+                ret.msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+            }
+            return ret;
+        }
+
         public List<Message> HomeLine(string userid, DateTime start, DateTime end)
         {
             TableQuery<HomeLineEntity> rangeQuery =
