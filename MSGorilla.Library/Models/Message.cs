@@ -45,7 +45,7 @@ namespace MSGorilla.Library.Models
                 double timespan = Double.Parse(messageID.Split('_')[0]);
                 DateTime timestamp = DateTime.MaxValue.AddMilliseconds(0 - timespan);
 
-                return string.Format("{0}_{1}", userid, Utils.ToAzureStorageDayBasedString(timestamp));
+                return string.Format("{0}_{1}", userid, Utils.ToAzureStorageDayBasedString(timestamp, false));
             }
             catch
             {

@@ -30,10 +30,6 @@ namespace MSGorilla.Library
                 return false;
             }
             UserProfile user = _accountCtx.Users.Find(userid);
-            if (user == null || !user.Userid.Equals(userid))
-            {
-                throw new UserNotFoundException(userid);
-            }
 
             if (string.IsNullOrEmpty(user.Password))
             {

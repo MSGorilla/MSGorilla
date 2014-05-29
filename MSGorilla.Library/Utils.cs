@@ -45,15 +45,23 @@ namespace MSGorilla.Library
             return encode;
         }
 
-        public static string ToAzureStorageSecondBasedString(DateTime timestamp)
+        public static string ToAzureStorageSecondBasedString(DateTime timestamp, bool toUtc = true)
         {
-            return ((long)DateTime.MaxValue.Subtract(timestamp.ToUniversalTime()).TotalMilliseconds).ToString();
+            if (toUtc)
+            {
+                timestamp = timestamp.ToUniversalTime();
+            }
+            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalMilliseconds).ToString();
             //return timestamp.ToUniversalTime().ToString("yyyyMMddHHmmss");
         }
 
-        public static string ToAzureStorageDayBasedString(DateTime timestamp)
+        public static string ToAzureStorageDayBasedString(DateTime timestamp, bool toUtc = true)
         {
-            return ((long)DateTime.MaxValue.Subtract(timestamp.ToUniversalTime()).TotalDays).ToString();
+            if (toUtc)
+            {
+                timestamp = timestamp.ToUniversalTime();
+            }
+            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalDays).ToString();
             //return timestamp.ToUniversalTime().ToString("yyyyMMdd");
         }
 
