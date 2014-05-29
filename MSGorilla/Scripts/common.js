@@ -126,7 +126,7 @@ function LoadUserInfo(user) {
             $("#user_following").html(followingcount);
             $("#user_followers").html(followerscount);
 
-            LoadUserFollowBtn(userid);
+            LoadUserFollowBtn(user);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowError(textStatus + ": " + errorThrown);
