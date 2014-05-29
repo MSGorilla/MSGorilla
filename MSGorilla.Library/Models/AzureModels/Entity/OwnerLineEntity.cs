@@ -16,9 +16,9 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             ;
         }
 
-        public OwnerLineEntity(Message msg)
+        public OwnerLineEntity(string ownerid, Message msg)
         {
-            this.PartitionKey = string.Format("{0}_{1}", msg.Owner, 
+            this.PartitionKey = string.Format("{0}_{1}", ownerid, 
                 Utils.ToAzureStorageDayBasedString(msg.PostTime.ToUniversalTime()));
             this.RowKey = msg.ID;
 

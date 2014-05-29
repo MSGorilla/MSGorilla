@@ -116,7 +116,7 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet, HttpPost]
-        public ActionResult PostMessage(string message, string schemaID = "none", string eventID = "none", string owner = "")
+        public ActionResult PostMessage(string message, string schemaID = "none", string eventID = "none", [FromUri]string[] owner = null)
         {
             _messageManager.PostMessage(whoami(), eventID, schemaID, owner, message, DateTime.UtcNow);
             return new ActionResult();
@@ -127,7 +127,7 @@ namespace MSGorilla.WebApi
             public string Message { get; set; }
             public string SchemaID { get; set; }
             public string EventID { get; set; }
-            public string Owner { get; set; }
+            public string[] Owner { get; set; }
         };
 
         [HttpPost]

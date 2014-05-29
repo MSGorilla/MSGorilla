@@ -189,7 +189,7 @@ namespace MSGorilla.Library
             string query = GeneratePKStartWithConditionQuery(userid);
 
             TableQuery<HomeLineEntity> tableQuery = new TableQuery<HomeLineEntity>().Where(query).Take(count);
-            TableQuerySegment<HomeLineEntity> queryResult = _userline.ExecuteQuerySegmented(tableQuery, continuationToken);
+            TableQuerySegment<HomeLineEntity> queryResult = _homeline.ExecuteQuerySegmented(tableQuery, continuationToken);
 
             MessagePagination ret = new MessagePagination();
             ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
@@ -321,7 +321,7 @@ namespace MSGorilla.Library
             return replies;
         }
 
-        public void PostMessage(string userid, string eventID, string schemaID, string owner, string message, DateTime timestamp)
+        public void PostMessage(string userid, string eventID, string schemaID, string[] owner, string message, DateTime timestamp)
         {
             if (message.Length > 2048)
             {
@@ -348,7 +348,7 @@ namespace MSGorilla.Library
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);
 
-            //insert into owner's homeline
+            //insert into poster's homeline
             insertOperation = TableOperation.InsertOrReplace(new HomeLineEntity(msg.User, msg));
             _homeline.Execute(insertOperation);
 
@@ -370,10 +370,16 @@ namespace MSGorilla.Library
             insertOperation = TableOperation.InsertOrReplace(new PublicSquareLineEntity(message));
             _publicSquareLine.Execute(insertOperation);
 
-            if (!string.IsNullOrEmpty(message.Owner) && Utils.IsValidID(message.Owner))
+            if (message.Owner != null)
             {
-                insertOperation = TableOperation.InsertOrReplace(new OwnerLineEntity(message));
-                _ownerline.Execute(insertOperation);
+                foreach (string ownerid in message.Owner)
+                {
+                    if (Utils.IsValidID(ownerid))
+                    {
+                        insertOperation = TableOperation.InsertOrReplace(new OwnerLineEntity(ownerid, message));
+                        _ownerline.Execute(insertOperation);
+                    }
+                }
             }
 
             List<UserProfile> followers = _accManager.Followers(message.User);
