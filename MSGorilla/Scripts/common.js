@@ -341,7 +341,7 @@ function LoadFeeds(category) {
         url: apiurl,
         dataType: "json",
         success: function (data) {
-            token = data.token
+            token = data.continuationToken
             data = data.message
             //ShowError(data);
             if (data.length == 0) {
@@ -364,6 +364,70 @@ function LoadFeeds(category) {
                     });
                 })
 
+            }
+
+            if (token == null) {
+                $("#Click2SeeMore").unbind("click");
+                $("#Click2SeeMore").text("No more feeds");
+                $("#Click2SeeMore").attr("disabled", true);
+            }
+            else {
+                $("#Click2SeeMore").text("Click to see more");
+                $("#Click2SeeMore").attr("disabled", false);
+                $("#Click2SeeMore").attr("onclick", "");
+                $("#Click2SeeMore").unbind("click");
+                $("#Click2SeeMore").click(
+                    function (event) {                        
+                        LoadMoreFeeds(apiurl, token);
+                });
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+function LoadMoreFeeds(apiurl, token) {
+    $.ajax({
+        type: "get",
+        url: apiurl + "&token=" + token,
+        dataType: "json",
+        success: function (data) {
+            nexttoken = data.continuationToken
+            messages = data.message
+            //ShowError(data);
+            if (messages.length > 0) {
+                // create feed list
+                $.each(messages, function (index, item) {
+                    $("#feedlist").append(CreateFeed(item));
+                    $.getJSON("/api/account/User", "userid=" + item.User, function (data) {
+                        var mid = item.ID;
+                        var username = data.DisplayName;
+                        var picurl = data.PortraitUrl;
+                        if (isNullOrEmpty(picurl)) {
+                            picurl = "/Content/Images/default_avatar.jpg";
+                        }
+                        $("#user_pic_" + mid).attr("src", picurl);
+                        $("#username_" + mid).text(username);
+                    });
+                })
+
+            }
+
+            if (data.continuationToken == null) {
+                $("#Click2SeeMore").unbind("click");
+                $("#Click2SeeMore").text("No more feeds");
+                $("#Click2SeeMore").attr("disabled", true);
+            }
+            else {
+                $("#Click2SeeMore").unbind("click");
+                $("#Click2SeeMore").text("Click to see more");
+                $("#Click2SeeMore").attr("disabled", false);
+                $("#Click2SeeMore").click(
+                    function (event) {
+                        LoadMoreFeeds(apiurl, data.continuationToken);
+                    });
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {

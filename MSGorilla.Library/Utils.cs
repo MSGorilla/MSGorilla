@@ -95,7 +95,7 @@ namespace MSGorilla.Library
         {
             if (token == null)
             {
-                return "null";
+                return null;
             }
             string ret = (token.NextPartitionKey == null ? "" : token.NextPartitionKey) + ";";
             ret += (token.NextRowKey == null ? "" : token.NextRowKey) + ";";
