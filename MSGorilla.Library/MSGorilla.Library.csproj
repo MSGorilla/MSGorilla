@@ -99,9 +99,11 @@
     <Compile Include="Models\AzureModels\Entity\PublicSquareLineEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\ReplyEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\ReplyNotificationEntifity.cs" />
+    <Compile Include="Models\AzureModels\Entity\TopicLine.cs" />
     <Compile Include="Models\AzureModels\Entity\UserLineEntity.cs" />
     <Compile Include="Models\AzureModels\Queue\QueueMessage.cs" />
     <Compile Include="Models\Reply.cs" />
+    <Compile Include="Models\SqlModels\NotificationCount.cs" />
     <Compile Include="Models\SqlModels\Schema.cs" />
     <Compile Include="Models\SqlModels\Subscription.cs" />
     <Compile Include="Models\SqlModels\UserProfile.cs" />

@@ -547,26 +547,61 @@ function CreateReply(replyData) {
 
 // event function
 function ShowEvents(mid, eid) {
-    var show = $("#isshowevents_" + mid);
-    var newerdiv = $("#event_newer_" + mid);
-    var olderdiv = $("#event_older_" + mid);
+    $("#events").empty();
+    GetEvents(eid);
+    $("#EventsModal").modal();
 
-    if (show.length == 0) {
-        return;
-    }
 
-    if (show.val() == "false") {
-        // show events
-        show.val("true");
-        // show events
-        LoadEvents(mid, eid);
-    }
-    else {
-        // clear events
-        show.val("false");
-        newerdiv.html("");
-        olderdiv.html("");
-    }
+    //var show = $("#isshowevents_" + mid);
+    //var newerdiv = $("#event_newer_" + mid);
+    //var olderdiv = $("#event_older_" + mid);
+
+    //if (show.length == 0) {
+    //    return;
+    //}
+
+    //if (show.val() == "false") {
+    //    // show events
+    //    show.val("true");
+    //    // show events
+    //    LoadEvents(mid, eid);
+    //}
+    //else {
+    //    // clear events
+    //    show.val("false");
+    //    newerdiv.html("");
+    //    olderdiv.html("");
+    //}
+}
+
+function GetEvents(eid) {
+    var newerdiv = $("#events");
+    $.ajax({
+        type: "get",
+        url: "/api/message/eventline",
+        data: "eventID=" + eid,
+        success: function (data) {
+            var eventdiv = newerdiv;
+            // create events list
+            $.each(data, function (index, item) {
+
+                eventdiv.append(CreateEvent(item));
+                var id = item.EventID;
+                $.getJSON("/api/account/User", "userid=" + item.User, function (data) {
+                    var username = data.DisplayName;
+                    var picurl = data.PortraitUrl;
+                    if (isNullOrEmpty(picurl)) {
+                        picurl = "/Content/Images/default_avatar.jpg";
+                    }
+                    $("#event_user_pic_" + id).attr("src", picurl);
+                    $("#event_username_" + id).text(username);
+                });
+            })
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
 }
 
 function LoadEvents(mid, eid) {

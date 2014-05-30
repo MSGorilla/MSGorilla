@@ -35,6 +35,7 @@ namespace MSGorilla.Library
         private CloudTable _ownerline;
         private CloudTable _atline;
         private CloudTable _publicSquareLine;
+        private CloudTable _topicline;
         private CloudTable _reply;
 
         private CloudQueue _queue;
@@ -48,6 +49,7 @@ namespace MSGorilla.Library
             _userline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Userline);
             _eventline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.EventLine);
             _publicSquareLine = AzureFactory.GetTable(AzureFactory.MSGorillaTable.PublicSquareLine);
+            _topicline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.TopicLine);
             _ownerline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.OwnerLine);
             _atline = AzureFactory.GetTable(Azure.AzureFactory.MSGorillaTable.AtLine);
             _reply = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Reply);
@@ -107,6 +109,11 @@ namespace MSGorilla.Library
 
         static string GeneratePKStartWithConditionQuery(string startWith)
         {
+            if (!Utils.IsValidID(startWith))
+            {
+                throw new InvalidIDException();
+            }
+
             string query = TableQuery.GenerateFilterCondition(
                 "PartitionKey",
                 QueryComparisons.LessThan,
@@ -241,6 +248,23 @@ namespace MSGorilla.Library
         //    return HomeLine(userid, DateTime.UtcNow, DateTime.UtcNow.AddDays(0 - DefaultTimelineQueryDayRange));
         //}
 
+        public MessagePagination TopicLine(string topicID, int count = 25, TableContinuationToken continuationToken = null)
+        {
+            string query = GeneratePKStartWithConditionQuery(topicID);
+
+            TableQuery<TopicLine> tableQuery = new TableQuery<TopicLine>().Where(query).Take(count);
+            TableQuerySegment<TopicLine> queryResult = _homeline.ExecuteQuerySegmented(tableQuery, continuationToken);
+
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
+            ret.message = new List<Message>();
+            foreach (TopicLine entity in queryResult)
+            {
+                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+            }
+            return ret;
+        }
+
         public List<Message> EventLine(string eventID)
         {
             string query = GeneratePKStartWithConditionQuery(eventID);
@@ -356,7 +380,14 @@ namespace MSGorilla.Library
             return replies;
         }
 
-        public Message PostMessage(string userid, string eventID, string schemaID, string[] owner, string[] atUser, string message, DateTime timestamp)
+        public Message PostMessage(string userid, 
+                                    string eventID, 
+                                    string schemaID, 
+                                    string topicID,
+                                    string[] owner, 
+                                    string[] atUser, 
+                                    string message, 
+                                    DateTime timestamp)
         {
             if (message.Length > 2048)
             {
@@ -378,7 +409,7 @@ namespace MSGorilla.Library
                 throw new InvalidIDException("Event");
             }
 
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, atUser);
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID, topicID, owner, atUser);
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);
@@ -406,6 +437,14 @@ namespace MSGorilla.Library
             //insert into PublicSquareLine
             insertOperation = TableOperation.InsertOrReplace(new PublicSquareLineEntity(message));
             _publicSquareLine.Execute(insertOperation);
+
+            if (Utils.IsValidID(message.TopicID))
+            {
+                //insert into TopicLine
+                insertOperation = TableOperation.InsertOrReplace(new TopicLine(message));
+                _topicline.Execute(insertOperation);
+            }
+            
 
             //todo:
             //The Userid of owner and AtUser may be ms alais or displayname instead of the

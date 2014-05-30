@@ -19,6 +19,7 @@ namespace MSGorilla.Library.Azure
             Homeline,
             Userline,
             PublicSquareLine,
+            TopicLine,
             EventLine,
             OwnerLine,
             AtLine,
@@ -45,6 +46,7 @@ namespace MSGorilla.Library.Azure
             _dict.Add(MSGorillaTable.Userline, "Userline");
             _dict.Add(MSGorillaTable.EventLine, "EventlineTweet");
             _dict.Add(MSGorillaTable.PublicSquareLine, "PublicSquareline");
+            _dict.Add(MSGorillaTable.TopicLine, "Topicline");
             _dict.Add(MSGorillaTable.OwnerLine, "Ownerline");
             _dict.Add(MSGorillaTable.AtLine, "Atline");
             _dict.Add(MSGorillaTable.Reply, "Reply");

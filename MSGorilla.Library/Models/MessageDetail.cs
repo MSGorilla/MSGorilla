@@ -10,14 +10,14 @@ namespace MSGorilla.Library.Models
     {
         public string User { get; set; }
         public string ID { get; set; }
-        public string EventID { get; set; }    // text, picture, retweet.
+        public string EventID { get; set; }
         public string SchemaID { get; set; }
-
-        // if type is retweet, then Message should be the jsonString of Origin tweet(no recursive!!!).
-        public string Message { get; set; }
-        //public string Url { get; set; }
+        public string TopicID { get; set; }
+        public string[] Owner { get; set; }
+        public string[] AtUser { get; set; }
+        public string MessageContent { get; set; }
         public DateTime PostTime { get; set; }
-        //public int RetweetCount;
+
         public int ReplyCount;
         public List<Reply> Replies;
 
@@ -27,7 +27,10 @@ namespace MSGorilla.Library.Models
             this.ID = msg.ID;
             this.EventID = msg.EventID;
             this.SchemaID = msg.SchemaID;
-            this.Message = msg.MessageContent;
+            this.TopicID = msg.TopicID;
+            this.Owner = msg.Owner;
+            this.AtUser = msg.AtUser;
+            this.MessageContent = msg.MessageContent;
             this.PostTime = msg.PostTime;
         }
     }
