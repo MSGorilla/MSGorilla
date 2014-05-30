@@ -82,7 +82,7 @@ namespace MSGorilla.Library
         }
 
 
-        public void PostReply(string fromUser,
+        public Reply PostReply(string fromUser,
                                 string toUser,
                                 string content,
                                 DateTime timestamp,
@@ -128,6 +128,8 @@ namespace MSGorilla.Library
             TableOperation insert = TableOperation.Insert(notifEntity);
             _replyNotification.Execute(insert);
             _replyArchive.Execute(insert);
+
+            return reply;
         }
     }
 }

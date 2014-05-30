@@ -127,10 +127,10 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet, HttpPost]
-        public ActionResult PostMessage(string message, string schemaID = "none", string eventID = "none", [FromUri]string[] owner = null)
+        public Message PostMessage(string message, string schemaID = "none", string eventID = "none", [FromUri]string[] owner = null)
         {
-            _messageManager.PostMessage(whoami(), eventID, schemaID, owner, message, DateTime.UtcNow);
-            return new ActionResult();
+            return _messageManager.PostMessage(whoami(), eventID, schemaID, owner, message, DateTime.UtcNow);
+            //return new ActionResult();
         }
 
         public class MessageModel
@@ -142,7 +142,7 @@ namespace MSGorilla.WebApi
         };
 
         [HttpPost]
-        public ActionResult PostMessage(MessageModel msg){
+        public Message PostMessage(MessageModel msg){
             if (string.IsNullOrEmpty(msg.Message))
             {
                 throw new MessageNullException();
@@ -155,8 +155,8 @@ namespace MSGorilla.WebApi
             {
                 msg.EventID = "none";
             }
-            _messageManager.PostMessage(whoami(), msg.EventID, msg.SchemaID, msg.Owner, msg.Message, DateTime.UtcNow);
-            return new ActionResult();
+            return _messageManager.PostMessage(whoami(), msg.EventID, msg.SchemaID, msg.Owner, msg.Message, DateTime.UtcNow);
+            //return new ActionResult();
         }
     }
 }

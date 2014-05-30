@@ -30,10 +30,10 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet, HttpPost]
-        public ActionResult PostReply(string to, string message, string messageUser, string messageID)
+        public Reply PostReply(string to, string message, string messageUser, string messageID)
         {
-            _replyManager.PostReply(whoami(), to, message, DateTime.UtcNow, messageUser, messageID);
-            return new ActionResult();
+            return _replyManager.PostReply(whoami(), to, message, DateTime.UtcNow, messageUser, messageID);
+            //return new ActionResult();
         }
 
         public class ReplyModel
@@ -45,7 +45,7 @@ namespace MSGorilla.WebApi
         }
 
         [HttpPost]
-        public ActionResult PostReply(ReplyModel reply)
+        public Reply PostReply(ReplyModel reply)
         {
             return PostReply(reply.To, reply.Message, reply.MessageUser, reply.MessageID);
         }

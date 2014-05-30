@@ -337,7 +337,7 @@ namespace MSGorilla.Library
             return replies;
         }
 
-        public void PostMessage(string userid, string eventID, string schemaID, string[] owner, string message, DateTime timestamp)
+        public Message PostMessage(string userid, string eventID, string schemaID, string[] owner, string message, DateTime timestamp)
         {
             if (message.Length > 2048)
             {
@@ -374,6 +374,8 @@ namespace MSGorilla.Library
 
             user.MessageCount++;
             _accManager.UpdateUser(user);
+
+            return msg;
         }
 
         public void SpreadMessage(Message message)
