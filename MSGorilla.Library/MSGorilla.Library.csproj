@@ -103,6 +103,7 @@
     <Compile Include="Models\AzureModels\Entity\UserLineEntity.cs" />
     <Compile Include="Models\AzureModels\Queue\QueueMessage.cs" />
     <Compile Include="Models\Reply.cs" />
+    <Compile Include="Models\SqlModels\NotificationCount.cs" />
     <Compile Include="Models\SqlModels\Schema.cs" />
     <Compile Include="Models\SqlModels\Subscription.cs" />
     <Compile Include="Models\SqlModels\UserProfile.cs" />
