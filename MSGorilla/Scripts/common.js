@@ -53,6 +53,9 @@ function Time2Now(datestring) {
     else if (diff / sec > 1) {
         return Math.ceil(diff / sec) + "s";
     }
+    else {
+        return "1s";
+    }
 }
 
 /* show message function */
@@ -277,16 +280,9 @@ function PostMessage() {
         type: "post",
         url: "/api/message/postmessage?" + "message=" + message,
         success: function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                $("#postmessage").val("");
-                alert(msg);
-                LoadFeeds("homeline");
-            }
-            else {
-                ShowError(msg);
-            }
+            $("#postmessage").val("");
+            // insert the new posted message
+            $("#feedlist").prepend(CreateFeed(data));
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowError(textStatus + ": " + errorThrown);
@@ -308,15 +304,8 @@ function PostReply(user, mid) {
         type: "post",
         url: "/api/reply/postreply?" + "to=" + user + "&message=" + message + "&messageUser=" + user + "&messageID=" + mid,
         success: function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                $("#replymessage_" + mid).val("");
-                LoadReplies(mid);
-            }
-            else {
-                ShowError(msg);
-            }
+            $("#replymessage_" + mid).val("");
+            $("#replylist_" + mid).prepend(CreateReply(data));
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowError(textStatus + ": " + errorThrown);
