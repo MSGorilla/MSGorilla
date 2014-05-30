@@ -17,26 +17,49 @@ using MSGorilla.Library.Models.SqlModels;
 using System.Threading;
 using System.Threading.Tasks;
 
+using System.Data.Entity;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace MSGorilla.WebApi
 {
+    public class DisplayUserProfile : UserProfile
+    {
+        [DataMember]
+        public int IsFollowing { get; private set; }
+
+        public DisplayUserProfile(UserProfile user, int isFollowing)
+        {
+            Userid = user.Userid;
+            DisplayName = user.DisplayName;
+            PortraitUrl = user.PortraitUrl;
+            Description = user.Description;
+            FollowingsCount = user.FollowingsCount;
+            FollowersCount = user.FollowersCount;
+            MessageCount = user.MessageCount;
+            IsFollowing = isFollowing;
+        }
+    }
+
     public class AccountController : BaseController
     {
         [HttpGet]
-        public Object User()
+        public List<DisplayUserProfile> User()
         {
-            return _accountManager.GetAllUsers();
+            var userlist = _accountManager.GetAllUsers();
+            var dispusers = new List<DisplayUserProfile>();
+
+            foreach (var u in userlist)
+            {
+                dispusers.Add(new DisplayUserProfile(u, IsFollowing(u.Userid)));
+            }
+
+            return dispusers;
         }
 
-        //[HttpGet]
-        //public Object CurrentUser()
-        //{
-        //    return User(HttpContext.Current.User.Identity.Name);
-        //}
-
         [HttpGet]
-        public UserProfile User(string userid)
+        public DisplayUserProfile User(string userid)
         {
             var user = _accountManager.FindUser(userid);
             if (user == null)
@@ -45,12 +68,12 @@ namespace MSGorilla.WebApi
             }
             else
             {
-                return user;
+                return new DisplayUserProfile(user, IsFollowing(userid));
             }
         }
 
         [HttpGet]
-        public UserProfile Me()
+        public DisplayUserProfile Me()
         {
             string userid = whoami();
             var user = _accountManager.FindUser(userid);
@@ -60,12 +83,12 @@ namespace MSGorilla.WebApi
             }
             else
             {
-                return user;
+                return new DisplayUserProfile(user, -1);
             }
         }
 
         [HttpGet]
-        public async Task<object> Register(string Username, string DisplayName, string Password, string Description)
+        public async Task<UserProfile> Register(string Username, string DisplayName, string Password, string Description)
         {
             UserProfile user = new UserProfile();
             //account.Userid = 0;
@@ -76,7 +99,7 @@ namespace MSGorilla.WebApi
 
             Task<UserProfile> createdUser = _accountManager.AddUser(user);
             UserProfile u = await createdUser;
-            return u;            
+            return u;
         }
 
         [HttpGet]
@@ -110,7 +133,7 @@ namespace MSGorilla.WebApi
             public string Description { get; set; }
         }
         [HttpPost]
-        public Task<object> Register(RegisterModel registerModel)
+        public Task<UserProfile> Register(RegisterModel registerModel)
         {
             return Register(registerModel.Username, registerModel.DisplayName, registerModel.Password, registerModel.Description);
         }
@@ -154,28 +177,44 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public List<UserProfile> Followings()
+        public List<DisplayUserProfile> Followings()
         {
-            return _accountManager.Followings(whoami());
+            string me = whoami();
+            return Followings(me);
         }
 
         [HttpGet]
-        public List<UserProfile> Followings(string userid)
+        public List<DisplayUserProfile> Followings(string userid)
         {
-            string me = whoami();
-            return _accountManager.Followings(userid);
+            var userlist = _accountManager.Followings(userid);
+            var dispusers = new List<DisplayUserProfile>();
+
+            foreach (var u in userlist)
+            {
+                dispusers.Add(new DisplayUserProfile(u, 1));
+            }
+
+            return dispusers;
         }
 
         [HttpGet]
-        public List<UserProfile> Followers()
+        public List<DisplayUserProfile> Followers()
         {
-            return _accountManager.Followers(whoami());
+            return Followers(whoami());
         }
+
         [HttpGet]
-        public List<UserProfile> Followers(string userid)
+        public List<DisplayUserProfile> Followers(string userid)
         {
-            string me = whoami();
-            return _accountManager.Followers(userid);
+            var userlist = _accountManager.Followers(userid);
+            var dispusers = new List<DisplayUserProfile>();
+
+            foreach (var u in userlist)
+            {
+                dispusers.Add(new DisplayUserProfile(u, IsFollowing(u.Userid)));
+            }
+
+            return dispusers;
         }
 
         [HttpGet]
@@ -197,10 +236,17 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public List<UserProfile> SearchUser(string keyword)
+        public List<DisplayUserProfile> SearchUser(string keyword)
         {
-            var users = _accountManager.SearchUser(keyword);
-            return users;
+            var userlist = _accountManager.SearchUser(keyword);
+            var dispusers = new List<DisplayUserProfile>();
+
+            foreach (var u in userlist)
+            {
+                dispusers.Add(new DisplayUserProfile(u, IsFollowing(u.Userid)));
+            }
+
+            return dispusers;
         }
     }
 }

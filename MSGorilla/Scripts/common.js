@@ -117,6 +117,7 @@ function LoadUserInfo(user) {
             var postscount = data.MessageCount;
             var followingcount = data.FollowingsCount;
             var followerscount = data.FollowersCount;
+            var isFollowimg = data.IsFollowing;
 
             $("#user_id").html("@" + userid);
             $("#user_name").html(username);
@@ -129,7 +130,7 @@ function LoadUserInfo(user) {
             $("#user_following").html(followingcount);
             $("#user_followers").html(followerscount);
 
-            LoadUserFollowBtn(user);
+            LoadUserFollowBtn(user, isFollowimg);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowError(textStatus + ": " + errorThrown);
@@ -137,22 +138,19 @@ function LoadUserInfo(user) {
     });
 }
 
-function LoadUserFollowBtn(user) {
+function LoadUserFollowBtn(user, isFollowing) {
     var btn = $("#btn_user_follow_" + user);
     if (btn.length == 0) {
         return;
     }
 
-    $.get("/api/account/isfollowing", "followingUserID=" + user, function (data) {
-        if (data == 0) {
-            SetFollowBtn(user, true);
-        } else if(data == 1) {
-            SetUnfollowBtn(user, true);
-        }
-        else {  // -1: myself
-            SetEditProfileBtn(user);
-        }
-    });
+    if (isFollowing == 0) {
+        SetFollowBtn(user, true);
+    } else if (isFollowing == 1) {
+        SetUnfollowBtn(user, true);
+    } else {  // -1: myself
+        SetEditProfileBtn(user);
+    }
 }
 
 function SetEditProfileBtn(user) {
@@ -324,7 +322,7 @@ function LoadFeeds(category) {
         apiurl = "/api/message/userline";
     else if (category == "homeline")
         apiurl = "/api/message/homeline";
-    else if(category == "ownerline")
+    else if (category == "ownerline")
         apiurl = "api/message/ownerline";
     else if (category == "publicsquareline")
         apiurl = "api/message/publicsquareline";
@@ -540,7 +538,7 @@ function ShowEvents(mid, eid) {
             events_div.empty();
             // create events list
             $.each(data, function (index, item) {
-                if(item.ID == mid)
+                if (item.ID == mid)
                     events_div.append(CreateEvent(item, true));
                 else
                     events_div.append(CreateEvent(item, false));
@@ -617,7 +615,7 @@ function SearchUser(keyword) {
                 $("#userlist").empty();
                 $.each(data, function (index, item) {
                     $("#userlist").append(CreateUserCard(item));
-                    LoadUserFollowBtn(item.Userid);
+                    LoadUserFollowBtn(item.Userid, item.IsFollowing);
                 })
 
             }
@@ -637,6 +635,7 @@ function CreateUserCard(data) {
     var postscount = data.MessageCount;
     var followingcount = data.FollowingsCount;
     var followerscount = data.FollowersCount;
+    var isFollowing = data.IsFollowing;
 
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";
