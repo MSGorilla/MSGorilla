@@ -93,6 +93,25 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
+        public MessagePagination AtLine(int count = 25, string token = null)
+        {
+            return AtLine(whoami(), count, token);
+        }
+
+        [HttpGet]
+        public MessagePagination AtLine(string userid, int count = 25, string token = null)
+        {
+            string me = whoami();
+            if (string.IsNullOrEmpty(userid))
+            {
+                userid = whoami();
+            }
+
+            TableContinuationToken tok = Utils.String2Token(token);
+            return _messageManager.AtLine(userid, count, tok);
+        }
+
+        [HttpGet]
         public List<Message> EventLine()
         {
             return _messageManager.EventLine("none");
@@ -127,9 +146,13 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet, HttpPost]
-        public Message PostMessage(string message, string schemaID = "none", string eventID = "none", [FromUri]string[] owner = null)
+        public Message PostMessage(string message, 
+                                    string schemaID = "none", 
+                                    string eventID = "none", 
+                                    [FromUri]string[] owner = null, 
+                                    [FromUri]string[] atUser = null)
         {
-            return _messageManager.PostMessage(whoami(), eventID, schemaID, owner, message, DateTime.UtcNow);
+            return _messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, message, DateTime.UtcNow);
             //return new ActionResult();
         }
 
@@ -139,6 +162,7 @@ namespace MSGorilla.WebApi
             public string SchemaID { get; set; }
             public string EventID { get; set; }
             public string[] Owner { get; set; }
+            public string[] AtUser { get; set; }
         };
 
         [HttpPost]
@@ -155,7 +179,7 @@ namespace MSGorilla.WebApi
             {
                 msg.EventID = "none";
             }
-            return _messageManager.PostMessage(whoami(), msg.EventID, msg.SchemaID, msg.Owner, msg.Message, DateTime.UtcNow);
+            return _messageManager.PostMessage(whoami(), msg.EventID, msg.SchemaID, msg.Owner, msg.AtUser, msg.Message, DateTime.UtcNow);
             //return new ActionResult();
         }
     }

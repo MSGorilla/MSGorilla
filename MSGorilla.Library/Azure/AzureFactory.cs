@@ -21,6 +21,7 @@ namespace MSGorilla.Library.Azure
             PublicSquareLine,
             EventLine,
             OwnerLine,
+            AtLine,
             Reply,
             ReplyNotification,
             ReplyArchive
@@ -45,6 +46,7 @@ namespace MSGorilla.Library.Azure
             _dict.Add(MSGorillaTable.EventLine, "EventlineTweet");
             _dict.Add(MSGorillaTable.PublicSquareLine, "PublicSquareline");
             _dict.Add(MSGorillaTable.OwnerLine, "Ownerline");
+            _dict.Add(MSGorillaTable.AtLine, "Atline");
             _dict.Add(MSGorillaTable.Reply, "Reply");
             _dict.Add(MSGorillaTable.ReplyNotification, "ReplyNotification");
             _dict.Add(MSGorillaTable.ReplyArchive, "ReplyArchive");

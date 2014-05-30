@@ -90,6 +90,7 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActionResult.cs" />
+    <Compile Include="Models\AzureModels\Entity\AtLineEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\EventLineEntity.cs">
       <SubType>Code</SubType>
     </Compile>

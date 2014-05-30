@@ -23,10 +23,16 @@ namespace MSGorilla.WebApi
             return _replyManager.GetAllReply(whoami());
         }
 
+        //[HttpGet]
+        //public List<Reply> ReplyNotification()
+        //{
+        //    return _replyManager.GetReplyNotif(whoami());
+        //}
+
         [HttpGet]
-        public List<Reply> ReplyNotification()
+        public ReplyPagiantion GetMyReply(int count = 25, string token = null)
         {
-            return _replyManager.GetReplyNotif(whoami());
+            return _replyManager.GetReply(whoami(), count, Utils.String2Token(token));
         }
 
         [HttpGet, HttpPost]

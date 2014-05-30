@@ -20,6 +20,12 @@ using MSGorilla.Library.Models.AzureModels.Entity;
 
 namespace MSGorilla.Library
 {
+    public class ReplyPagiantion
+    {
+        public List<Reply> reply {get; set;}
+        public string continuationToken { get; set; }
+    }
+
     public class ReplyManager
     {
         private CloudTable _reply;
@@ -37,36 +43,54 @@ namespace MSGorilla.Library
             _accManager = new AccountManager();
         }
 
-        public List<Reply> GetReplyNotif(string userid)
+        public ReplyPagiantion GetReply(string userid, int count = 25, TableContinuationToken token = null)
         {
-            TableQuery<ReplyNotificationEntifity> query = new TableQuery<ReplyNotificationEntifity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userid));
-            
-            List<Reply> replies = new List<Reply>();
-            TableBatchOperation batchOperation = new TableBatchOperation();
-            int count = 0;
+            TableQuery<ReplyNotificationEntifity> query = new TableQuery<ReplyNotificationEntifity>()
+                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userid))
+                .Take(count);
 
-            // Print the fields for each customer.
-            foreach (ReplyNotificationEntifity entity in _replyNotification.ExecuteQuery(query))
+            TableQuerySegment<ReplyNotificationEntifity> queryResult = _replyNotification.ExecuteQuerySegmented(query, token);
+
+            ReplyPagiantion ret = new ReplyPagiantion();
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
+            ret.reply = new List<Reply>();
+            foreach (ReplyNotificationEntifity entity in queryResult)
             {
-                replies.Add(JsonConvert.DeserializeObject<Reply>(entity.Content));
-
-                batchOperation.Add(TableOperation.Delete(entity));
-                count++;
-                
-                if((count % 100) == 0){
-                    _replyNotification.ExecuteBatch(batchOperation);
-                    batchOperation = new TableBatchOperation();
-                    count = 0;
-                }
+                ret.reply.Add(JsonConvert.DeserializeObject<Reply>(entity.Content));
             }
-
-            if (count > 0)
-            {
-                _replyNotification.ExecuteBatch(batchOperation);
-            }
-
-            return replies;
+            return ret;
         }
+
+        //public List<Reply> GetReplyNotif(string userid)
+        //{
+        //    TableQuery<ReplyNotificationEntifity> query = new TableQuery<ReplyNotificationEntifity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userid));
+            
+        //    List<Reply> replies = new List<Reply>();
+        //    TableBatchOperation batchOperation = new TableBatchOperation();
+        //    int count = 0;
+
+        //    // Print the fields for each customer.
+        //    foreach (ReplyNotificationEntifity entity in _replyNotification.ExecuteQuery(query))
+        //    {
+        //        replies.Add(JsonConvert.DeserializeObject<Reply>(entity.Content));
+
+        //        batchOperation.Add(TableOperation.Delete(entity));
+        //        count++;
+                
+        //        if((count % 100) == 0){
+        //            _replyNotification.ExecuteBatch(batchOperation);
+        //            batchOperation = new TableBatchOperation();
+        //            count = 0;
+        //        }
+        //    }
+
+        //    if (count > 0)
+        //    {
+        //        _replyNotification.ExecuteBatch(batchOperation);
+        //    }
+
+        //    return replies;
+        //}
 
         public List<Reply> GetAllReply(string userid)
         {

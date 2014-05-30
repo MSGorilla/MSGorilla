@@ -33,6 +33,7 @@ namespace MSGorilla.Library
         private CloudTable _userline;
         private CloudTable _eventline;
         private CloudTable _ownerline;
+        private CloudTable _atline;
         private CloudTable _publicSquareLine;
         private CloudTable _reply;
 
@@ -48,6 +49,7 @@ namespace MSGorilla.Library
             _eventline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.EventLine);
             _publicSquareLine = AzureFactory.GetTable(AzureFactory.MSGorillaTable.PublicSquareLine);
             _ownerline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.OwnerLine);
+            _atline = AzureFactory.GetTable(Azure.AzureFactory.MSGorillaTable.AtLine);
             _reply = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Reply);
 
             _queue = AzureFactory.GetQueue();
@@ -182,6 +184,23 @@ namespace MSGorilla.Library
             {
                 ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
             }
+            return ret;
+        }
+
+        public MessagePagination AtLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
+        {
+            string query = GeneratePKStartWithConditionQuery(userid);
+            TableQuery<AtLineEntity> tableQuery = new TableQuery<AtLineEntity>().Where(query).Take(count);
+            TableQuerySegment<AtLineEntity> queryResult = _atline.ExecuteQuerySegmented(tableQuery, continuationToken);
+
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
+            ret.message = new List<Message>();
+            foreach (AtLineEntity entity in queryResult)
+            {
+                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+            }
+
             return ret;
         }
 
@@ -337,7 +356,7 @@ namespace MSGorilla.Library
             return replies;
         }
 
-        public Message PostMessage(string userid, string eventID, string schemaID, string[] owner, string message, DateTime timestamp)
+        public Message PostMessage(string userid, string eventID, string schemaID, string[] owner, string[] atUser, string message, DateTime timestamp)
         {
             if (message.Length > 2048)
             {
@@ -359,7 +378,7 @@ namespace MSGorilla.Library
                 throw new InvalidIDException("Event");
             }
 
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner);
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, atUser);
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);
@@ -388,6 +407,10 @@ namespace MSGorilla.Library
             insertOperation = TableOperation.InsertOrReplace(new PublicSquareLineEntity(message));
             _publicSquareLine.Execute(insertOperation);
 
+            //todo:
+            //The Userid of owner and AtUser may be ms alais or displayname instead of the
+            //real id in MSGorilla System.
+            //Should have a way to convert these names to Userid in our system
             if (message.Owner != null)
             {
                 foreach (string ownerid in message.Owner)
@@ -396,6 +419,18 @@ namespace MSGorilla.Library
                     {
                         insertOperation = TableOperation.InsertOrReplace(new OwnerLineEntity(ownerid, message));
                         _ownerline.Execute(insertOperation);
+                    }
+                }
+            }
+
+            if (message.AtUser != null)
+            {
+                foreach (string atUserid in message.AtUser)
+                {
+                    if (Utils.IsValidID(atUserid))
+                    {
+                        insertOperation = TableOperation.InsertOrReplace(new AtLineEntity(atUserid, message));
+                        _atline.Execute(insertOperation);
                     }
                 }
             }
