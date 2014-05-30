@@ -109,7 +109,7 @@ namespace MSGorilla.Library
 
         static string GeneratePKStartWithConditionQuery(string startWith)
         {
-            if (Utils.IsValidID(startWith))
+            if (!Utils.IsValidID(startWith))
             {
                 throw new InvalidIDException();
             }
