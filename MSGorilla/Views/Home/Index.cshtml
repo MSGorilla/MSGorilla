@@ -8,16 +8,18 @@
 </script>
 
 <div class="main-container">
+
     <!-- Events Modal -->
-    <div class="modal fade" id="EventsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal fade" id="EventsModal" tabindex="-1" role="dialog" aria-labelledby="EventsModalLabel" aria-hidden="true">
         <div class="modal-dialog  modal-lg">
             <div class="modal-content">
-
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">Related Events</h4>
+                    <h4 class="modal-title" id="EventsModalLabel">Related events</h4>
                 </div>
-                <div class="modal-body" id="events">
+                <div class="modal-body">
+                    <ul class='list-group' id="events_div">
+                    </ul>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -25,7 +27,6 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-
 
     <div class="contents-container">
         <div class="posts-newpost">

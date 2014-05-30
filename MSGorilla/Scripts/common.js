@@ -410,10 +410,6 @@ function CreateFeed(postData) {
 
     output += "<ul class='list-group'>";
 
-    if (showevents) {
-        output += "  <div id='event_newer_" + mid + "'></div>";
-    }
-
     output += "<div>";
     output += "  <li class='list-group-item'>";
     output += "    <div>"
@@ -426,7 +422,7 @@ function CreateFeed(postData) {
     output += "        <div class='newpost-input'><p>" + encodeHtml(msg) + "</p></div>";
     output += "        <div class='newpost-footer'>";
     if (showevents) {
-        output += "      <button id='btn_expandevent' class='btn btn-link' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Events</button>";
+        output += "      <button id='btn_expandevent' class='btn btn-link' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>View Events</button>";
     }
     output += "          <button id='btn_showreply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Comments</button>";
     output += "        </div>";
@@ -434,24 +430,10 @@ function CreateFeed(postData) {
     output += "    </div>";
     output += "    <div id='reply_" + mid + "'></div>";
     output += "    <input type='hidden' id='isshowreplies_" + mid + "' value='false'/>";
-
-    if (showevents) {
-        output += "    <input type='hidden' id='isshowevents_" + mid + "' value='false'/>";
-    }
     output += "  </li>";
     output += "</div>";
 
-    if (showevents) {
-        output += "  <div id='event_older_" + mid + "'></div>";
-    }
-
     output += "</ul>";
-
-    return output;
-}
-
-function CreateMessage(user, mid, sid, eid, msg, posttime) {
-    var output = "";
 
     return output;
 }
@@ -504,16 +486,6 @@ function LoadReplies(mid) {
             $("#replylist_" + mid).empty();
             $.each(data, function (index, item) {
                 $("#replylist_" + mid).append(CreateReply(item));
-                var rid = item.ReplyID;
-                $.getJSON("/api/account/User", "userid=" + item.FromUser, function (data) {
-                    var username = data.DisplayName;
-                    var picurl = data.PortraitUrl;
-                    if (isNullOrEmpty(picurl)) {
-                        picurl = "/Content/Images/default_avatar.jpg";
-                    }
-                    $("#reply_user_pic_" + rid).attr("src", picurl);
-                    $("#reply_username_" + rid).text(username);
-                });
             })
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -528,15 +500,22 @@ function CreateReply(replyData) {
     var msg = replyData.Message;
     var posttime = replyData.PostTime;
     var rid = replyData.ReplyID;
+    var username = replyData.DisplayName;
+    var picurl = replyData.PortraitUrl;
+    var userdesp = replyData.Description;
+
+    if (isNullOrEmpty(picurl)) {
+        picurl = "/Content/Images/default_avatar.jpg";
+    }
 
     output = "<li class='list-group-item'>";
     output += "  <div>"
     output += "    <div class='reply-pic'>";
-    output += "      <img class='img-rounded' id='reply_user_pic_" + rid + "' src='/Content/Images/default_avatar.jpg' width='50' height='50' />";
+    output += "      <img class='img-rounded' id='reply_user_pic_" + rid + "' src='" + picurl + "' width='50' height='50' />";
     output += "    </div>";
     output += "    <div class='reply-content'>";
     output += "      <div class='reply-input'>";
-    output += "        <a id='reply_username_" + rid + "' href='/profile/index?user=" + user + "'>" + user + "</a>";
+    output += "        <a id='reply_username_" + rid + "' href='/profile/index?user=" + user + "'>" + username + "</a>";
     output += "        &nbsp;<span class='badge'>-&nbsp;" + Time2Now(posttime) + "</span>&nbsp;";
     output += "        " + encodeHtml(msg);
     output += "      </div>";
@@ -545,58 +524,29 @@ function CreateReply(replyData) {
     return output;
 }
 
+
 // event function
 function ShowEvents(mid, eid) {
-    $("#events").empty();
-    GetEvents(eid);
-    $("#EventsModal").modal();
+    var events_div = $("#events_div");
+    if (events_div.length == 0) {
+        return;
+    }
 
-
-    //var show = $("#isshowevents_" + mid);
-    //var newerdiv = $("#event_newer_" + mid);
-    //var olderdiv = $("#event_older_" + mid);
-
-    //if (show.length == 0) {
-    //    return;
-    //}
-
-    //if (show.val() == "false") {
-    //    // show events
-    //    show.val("true");
-    //    // show events
-    //    LoadEvents(mid, eid);
-    //}
-    //else {
-    //    // clear events
-    //    show.val("false");
-    //    newerdiv.html("");
-    //    olderdiv.html("");
-    //}
-}
-
-function GetEvents(eid) {
-    var newerdiv = $("#events");
     $.ajax({
         type: "get",
         url: "/api/message/eventline",
         data: "eventID=" + eid,
         success: function (data) {
-            var eventdiv = newerdiv;
+            events_div.empty();
             // create events list
             $.each(data, function (index, item) {
-
-                eventdiv.append(CreateEvent(item));
-                var id = item.EventID;
-                $.getJSON("/api/account/User", "userid=" + item.User, function (data) {
-                    var username = data.DisplayName;
-                    var picurl = data.PortraitUrl;
-                    if (isNullOrEmpty(picurl)) {
-                        picurl = "/Content/Images/default_avatar.jpg";
-                    }
-                    $("#event_user_pic_" + id).attr("src", picurl);
-                    $("#event_username_" + id).text(username);
-                });
+                if(item.ID == mid)
+                    events_div.append(CreateEvent(item, true));
+                else
+                    events_div.append(CreateEvent(item, false));
             })
+
+            $("#EventsModal").modal();
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowError(textStatus + ": " + errorThrown);
@@ -604,45 +554,7 @@ function GetEvents(eid) {
     });
 }
 
-function LoadEvents(mid, eid) {
-    var newerdiv = $("#event_newer_" + mid);
-    var olderdiv = $("#event_older_" + mid);
-
-    newerdiv.empty();
-    olderdiv.empty();
-
-    $.ajax({
-        type: "get",
-        url: "/api/message/eventline",
-        data: "eventID=" + eid,
-        success: function (data) {
-            var eventdiv = newerdiv;
-            // create events list
-            $.each(data, function (index, item) {
-                if (item.ID == mid) {
-                    eventdiv = olderdiv;
-                    return true;
-                }
-                eventdiv.append(CreateEvent(item));
-                var id = item.EventID;
-                $.getJSON("/api/account/User", "userid=" + item.User, function (data) {
-                    var username = data.DisplayName;
-                    var picurl = data.PortraitUrl;
-                    if (isNullOrEmpty(picurl)) {
-                        picurl = "/Content/Images/default_avatar.jpg";
-                    }
-                    $("#event_user_pic_" + id).attr("src", picurl);
-                    $("#event_username_" + id).text(username);
-                });
-            })
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
-        }
-    });
-}
-
-function CreateEvent(postData) {
+function CreateEvent(postData, isHeighlight) {
     var output = "";
     var user = postData.User;
     var mid = postData.ID;
@@ -650,14 +562,25 @@ function CreateEvent(postData) {
     var eid = postData.EventID;
     var msg = postData.MessageContent;
     var posttime = postData.PostTime;
+    var username = postData.DisplayName;
+    var picurl = postData.PortraitUrl;
+    var userdesp = postData.Description;
 
-    output += "  <li class='list-group-item quote'>";
+    if (isNullOrEmpty(picurl)) {
+        picurl = "/Content/Images/default_avatar.jpg";
+    }
+
+    if (isHeighlight) {
+        output += "  <li class='list-group-item'>";
+    } else {
+        output += "  <li class='list-group-item quote'>";
+    }
     output += "    <div>"
     output += "      <div class='feed-pic'>";
-    output += "        <img class='img-rounded' id='event_user_pic_" + eid + "' src='/Content/Images/default_avatar.jpg' width='100' height='100' />";
+    output += "        <img class='img-rounded' id='event_user_pic_" + eid + "' src='" + picurl + "' width='100' height='100' />";
     output += "      </div>";
     output += "      <div class='feed-content'>";
-    output += "        <div class='newpost-header'><a id='event_username_" + eid + "' class='list-group-item-heading bold' href='/profile/index?user=" + user + "'>" + user + "</a>";
+    output += "        <div class='newpost-header'><a id='event_username_" + eid + "' class='list-group-item-heading bold' href='/profile/index?user=" + user + "'>" + username + "</a>";
     output += "        &nbsp;<span class='badge'>-&nbsp;" + Time2Now(posttime) + "</span></div>";
     output += "        <div class='newpost-input'><p>" + encodeHtml(msg) + "</p></div>";
     //output += "        <div class='newpost-footer'>";

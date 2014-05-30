@@ -13,32 +13,82 @@ using MSGorilla.Library.Models.SqlModels;
 
 namespace MSGorilla.WebApi
 {
+    public class DisplayReplyPagination
+    {
+        public string continuationToken { get; set; }
+        public List<DisplayReply> reply { get; set; }
+
+        public DisplayReplyPagination(ReplyPagiantion rpl)
+        {
+            continuationToken = rpl.continuationToken;
+            var replylist = rpl.reply;
+
+            reply = new List<DisplayReply>();
+            foreach (var r in replylist)
+            {
+                reply.Add(new DisplayReply(r));
+            }
+        }
+    }
+
+    public class DisplayReply : Reply
+    {
+        public string DisplayName { get; private set; }
+
+        public string PortraitUrl { get; private set; }
+
+        public string Description { get; private set; }
+
+        public DisplayReply(Reply rpl)
+            : base(rpl.FromUser, rpl.ToUser, rpl.Message, rpl.PostTime, rpl.MessageUser, rpl.MessageID)
+        {
+            // use old id
+            ReplyID = rpl.ReplyID;
+
+            AccountManager accmng = new AccountManager();
+            var userinfo = accmng.FindUser(FromUser);
+            if (userinfo == null)
+            {
+                DisplayName = FromUser;
+                PortraitUrl = "";
+                Description = FromUser;
+            }
+            else
+            {
+                DisplayName = userinfo.DisplayName;
+                PortraitUrl = userinfo.PortraitUrl;
+                Description = userinfo.Description;
+            }
+        }
+    }
+
     public class ReplyController : BaseController
     {
         ReplyManager _replyManager = new ReplyManager();
 
         [HttpGet]
-        public List<Reply> Replies()
+        public List<DisplayReply> Replies()
         {
-            return _replyManager.GetAllReply(whoami());
+            var replylist = _replyManager.GetAllReply(whoami());
+            var reply = new List<DisplayReply>();
+            foreach (var r in replylist)
+            {
+                reply.Add(new DisplayReply(r));
+            }
+
+            return reply;
         }
 
-        //[HttpGet]
-        //public List<Reply> ReplyNotification()
-        //{
-        //    return _replyManager.GetReplyNotif(whoami());
-        //}
-
         [HttpGet]
-        public ReplyPagiantion GetMyReply(int count = 25, string token = null)
+        public DisplayReplyPagination GetMyReply(int count = 25, string token = null)
         {
-            return _replyManager.GetReply(whoami(), count, Utils.String2Token(token));
+            return new DisplayReplyPagination(_replyManager.GetReply(whoami(), count, Utils.String2Token(token)));
         }
 
         [HttpGet, HttpPost]
-        public Reply PostReply(string to, string message, string messageUser, string messageID)
+        public DisplayReply PostReply(string to, string message, string messageUser, string messageID)
         {
-            return _replyManager.PostReply(whoami(), to, message, DateTime.UtcNow, messageUser, messageID);
+            return new DisplayReply(_replyManager.PostReply(whoami(), to, message, DateTime.UtcNow, messageUser, messageID));
             //return new ActionResult();
         }
 
@@ -51,7 +101,7 @@ namespace MSGorilla.WebApi
         }
 
         [HttpPost]
-        public Reply PostReply(ReplyModel reply)
+        public DisplayReply PostReply(ReplyModel reply)
         {
             return PostReply(reply.To, reply.Message, reply.MessageUser, reply.MessageID);
         }

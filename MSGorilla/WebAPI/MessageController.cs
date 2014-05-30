@@ -41,16 +41,19 @@ namespace MSGorilla.WebApi
 
         public string Description { get; private set; }
 
-        public DisplayMessage(string userid, string message, DateTime timestamp, string eventID, string schemaID, string[] owner, string[] atUser)
-            : base(userid, message, timestamp, eventID, schemaID, owner, atUser)
+        public DisplayMessage(Message msg)
+            : base(msg.User, msg.MessageContent, msg.PostTime, msg.EventID, msg.TopicID, msg.SchemaID, msg.Owner, msg.AtUser)
         {
+            // use old id
+            ID = msg.ID;
+
             AccountManager accmng = new AccountManager();
             var userinfo = accmng.FindUser(User);
             if (userinfo == null)
             {
-                DisplayName = userid;
+                DisplayName = User;
                 PortraitUrl = "";
-                Description = "";
+                Description = User;
             }
             else
             {
@@ -58,11 +61,6 @@ namespace MSGorilla.WebApi
                 PortraitUrl = userinfo.PortraitUrl;
                 Description = userinfo.Description;
             }
-        }
-
-        public DisplayMessage(Message msg)
-            : this(msg.User, msg.MessageContent, msg.PostTime, msg.EventID, msg.SchemaID, msg.Owner, msg.AtUser)
-        {
         }
     }
 
@@ -162,20 +160,30 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public List<Message> EventLine()
+        public List<DisplayMessage> EventLine()
         {
-            return _messageManager.EventLine("none");
+            return EventLine("none");
         }
+
         [HttpGet]
-        public List<Message> EventLine(string eventID)
+        public List<DisplayMessage> EventLine(string eventID)
         {
-            return _messageManager.EventLine(eventID);
+            var msglist = _messageManager.EventLine(eventID);
+            var msg = new List<DisplayMessage>();
+            foreach (var m in msglist)
+            {
+                msg.Add(new DisplayMessage(m));
+            }
+
+            return msg;
         }
+
         [HttpGet]
         public List<Message> PublicSquareLine(DateTime start, DateTime end)
         {
             return _messageManager.PublicSquareLine(start, end);
         }
+
         [HttpGet]
         public DisplayMessagePagination PublicSquareLine(int count = 25, string token = null)
         {
@@ -183,12 +191,14 @@ namespace MSGorilla.WebApi
             TableContinuationToken tok = Utils.String2Token(token);
             return new DisplayMessagePagination(_messageManager.PublicSquareLine(count, tok));
         }
+
         [HttpGet]
-        public MessagePagination TopicLine(string topicID, int count = 25, string token = null)
+        public DisplayMessagePagination TopicLine(string topicID, int count = 25, string token = null)
         {
             string me = whoami();
-            return _messageManager.TopicLine(topicID, count, Utils.String2Token(token));
+            return new DisplayMessagePagination(_messageManager.TopicLine(topicID, count, Utils.String2Token(token)));
         }
+
         [HttpGet]
         public MessageDetail GetMessage(string userid, string messageID)
         {
@@ -196,9 +206,16 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public List<Reply> GetMessageReply(string msgID)
+        public List<DisplayReply> GetMessageReply(string msgID)
         {
-            return _messageManager.GetAllReplies(msgID);
+            var replylist = _messageManager.GetAllReplies(msgID);
+            var reply = new List<DisplayReply>();
+            foreach (var r in replylist)
+            {
+                reply.Add(new DisplayReply(r));
+            }
+
+            return reply;
         }
 
         [HttpGet, HttpPost]
@@ -209,7 +226,7 @@ namespace MSGorilla.WebApi
                                     [FromUri]string[] owner = null, 
                                     [FromUri]string[] atUser = null)
         {
-            return _messageManager.PostMessage(whoami(), eventID, schemaID, topicID, owner, atUser, message, DateTime.UtcNow);
+            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, topicID, owner, atUser, message, DateTime.UtcNow));
             //return new ActionResult();
         }
 
@@ -238,7 +255,7 @@ namespace MSGorilla.WebApi
             {
                 msg.EventID = "none";
             }
-            return _messageManager.PostMessage(whoami(), msg.EventID, msg.SchemaID, msg.TopicID, msg.Owner, msg.AtUser, msg.Message, DateTime.UtcNow);
+            return PostMessage(msg.Message, msg.SchemaID, msg.EventID, msg.TopicID, msg.Owner, msg.AtUser);
             //return new ActionResult();
         }
     }
