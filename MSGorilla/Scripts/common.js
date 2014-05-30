@@ -368,16 +368,6 @@ function LoadFeeds(category) {
                 }
                 $.each(data, function (index, item) {
                     $("#feedlist").append(CreateFeed(item));
-                    $.getJSON("/api/account/User", "userid=" + item.User, function (data) {
-                        var mid = item.ID;
-                        var username = data.DisplayName;
-                        var picurl = data.PortraitUrl;
-                        if (isNullOrEmpty(picurl)) {
-                            picurl = "/Content/Images/default_avatar.jpg";
-                        }
-                        $("#user_pic_" + mid).attr("src", picurl);
-                        $("#username_" + mid).text(username);
-                    });
                 })
 
             }
@@ -405,21 +395,20 @@ function CreateFeed(postData) {
     var eid = postData.EventID;
     var msg = postData.MessageContent;
     var posttime = postData.PostTime;
-
-    output += "<ul class='list-group'>";
-    output += CreateMessage(user, mid, sid, eid, msg, posttime);
-    output += "</ul>";
-
-    return output;
-}
-
-function CreateMessage(user, mid, sid, eid, msg, posttime) {
-    var output = "";
+    var username = postData.DisplayName;
+    var picurl = postData.PortraitUrl;
+    var userdesp = postData.Description;
     var showevents = false;
+
+    if (isNullOrEmpty(picurl)) {
+        picurl = "/Content/Images/default_avatar.jpg";
+    }
 
     if (!isNullOrEmpty(eid) && eid != "none") {
         showevents = true;
     }
+
+    output += "<ul class='list-group'>";
 
     if (showevents) {
         output += "  <div id='event_newer_" + mid + "'></div>";
@@ -429,10 +418,10 @@ function CreateMessage(user, mid, sid, eid, msg, posttime) {
     output += "  <li class='list-group-item'>";
     output += "    <div>"
     output += "      <div class='feed-pic'>";
-    output += "        <img class='img-rounded' id='user_pic_" + mid + "' src='/Content/Images/default_avatar.jpg' width='100' height='100' />";
+    output += "        <img class='img-rounded' id='user_pic_" + mid + "' src='" + picurl + "' width='100' height='100' />";
     output += "      </div>";
     output += "      <div class='feed-content'>";
-    output += "        <div class='newpost-header'><a id='username_" + mid + "' class='list-group-item-heading bold' href='/profile/index?user=" + user + "'>" + user + "</a>";
+    output += "        <div class='newpost-header'><a id='username_" + mid + "' class='list-group-item-heading bold' href='/profile/index?user=" + user + "'>" + username + "</a>";
     output += "        &nbsp;<span class='badge'>-&nbsp;" + Time2Now(posttime) + "</span></div>";
     output += "        <div class='newpost-input'><p>" + encodeHtml(msg) + "</p></div>";
     output += "        <div class='newpost-footer'>";
@@ -445,6 +434,7 @@ function CreateMessage(user, mid, sid, eid, msg, posttime) {
     output += "    </div>";
     output += "    <div id='reply_" + mid + "'></div>";
     output += "    <input type='hidden' id='isshowreplies_" + mid + "' value='false'/>";
+
     if (showevents) {
         output += "    <input type='hidden' id='isshowevents_" + mid + "' value='false'/>";
     }
@@ -454,6 +444,14 @@ function CreateMessage(user, mid, sid, eid, msg, posttime) {
     if (showevents) {
         output += "  <div id='event_older_" + mid + "'></div>";
     }
+
+    output += "</ul>";
+
+    return output;
+}
+
+function CreateMessage(user, mid, sid, eid, msg, posttime) {
+    var output = "";
 
     return output;
 }

@@ -16,17 +16,67 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace MSGorilla.WebApi
 {
+    public class DisplayMessagePagination
+    {
+        public string continuationToken { get; set; }
+        public List<DisplayMessage> message { get; set; }
+
+        public DisplayMessagePagination(MessagePagination msg){
+            continuationToken = msg.continuationToken;
+            var msglist = msg.message;
+
+            message = new List<DisplayMessage>();
+            foreach (var m in msglist)
+            {
+                message.Add(new DisplayMessage(m));
+            }
+        }
+    }
+
+    public class DisplayMessage : Message
+    {
+        public string DisplayName { get; private set; }
+
+        public string PortraitUrl { get; private set; }
+
+        public string Description { get; private set; }
+
+        public DisplayMessage(string userid, string message, DateTime timestamp, string eventID, string schemaID, string[] owner, string[] atUser)
+            : base(userid, message, timestamp, eventID, schemaID, owner, atUser)
+        {
+            AccountManager accmng = new AccountManager();
+            var userinfo = accmng.FindUser(User);
+            if (userinfo == null)
+            {
+                DisplayName = userid;
+                PortraitUrl = "";
+                Description = "";
+            }
+            else
+            {
+                DisplayName = userinfo.DisplayName;
+                PortraitUrl = userinfo.PortraitUrl;
+                Description = userinfo.Description;
+            }
+        }
+
+        public DisplayMessage(Message msg)
+            : this(msg.User, msg.MessageContent, msg.PostTime, msg.EventID, msg.SchemaID, msg.Owner, msg.AtUser)
+        {
+        }
+    }
+
     public class MessageController : BaseController
     {
         MessageManager _messageManager = new MessageManager();
 
         [HttpGet]
-        public MessagePagination UserLine(int count = 25, string token = null)
+        public DisplayMessagePagination UserLine(int count = 25, string token = null)
         {
             return UserLine(whoami(), count, token);
         }
         [HttpGet]
-        public MessagePagination UserLine(string userid, int count = 25, string token = null)
+        public DisplayMessagePagination UserLine(string userid, int count = 25, string token = null)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
@@ -34,7 +84,7 @@ namespace MSGorilla.WebApi
                 userid = me;
             }
             TableContinuationToken tok = Utils.String2Token(token);
-            return _messageManager.UserLine(userid, count, tok);
+            return new DisplayMessagePagination(_messageManager.UserLine(userid, count, tok));
         }
 
         [HttpGet]
@@ -45,13 +95,13 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public MessagePagination HomeLine(int count = 25, string token = null)
+        public DisplayMessagePagination HomeLine(int count = 25, string token = null)
         {
             return HomeLine(whoami(), count, token);
         }
 
         [HttpGet]
-        public MessagePagination HomeLine(string userid, int count = 25, string token = null)
+        public DisplayMessagePagination HomeLine(string userid, int count = 25, string token = null)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
@@ -59,7 +109,7 @@ namespace MSGorilla.WebApi
                 userid = me;
             }
             TableContinuationToken tok = Utils.String2Token(token);
-            return _messageManager.HomeLine(userid, count, tok);
+            return new DisplayMessagePagination(_messageManager.HomeLine(userid, count, tok));
         }
 
         [HttpGet]
@@ -70,12 +120,12 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public MessagePagination OwnerLine(int count = 25, string token = null)
+        public DisplayMessagePagination OwnerLine(int count = 25, string token = null)
         {
             return OwnerLine(whoami(), count, token);
         }
         [HttpGet]
-        public MessagePagination OwnerLine(string userid, int count = 25, string token = null)
+        public DisplayMessagePagination OwnerLine(string userid, int count = 25, string token = null)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
@@ -83,7 +133,7 @@ namespace MSGorilla.WebApi
                 userid = me;
             }
             TableContinuationToken tok = Utils.String2Token(token);
-            return _messageManager.OwnerLine(userid, count, tok);
+            return new DisplayMessagePagination(_messageManager.OwnerLine(userid, count, tok));
         }
         [HttpGet]
         public List<Message> OwnerLine(string userid, DateTime end, DateTime start)
@@ -93,13 +143,13 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public MessagePagination AtLine(int count = 25, string token = null)
+        public DisplayMessagePagination AtLine(int count = 25, string token = null)
         {
             return AtLine(whoami(), count, token);
         }
 
         [HttpGet]
-        public MessagePagination AtLine(string userid, int count = 25, string token = null)
+        public DisplayMessagePagination AtLine(string userid, int count = 25, string token = null)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
@@ -108,7 +158,7 @@ namespace MSGorilla.WebApi
             }
 
             TableContinuationToken tok = Utils.String2Token(token);
-            return _messageManager.AtLine(userid, count, tok);
+            return new DisplayMessagePagination(_messageManager.AtLine(userid, count, tok));
         }
 
         [HttpGet]
@@ -127,11 +177,11 @@ namespace MSGorilla.WebApi
             return _messageManager.PublicSquareLine(start, end);
         }
         [HttpGet]
-        public MessagePagination PublicSquareLine(int count = 25, string token = null)
+        public DisplayMessagePagination PublicSquareLine(int count = 25, string token = null)
         {
             string me = whoami();
             TableContinuationToken tok = Utils.String2Token(token);
-            return _messageManager.PublicSquareLine(count, tok);
+            return new DisplayMessagePagination(_messageManager.PublicSquareLine(count, tok));
         }
         [HttpGet]
         public MessageDetail GetMessage(string userid, string messageID)
@@ -146,13 +196,13 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet, HttpPost]
-        public Message PostMessage(string message, 
-                                    string schemaID = "none", 
-                                    string eventID = "none", 
-                                    [FromUri]string[] owner = null, 
+        public DisplayMessage PostMessage(string message,
+                                    string schemaID = "none",
+                                    string eventID = "none",
+                                    [FromUri]string[] owner = null,
                                     [FromUri]string[] atUser = null)
         {
-            return _messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, message, DateTime.UtcNow);
+            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, message, DateTime.UtcNow));
             //return new ActionResult();
         }
 
@@ -166,7 +216,8 @@ namespace MSGorilla.WebApi
         };
 
         [HttpPost]
-        public Message PostMessage(MessageModel msg){
+        public DisplayMessage PostMessage(MessageModel msg)
+        {
             if (string.IsNullOrEmpty(msg.Message))
             {
                 throw new MessageNullException();
@@ -179,8 +230,9 @@ namespace MSGorilla.WebApi
             {
                 msg.EventID = "none";
             }
-            return _messageManager.PostMessage(whoami(), msg.EventID, msg.SchemaID, msg.Owner, msg.AtUser, msg.Message, DateTime.UtcNow);
+            return new DisplayMessage(_messageManager.PostMessage(whoami(), msg.EventID, msg.SchemaID, msg.Owner, msg.AtUser, msg.Message, DateTime.UtcNow));
             //return new ActionResult();
         }
     }
+
 }
