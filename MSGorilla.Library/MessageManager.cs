@@ -457,15 +457,25 @@ namespace MSGorilla.Library
                 }
             }
 
-            if (message.AtUser != null)
+            //Merge At user list from the interface 
+            //as well as the words found in MessageContent start with @
+            List<string> AtUser = new List<string>(message.AtUser);
+            string[] words = message.MessageContent.Split(' ');
+            foreach (string word in words)
             {
-                foreach (string atUserid in message.AtUser)
+                if (word.StartsWith("@"))
                 {
-                    if (Utils.IsValidID(atUserid))
-                    {
-                        insertOperation = TableOperation.InsertOrReplace(new AtLineEntity(atUserid, message));
-                        _atline.Execute(insertOperation);
-                    }
+                    AtUser.Add(word.Replace("@", ""));
+                }
+            }
+
+            foreach (string atUserid in AtUser)
+            {
+                UserProfile user = _accManager.FindUser(atUserid);
+                if (user != null)
+                {
+                    insertOperation = TableOperation.InsertOrReplace(new AtLineEntity(user.Userid, message));
+                    _atline.Execute(insertOperation);
                 }
             }
 
