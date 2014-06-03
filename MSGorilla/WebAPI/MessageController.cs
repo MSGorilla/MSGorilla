@@ -28,38 +28,55 @@ namespace MSGorilla.WebApi
             message = new List<DisplayMessage>();
             foreach (var m in msglist)
             {
-                message.Add(new DisplayMessage(m));
+                message.Add(new DisplayMessage(m, new AccountManager()));
             }
         }
     }
 
-    public class DisplayMessage : Message
+    public class DisplayMessage
     {
-        public string DisplayName { get; private set; }
+        public class SimpleUserProfile
+        {
+            public string Userid { get; set; }
+            public string DisplayName { get; set; }
 
-        public string PortraitUrl { get; private set; }
+            public string PortraitUrl { get; set; }
 
-        public string Description { get; private set; }
+            public string Description { get; set; }
+        }
 
-        public DisplayMessage(Message msg)
-            : base(msg.User, msg.MessageContent, msg.PostTime, msg.EventID, msg.TopicID, msg.SchemaID, msg.Owner, msg.AtUser)
+        public SimpleUserProfile User { get; set; }
+        //public string User { get; set; }
+        public string ID { get; set; }
+        public string EventID { get; set; }
+        public string SchemaID { get; set; }
+        public string TopicID { get; set; }
+        public string[] Owner { get; set; }
+        public string[] AtUser { get; set; }
+        public string MessageContent { get; set; }
+        public DateTime PostTime { get; set; }
+
+        public DisplayMessage(Message msg, AccountManager accManager)
         {
             // use old id
             ID = msg.ID;
 
-            AccountManager accmng = new AccountManager();
-            var userinfo = accmng.FindUser(User);
+            //AccountManager accmng = new AccountManager();
+            var userinfo = accManager.FindUser(msg.User);
+            this.User = new SimpleUserProfile();
             if (userinfo == null)
             {
-                DisplayName = User;
-                PortraitUrl = "";
-                Description = User;
+                this.User.Userid = msg.User;
+                this.User.DisplayName = msg.User;
+                this.User.PortraitUrl = "";
+                this.User.Description = "";
             }
             else
             {
-                DisplayName = userinfo.DisplayName;
-                PortraitUrl = userinfo.PortraitUrl;
-                Description = userinfo.Description;
+                this.User.Userid = userinfo.Userid;
+                this.User.DisplayName = userinfo.Userid;
+                this.User.PortraitUrl = userinfo.PortraitUrl;
+                this.User.Description = userinfo.Description;
             }
         }
     }
@@ -170,9 +187,10 @@ namespace MSGorilla.WebApi
         {
             var msglist = _messageManager.EventLine(eventID);
             var msg = new List<DisplayMessage>();
+            AccountManager accManager = new AccountManager();
             foreach (var m in msglist)
             {
-                msg.Add(new DisplayMessage(m));
+                msg.Add(new DisplayMessage(m, accManager));
             }
 
             return msg;
@@ -226,7 +244,7 @@ namespace MSGorilla.WebApi
                                     [FromUri]string[] owner = null, 
                                     [FromUri]string[] atUser = null)
         {
-            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, topicID, owner, atUser, message, DateTime.UtcNow));
+            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, topicID, owner, atUser, message, DateTime.UtcNow), new AccountManager());
             //return new ActionResult();
         }
 

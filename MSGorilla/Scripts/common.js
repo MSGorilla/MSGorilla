@@ -387,15 +387,15 @@ function LoadFeeds(category) {
 
 function CreateFeed(postData) {
     var output = "";
-    var user = postData.User;
+    var user = postData.User.Userid;
     var mid = postData.ID;
     var sid = postData.SchemaID;
     var eid = postData.EventID;
     var msg = postData.MessageContent;
     var posttime = postData.PostTime;
-    var username = postData.DisplayName;
-    var picurl = postData.PortraitUrl;
-    var userdesp = postData.Description;
+    var username = postData.User.DisplayName;
+    var picurl = postData.User.PortraitUrl;
+    var userdesp = postData.User.Description;
     var showevents = false;
 
     if (isNullOrEmpty(picurl)) {
@@ -554,15 +554,15 @@ function ShowEvents(mid, eid) {
 
 function CreateEvent(postData, isHeighlight) {
     var output = "";
-    var user = postData.User;
+    var user = postData.User.Userid;
     var mid = postData.ID;
     var sid = postData.SchemaID;
     var eid = postData.EventID;
     var msg = postData.MessageContent;
     var posttime = postData.PostTime;
-    var username = postData.DisplayName;
-    var picurl = postData.PortraitUrl;
-    var userdesp = postData.Description;
+    var username = postData.User.DisplayName;
+    var picurl = postData.User.PortraitUrl;
+    var userdesp = postData.User.Description;
 
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";
