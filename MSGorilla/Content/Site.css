@@ -12,11 +12,11 @@
 }
 
 /* Set width on the form input elements since they're 100% wide by default */
-input text,
+/*input text,
 select,
 textarea {
     min-width: 300px;
-}
+}*/
 
 /* styles for validation helpers */
 .field-validation-error {
@@ -187,6 +187,10 @@ input[type="checkbox"].input-validation-error {
     padding-right: 30px;
 }
 
+hr {
+    border: 1px solid #dddddd;
+}
+
 .ma-5 {
     margin: 5px;
 }
@@ -219,6 +223,10 @@ input[type="checkbox"].input-validation-error {
     text-align: right;
 }
 
+.mw-300 {
+    min-width: 300px;
+}
+
 .users-cards {
     margin-bottom: 20px;
     -webkit-border-radius: 10px;
@@ -226,6 +234,23 @@ input[type="checkbox"].input-validation-error {
     border-radius: 10px;
     background-color: white;
     padding: 10px;
+    border: 1px solid lightgray;
+}
+
+.userlist-group {
+    padding-left: 0;
+}
+
+.userlist-group-item {
+    position: relative;
+    display: inline-block;
+    width: 176px;
+    margin: 10px 10px 20px 10px;
+    padding: 0px 0px 20px 0px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    background-color: #f4f8f9;
     border: 1px solid lightgray;
 }
 
@@ -253,3 +278,31 @@ input[type="checkbox"].input-validation-error {
 
 .user-card-postinfo {
 }
+
+.shortcut-container {
+}
+
+.sub-list-group {
+    margin-top: 10px;
+    margin-left: -15px;
+    margin-right: -15px;
+    margin-bottom: -10px;
+    padding-left: 0px;
+}
+
+.sub-list-group-item {
+    position: relative;
+    display: block;
+    padding: 10px 15px 10px 30px;
+    margin-bottom: -1px;
+    background-color: #eeeeee;
+    border-top: 1px solid #ffffff;
+}
+
+    .sub-list-group-item > .badge {
+        float: right;
+    }
+
+        .sub-list-group-item > .badge + .badge {
+            margin-right: 5px;
+        }

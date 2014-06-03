@@ -198,7 +198,10 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
+    <Compile Include="Controllers\SquareController.cs" />
+    <Compile Include="Controllers\TopicController.cs" />
     <Compile Include="Filters\BasicAuthAttribute.cs" />
     <Compile Include="Filters\ExceptionHandleAttribute.cs" />
     <Compile Include="Filters\TokenAuthAttribute.cs" />
@@ -269,6 +272,10 @@
     <Content Include="Views\Profile\Index.cshtml" />
     <Content Include="Views\Shared\_MePartial.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
+    <Content Include="Views\Shared\_ShortcutPartial.cshtml" />
+    <Content Include="Views\Square\Index.cshtml" />
+    <Content Include="Views\Notification\Index.cshtml" />
+    <Content Include="Views\Topic\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

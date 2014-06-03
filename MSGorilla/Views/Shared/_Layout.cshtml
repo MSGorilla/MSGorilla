@@ -35,7 +35,7 @@
                     }
                     else
                     {
-                        <li class="disabled">@Html.ActionLink("Notifications", "Index", "Home")</li>
+                        <li>@Html.ActionLink("Notifications", "Index", "Notification")</li>
                     }
                     @if (ViewBag.Title == "Me")
                     {
@@ -47,7 +47,7 @@
                     }
                 </ul>
                 <form class="navbar-form navbar-left" method="get" action="/Search/index">
-                    <input class="form-control col-lg-8" type="text" placeholder="Search for people, events and things" name="keyword">
+                    <input class="form-control col-lg-12 mw-300" type="text" placeholder="Search for people, events and things" name="keyword">
                 </form>
                 @Html.Partial("_LoginPartial")
             </div>

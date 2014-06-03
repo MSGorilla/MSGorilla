@@ -3,10 +3,6 @@
 }
 
 <script src="~/Scripts/common.js"></script>
-<script>
-    $(SearchUser('@ViewBag.SearchKeyword'));
-</script>
-
 <div class="main-container">
     <div class="contents-container">
         <div id="notifications" class="posts-notification">
@@ -20,14 +16,21 @@
             <div>
                 <span class="help-block bold">People</span>
             </div>
-            <div id="userlist">
+            <ul id="userlist" class="userlist-group">
                 @*autofill by js*@
-            </div>
+            </ul>
             <div class="clearfix"></div>
         </div>
     </div>
     <div class="tools-container">
         @Html.Partial("_MePartial")
+        @Html.Partial("_ShortcutPartial")
     </div>
 
 </div>
+
+<script>
+    $(SearchUser('@ViewBag.SearchKeyword'));
+</script>
+
+

@@ -19,7 +19,6 @@ namespace MSGorilla.Controllers
         {
             string myid = this.Session["userid"].ToString();
             UserProfile me = _accManager.FindUser(myid);
-
             ViewBag.Myid = me.Userid;
             ViewBag.Me = me;
 
@@ -33,6 +32,8 @@ namespace MSGorilla.Controllers
             }
 
             ViewBag.UserId = user;
+
+            ViewBag.FeedCategory = "userline";
 
             return View();
         }

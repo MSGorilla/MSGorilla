@@ -3,10 +3,6 @@
 }
 
 <script src="~/Scripts/common.js"></script>
-<script>
-    $(LoadFeeds("homeline"));
-</script>
-
 <div class="main-container">
 
     <!-- Events Modal -->
@@ -64,7 +60,7 @@
                     var windowHeight = $(window).height();
                     var documentHeight = $(document).height();
                     if (documentTop >= (documentHeight - windowHeight)) {
-                        LoadFeeds("homeline");
+                        LoadFeeds("@ViewBag.FeedCategory");
                     }
                 })
             </script>
@@ -73,6 +69,12 @@
 
     <div class="tools-container">
         @Html.Partial("_MePartial")
+        @Html.Partial("_ShortcutPartial")
     </div>
 
 </div>
+
+<script>
+    $(LoadFeeds("@ViewBag.FeedCategory"));
+</script>
+

@@ -141,7 +141,6 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public DisplayMessagePagination PublicSquareLine(int count = 25, string token = null)
         {
-            string me = whoami();
             TableContinuationToken tok = Utils.String2Token(token);
             return new DisplayMessagePagination(_messageManager.PublicSquareLine(count, tok));
         }

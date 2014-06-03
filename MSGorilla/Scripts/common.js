@@ -139,7 +139,7 @@ function LoadUserInfo(user) {
 }
 
 function LoadUserFollowBtn(user, isFollowing) {
-    var btn = $("#btn_user_follow_" + user);
+    var btn = $("#btn_user_follow_" + encodeEmail(user));
     if (btn.length == 0) {
         return;
     }
@@ -154,7 +154,7 @@ function LoadUserFollowBtn(user, isFollowing) {
 }
 
 function SetEditProfileBtn(user) {
-    var btn = $("#btn_user_follow_" + user);
+    var btn = $("#btn_user_follow_" + encodeEmail(user));
     if (btn.length == 0) {
         return;
     }
@@ -165,7 +165,7 @@ function SetEditProfileBtn(user) {
 }
 
 function SetUnfollowBtn(user, enabled) {
-    var btn = $("#btn_user_follow_" + user);
+    var btn = $("#btn_user_follow_" + encodeEmail(user));
     if (btn.length == 0) {
         return;
     }
@@ -183,7 +183,7 @@ function SetUnfollowBtn(user, enabled) {
 }
 
 function UnfollowBtnMouseOver(user) {
-    var btn = $("#btn_user_follow_" + user);
+    var btn = $("#btn_user_follow_" + encodeEmail(user));
     if (btn.length == 0) {
         return;
     }
@@ -193,7 +193,7 @@ function UnfollowBtnMouseOver(user) {
 }
 
 function UnfollowBtnMouseOut(user) {
-    var btn = $("#btn_user_follow_" + user);
+    var btn = $("#btn_user_follow_" + encodeEmail(user));
     if (btn.length == 0) {
         return;
     }
@@ -203,7 +203,7 @@ function UnfollowBtnMouseOut(user) {
 }
 
 function SetFollowBtn(user, enabled) {
-    var btn = $("#btn_user_follow_" + user);
+    var btn = $("#btn_user_follow_" + encodeEmail(user));
     if (btn.length == 0) {
         return;
     }
@@ -315,20 +315,38 @@ function PostReply(user, mid) {
 
 
 // feed function
-function LoadFeeds(category) {
+function LoadFeeds(category, id) {
     var apiurl = "";
     var apidata = ""
     if (isNullOrEmpty(category))
         apiurl = "/api/message/userline";
     else if (category == "homeline")
         apiurl = "/api/message/homeline";
+    else if (category == "atline")
+        apiurl = "/api/message/atline";
     else if (category == "ownerline")
-        apiurl = "api/message/ownerline";
+        apiurl = "/api/message/ownerline";
     else if (category == "publicsquareline")
-        apiurl = "api/message/publicsquareline";
-    else {
+        apiurl = "/api/message/publicsquareline";
+    else if (category == "userline") {
         apiurl = "/api/message/userline";
-        apidata = "userid=" + category;
+        if (isNullOrEmpty(id)) {
+            ShowError("Illegal operation.");
+            return;
+        }
+        apidata = "userid=" + id;
+    }
+    else if (category == "topicline") {
+        apiurl = "/api/message/topicline";
+        if (isNullOrEmpty(id)) {
+            ShowError("Illegal operation.");
+            return;
+        }
+        apidata = "topicid=" + id;
+    }
+    else {
+        ShowError("Illegal operation.");
+        return;
     }
 
     var token = $("#hd_token").val();
@@ -371,7 +389,7 @@ function LoadFeeds(category) {
             }
 
             if (isNullOrEmpty(nexttoken)) {
-                $("#lbl_seemore").html("No more feeds");
+                $("#lbl_seemore").html("No more feeds.");
                 $("#hd_token").val("nomore");
             }
             else {
@@ -412,7 +430,6 @@ function CreateFeed(postData) {
 
     output += "<ul class='list-group'>";
     
-    output += "<div>";
     output += "  <li class='list-group-item'>";
     output += "    <div>"
     output += "      <div class='feed-pic'>";
@@ -434,7 +451,6 @@ function CreateFeed(postData) {
     output += "    <div id='reply_" + mid + "'></div>";
     output += "    <input type='hidden' id='isshowreplies_" + mid + "' value='false'/>";
     output += "  </li>";
-    output += "</div>";
 
     output += "</ul>";
 
@@ -647,24 +663,30 @@ function CreateUserCard(data) {
         picurl = "/Content/Images/default_avatar.jpg";
     }
 
-    output = "  <div class='user-card'>"
-           + "    <div class='user-card-info '>"
+    output = "  <li class='userlist-group-item'>"
+           + "    <div class='user-card-info'>"
            + "      <div class='ma-btm-10'>"
-           + "        <img class='img-rounded' id='user_pic_" + userid + "' src='" + picurl + "' width='100' height='100' />"
+           + "        <img class='img-rounded' id='user_pic_" + encodeEmail(userid) + "' src='" + picurl + "' width='100' height='100' />"
            + "      </div>"
            + "      <div>"
-           + "        <a class='' id='user_name_" + userid + "' href='/profile/index?user=" + userid + "'>" + username + "</a>"
+           + "        <a class='' id='user_name_" + encodeEmail(userid) + "' href='/profile/index?user=" + userid + "'>" + username + "</a>"
            + "      </div>"
            + "      <div>"
-           + "        <span id='user_id_" + userid + "'>" + userid + "</span>"
+           + "        <span id='user_id_" + encodeEmail(userid) + "'>@" + userid + "</span>"
            + "      </div>"
            + "    </div>"
            + "    <div class='user-card-postinfo'>"
            + "      <div class='btn-group btn-group-justified'>"
-           + "        <a class='btn btn-primary' id='btn_user_follow_" + userid + "'>Follow</a>"
+           + "        <a class='btn btn-default' id='btn_user_follow_" + encodeEmail(userid) + "'>&nbsp;</a>"
            + "      </div>"
            + "    </div>"
-           + "  </div>";
+           + "  </li>";
 
     return output;
+}
+
+function encodeEmail(code) {
+    code = code.replace('@', '-');
+    code = code.replace('.', '_');
+    return code;
 }

@@ -37,6 +37,7 @@ namespace MSGorilla.Controllers
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
+            ViewBag.FeedCategory = "publicsquareline";
             return View();
         }
 
@@ -83,6 +84,7 @@ namespace MSGorilla.Controllers
             }
 
             // If we got this far, something failed, redisplay form
+            ViewBag.FeedCategory = "publicsquareline";
             return View(model);
         }
 
