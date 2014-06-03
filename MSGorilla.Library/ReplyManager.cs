@@ -15,17 +15,12 @@ using MSGorilla.Library.Azure;
 using MSGorilla.Library.Models;
 using MSGorilla.Library.Models.SqlModels;
 using MSGorilla.Library.Models.AzureModels;
+using MSGorilla.Library.Models.ViewModels;
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.AzureModels.Entity;
 
 namespace MSGorilla.Library
 {
-    public class ReplyPagiantion
-    {
-        public List<Reply> reply {get; set;}
-        public string continuationToken { get; set; }
-    }
-
     public class ReplyManager
     {
         private CloudTable _reply;

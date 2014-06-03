@@ -386,6 +386,7 @@ function LoadFeeds(category) {
 }
 
 function CreateFeed(postData) {
+    
     var output = "";
     var user = postData.User.Userid;
     var mid = postData.ID;
@@ -398,6 +399,9 @@ function CreateFeed(postData) {
     var userdesp = postData.User.Description;
     var showevents = false;
 
+    //alert(user);
+    //alert(username);
+
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";
     }
@@ -407,7 +411,7 @@ function CreateFeed(postData) {
     }
 
     output += "<ul class='list-group'>";
-
+    
     output += "<div>";
     output += "  <li class='list-group-item'>";
     output += "    <div>"
@@ -419,6 +423,7 @@ function CreateFeed(postData) {
     output += "        &nbsp;<span class='badge'>-&nbsp;" + Time2Now(posttime) + "</span></div>";
     output += "        <div class='newpost-input'><p>" + encodeHtml(msg) + "</p></div>";
     output += "        <div class='newpost-footer'>";
+    
     if (showevents) {
         output += "      <button id='btn_expandevent' class='btn btn-link' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>View Events</button>";
     }
@@ -433,6 +438,7 @@ function CreateFeed(postData) {
 
     output += "</ul>";
 
+    
     return output;
 }
 
@@ -494,13 +500,13 @@ function LoadReplies(mid) {
 
 function CreateReply(replyData) {
     var output = "";
-    var user = replyData.FromUser;
+    var user = replyData.FromUser.Userid;
     var msg = replyData.Message;
     var posttime = replyData.PostTime;
     var rid = replyData.ReplyID;
-    var username = replyData.DisplayName;
-    var picurl = replyData.PortraitUrl;
-    var userdesp = replyData.Description;
+    var username = replyData.FromUser.DisplayName;
+    var picurl = replyData.FromUser.PortraitUrl;
+    var userdesp = replyData.FromUser.Description;
 
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";

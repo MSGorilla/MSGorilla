@@ -12,6 +12,7 @@ using MSGorilla.Library.Azure;
 using MSGorilla.Library.Models;
 using MSGorilla.Library.Models.SqlModels;
 using MSGorilla.Library.Models.AzureModels;
+using MSGorilla.Library.Models.ViewModels;
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.AzureModels.Entity;
 
@@ -20,12 +21,6 @@ using Newtonsoft.Json.Converters;
 
 namespace MSGorilla.Library
 {
-    public class MessagePagination
-    {
-        public List<Message> message {get; set;}
-        public string continuationToken { get; set; }
-    }
-
     public class MessageManager
     {
         private const int DefaultTimelineQueryDayRange = 3;
