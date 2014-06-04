@@ -437,14 +437,14 @@ function CreateFeed(postData) {
     output += "      </div>";
     output += "      <div class='feed-content'>";
     output += "        <div class='newpost-header'><a id='username_" + mid + "' class='list-group-item-heading bold' href='/profile/index?user=" + user + "'>" + username + "</a>";
-    output += "        &nbsp;<span class='badge'>-&nbsp;" + Time2Now(posttime) + "</span></div>";
-    output += "        <div class='newpost-input'><p>" + encodeHtml(msg) + "</p></div>";
+    output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span></div>";
+    output += "        <div class='newpost-input'>" + encodeHtml(msg) + "</div>";
     output += "        <div class='newpost-footer'>";
     
     if (showevents) {
-        output += "      <button id='btn_expandevent' class='btn btn-link' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>View Events</button>";
+        output += "      <button id='btn_expandevent' class='btn btn-link' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>View events</button>";
     }
-    output += "          <button id='btn_showreply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Comments</button>";
+    output += "          <button id='btn_showreply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
     output += "        </div>";
     output += "      </div>";
     output += "    </div>";
@@ -536,7 +536,7 @@ function CreateReply(replyData) {
     output += "    <div class='reply-content'>";
     output += "      <div class='reply-input'>";
     output += "        <a id='reply_username_" + rid + "' href='/profile/index?user=" + user + "'>" + username + "</a>";
-    output += "        &nbsp;<span class='badge'>-&nbsp;" + Time2Now(posttime) + "</span>&nbsp;";
+    output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>&nbsp;";
     output += "        " + encodeHtml(msg);
     output += "      </div>";
     output += "  </div>";
@@ -601,8 +601,8 @@ function CreateEvent(postData, isHeighlight) {
     output += "      </div>";
     output += "      <div class='feed-content'>";
     output += "        <div class='newpost-header'><a id='event_username_" + eid + "' class='list-group-item-heading bold' href='/profile/index?user=" + user + "'>" + username + "</a>";
-    output += "        &nbsp;<span class='badge'>-&nbsp;" + Time2Now(posttime) + "</span></div>";
-    output += "        <div class='newpost-input'><p>" + encodeHtml(msg) + "</p></div>";
+    output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span></div>";
+    output += "        <div class='newpost-input'>" + encodeHtml(msg) + "</div>";
     //output += "        <div class='newpost-footer'>";
     //output += "          <button id='btn_reply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Comments</button>";
     //output += "        </div>";

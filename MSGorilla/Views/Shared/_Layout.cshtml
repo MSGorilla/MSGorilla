@@ -37,6 +37,14 @@
                     {
                         <li>@Html.ActionLink("Notifications", "Index", "Notification")</li>
                     }
+                    @if (ViewBag.Title == "Square")
+                    {
+                        <li class="active">@Html.ActionLink("Square", "Index", "Square")</li>
+                    }
+                    else
+                    {
+                        <li>@Html.ActionLink("Square", "Index", "Square")</li>
+                    }
                     @if (ViewBag.Title == "Me")
                     {
                         <li class="active">@Html.ActionLink("Me", "Index", "Profile")</li>

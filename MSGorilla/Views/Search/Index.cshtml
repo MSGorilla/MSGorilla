@@ -5,6 +5,12 @@
 <script src="~/Scripts/common.js"></script>
 <div class="main-container">
     <div class="contents-container">
+        <div class="title-container">
+            <div>
+                <h4>Results for <span class="bold">@ViewBag.SearchKeyword</span></h4>
+            </div>
+        </div>
+
         <div id="notifications" class="posts-notification">
             @*<div class="alert alert-dismissable alert-warning">
                     <button class="close" type="button" data-dismiss="alert">×</button>
@@ -12,9 +18,9 @@
                 </div>*@
         </div>
 
-        <div class="users-cards">
+        <div class="block-container">
             <div>
-                <span class="help-block bold">People</span>
+                <span class="help-block">People</span>
             </div>
             <ul id="userlist" class="userlist-group">
                 @*autofill by js*@

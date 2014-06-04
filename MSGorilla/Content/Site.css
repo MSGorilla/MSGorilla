@@ -2,6 +2,11 @@
     padding-top: 50px;
     padding-bottom: 20px;
     background-color: aliceblue;
+    background-attachment: fixed;
+    background-image: url("/Content/Images/default_bg.png");
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-color: #C0DEED;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -227,13 +232,26 @@ hr {
     min-width: 300px;
 }
 
-.users-cards {
+.block-container {
     margin-bottom: 20px;
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
     background-color: white;
     padding: 10px;
+    border: 1px solid lightgray;
+}
+
+.title-container {
+    margin-bottom: 20px;
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -moz-border-top-left-radius: 10px;
+    -moz-border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background-color: white;
+    padding: 10px 15px;
     border: 1px solid lightgray;
 }
 
@@ -306,3 +324,4 @@ hr {
         .sub-list-group-item > .badge + .badge {
             margin-right: 5px;
         }
+

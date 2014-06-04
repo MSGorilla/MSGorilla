@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Square";
+    ViewBag.Title = "Topic";
 }
 
 <script src="~/Scripts/common.js"></script>
@@ -11,7 +11,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="EventsModalLabel">Related events</h4>
+                    <h4 class="modal-title" id="EventsModalLabel">Events</h4>
                 </div>
                 <div class="modal-body">
                     <ul class='list-group' id="events_div"></ul>
@@ -24,10 +24,13 @@
     </div><!-- /.modal -->
 
     <div class="contents-container">
-        <div>
-            <span class="help-block bold">@ViewBag.FeedCategory</span>
-            <hr />
+        <div class="title-container">
+            <div>
+                <h4>@ViewBag.Title</h4>
+                <span class="help-block">See topics you’re interested in.</span>
+            </div>
         </div>
+
 
         <div id="notifications" class="posts-notification">
             @*<div class="alert alert-dismissable alert-warning">
