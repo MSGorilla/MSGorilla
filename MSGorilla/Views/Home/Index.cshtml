@@ -4,25 +4,7 @@
 
 <script src="~/Scripts/common.js"></script>
 <div class="main-container">
-
-    <!-- Events Modal -->
-    <div class="modal fade" id="EventsModal" tabindex="-1" role="dialog" aria-labelledby="EventsModalLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="EventsModalLabel">Events</h4>
-                </div>
-                <div class="modal-body">
-                    <ul class='list-group' id="events_div">
-                    </ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+    @Html.Partial("_EventModalPartial")
 
     <div class="contents-container">
         <div class="posts-newpost">
@@ -46,13 +28,20 @@
                 </div>*@
         </div>
 
-        <div id="feedlist" class="posts-feeds">
-            @*autofill by js*@
+        <div class="title-container">
+            <h4>@ViewBag.Title</h4>
+        </div>
+
+        <div class="posts-feeds">
+            <ul id="feedlist" class='list-group'>
+                <li class="list-group-item txtaln-c">Loading...</li>
+                @*autofill by js*@
+            </ul>
         </div>
 
         <div class="txtaln-c">
             <span id="lbl_seemore" class="help-block">Loading more...</span>
-            <input id="hd_token" type="hidden" value=""/>
+            <input id="hd_token" type="hidden" value="" />
 
             <script type="text/javascript">
                 $(window).scroll(function () {

@@ -277,6 +277,9 @@
     <Content Include="Views\Square\Index.cshtml" />
     <Content Include="Views\Notification\Index.cshtml" />
     <Content Include="Views\Topic\Index.cshtml" />
+    <Content Include="Views\Profile\Following.cshtml" />
+    <Content Include="Views\Profile\Followers.cshtml" />
+    <Content Include="Views\Shared\_EventModalPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

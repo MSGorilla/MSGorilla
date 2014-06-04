@@ -192,10 +192,6 @@ input[type="checkbox"].input-validation-error {
     padding-right: 30px;
 }
 
-hr {
-    border: 1px solid #dddddd;
-}
-
 .ma-5 {
     margin: 5px;
 }
@@ -232,7 +228,26 @@ hr {
     min-width: 300px;
 }
 
+.top-radius-10 {
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -moz-border-top-left-radius: 10px;
+    -moz-border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.top-radius-10:first-child {
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -moz-border-top-left-radius: 10px;
+    -moz-border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
 .block-container {
+    margin-top: 10px;
     margin-bottom: 20px;
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
@@ -243,7 +258,7 @@ hr {
 }
 
 .title-container {
-    margin-bottom: 20px;
+    margin-bottom: -1px;
     -webkit-border-top-left-radius: 10px;
     -webkit-border-top-right-radius: 10px;
     -moz-border-top-left-radius: 10px;
@@ -324,4 +339,3 @@ hr {
         .sub-list-group-item > .badge + .badge {
             margin-right: 5px;
         }
-

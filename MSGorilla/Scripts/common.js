@@ -1,4 +1,10 @@
 ﻿/* common function */
+function encodeEmail(code) {
+    code = code.replace('@', '-');
+    code = code.replace('.', '_');
+    return code;
+}
+
 function ScrollTo(itemname) {
     var scroll_offset = $("#" + itemname).offset();
     $("body,html").animate({
@@ -317,7 +323,7 @@ function PostReply(user, mid) {
 // feed function
 function LoadFeeds(category, id) {
     var apiurl = "";
-    var apidata = ""
+    var apidata = "";
     if (isNullOrEmpty(category))
         apiurl = "/api/message/userline";
     else if (category == "homeline")
@@ -389,7 +395,7 @@ function LoadFeeds(category, id) {
             }
 
             if (isNullOrEmpty(nexttoken)) {
-                $("#lbl_seemore").html("No more feeds.");
+                $("#lbl_seemore").html("");
                 $("#hd_token").val("nomore");
             }
             else {
@@ -428,7 +434,7 @@ function CreateFeed(postData) {
         showevents = true;
     }
 
-    output += "<ul class='list-group'>";
+    //output += "<ul class='list-group'>";
     
     output += "  <li class='list-group-item'>";
     output += "    <div>"
@@ -452,7 +458,7 @@ function CreateFeed(postData) {
     output += "    <input type='hidden' id='isshowreplies_" + mid + "' value='false'/>";
     output += "  </li>";
 
-    output += "</ul>";
+    //output += "</ul>";
 
     
     return output;
@@ -616,7 +622,7 @@ function CreateEvent(postData, isHeighlight) {
 }
 
 
-// search function
+// search user function
 function SearchUser(keyword) {
     var apiurl = "";
     if (isNullOrEmpty(keyword))
@@ -640,6 +646,48 @@ function SearchUser(keyword) {
                     LoadUserFollowBtn(item.Userid, item.IsFollowing);
                 })
 
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+function LoadUsers(category, user) {
+    var apiurl = "";
+    var apidata = "";
+    if (isNullOrEmpty(category))
+        apiurl = "/api/account/user";
+    else if (category == "following")
+        apiurl = "/api/account/followings";
+    else if (category == "followers")
+        apiurl = "/api/account/followers";
+    else {
+        ShowError("Illegal operation.");
+        return;
+    }
+
+    if (!isNullOrEmpty(user)) {
+        apidata = "userid=" + user;
+    }
+
+    $.ajax({
+        type: "get",
+        url: apiurl,
+        data: apidata,
+        dataType: "json",
+        success: function (data) {
+            if (data.length == 0) {
+                ShowError("No user found.");
+            }
+            else {
+                // create user list
+                $("#userlist").empty();
+                $.each(data, function (index, item) {
+                    $("#userlist").append(CreateUserCard(item));
+                    LoadUserFollowBtn(item.Userid, item.IsFollowing);
+                })
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -685,8 +733,4 @@ function CreateUserCard(data) {
     return output;
 }
 
-function encodeEmail(code) {
-    code = code.replace('@', '-');
-    code = code.replace('.', '_');
-    return code;
-}
+

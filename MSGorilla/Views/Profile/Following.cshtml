@@ -11,7 +11,6 @@
 
 <script src="~/Scripts/common.js"></script>
 <div class="main-container">
-    @Html.Partial("_EventModalPartial")
 
     <div class="contents-container">
         <div class="user-container ">
@@ -31,8 +30,8 @@
             </div>
             <div class="user-postinfo">
                 <div class="btn-group btn-group-justified">
-                    <a class="btn btn-default disabled">POSTS &nbsp;<span id="user_posts" class="badge">0</span></a>
-                    <a class="btn btn-default" href="/Profile/Following?user=@ViewBag.UserId">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
+                    <a class="btn btn-default" href="/Profile/Index?user=@ViewBag.UserId">POSTS &nbsp;<span id="user_posts" class="badge">0</span></a>
+                    <a class="btn btn-default disabled">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
                     <a class="btn btn-default" href="/Profile/Followers?user=@ViewBag.UserId">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
                     <a class='btn btn-default' id='btn_user_follow_@ViewBag.UserId.Replace("@","-").Replace(".","_")'></a>
                 </div>
@@ -46,33 +45,15 @@
                 </div>*@
         </div>
 
-        <div class="title-container">
-            <h4>Posts</h4>
-        </div>
-
-        <div class="posts-feeds">
-            <ul id="feedlist" class='list-group'>
-                <li class="list-group-item txtaln-c">Loading...</li>
+        <div class="block-container">
+            <div>
+                <span class="help-block">Following</span>
+            </div>
+            <ul id="userlist" class="userlist-group">
                 @*autofill by js*@
             </ul>
+            <div class="clearfix"></div>
         </div>
-
-        <div class="txtaln-c">
-            <span id="lbl_seemore" class="help-block">Loading more...</span>
-            <input id="hd_token" type="hidden" value="" />
-
-            <script type="text/javascript">
-                $(window).scroll(function () {
-                    var documentTop = $(document).scrollTop();
-                    var windowHeight = $(window).height();
-                    var documentHeight = $(document).height();
-                    if (documentTop >= (documentHeight - windowHeight)) {
-                        LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.UserId');
-                    }
-                })
-            </script>
-        </div>
-
     </div>
 
     <div class="tools-container">
@@ -86,6 +67,7 @@
 
 <script>
     $(LoadUserInfo('@ViewBag.UserId'));
-    $(LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.UserId'));
+    $(LoadUsers('following', '@ViewBag.UserId'));
 </script>
+
 
