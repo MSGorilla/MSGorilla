@@ -68,6 +68,8 @@ function Time2Now(datestring) {
 function ShowError(msg) {
     var msghtml = "<div class='alert alert-dismissable alert-warning'><button class='close' type='button' data-dismiss='alert'>×</button><p>" + msg + "</p></div>";
     $("#notifications").append(msghtml);
+
+    $("#loading_message").html(msg);
 }
 
 
