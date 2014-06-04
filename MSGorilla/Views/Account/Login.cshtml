@@ -6,24 +6,7 @@
 
 <script src="~/Scripts/common.js"></script>
 <div class="main-container">
-
-    <!-- Events Modal -->
-    <div class="modal fade" id="EventsModal" tabindex="-1" role="dialog" aria-labelledby="EventsModalLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="EventsModalLabel">Related events</h4>
-                </div>
-                <div class="modal-body">
-                    <ul class='list-group' id="events_div"></ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+    @Html.Partial("_EventModalPartial")
 
     <div class="contents-container">
         <div id="notifications" class="posts-notification">
@@ -33,75 +16,84 @@
                 </div>*@
         </div>
 
-        <div id="feedlist" class="posts-feeds">
-            @*autofill by js*@
+        <div class="title-container">
+            <h4>@ViewBag.Title</h4>
+            <span class="help-block">to see what's happening now.</span>
+        </div>
+
+        <div class="posts-feeds">
+            <ul id="feedlist" class='list-group'>
+                <li id ="loading_message" class="list-group-item txtaln-c">Loading...</li>
+                @*autofill by js*@
+            </ul>
         </div>
 
         @*<div class="txtaln-c">
-            <span id="lbl_seemore" class="help-block">Loading more...</span>
-            <input id="hd_token" type="hidden" value="" />
+                <span id="lbl_seemore" class="help-block">Loading more...</span>
+                <input id="hd_token" type="hidden" value="" />
 
-            <script type="text/javascript">
-                $(window).scroll(function () {
-                    var documentTop = $(document).scrollTop();
-                    var windowHeight = $(window).height();
-                    var documentHeight = $(document).height();
-                    if (documentTop >= (documentHeight - windowHeight)) {
-                        LoadFeeds("@ViewBag.FeedCategory");
-                    }
-                })
-            </script>
-        </div>*@
+                <script type="text/javascript">
+                    $(window).scroll(function () {
+                        var documentTop = $(document).scrollTop();
+                        var windowHeight = $(window).height();
+                        var documentHeight = $(document).height();
+                        if (documentTop >= (documentHeight - windowHeight)) {
+                            LoadFeeds("@ViewBag.FeedCategory");
+                        }
+                    })
+                </script>
+            </div>*@
     </div>
 
     <div class="tools-container">
-        <div class="row">
-            <div class="col-md-12">
-                <section id="loginForm">
-                    @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        <span class="lead">Please log in.</span>
-                        <hr />
-                        @Html.ValidationSummary(true)
-                        <div class="form-group">
-                            @*@Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })*@
-                            <div class="col-md-12">
-                                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Username" })
-                                @Html.ValidationMessageFor(m => m.UserName)
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            @*@Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })*@
-                            <div class="col-md-12">
-                                @Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "Password" })
-                                @Html.ValidationMessageFor(m => m.Password)
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-md-offset-0 col-md-12">
-                                <div class="checkbox">
-                                    @Html.CheckBoxFor(m => m.RememberMe)
-                                    @Html.LabelFor(m => m.RememberMe)
+        <div class="block-container">
+            <div class="row">
+                <div class="col-md-12">
+                    <section id="loginForm">
+                        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <span class="help-block">Please log in.</span>
+                            @Html.ValidationSummary(true)
+                            <div class="form-group">
+                                @*@Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })*@
+                                <div class="col-md-12">
+                                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Username" })
+                                    @Html.ValidationMessageFor(m => m.UserName)
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-md-offset-0 col-md-12">
-                                <input type="submit" value="Log in" class="btn btn-default" />
+                            <div class="form-group">
+                                @*@Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })*@
+                                <div class="col-md-12">
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "Password" })
+                                    @Html.ValidationMessageFor(m => m.Password)
+                                </div>
                             </div>
-                        </div>
-                        <p>
-                            @Html.ActionLink("Register", "Register") if you don't have an account.
-                        </p>
-                    }
-                </section>
+                            <div class="form-group">
+                                <div class="col-md-offset-0 col-md-12">
+                                    <div class="checkbox">
+                                        @Html.CheckBoxFor(m => m.RememberMe)
+                                        @Html.LabelFor(m => m.RememberMe)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-0 col-md-12">
+                                    <input type="submit" value="Log in" class="btn btn-default" />
+                                </div>
+                            </div>
+                            <p>
+                                @Html.ActionLink("Register", "Register") if you don't have an account.
+                            </p>
+                        }
+                    </section>
+                </div>
+                @*<div class="col-md-4">
+                    <section id="socialLoginForm">
+                        @Html.Partial("_ExternalLoginsListPartial", new { Action = "ExternalLogin", ReturnUrl = ViewBag.ReturnUrl })
+                    </section>
+                    </div>*@
             </div>
-            @*<div class="col-md-4">
-            <section id="socialLoginForm">
-                @Html.Partial("_ExternalLoginsListPartial", new { Action = "ExternalLogin", ReturnUrl = ViewBag.ReturnUrl })
-            </section>
-            </div>*@
         </div>
     </div>
 

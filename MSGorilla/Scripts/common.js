@@ -1,4 +1,10 @@
 ﻿/* common function */
+function encodeEmail(code) {
+    code = code.replace('@', '-');
+    code = code.replace('.', '_');
+    return code;
+}
+
 function ScrollTo(itemname) {
     var scroll_offset = $("#" + itemname).offset();
     $("body,html").animate({
@@ -58,10 +64,13 @@ function Time2Now(datestring) {
     }
 }
 
+
 /* show message function */
 function ShowError(msg) {
     var msghtml = "<div class='alert alert-dismissable alert-warning'><button class='close' type='button' data-dismiss='alert'>×</button><p>" + msg + "</p></div>";
     $("#notifications").append(msghtml);
+
+    $("#loading_message").html(msg);
 }
 
 
@@ -317,7 +326,7 @@ function PostReply(user, mid) {
 // feed function
 function LoadFeeds(category, id) {
     var apiurl = "";
-    var apidata = ""
+    var apidata = "";
     if (isNullOrEmpty(category))
         apiurl = "/api/message/userline";
     else if (category == "homeline")
@@ -389,7 +398,7 @@ function LoadFeeds(category, id) {
             }
 
             if (isNullOrEmpty(nexttoken)) {
-                $("#lbl_seemore").html("No more feeds.");
+                $("#lbl_seemore").html("");
                 $("#hd_token").val("nomore");
             }
             else {
@@ -428,7 +437,7 @@ function CreateFeed(postData) {
         showevents = true;
     }
 
-    output += "<ul class='list-group'>";
+    //output += "<ul class='list-group'>";
     
     output += "  <li class='list-group-item'>";
     output += "    <div>"
@@ -437,14 +446,14 @@ function CreateFeed(postData) {
     output += "      </div>";
     output += "      <div class='feed-content'>";
     output += "        <div class='newpost-header'><a id='username_" + mid + "' class='list-group-item-heading bold' href='/profile/index?user=" + user + "'>" + username + "</a>";
-    output += "        &nbsp;<span class='badge'>-&nbsp;" + Time2Now(posttime) + "</span></div>";
-    output += "        <div class='newpost-input'><p>" + encodeHtml(msg) + "</p></div>";
+    output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span></div>";
+    output += "        <div class='newpost-input'>" + encodeHtml(msg) + "</div>";
     output += "        <div class='newpost-footer'>";
     
     if (showevents) {
-        output += "      <button id='btn_expandevent' class='btn btn-link' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>View Events</button>";
+        output += "      <button id='btn_expandevent' class='btn btn-link' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>View events</button>";
     }
-    output += "          <button id='btn_showreply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Comments</button>";
+    output += "          <button id='btn_showreply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
     output += "        </div>";
     output += "      </div>";
     output += "    </div>";
@@ -452,7 +461,7 @@ function CreateFeed(postData) {
     output += "    <input type='hidden' id='isshowreplies_" + mid + "' value='false'/>";
     output += "  </li>";
 
-    output += "</ul>";
+    //output += "</ul>";
 
     
     return output;
@@ -536,7 +545,7 @@ function CreateReply(replyData) {
     output += "    <div class='reply-content'>";
     output += "      <div class='reply-input'>";
     output += "        <a id='reply_username_" + rid + "' href='/profile/index?user=" + user + "'>" + username + "</a>";
-    output += "        &nbsp;<span class='badge'>-&nbsp;" + Time2Now(posttime) + "</span>&nbsp;";
+    output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>&nbsp;";
     output += "        " + encodeHtml(msg);
     output += "      </div>";
     output += "  </div>";
@@ -601,8 +610,8 @@ function CreateEvent(postData, isHeighlight) {
     output += "      </div>";
     output += "      <div class='feed-content'>";
     output += "        <div class='newpost-header'><a id='event_username_" + eid + "' class='list-group-item-heading bold' href='/profile/index?user=" + user + "'>" + username + "</a>";
-    output += "        &nbsp;<span class='badge'>-&nbsp;" + Time2Now(posttime) + "</span></div>";
-    output += "        <div class='newpost-input'><p>" + encodeHtml(msg) + "</p></div>";
+    output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span></div>";
+    output += "        <div class='newpost-input'>" + encodeHtml(msg) + "</div>";
     //output += "        <div class='newpost-footer'>";
     //output += "          <button id='btn_reply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Comments</button>";
     //output += "        </div>";
@@ -616,7 +625,7 @@ function CreateEvent(postData, isHeighlight) {
 }
 
 
-// search function
+// search user function
 function SearchUser(keyword) {
     var apiurl = "";
     if (isNullOrEmpty(keyword))
@@ -640,6 +649,48 @@ function SearchUser(keyword) {
                     LoadUserFollowBtn(item.Userid, item.IsFollowing);
                 })
 
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+function LoadUsers(category, user) {
+    var apiurl = "";
+    var apidata = "";
+    if (isNullOrEmpty(category))
+        apiurl = "/api/account/user";
+    else if (category == "following")
+        apiurl = "/api/account/followings";
+    else if (category == "followers")
+        apiurl = "/api/account/followers";
+    else {
+        ShowError("Illegal operation.");
+        return;
+    }
+
+    if (!isNullOrEmpty(user)) {
+        apidata = "userid=" + user;
+    }
+
+    $.ajax({
+        type: "get",
+        url: apiurl,
+        data: apidata,
+        dataType: "json",
+        success: function (data) {
+            if (data.length == 0) {
+                ShowError("No user found.");
+            }
+            else {
+                // create user list
+                $("#userlist").empty();
+                $.each(data, function (index, item) {
+                    $("#userlist").append(CreateUserCard(item));
+                    LoadUserFollowBtn(item.Userid, item.IsFollowing);
+                })
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -685,8 +736,4 @@ function CreateUserCard(data) {
     return output;
 }
 
-function encodeEmail(code) {
-    code = code.replace('@', '-');
-    code = code.replace('.', '_');
-    return code;
-}
+

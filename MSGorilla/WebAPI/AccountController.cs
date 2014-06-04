@@ -179,8 +179,16 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public List<DisplayUserProfile> Followings()
         {
-            string me = whoami();
-            return Followings(me);
+            string userid = whoami();
+            var userlist = _accountManager.Followings(userid);
+            var dispusers = new List<DisplayUserProfile>();
+
+            foreach (var u in userlist)
+            {
+                dispusers.Add(new DisplayUserProfile(u, 1));
+            }
+
+            return dispusers;
         }
 
         [HttpGet]
@@ -191,7 +199,7 @@ namespace MSGorilla.WebApi
 
             foreach (var u in userlist)
             {
-                dispusers.Add(new DisplayUserProfile(u, 1));
+                dispusers.Add(new DisplayUserProfile(u, IsFollowing(u.Userid)));
             }
 
             return dispusers;

@@ -23,27 +23,35 @@
                 <ul class="nav navbar-nav">
                     @if (ViewBag.Title == "Home")
                     {
-                        <li class="active">@Html.ActionLink("Home", "Index", "Home")</li>
+                        <li class="active">@Html.ActionLink("⌂ Home", "Index", "Home")</li>
                     }
                     else
                     {
-                        <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                        <li>@Html.ActionLink("⌂ Home", "Index", "Home")</li>
                     }
                     @if (ViewBag.Title == "Notifications")
                     {
-                        <li class="active">@Html.ActionLink("Notifications", "Index", "Home")</li>
+                        <li class="active">@Html.ActionLink("҉ Notifications", "Index", "Home")</li>
                     }
                     else
                     {
-                        <li>@Html.ActionLink("Notifications", "Index", "Notification")</li>
+                        <li>@Html.ActionLink("҉ Notifications", "Index", "Notification")</li>
+                    }
+                    @if (ViewBag.Title == "Square")
+                    {
+                        <li class="active">@Html.ActionLink("# Square", "Index", "Square")</li>
+                    }
+                    else
+                    {
+                        <li>@Html.ActionLink("# Square", "Index", "Square")</li>
                     }
                     @if (ViewBag.Title == "Me")
                     {
-                        <li class="active">@Html.ActionLink("Me", "Index", "Profile")</li>
+                        <li class="active">@Html.ActionLink("Ω Me", "Index", "Profile")</li>
                     }
                     else
                     {
-                        <li>@Html.ActionLink("Me", "Index", "Profile")</li>
+                        <li>@Html.ActionLink("Ω Me", "Index", "Profile")</li>
                     }
                 </ul>
                 <form class="navbar-form navbar-left" method="get" action="/Search/index">
@@ -59,7 +67,6 @@
             @RenderBody()
         </div>
         <div class="clearfix"></div>
-        <hr />
         <footer>
             <p>&copy; @DateTime.Now.Year - MSGorilla</p>
         </footer>
