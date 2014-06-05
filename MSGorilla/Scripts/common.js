@@ -353,6 +353,8 @@ function LoadFeeds(category, id) {
         }
         apidata = "topicid=" + id;
     }
+    else if (category == "replyline")
+        return LoadReplyFeeds(category);
     else {
         ShowError("Illegal operation.");
         return;
@@ -383,7 +385,7 @@ function LoadFeeds(category, id) {
             data = data.message
             //ShowError(data);
             if (data.length == 0) {
-                ShowError("No feed found.");
+                ShowError("No content.");
             }
             else {
                 // create feed list
@@ -467,6 +469,70 @@ function CreateFeed(postData) {
     return output;
 }
 
+function LoadReplyFeeds(category) {
+    var apiurl = "";
+    var apidata = "";
+    if (category == "replyline")
+        apiurl = "/api/reply/getmyreply";
+    else {
+        ShowError("Illegal operation.");
+        return;
+    }
+
+    var token = $("#hd_token").val();
+    if (!isNullOrEmpty(token)) {
+        if (token == "nomore") {
+            // already no more feeds, don't load any more
+            return;
+        }
+
+        if (isNullOrEmpty(apidata)) {
+            apidata = "token=" + token;
+        }
+        else {
+            apidata += "&token=" + token;
+        }
+    }
+
+    $.ajax({
+        type: "get",
+        url: apiurl,
+        dataType: "json",
+        data: apidata,
+        success: function (data) {
+            nexttoken = data.continuationToken
+            data = data.reply
+            //ShowError(data);
+            if (data.length == 0) {
+                ShowError("No content.");
+            }
+            else {
+                // create feed list
+                if (isNullOrEmpty(token)) {
+                    // clear feeds at the first time 
+                    $("#feedlist").empty();
+                }
+                $.each(data, function (index, item) {
+                    $("#feedlist").append(CreateReply(item, true));
+                })
+
+            }
+
+            if (isNullOrEmpty(nexttoken)) {
+                $("#lbl_seemore").html("");
+                $("#hd_token").val("nomore");
+            }
+            else {
+                $("#lbl_seemore").html("Loading more...");
+                $("#hd_token").val(nexttoken);
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
 
 // reply function
 function ShowReplies(user, mid) {
@@ -514,7 +580,7 @@ function LoadReplies(mid) {
             // create reply list
             $("#replylist_" + mid).empty();
             $.each(data, function (index, item) {
-                $("#replylist_" + mid).append(CreateReply(item));
+                $("#replylist_" + mid).append(CreateReply(item, false));
             })
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -523,7 +589,7 @@ function LoadReplies(mid) {
     });
 }
 
-function CreateReply(replyData) {
+function CreateReply(replyData, isLinkToMsg) {
     var output = "";
     var user = replyData.FromUser.Userid;
     var msg = replyData.Message;
@@ -537,7 +603,7 @@ function CreateReply(replyData) {
         picurl = "/Content/Images/default_avatar.jpg";
     }
 
-    output = "<li class='list-group-item'>";
+    output += "<li class='list-group-item' data-toggle='modal' data-target='#EventsModal'>";
     output += "  <div>"
     output += "    <div class='reply-pic'>";
     output += "      <img class='img-rounded' id='reply_user_pic_" + rid + "' src='" + picurl + "' width='50' height='50' />";
@@ -550,6 +616,7 @@ function CreateReply(replyData) {
     output += "      </div>";
     output += "  </div>";
     output += "</li>";
+
     return output;
 }
 
@@ -639,7 +706,7 @@ function SearchUser(keyword) {
         dataType: "json",
         success: function (data) {
             if (data.length == 0) {
-                ShowError("No user found.");
+                ShowError("No content.");
             }
             else {
                 // create user list
@@ -682,7 +749,7 @@ function LoadUsers(category, user) {
         dataType: "json",
         success: function (data) {
             if (data.length == 0) {
-                ShowError("No user found.");
+                ShowError("No content.");
             }
             else {
                 // create user list
