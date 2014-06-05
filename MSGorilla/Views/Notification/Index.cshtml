@@ -19,9 +19,38 @@
             @*<span class="help-block">What's happening now, tailored for you.</span>*@
         </div>
 
+        <div class="nav-container">
+            <ul class="nav nav-pills">
+                @if (ViewBag.FeedCategory == "replyline")
+                {
+                    <li class="active"><a href="/Notification/index?category=replyline">Replies</a></li>
+                }
+                else
+                {
+                    <li><a href="/Notification/index?category=replyline">Replies</a></li>
+                }
+                @if (ViewBag.FeedCategory == "atline")
+                {
+                    <li class="active"><a href="/Notification/index?category=atline">Mentions</a></li>
+                }
+                else
+                {
+                    <li><a href="/Notification/index?category=atline">Mentions</a></li>
+                }
+                @if (ViewBag.FeedCategory == "ownerline")
+                {
+                    <li class="active"><a href="/Notification/index?category=ownerline">My owns</a></li>
+                }
+                else
+                {
+                    <li><a href="/Notification/index?category=ownerline">My owns</a></li>
+                }
+            </ul>
+        </div>
+
         <div class="posts-feeds">
             <ul id="feedlist" class='list-group'>
-                <li id ="loading_message" class="list-group-item txtaln-c">Loading...</li>
+                <li id="loading_message" class="list-group-item txtaln-c">Loading...</li>
                 @*autofill by js*@
             </ul>
         </div>
