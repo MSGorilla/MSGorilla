@@ -4,18 +4,20 @@
 
 <script src="~/Scripts/common.js"></script>
 <div class="main-container">
+    @Html.Partial("_EventModalPartial")
+
     <div class="contents-container">
+        <div id="notifications" class="posts-notification">
+            @*<div class="alert alert-dismissable alert-warning">
+                <button class="close" type="button" data-dismiss="alert">×</button>
+                <p><a class="alert-link" href="#">You have new messages.</a></p>
+            </div>*@
+        </div>
+
         <div class="title-container">
             <div>
                 <h4>Results for "<span class="bold">@ViewBag.SearchKeyword</span>"</h4>
             </div>
-        </div>
-
-        <div id="notifications" class="posts-notification">
-            @*<div class="alert alert-dismissable alert-warning">
-                    <button class="close" type="button" data-dismiss="alert">×</button>
-                    <p><a class="alert-link" href="#">You have new messages.</a></p>
-                </div>*@
         </div>
 
         <div class="block-container">
@@ -27,6 +29,33 @@
             </ul>
             <div class="clearfix"></div>
         </div>
+
+        <div class="title-container">
+            <span class="help-block">Topics for "#<span class="bold">@ViewBag.SearchKeyword</span>"</span>
+        </div>
+
+        <div class="posts-feeds">
+            <ul id="feedlist" class='list-group'>
+                <li id="loading_message" class="list-group-item txtaln-c">Loading...</li>
+                @*autofill by js*@
+            </ul>
+        </div>
+
+        <div class="txtaln-c">
+            <span id="lbl_seemore" class="help-block">Loading more...</span>
+            <input id="hd_token" type="hidden" value="" />
+
+            <script type="text/javascript">
+                $(window).scroll(function () {
+                    var documentTop = $(document).scrollTop();
+                    var windowHeight = $(window).height();
+                    var documentHeight = $(document).height();
+                    if (documentTop >= (documentHeight - windowHeight)) {
+                        LoadFeeds("@ViewBag.FeedCategory", "@ViewBag.SearchKeyword");
+                    }
+                })
+            </script>
+        </div>
     </div>
     <div class="tools-container">
         @Html.Partial("_MePartial")
@@ -37,6 +66,7 @@
 
 <script>
     $(SearchUser('@ViewBag.SearchKeyword'));
+    $(LoadFeeds("@ViewBag.FeedCategory", "@ViewBag.SearchKeyword"));
 </script>
 
 
