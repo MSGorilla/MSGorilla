@@ -12,8 +12,9 @@ namespace MSGorilla.Library.DAL
     {
         public DbSet<UserProfile> Users { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
-
         public DbSet<Schema> Schemas { get; set; }
+        public DbSet<Topic> Topics { get; set; }
+        public DbSet<NotificationCount> NotifCounts { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

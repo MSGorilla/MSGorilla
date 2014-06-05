@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
@@ -11,17 +10,15 @@ using System.Runtime.Serialization;
 namespace MSGorilla.Library.Models.SqlModels
 {
     [Serializable, DataContract]
-    public class NotificationCount
+    public class Topic
     {
-        [Key, DataMember]
-        public string Userid { get; set; }
         [DataMember]
-        public int UnreadHomelineMsgCount { get; set; }
+        public int Id { get; set; }
         [DataMember]
-        public int UnreadOwnerlineMsgCount { get; set; }
+        public string Name { get; set; }
         [DataMember]
-        public int UnreadAtlineMsgCount { get; set; }
+        public string Description { get; set; }
         [DataMember]
-        public int UnreadReplyCount { get; set; }
+        public int MsgCount { get; set; }
     }
 }
