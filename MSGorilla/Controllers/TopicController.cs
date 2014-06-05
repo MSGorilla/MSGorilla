@@ -27,7 +27,7 @@ namespace MSGorilla.Controllers
             {
                 topic = "";
             }
-            ViewBag.Topic = topic.ToLower();
+            ViewBag.Topic = topic;
 
             return View();
         }

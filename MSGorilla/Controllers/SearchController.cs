@@ -23,6 +23,12 @@ namespace MSGorilla.Views
             ViewBag.Myid = me.Userid;
             ViewBag.Me = me;
 
+            ViewBag.FeedCategory = "topicline";
+
+            if (string.IsNullOrEmpty(keyword))
+            {
+                keyword = "";
+            }
             ViewBag.SearchKeyword = keyword;
 
             return View();
