@@ -31,7 +31,11 @@ namespace MSGorilla.Library
             }
             UserProfile user = _accountCtx.Users.Find(userid);
 
-            if (string.IsNullOrEmpty(user.Password))
+            if (user.Password == null)
+            {
+                return false;
+            }
+            if ("".Equals(user.Password))
             {
                 return true;
             }

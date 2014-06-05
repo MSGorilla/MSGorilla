@@ -8,8 +8,12 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.Cookies;
+
+using Microsoft.Owin.Security.OpenIdConnect;
 using MSGorilla.Models;
 using MSGorilla.Filters;
+using MSGorilla.Utility;
 using MSGorilla.Library;
 using MSGorilla.Library.Models.SqlModels;
 
@@ -420,6 +424,29 @@ namespace MSGorilla.Controllers
 
             return RedirectToAction("Login", "Account");
         }
+
+        public void SignIn()
+        {
+            // Send an OpenID Connect sign-in request.
+            if (!Request.IsAuthenticated)
+            {
+                HttpContext.GetOwinContext().Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" }, OpenIdConnectAuthenticationDefaults.AuthenticationType);
+            }
+        }
+        public void SignOut()
+        {
+            // Remove all cache entries for this user and send an OpenID Connect sign-out request.
+            TokenCacheUtils.RemoveAllFromCache();
+            HttpContext.GetOwinContext().Authentication.SignOut(
+                OpenIdConnectAuthenticationDefaults.AuthenticationType, CookieAuthenticationDefaults.AuthenticationType);
+            LogOff();
+        }
+
+
+
+
+
+
 
         //
         // GET: /Account/ExternalLoginFailure

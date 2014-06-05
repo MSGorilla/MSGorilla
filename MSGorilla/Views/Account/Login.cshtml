@@ -52,7 +52,7 @@
                     <section id="loginForm">
                         @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
                         {
-                            @Html.AntiForgeryToken()
+                            //@Html.AntiForgeryToken()
                             <span class="help-block">Please log in.</span>
                             @Html.ValidationSummary(true)
                             <div class="form-group">

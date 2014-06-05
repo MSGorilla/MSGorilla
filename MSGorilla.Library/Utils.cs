@@ -8,6 +8,9 @@ using System.Security.Cryptography;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
+using MSGorilla.Library.Models.SqlModels;
+using MSGorilla.Library.Exceptions;
+
 namespace MSGorilla.Library
 {
     public class Utils
@@ -130,5 +133,18 @@ namespace MSGorilla.Library
             ret.TargetLocation = "Primary".Equals(parts[3]) ? StorageLocation.Primary : StorageLocation.Secondary;
             return ret;
         }
+
+        public static UserProfile CreateNewUser(string userid)
+        {
+            if (!IsValidID(userid))
+            {
+                throw new InvalidIDException();
+            }
+            UserProfile userprofile = new UserProfile();
+            userprofile.Userid = userprofile.DisplayName = userid;
+            userprofile.Password = null;
+            userprofile.FollowersCount = userprofile.FollowingsCount = 0;
+            return userprofile;
+        } 
     }
 }
