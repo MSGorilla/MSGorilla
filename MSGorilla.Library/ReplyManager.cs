@@ -28,6 +28,7 @@ namespace MSGorilla.Library
         private CloudTable _replyArchive;
         private CloudTable _userline;
         private AccountManager _accManager;
+        private NotifManager _notifManager;
 
         public ReplyManager()
         {
@@ -36,6 +37,7 @@ namespace MSGorilla.Library
             _replyArchive = AzureFactory.GetTable(AzureFactory.MSGorillaTable.ReplyArchive);
             _userline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Userline);
             _accManager = new AccountManager();
+            _notifManager = new NotifManager();
         }
 
         public ReplyPagiantion GetReply(string userid, int count = 25, TableContinuationToken token = null)
@@ -147,6 +149,8 @@ namespace MSGorilla.Library
             TableOperation insert = TableOperation.Insert(notifEntity);
             _replyNotification.Execute(insert);
             _replyArchive.Execute(insert);
+
+            _notifManager.incrementReplyNotifCount(toUser);
 
             return reply;
         }

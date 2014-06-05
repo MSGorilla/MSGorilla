@@ -17,6 +17,7 @@ namespace MSGorilla.WebApi
     public class ReplyController : BaseController
     {
         ReplyManager _replyManager = new ReplyManager();
+        NotifManager _notifManager = new NotifManager();
 
         [HttpGet]
         public List<DisplayReply> Replies()
@@ -34,7 +35,11 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public DisplayReplyPagination GetMyReply(int count = 25, string token = null)
         {
-            return new DisplayReplyPagination(_replyManager.GetReply(whoami(), count, Utils.String2Token(token)));
+            string me = whoami();
+            if(token == null){
+                _notifManager.clearReplyNotifCount(me);
+            }            
+            return new DisplayReplyPagination(_replyManager.GetReply(me, count, Utils.String2Token(token)));
         }
 
         [HttpGet, HttpPost]

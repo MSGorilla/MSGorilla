@@ -37,6 +37,7 @@ namespace MSGorilla.Library
 
         private AccountManager _accManager;
         private SchemaManager _schemaManager;
+        private NotifManager _notifManager;
 
         public MessageManager()
         {
@@ -53,6 +54,7 @@ namespace MSGorilla.Library
 
             _accManager = new AccountManager();
             _schemaManager = new SchemaManager();
+            _notifManager = new NotifManager();
         }
 
         static string GenerateTimestampConditionQuery(string userid, DateTime start, DateTime end)
@@ -237,11 +239,6 @@ namespace MSGorilla.Library
             }
             return ret;
         }
-
-        //public List<Message> HomeLine(string userid)
-        //{
-        //    return HomeLine(userid, DateTime.UtcNow, DateTime.UtcNow.AddDays(0 - DefaultTimelineQueryDayRange));
-        //}
 
         public MessagePagination TopicLine(string topicID, int count = 25, TableContinuationToken continuationToken = null)
         {
@@ -449,10 +446,12 @@ namespace MSGorilla.Library
             {
                 foreach (string ownerid in message.Owner)
                 {
-                    if (Utils.IsValidID(ownerid))
+                    UserProfile user = _accManager.FindUser(ownerid);
+                    if (user != null)
                     {
-                        insertOperation = TableOperation.InsertOrReplace(new OwnerLineEntity(ownerid, message));
+                        insertOperation = TableOperation.InsertOrReplace(new OwnerLineEntity(user.Userid, message));
                         _ownerline.Execute(insertOperation);
+                        _notifManager.incrementOwnerlineNotifCount(user.Userid);
                     }
                 }
             }
@@ -476,6 +475,8 @@ namespace MSGorilla.Library
                 {
                     insertOperation = TableOperation.InsertOrReplace(new AtLineEntity(user.Userid, message));
                     _atline.Execute(insertOperation);
+
+                    _notifManager.incrementAtlineNotifCount(user.Userid);
                 }
             }
 
@@ -487,6 +488,8 @@ namespace MSGorilla.Library
                 HomeLineEntity entity = new HomeLineEntity(user.Userid, message);
                 insertOperation = TableOperation.InsertOrReplace(entity);
                 _homeline.Execute(insertOperation);
+
+                _notifManager.incrementHomelineNotifCount(user.Userid);
             }
         }
     }

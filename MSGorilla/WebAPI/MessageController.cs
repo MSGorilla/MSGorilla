@@ -20,6 +20,7 @@ namespace MSGorilla.WebApi
     public class MessageController : BaseController
     {
         MessageManager _messageManager = new MessageManager();
+        NotifManager _notifManager = new NotifManager();
 
         [HttpGet]
         public DisplayMessagePagination UserLine(int count = 25, string token = null)
@@ -60,6 +61,11 @@ namespace MSGorilla.WebApi
                 userid = me;
             }
             TableContinuationToken tok = Utils.String2Token(token);
+
+            if (me.Equals(userid) && token == null)
+            {
+                _notifManager.clearHomelineNotifCount(me);
+            }
             return new DisplayMessagePagination(_messageManager.HomeLine(userid, count, tok));
         }
 
@@ -84,6 +90,11 @@ namespace MSGorilla.WebApi
                 userid = me;
             }
             TableContinuationToken tok = Utils.String2Token(token);
+
+            if (me.Equals(userid) && token == null)
+            {
+                _notifManager.clearOwnerlineNotifCount(me);
+            }
             return new DisplayMessagePagination(_messageManager.OwnerLine(userid, count, tok));
         }
         [HttpGet]
@@ -109,6 +120,12 @@ namespace MSGorilla.WebApi
             }
 
             TableContinuationToken tok = Utils.String2Token(token);
+
+            if (me.Equals(userid) && token == null)
+            {
+                _notifManager.clearAtlineNotifCount(me);
+            }
+
             return new DisplayMessagePagination(_messageManager.AtLine(userid, count, tok));
         }
 

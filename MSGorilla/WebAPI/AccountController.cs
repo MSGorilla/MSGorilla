@@ -44,6 +44,8 @@ namespace MSGorilla.WebApi
 
     public class AccountController : BaseController
     {
+        private NotifManager _notifManager = new NotifManager();
+
         [HttpGet]
         public List<DisplayUserProfile> User()
         {
@@ -241,6 +243,13 @@ namespace MSGorilla.WebApi
             }
 
             return _accountManager.IsFollowing(userid, followingUserID) ? 1 : 0;
+        }
+
+        [HttpGet]
+        public NotificationCount GetNotificationCount()
+        {
+            string me = whoami();
+            return _notifManager.FindUserNotif(me);
         }
 
         [HttpGet]
