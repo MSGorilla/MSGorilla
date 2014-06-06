@@ -29,6 +29,29 @@ namespace MSGorilla.Library
             return topic;
         }
 
+        public void incrementTopicCount(string topicID)
+        {
+            Topic topic = FindTopic(topicID);
+            if (topic != null)
+            {
+                topic.MsgCount++;
+                _gorillaCtx.SaveChanges();
+            }            
+        }
+
+        public Topic FindTopic(string topicID)
+        {
+            Topic ret = null;
+            try
+            {
+                ret = _gorillaCtx.Topics.Find(int.Parse(topicID));
+            }
+            catch
+            {
+            }
+            return ret;
+        }
+
         public Topic FindTopic(int topicID)
         {
             return _gorillaCtx.Topics.Find(topicID);

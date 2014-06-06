@@ -38,6 +38,7 @@ namespace MSGorilla.Library
         private AccountManager _accManager;
         private SchemaManager _schemaManager;
         private NotifManager _notifManager;
+        private TopicManager _topicManager;
 
         public MessageManager()
         {
@@ -55,6 +56,7 @@ namespace MSGorilla.Library
             _accManager = new AccountManager();
             _schemaManager = new SchemaManager();
             _notifManager = new NotifManager();
+            _topicManager = new TopicManager();
         }
 
         static string GenerateTimestampConditionQuery(string userid, DateTime start, DateTime end)
@@ -435,6 +437,8 @@ namespace MSGorilla.Library
                 //insert into TopicLine
                 insertOperation = TableOperation.InsertOrReplace(new TopicLine(message));
                 _topicline.Execute(insertOperation);
+
+                _topicManager.incrementTopicCount(message.TopicID);
             }
             
 
