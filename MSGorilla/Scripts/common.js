@@ -300,7 +300,9 @@ function PostMessage() {
 }
 
 function PostReply(user, mid) {
-    var message = $("#replymessage_" + mid).val().trim();
+    var replybox = $("#replymessage_" + mid);
+    var message = replybox.val().trim();
+    var touser = replybox.attr("replyto");
 
     if (message.length === 0) {
         return;
@@ -309,7 +311,7 @@ function PostReply(user, mid) {
     $("#btn_reply_" + mid).button('loading');
     $.ajax({
         type: "post",
-        url: "/api/reply/postreply?" + "to=" + user + "&message=" + message + "&messageUser=" + user + "&messageID=" + mid,
+        url: "/api/reply/postreply?" + "to=" + touser + "&message=" + message + "&messageUser=" + user + "&messageID=" + mid,
         success: function (data) {
             $("#replymessage_" + mid).val("");
             $("#replylist_" + mid).prepend(CreateReply(data));
@@ -447,13 +449,13 @@ function CreateFeed(postData) {
     output += "        <img class='img-rounded' id='user_pic_" + mid + "' src='" + picurl + "' width='100' height='100' />";
     output += "      </div>";
     output += "      <div class='feed-content'>";
-    output += "        <div class='newpost-header'><a id='username_" + mid + "' class='list-group-item-heading bold' href='/profile/index?user=" + user + "'>" + username + "</a>";
+    output += "        <div class='newpost-header'><a id='username_" + mid + "' class='fullname' href='/profile/index?user=" + user + "'>" + username + "</a>";
     output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span></div>";
     output += "        <div class='newpost-input'>" + encodeHtml(msg) + "</div>";
     output += "        <div class='newpost-footer'>";
     
     if (showevents) {
-        output += "      <button id='btn_expandevent' class='btn btn-link' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>View events</button>";
+        output += "      <button id='btn_expandevent' class='btn btn-link' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Expand events</button>";
     }
     output += "          <button id='btn_showreply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
     output += "        </div>";
@@ -548,7 +550,7 @@ function ShowReplies(user, mid) {
         // add reply box
         html += "  <div class='input-group'>";
         //html += "     <span class='input-group-addon'>Comment</span>";
-        html += "     <input class='form-control' type='text' id='replymessage_" + mid + "'>";
+        html += "     <input class='form-control' type='text' id='replymessage_" + mid + "' replyto='" + user + "' placeholder='Reply to @" + user + "'>";
         html += "     <span class='input-group-btn'>";
         html += "       <button class='btn btn-primary' type='button' id='btn_reply_" + mid + "' data-loading-text='Replying...' onclick='PostReply(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
         html += "     </span>";
@@ -589,37 +591,54 @@ function LoadReplies(mid) {
     });
 }
 
-function CreateReply(replyData, isLinkToMsg) {
+function CreateReply(replyData) {
     var output = "";
     var user = replyData.FromUser.Userid;
     var msg = replyData.Message;
     var posttime = replyData.PostTime;
     var rid = replyData.ReplyID;
+    var mid = replyData.MessageID;
     var username = replyData.FromUser.DisplayName;
     var picurl = replyData.FromUser.PortraitUrl;
     var userdesp = replyData.FromUser.Description;
+    var touser = replyData.ToUser.Userid;
+    var tousername = replyData.ToUser.DisplayName;
 
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";
     }
 
-    output += "<li class='list-group-item' data-toggle='modal' data-target='#EventsModal'>";
+    output += "<li class='list-group-item clickable' onclick='SetReplyTo(\"" + mid + "\", \"" + user + "\");'>";
     output += "  <div>"
     output += "    <div class='reply-pic'>";
     output += "      <img class='img-rounded' id='reply_user_pic_" + rid + "' src='" + picurl + "' width='50' height='50' />";
     output += "    </div>";
     output += "    <div class='reply-content'>";
+    output += "      <div class='reply-header'>"
+    output += "        <a id='reply_username_" + rid + "' class='fullname' href='/profile/index?user=" + user + "'>" + username + "</a>";
+    output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
+    output += "      </div>";
     output += "      <div class='reply-input'>";
-    output += "        <a id='reply_username_" + rid + "' href='/profile/index?user=" + user + "'>" + username + "</a>";
-    output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>&nbsp;";
+    output += "        <a id='reply_tousername_" + rid + "' href='/profile/index?user=" + touser + "'>@" + touser + "</a>&nbsp;";
     output += "        " + encodeHtml(msg);
     output += "      </div>";
+    output += "    </div>";
     output += "  </div>";
     output += "</li>";
 
     return output;
 }
 
+function SetReplyTo(mid, user) {
+    var replybox = $("#replymessage_" + mid);
+
+    if (replybox.length == 0) {
+        return;
+    }
+
+    replybox.attr("replyto", user);
+    replybox.attr("placeholder", "Reply to @" + user);
+}
 
 // event function
 function ShowEvents(mid, eid) {
@@ -676,7 +695,7 @@ function CreateEvent(postData, isHeighlight) {
     output += "        <img class='img-rounded' id='event_user_pic_" + eid + "' src='" + picurl + "' width='100' height='100' />";
     output += "      </div>";
     output += "      <div class='feed-content'>";
-    output += "        <div class='newpost-header'><a id='event_username_" + eid + "' class='list-group-item-heading bold' href='/profile/index?user=" + user + "'>" + username + "</a>";
+    output += "        <div class='newpost-header'><a id='event_username_" + eid + "' class='fullname' href='/profile/index?user=" + user + "'>" + username + "</a>";
     output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span></div>";
     output += "        <div class='newpost-input'>" + encodeHtml(msg) + "</div>";
     //output += "        <div class='newpost-footer'>";
