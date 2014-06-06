@@ -417,7 +417,6 @@ function LoadFeeds(category, id) {
 }
 
 function CreateFeed(postData) {
-    
     var output = "";
     var user = postData.User.Userid;
     var mid = postData.ID;
@@ -466,7 +465,6 @@ function CreateFeed(postData) {
     output += "  </li>";
 
     //output += "</ul>";
-
     
     return output;
 }
@@ -591,24 +589,31 @@ function LoadReplies(mid) {
     });
 }
 
-function CreateReply(replyData) {
+function CreateReply(replyData, isReplyFeed) {
     var output = "";
     var user = replyData.FromUser.Userid;
+    var username = replyData.FromUser.DisplayName;
+    var picurl = replyData.FromUser.PortraitUrl;
+    var userdesp = replyData.FromUser.Description;
     var msg = replyData.Message;
     var posttime = replyData.PostTime;
     var rid = replyData.ReplyID;
     var mid = replyData.MessageID;
-    var username = replyData.FromUser.DisplayName;
-    var picurl = replyData.FromUser.PortraitUrl;
-    var userdesp = replyData.FromUser.Description;
     var touser = replyData.ToUser.Userid;
     var tousername = replyData.ToUser.DisplayName;
+    var msguser = replyData.MessageUser.Userid;
+    var msgusername = replyData.MessageUser.DisplayName;
 
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";
     }
 
-    output += "<li class='list-group-item clickable' onclick='SetReplyTo(\"" + mid + "\", \"" + user + "\");'>";
+    if (isReplyFeed) {
+        output += "<li class='list-group-item clickable' onclick='ShowMessage(\"" + mid + "\", \"" + msguser + "\");'>";
+    } else {
+        output += "<li class='list-group-item clickable' onclick='SetReplyTo(\"" + mid + "\", \"" + user + "\");'>";
+    }
+
     output += "  <div>"
     output += "    <div class='reply-pic'>";
     output += "      <img class='img-rounded' id='reply_user_pic_" + rid + "' src='" + picurl + "' width='50' height='50' />";
@@ -639,6 +644,30 @@ function SetReplyTo(mid, user) {
     replybox.attr("replyto", user);
     replybox.attr("placeholder", "Reply to @" + user);
 }
+
+function ShowMessage(mid, user) {
+    var message_div = $("#message_div");
+    if (message_div.length == 0) {
+        return;
+    }
+
+    $.ajax({
+        type: "get",
+        url: "/api/message/getdisplaymessage",
+        data: "msgUser=" + user + "&msgID=" + mid,
+        success: function (data) {
+            message_div.empty();
+            // create message
+            message_div.append(CreateFeed(data));
+
+            $("#MessageModal").modal();
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
 
 // event function
 function ShowEvents(mid, eid) {
@@ -711,7 +740,46 @@ function CreateEvent(postData, isHeighlight) {
 }
 
 
-// search user function
+// search function
+function SearchTopic(keyword) {
+    var apiurl = "";
+    if (isNullOrEmpty(keyword))
+        apiurl = "/api/topic/getalltopic";
+    else
+        apiurl = "/api/topic/searchtopic?keyword=" + keyword;
+
+    $.ajax({
+        type: "get",
+        url: apiurl,
+        dataType: "json",
+        success: function (data) {
+            if (data.length == 0) {
+                ShowError("No content.");
+            }
+            else {
+                $("#topiclist").empty();
+                $.each(data, function (index, item) {
+                    var output = "";
+                    var topicid = item.Id;
+                    var topicname = item.Name;
+                    var topicdesp = item.Description;
+                    var topiccount = item.MsgCount;
+
+                    output += "  <a class='btn btn-link' href='/Topic/index?topic=" + topicid + "'>#" + topicname + "</a>";
+                    $("#topiclist").append(output);
+
+                    if (index == 0) {
+                        LoadFeeds("topicline", topicid);
+                    }
+                })
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
 function SearchUser(keyword) {
     var apiurl = "";
     if (isNullOrEmpty(keyword))
@@ -823,3 +891,64 @@ function CreateUserCard(data) {
 }
 
 
+// notification count function
+function SetNotificationCount() {
+    var apiurl = "/api/account/getnotificationcount";
+
+    $.ajax({
+        type: "get",
+        url: apiurl,
+        dataType: "json",
+        success: function (data) {
+            var homelineCount = data.UnreadHomelineMsgCount;
+            var ownerlineCount = data.UnreadOwnerlineMsgCount;
+            var atlineCount = data.UnreadAtlineMsgCount;
+            var replyCount = data.UnreadReplyCount;
+            var userid = data.Userid;
+            var notificationCount = ownerlineCount + replyCount + atlineCount;
+
+            $("#shortcut_homeline_count").html(homelineCount);
+            $("#shortcut_reply_count").html(replyCount);
+            $("#shortcut_atline_count").html(atlineCount);
+            $("#shortcut_ownerline_count").html(ownerlineCount);
+            $("#shortcut_notification_count").html(notificationCount);
+
+            $("#nav_notification_count").html(notificationCount);
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+
+// topic function
+function LoadHotTopics() {
+    var apiurl = "/api/topic/getalltopic";
+
+    $.ajax({
+        type: "get",
+        url: apiurl,
+        dataType: "json",
+        success: function (data) {
+            // create hot topic
+            $("#shortcut_topic_collapse").empty();
+            $.each(data, function (index, item) {
+                var output = "";
+                var topicid = item.Id;
+                var topicname = item.Name;
+                var topicdesp = item.Description;
+                var topiccount = item.MsgCount;
+
+                output += "<li class='sub-list-group-item'>";
+                output += "  <span class='badge'>" + topiccount + "</span>";
+                output += "  <a href='/Topic/index?topic=" + topicid + "'>" + topicname + "</a>";
+                output += "</li>";
+                $("#shortcut_topic_collapse").append(output);
+            })
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}

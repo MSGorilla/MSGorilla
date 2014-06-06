@@ -14,7 +14,7 @@
             </div>*@
         </div>
 
-        <div class="title-container">
+        <div class="title-container-single">
             <div>
                 <h4>Results for "<span class="bold">@ViewBag.SearchKeyword</span>"</h4>
             </div>
@@ -22,7 +22,7 @@
 
         <div class="block-container">
             <div>
-                <span class="help-block">People</span>
+                <span class="help-block">People for "@@<span class="bold">@ViewBag.SearchKeyword</span>"</span>
             </div>
             <ul id="userlist" class="userlist-group">
                 @*autofill by js*@
@@ -32,6 +32,7 @@
 
         <div class="title-container">
             <span class="help-block">Topics for "#<span class="bold">@ViewBag.SearchKeyword</span>"</span>
+            <div id="topiclist"></div>
         </div>
 
         <div class="posts-feeds">
@@ -66,7 +67,7 @@
 
 <script>
     $(SearchUser('@ViewBag.SearchKeyword'));
-    $(LoadFeeds("@ViewBag.FeedCategory", "@ViewBag.SearchKeyword"));
+    $(SearchTopic('@ViewBag.SearchKeyword'));
 </script>
 
 
