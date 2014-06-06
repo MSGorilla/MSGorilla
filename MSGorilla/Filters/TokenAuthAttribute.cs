@@ -34,7 +34,7 @@ namespace MSGorilla.Filters
                     if (_accManager.FindUser(userid) == null)
                     {
                         UserProfile profile = Utils.CreateNewUser(userid);
-                        _accManager.AddUser(profile).Wait();
+                        _accManager.AddUser(profile);
                     }
                     return;
                 }

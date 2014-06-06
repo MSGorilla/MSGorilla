@@ -78,10 +78,19 @@ namespace MSGorilla.WebApi
                     userid = userid.Replace("@microsoft.com", "");
                 }
 
-                if (_accountManager.FindUser(userid) == null)
+                UserProfile profile = _accountManager.FindUser(userid);
+                if (profile == null)
                 {
                     //CreateNewAADUser().Wait();
                     CreateNewAADUser(userid);
+                }
+                else if (profile.Password != null)
+                {
+                    string description = string.Format("A local account names {0} already exists "
+                     + "so you can't use your MS account to login. "
+                     + "Register a local account or contact MSGorilla Admin to solve this problem."
+                     , profile.Userid);
+                    throw new UserAlreadyExistException(profile.Userid, description);
                 }
                 return userid;
             }
@@ -92,7 +101,7 @@ namespace MSGorilla.WebApi
         public void CreateNewAADUser(string userid)
         {
             UserProfile newUser = Utils.CreateNewUser(userid);
-            _accountManager.AddUser(newUser).Wait();
+            _accountManager.AddUser(newUser);
         }
     }
 }

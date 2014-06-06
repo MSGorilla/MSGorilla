@@ -53,7 +53,7 @@ namespace MSGorilla.Library
             return users.ToList<UserProfile>();
         }
 
-        public async Task<UserProfile> AddUser(UserProfile user)
+        public UserProfile AddUser(UserProfile user)
         {
             if (!Utils.IsValidID(user.Userid))
             {
@@ -66,8 +66,8 @@ namespace MSGorilla.Library
             }
             user.MessageCount = 0;
             _accountCtx.Users.Add(user);
-            await _accountCtx.SaveChangesAsync();
-            return  _accountCtx.Users.Find(user.Userid);
+            _accountCtx.SaveChanges();
+            return user;
         }
 
         public UserProfile UpdateUser(UserProfile user)
