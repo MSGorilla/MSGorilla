@@ -55,6 +55,12 @@ namespace MSGorilla.Library.Exceptions
             Description = string.Format("Userid {0} already exists.", userid);
             Code = 2001;
         }
+
+        public UserAlreadyExistException(string userid, string Description)
+        {
+            Code = 2001;
+            this.Description = Description;
+        }
     }
 
     public class LoginFailException : MSGorillaBaseException

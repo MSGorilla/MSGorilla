@@ -131,7 +131,7 @@ namespace MSGorilla.Controllers
                     newUser.Password = Utils.MD5Encoding(password);
                     newUser.PortraitUrl = "/Content/Images/default_avatar.jpg";
 
-                    var result = await _accManager.AddUser(newUser);
+                    var result = _accManager.AddUser(newUser);
                     if (result != null)
                     {
                         SignIn(result, false);

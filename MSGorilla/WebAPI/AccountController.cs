@@ -90,7 +90,7 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public async Task<UserProfile> Register(string Username, string DisplayName, string Password, string Description)
+        public UserProfile Register(string Username, string DisplayName, string Password, string Description)
         {
             UserProfile user = new UserProfile();
             //account.Userid = 0;
@@ -99,9 +99,8 @@ namespace MSGorilla.WebApi
             user.Password = Utils.MD5Encoding(Password);
             user.Description = Description;
 
-            Task<UserProfile> createdUser = _accountManager.AddUser(user);
-            UserProfile u = await createdUser;
-            return u;
+            UserProfile createdUser = _accountManager.AddUser(user);
+            return createdUser;
         }
 
         [HttpGet]
@@ -135,7 +134,7 @@ namespace MSGorilla.WebApi
             public string Description { get; set; }
         }
         [HttpPost]
-        public Task<UserProfile> Register(RegisterModel registerModel)
+        public UserProfile Register(RegisterModel registerModel)
         {
             return Register(registerModel.Username, registerModel.DisplayName, registerModel.Password, registerModel.Description);
         }
