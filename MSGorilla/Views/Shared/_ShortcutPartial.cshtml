@@ -1,46 +1,48 @@
 ﻿<div class="shortcut-container ">
     <ul class="list-group" id="accordion">
         <li class="list-group-item top-radius-10">
-            <span class="badge">0</span>
+            <span id="shortcut_homeline_count" class="badge">0</span>
             <a href="/Home">Home</a>
         </li>
         <li class="list-group-item">
-            <span class="badge">0</span>
+            <span id="shortcut_notification_count" class="badge">0</span>
             <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">Notifications</a>
             <ul id="collapse1" class="panel-collapse collapse in sub-list-group">
                 <li class="sub-list-group-item">
-                    <span class="badge">0</span>
+                    <span id="shortcut_reply_count" class="badge">0</span>
                     <a href="/Notification/index?category=replyline">Replies</a>
                 </li>
                 <li class="sub-list-group-item">
-                    <span class="badge">0</span>
+                    <span id="shortcut_atline_count" class="badge">0</span>
                     <a href="/Notification/index?category=atline">Mentions</a>
                 </li>
                 <li class="sub-list-group-item">
-                    <span class="badge">0</span>
+                    <span id="shortcut_ownerline_count" class="badge">0</span>
                     <a href="/Notification/index?category=ownerline">My owns</a>
                 </li>
             </ul>
         </li>
         <li class="list-group-item">
-            <span class="badge">0</span>
+            <span class="badge"></span>
             <a href="/Square">Square</a>
         </li>
         <li class="list-group-item">
-            <span class="badge">0</span>
+            <span class="badge">...</span>
             <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
                 Topics
             </a>
             <ul id="collapse2" class="panel-collapse collapse out sub-list-group">
                 <li class="sub-list-group-item">
-                    <span class="badge">0</span>
                     <a href="/Topic/index?topic=WorldCup2014">#WorldCup2014</a>
                 </li>
                 <li class="sub-list-group-item">
-                    <span class="badge">0</span>
                     <a href="/Topic/index?topic=ObamaCare">#ObamaCare</a>
                 </li>
             </ul>
         </li>
     </ul>
 </div>
+
+<script>
+    $(SetNotificationCount());
+</script>
