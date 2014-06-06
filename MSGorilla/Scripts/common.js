@@ -765,7 +765,7 @@ function SearchTopic(keyword) {
                     var topicdesp = item.Description;
                     var topiccount = item.MsgCount;
 
-                    output += "  <a class='btn btn-link' href='/Topic/index?topic=" + topicid + "'>#" + topicname + "</a>";
+                    output += "  <a class='btn btn-link' href='/Topic/index?topic=" + topicid + "&topicname=" + topicname + "'>" + topicname + "</a>";
                     $("#topiclist").append(output);
 
                     if (index == 0) {
@@ -942,7 +942,7 @@ function LoadHotTopics() {
 
                 output += "<li class='sub-list-group-item'>";
                 output += "  <span class='badge'>" + topiccount + "</span>";
-                output += "  <a href='/Topic/index?topic=" + topicid + "'>" + topicname + "</a>";
+                output += "  <a href='/Topic/index?topic=" + topicid + "&topicname=" + topicname + "'>" + topicname + "</a>";
                 output += "</li>";
                 $("#shortcut_topic_collapse").append(output);
             })
