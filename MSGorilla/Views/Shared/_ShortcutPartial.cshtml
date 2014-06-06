@@ -6,8 +6,8 @@
         </li>
         <li class="list-group-item">
             <span id="shortcut_notification_count" class="badge">0</span>
-            <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">Notifications</a>
-            <ul id="collapse1" class="panel-collapse collapse in sub-list-group">
+            <a data-toggle="collapse" data-parent="#accordion" href="#notification_collapse">Notifications</a>
+            <ul id="notification_collapse" class="panel-collapse collapse in sub-list-group">
                 <li class="sub-list-group-item">
                     <span id="shortcut_reply_count" class="badge">0</span>
                     <a href="/Notification/index?category=replyline">Replies</a>
@@ -28,16 +28,10 @@
         </li>
         <li class="list-group-item">
             <span class="badge">...</span>
-            <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
+            <a data-toggle="collapse" data-parent="#accordion" href="#shortcut_topic_collapse">
                 Topics
             </a>
-            <ul id="collapse2" class="panel-collapse collapse out sub-list-group">
-                <li class="sub-list-group-item">
-                    <a href="/Topic/index?topic=WorldCup2014">#WorldCup2014</a>
-                </li>
-                <li class="sub-list-group-item">
-                    <a href="/Topic/index?topic=ObamaCare">#ObamaCare</a>
-                </li>
+            <ul id="shortcut_topic_collapse" class="panel-collapse collapse out sub-list-group">
             </ul>
         </li>
     </ul>
@@ -45,4 +39,5 @@
 
 <script>
     $(SetNotificationCount());
+    $(LoadHotTopics());
 </script>

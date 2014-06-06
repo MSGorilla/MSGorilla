@@ -740,7 +740,46 @@ function CreateEvent(postData, isHeighlight) {
 }
 
 
-// search user function
+// search function
+function SearchTopic(keyword) {
+    var apiurl = "";
+    if (isNullOrEmpty(keyword))
+        apiurl = "/api/topic/getalltopic";
+    else
+        apiurl = "/api/topic/searchtopic?keyword=" + keyword;
+
+    $.ajax({
+        type: "get",
+        url: apiurl,
+        dataType: "json",
+        success: function (data) {
+            if (data.length == 0) {
+                ShowError("No content.");
+            }
+            else {
+                $("#topiclist").empty();
+                $.each(data, function (index, item) {
+                    var output = "";
+                    var topicid = item.Id;
+                    var topicname = item.Name;
+                    var topicdesp = item.Description;
+                    var topiccount = item.MsgCount;
+
+                    output += "  <a class='btn btn-link' href='/Topic/index?topic=" + topicid + "'>#" + topicname + "</a>";
+                    $("#topiclist").append(output);
+
+                    if (index == 0) {
+                        LoadFeeds("topicline", topicid);
+                    }
+                })
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
 function SearchUser(keyword) {
     var apiurl = "";
     if (isNullOrEmpty(keyword))
@@ -853,13 +892,13 @@ function CreateUserCard(data) {
 
 
 // notification count function
-function SetNotificationCount()
-{
+function SetNotificationCount() {
     var apiurl = "/api/account/getnotificationcount";
 
     $.ajax({
         type: "get",
         url: apiurl,
+        dataType: "json",
         success: function (data) {
             var homelineCount = data.UnreadHomelineMsgCount;
             var ownerlineCount = data.UnreadOwnerlineMsgCount;
@@ -875,6 +914,38 @@ function SetNotificationCount()
             $("#shortcut_notification_count").html(notificationCount);
 
             $("#nav_notification_count").html(notificationCount);
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+
+// topic function
+function LoadHotTopics() {
+    var apiurl = "/api/topic/getalltopic";
+
+    $.ajax({
+        type: "get",
+        url: apiurl,
+        dataType: "json",
+        success: function (data) {
+            // create hot topic
+            $("#shortcut_topic_collapse").empty();
+            $.each(data, function (index, item) {
+                var output = "";
+                var topicid = item.Id;
+                var topicname = item.Name;
+                var topicdesp = item.Description;
+                var topiccount = item.MsgCount;
+
+                output += "<li class='sub-list-group-item'>";
+                output += "  <span class='badge'>" + topiccount + "</span>";
+                output += "  <a href='/Topic/index?topic=" + topicid + "'>" + topicname + "</a>";
+                output += "</li>";
+                $("#shortcut_topic_collapse").append(output);
+            })
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowError(textStatus + ": " + errorThrown);
