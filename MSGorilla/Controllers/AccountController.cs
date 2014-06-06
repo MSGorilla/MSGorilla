@@ -419,6 +419,13 @@ namespace MSGorilla.Controllers
                     myCookie.Expires = DateTime.Now.AddDays(-1d);
                     Response.Cookies.Add(myCookie);
                 }
+
+                if (System.Web.HttpContext.Current.User.Identity.IsAuthenticated)
+                {
+                    TokenCacheUtils.RemoveAllFromCache();
+                    HttpContext.GetOwinContext().Authentication.SignOut(
+                        OpenIdConnectAuthenticationDefaults.AuthenticationType, CookieAuthenticationDefaults.AuthenticationType);
+                }
             }
             catch {}
 
