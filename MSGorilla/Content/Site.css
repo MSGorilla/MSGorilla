@@ -132,6 +132,10 @@ input[type="checkbox"].input-validation-error {
     display: block;
 }
 
+.reply-header {
+    margin-bottom: 10px;
+}
+
 .reply-input {
     margin-bottom: 10px;
     text-wrap: normal;
@@ -346,3 +350,12 @@ input[type="checkbox"].input-validation-error {
         .sub-list-group-item > .badge + .badge {
             margin-right: 5px;
         }
+
+.clickable {
+    cursor: pointer;
+}
+
+.fullname {
+    font-weight:700;
+    color:#292f33
+}
