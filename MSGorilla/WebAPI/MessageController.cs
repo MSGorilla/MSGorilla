@@ -172,7 +172,15 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public MessageDetail GetMessage(string userid, string messageID)
         {
+            whoami();
             return _messageManager.GetMessageDetail(userid, messageID);
+        }
+
+        [HttpGet]
+        public DisplayMessage GetDisplayMessage(string msgUser, string msgID)
+        {
+            whoami();
+            return _messageManager.GetDisplayMessage(msgUser, msgID);
         }
 
         [HttpGet]

@@ -374,6 +374,29 @@ namespace MSGorilla.Library
             return replies;
         }
 
+        public Message GetMessage(string msgUser, string msgID)
+        {
+            string pk = Message.ToMessagePK(msgUser, msgID);
+            TableOperation retreiveOperation = TableOperation.Retrieve<UserLineEntity>(pk, msgID);
+            TableResult retreiveResult = _userline.Execute(retreiveOperation);
+            UserLineEntity entity = ((UserLineEntity)retreiveResult.Result);
+            if (entity == null)
+            {
+                return null;
+            }
+            return JsonConvert.DeserializeObject<Message>(entity.Content);
+        }
+
+        public DisplayMessage GetDisplayMessage(string msgUser, string msgID)
+        {
+            Message msg = GetMessage(msgUser, msgID);
+            if (msg == null)
+            {
+                return null;
+            }
+            return new DisplayMessage(msg, _accManager);
+        }
+
         public Message PostMessage(string userid, 
                                     string eventID, 
                                     string schemaID, 
