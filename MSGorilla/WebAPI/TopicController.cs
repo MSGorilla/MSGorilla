@@ -45,5 +45,11 @@ namespace MSGorilla.WebApi
         {
             return _topicManager.GetAllTopics();
         }
+
+        [HttpGet]
+        public List<Topic> HotTopics(int count = 5)
+        {
+            return _topicManager.GetHotTopics(count);
+        }
     }
 }

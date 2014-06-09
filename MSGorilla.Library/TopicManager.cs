@@ -61,5 +61,15 @@ namespace MSGorilla.Library
         {
             return _gorillaCtx.Topics.Where(topic => topic.Name.Contains(keyword)).ToList();
         }
+
+        public List<Topic> GetHotTopics(int count = 5)
+        {
+            return _gorillaCtx.Topics.SqlQuery(
+                    @"select t.id, t.name, t.description, t.msgcount from (
+                        select * , ROW_NUMBER() OVER (ORDER BY msgcount desc) as row from [topic]
+                    )t where t.row > 0 and t.row <= {0}",
+                    new object[] { count }
+                ).ToList();
+        }
     }
 }
