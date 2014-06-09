@@ -441,7 +441,7 @@ function CreateFeed(postData) {
     }
 
     //output += "<ul class='list-group'>";
-    
+
     output += "  <li class='list-group-item'>";
     output += "    <div>"
     output += "      <div class='feed-pic'>";
@@ -452,7 +452,7 @@ function CreateFeed(postData) {
     output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span></div>";
     output += "        <div class='newpost-input'>" + encodeHtml(msg) + "</div>";
     output += "        <div class='newpost-footer'>";
-    
+
     if (showevents) {
         output += "      <button id='btn_expandevent' class='btn btn-link' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Expand events</button>";
     }
@@ -465,7 +465,7 @@ function CreateFeed(postData) {
     output += "  </li>";
 
     //output += "</ul>";
-    
+
     return output;
 }
 
@@ -765,7 +765,7 @@ function SearchTopic(keyword) {
                     var topicdesp = item.Description;
                     var topiccount = item.MsgCount;
 
-                    output += "  <a class='btn btn-link' href='/Topic/index?topic=" + topicid + "'>#" + topicname + "</a>";
+                    output += "  <a class='btn btn-link' href='/Topic/index?topic=" + topicid + "&topicname=" + topicname + "'>" + topicname + "</a>";
                     $("#topiclist").append(output);
 
                     if (index == 0) {
@@ -894,31 +894,35 @@ function CreateUserCard(data) {
 // notification count function
 function SetNotificationCount() {
     var apiurl = "/api/account/getnotificationcount";
+    var timer = $.timer(function () {
+            $.ajax({
+                type: "get",
+                url: apiurl,
+                dataType: "json",
+                success: function (data) {
+                    var homelineCount = data.UnreadHomelineMsgCount;
+                    var ownerlineCount = data.UnreadOwnerlineMsgCount;
+                    var atlineCount = data.UnreadAtlineMsgCount;
+                    var replyCount = data.UnreadReplyCount;
+                    var userid = data.Userid;
+                    var notificationCount = ownerlineCount + replyCount + atlineCount;
 
-    $.ajax({
-        type: "get",
-        url: apiurl,
-        dataType: "json",
-        success: function (data) {
-            var homelineCount = data.UnreadHomelineMsgCount;
-            var ownerlineCount = data.UnreadOwnerlineMsgCount;
-            var atlineCount = data.UnreadAtlineMsgCount;
-            var replyCount = data.UnreadReplyCount;
-            var userid = data.Userid;
-            var notificationCount = ownerlineCount + replyCount + atlineCount;
+                    $("#shortcut_homeline_count").html(homelineCount);
+                    $("#shortcut_reply_count").html(replyCount);
+                    $("#shortcut_atline_count").html(atlineCount);
+                    $("#shortcut_ownerline_count").html(ownerlineCount);
+                    $("#shortcut_notification_count").html(notificationCount);
 
-            $("#shortcut_homeline_count").html(homelineCount);
-            $("#shortcut_reply_count").html(replyCount);
-            $("#shortcut_atline_count").html(atlineCount);
-            $("#shortcut_ownerline_count").html(ownerlineCount);
-            $("#shortcut_notification_count").html(notificationCount);
-
-            $("#nav_notification_count").html(notificationCount);
+                    $("#nav_notification_count").html(notificationCount);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    ShowError(textStatus + ": " + errorThrown);
+                }
+            });
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
-        }
-    });
+        60000,
+        true
+        );
 }
 
 
@@ -942,7 +946,7 @@ function LoadHotTopics() {
 
                 output += "<li class='sub-list-group-item'>";
                 output += "  <span class='badge'>" + topiccount + "</span>";
-                output += "  <a href='/Topic/index?topic=" + topicid + "'>" + topicname + "</a>";
+                output += "  <a href='/Topic/index?topic=" + topicid + "&topicname=" + topicname + "'>" + topicname + "</a>";
                 output += "</li>";
                 $("#shortcut_topic_collapse").append(output);
             })

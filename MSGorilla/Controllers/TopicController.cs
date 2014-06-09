@@ -14,7 +14,7 @@ namespace MSGorilla.Controllers
         AccountManager _accManager = new AccountManager();
 
         [TokenAuthAttribute]
-        public ActionResult Index(string topic)
+        public ActionResult Index(string topic, string topicname)
         {
             string myid = this.Session["userid"].ToString();
             UserProfile me = _accManager.FindUser(myid);
@@ -28,6 +28,7 @@ namespace MSGorilla.Controllers
                 topic = "";
             }
             ViewBag.Topic = topic;
+            ViewBag.TopicName = topicname;
 
             return View();
         }
