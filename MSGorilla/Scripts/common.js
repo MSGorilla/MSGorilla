@@ -890,39 +890,42 @@ function CreateUserCard(data) {
     return output;
 }
 
+function UpdateNotificationCount()
+{
+    var apiurl = "/api/account/getnotificationcount";
+    $.ajax({
+        type: "get",
+        url: apiurl,
+        dataType: "json",
+        success: function (data) {
+            var homelineCount = data.UnreadHomelineMsgCount;
+            var ownerlineCount = data.UnreadOwnerlineMsgCount;
+            var atlineCount = data.UnreadAtlineMsgCount;
+            var replyCount = data.UnreadReplyCount;
+            var userid = data.Userid;
+            var notificationCount = ownerlineCount + replyCount + atlineCount;
+
+            alert(notificationCount);
+
+            $("#shortcut_homeline_count").html(homelineCount);
+            $("#shortcut_reply_count").html(replyCount);
+            $("#shortcut_atline_count").html(atlineCount);
+            $("#shortcut_ownerline_count").html(ownerlineCount);
+            $("#shortcut_notification_count").html(notificationCount);
+
+            $("#nav_notification_count").html(notificationCount);
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
 
 // notification count function
 function SetNotificationCount() {
-    var apiurl = "/api/account/getnotificationcount";
-    var timer = $.timer(function () {
-            $.ajax({
-                type: "get",
-                url: apiurl,
-                dataType: "json",
-                success: function (data) {
-                    var homelineCount = data.UnreadHomelineMsgCount;
-                    var ownerlineCount = data.UnreadOwnerlineMsgCount;
-                    var atlineCount = data.UnreadAtlineMsgCount;
-                    var replyCount = data.UnreadReplyCount;
-                    var userid = data.Userid;
-                    var notificationCount = ownerlineCount + replyCount + atlineCount;
-
-                    $("#shortcut_homeline_count").html(homelineCount);
-                    $("#shortcut_reply_count").html(replyCount);
-                    $("#shortcut_atline_count").html(atlineCount);
-                    $("#shortcut_ownerline_count").html(ownerlineCount);
-                    $("#shortcut_notification_count").html(notificationCount);
-
-                    $("#nav_notification_count").html(notificationCount);
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    ShowError(textStatus + ": " + errorThrown);
-                }
-            });
-        },
-        60000,
-        true
-        );
+    //var apiurl = "/api/account/getnotificationcount";
+    UpdateNotificationCount();
+    var timer = $.timer(UpdateNotificationCount, 30000, true);
 }
 
 
