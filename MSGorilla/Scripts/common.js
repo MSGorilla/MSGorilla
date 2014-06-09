@@ -905,8 +905,6 @@ function UpdateNotificationCount()
             var userid = data.Userid;
             var notificationCount = ownerlineCount + replyCount + atlineCount;
 
-            alert(notificationCount);
-
             $("#shortcut_homeline_count").html(homelineCount);
             $("#shortcut_reply_count").html(replyCount);
             $("#shortcut_atline_count").html(atlineCount);
