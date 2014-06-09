@@ -42,6 +42,7 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public string whoami()
         {
+            _accountManager = new AccountManager();
             string authString = null;
             if(HttpContext.Current.Request.Cookies.Get("Authorization") !=null 
                 && !string.IsNullOrEmpty(HttpContext.Current.Request.Cookies.Get("Authorization").Value))

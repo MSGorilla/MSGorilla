@@ -201,5 +201,19 @@ namespace MSGorilla.Library
             }
             return false;
         }
+
+        public void DeleteUser(string userid)
+        {
+            UserProfile user = _accountCtx.Users.Find(userid);
+            if (user != null)
+            {
+                _accountCtx.Users.Remove(user);
+                _accountCtx.SaveChanges();
+            }
+            else
+            {
+                throw new UserNotFoundException(userid);
+            }
+        }
     }
 }

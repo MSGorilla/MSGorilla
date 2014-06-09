@@ -264,5 +264,12 @@ namespace MSGorilla.WebApi
 
             return dispusers;
         }
+
+        [HttpGet]
+        public ActionResult DeleteUser(string userid)
+        {
+            _accountManager.DeleteUser(userid);
+            return new ActionResult();
+        }
     }
 }
