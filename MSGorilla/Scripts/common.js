@@ -928,7 +928,7 @@ function SetNotificationCount() {
 
 // topic function
 function LoadHotTopics() {
-    var apiurl = "/api/topic/getalltopic";
+    var apiurl = "/api/topic/hottopics";
 
     $.ajax({
         type: "get",
