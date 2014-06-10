@@ -292,6 +292,9 @@ function PostMessage() {
         return;
     }
 
+    var atUser = FindAtUsers(message);
+    
+
     $("#btn_post").button('loading');
     $.ajax({
         type: "post",
@@ -309,6 +312,10 @@ function PostMessage() {
     });
 }
 
+function FindAtUsers(message) {
+    return "";
+}
+
 function PostReply(user, mid) {
     var replybox = $("#replymessage_" + mid);
     var message = replybox.val().trim();
@@ -316,6 +323,10 @@ function PostReply(user, mid) {
 
     if (message.length === 0) {
         return;
+    }
+
+    if (isNullOrEmpty(touser)) {
+        touser = user;
     }
 
     $("#btn_reply_" + mid).button('loading');
