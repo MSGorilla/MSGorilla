@@ -1,4 +1,14 @@
 ﻿/* common function */
+function isValidForUserid(c) {
+    if ((c >= 'a' && c <= 'z')
+        || (c >= '0' && c <= '9')
+        || (c >= 'A' && c <= 'Z')
+        || c == '_')
+        return true;
+    else
+        return false;
+}
+
 function encodeEmail(code) {
     code = code.replace('@', '-');
     code = code.replace('.', '_');
@@ -957,3 +967,5 @@ function LoadHotTopics() {
         }
     });
 }
+
+

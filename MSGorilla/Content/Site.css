@@ -340,12 +340,12 @@ input[type="checkbox"].input-validation-error {
 
 .user-card-info {
     padding: 15px;
-    color: darkgray;
+    color: #8899a6;
 }
 
     .user-card-info a {
         color: #292f33;
-        font-weight: bold;
+        font-weight: 700;
     }
 
 .user-card-postinfo {
@@ -386,4 +386,26 @@ input[type="checkbox"].input-validation-error {
 .fullname {
     font-weight:700;
     color:#292f33
+}
+
+    .list-group-item.active > .fullname {
+        color:#ffffff
+    }
+
+.username {
+    color:#8899a6
+}
+
+    .list-group-item.active > .username {
+        color:#ffffff
+    }
+
+.flexselect_dropdown {
+    display: none;
+    position: absolute;
+    z-index: 999;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: transparent;
 }
