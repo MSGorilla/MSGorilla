@@ -3,7 +3,8 @@ function isValidForKey(c) {
     if ((c >= 'a' && c <= 'z')
         || (c >= '0' && c <= '9')
         || (c >= 'A' && c <= 'Z')
-        || c == '_')
+        || c == '_'
+        || c == '-')
         return true;
     else
         return false;
@@ -23,28 +24,49 @@ function ScrollTo(itemname) {
 }
 
 function encodeHtml(code) {
+    var strRegex = "http[s]?://((([0-9a-z][0-9a-z\\-]*)?[0-9a-z](\\.))+)?[0-9a-z]+(:[0-9]{1,5})?(/[\\w\\-/\\+\\?%#&=\\.:]*)?";
+    var linkre = new RegExp(strRegex, "gi");
+
+    strRegex = "@([0-9a-z_\\-]+)(\\s|$)";
+    var atre = new RegExp(strRegex, "gi");
+
+    strRegex = "#([0-9a-z_\\-]+)(\\s|$)";
+    var topicre = new RegExp(strRegex, "gi");
+
+    code = code.replace(linkre, function (s) {
+        return encodeURIComponent('<a href="' + s + '">' + s + '</a>');
+    });
+
+    code = code.replace(atre, function (s1, s2, s3) {
+        return encodeURIComponent('<a href="/profile/index?user=' + s2 + '">' + s1 + '</a>') + s3;
+    });
+
+    code = code.replace(topicre, function (s1, s2, s3) {
+        return encodeURIComponent('<a href="/topic/index?topic=' + s2 + '">' + s1 + '</a>') + s3;
+    });
+
     code = code.replace(/&/mg, '&#38;');
     code = code.replace(/</mg, '&#60;');
     code = code.replace(/>/mg, '&#62;');
     code = code.replace(/\"/mg, '&#34;');
     code = code.replace(/\t/g, '  ');
     code = code.replace(/\r?\n/g, '<br/>');
-    code = code.replace(/<br><br>/g, '<br/>');
+    code = code.replace(/<br><br>/g, '<br>');
     code = code.replace(/ /g, '&nbsp;');
-    code = code.replace(/http[s]?:\/\/[\w.]+\.(com|org|net|cn)[^ ]* /g, '<a href="$&">$&</a>');
+    code = decodeURIComponent(code);
     return code;
 }
 
 function encodeTxt(code) {
-    code = code.replace(/&/mg, '&#38;');
-    code = code.replace(/</mg, '&#60;');
-    code = code.replace(/>/mg, '&#62;');
-    code = code.replace(/\"/mg, '&#34;');
-    code = code.replace(/\t/g, '  ');
-    code = code.replace(/\r?\n/g, '<br/>');
-    code = code.replace(/<br><br>/g, '<br/>');
-    code = code.replace(/ /g, '&nbsp;');
-    code = code.replace(/http[s]?:\/\/[\w.]+\.(com|org|net|cn)[^ ]* /g, '<a href="$&">$&</a>');
+    //code = code.replace(/&/mg, '&#38;');
+    //code = code.replace(/</mg, '&#60;');
+    //code = code.replace(/>/mg, '&#62;');
+    //code = code.replace(/\"/mg, '&#34;');
+    //code = code.replace(/\t/g, '  ');
+    //code = code.replace(/\r?\n/g, '<br/>');
+    //code = code.replace(/<br><br>/g, '<br>');
+    //code = code.replace(/ /g, '&nbsp;');
+    code = encodeURIComponent(code);
     return code;
 }
 
@@ -302,7 +324,7 @@ function Unfollow(user) {
 
 /* post function */
 function PostMessage() {
-    var message = $("#postmessage").val().trim();
+    var message = encodeTxt($("#postmessage").val().trim());
     if (message.length === 0) {
         return;
     }
@@ -328,7 +350,7 @@ function PostMessage() {
 
 function PostReply(user, mid) {
     var replybox = $("#replymessage_" + mid);
-    var message = replybox.val().trim();
+    var message = encodeTxt(replybox.val().trim());
     var touser = replybox.attr("replyto");
 
     if (message.length === 0) {
