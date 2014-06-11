@@ -31,11 +31,13 @@
                     }
                     @if (ViewBag.Title == "Notifications")
                     {
-                        <li class="active">@Html.ActionLink("● Notifications", "Index", "Home")</li>
+                        @*<li class="active">@Html.ActionLink("● Notifications", "Index", "Home")</li>*@
+                        <li class="active"><a href="/Notification">● Notifications <span class="badge" id="nav_notification_count"></span></a></li>
                     }
                     else
                     {
-                        <li>@Html.ActionLink("● Notifications", "Index", "Notification")</li>
+                        @*<li>@Html.ActionLink("● Notifications", "Index", "Notification")</li>*@
+                        <li><a href="/Notification">● Notifications <span class="badge" id="nav_notification_count"></span></a></li>
                     }
                     @if (ViewBag.Title == "Square")
                     {

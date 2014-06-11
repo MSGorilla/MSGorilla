@@ -9,9 +9,9 @@
     <div class="contents-container">
         <div id="notifications" class="posts-notification">
             @*<div class="alert alert-dismissable alert-warning">
-                <button class="close" type="button" data-dismiss="alert">×</button>
-                <p><a class="alert-link" href="#">You have new messages.</a></p>
-            </div>*@
+                    <button class="close" type="button" data-dismiss="alert">×</button>
+                    <p><a class="alert-link" href="#">You have new messages.</a></p>
+                </div>*@
         </div>
 
         <div class="title-container-single">
@@ -58,16 +58,15 @@
             </script>
         </div>
     </div>
+
+    <script>
+        $(SearchUser('@ViewBag.SearchKeyword'));
+        $(SearchTopic('@ViewBag.SearchKeyword'));
+    </script>
+
     <div class="tools-container">
         @Html.Partial("_MePartial")
         @Html.Partial("_ShortcutPartial")
     </div>
 
 </div>
-
-<script>
-    $(SearchUser('@ViewBag.SearchKeyword'));
-    $(SearchTopic('@ViewBag.SearchKeyword'));
-</script>
-
-

@@ -56,6 +56,11 @@
         </div>
     </div>
 
+    <script>
+        $(LoadUserInfo('@ViewBag.UserId'));
+        $(LoadUsers('following', '@ViewBag.UserId'));
+    </script>
+
     <div class="tools-container">
         @if (!ViewBag.IsMe)
         {
@@ -64,10 +69,3 @@
     </div>
 
 </div>
-
-<script>
-    $(LoadUserInfo('@ViewBag.UserId'));
-    $(LoadUsers('following', '@ViewBag.UserId'));
-</script>
-
-

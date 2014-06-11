@@ -908,8 +908,7 @@ function CreateUserCard(data) {
     return output;
 }
 
-function UpdateNotificationCount()
-{
+function UpdateNotificationCount() {
     var apiurl = "/api/account/getnotificationcount";
     $.ajax({
         type: "get",
@@ -929,7 +928,10 @@ function UpdateNotificationCount()
             $("#shortcut_ownerline_count").html(ownerlineCount);
             $("#shortcut_notification_count").html(notificationCount);
 
-            $("#nav_notification_count").html(notificationCount);
+            if (notificationCount > 0)
+                $("#nav_notification_count").html(notificationCount);
+            else
+                $("#nav_notification_count").html("");
         },
         //error: function (XMLHttpRequest, textStatus, errorThrown) {
         //    ShowError(textStatus + ": " + errorThrown);

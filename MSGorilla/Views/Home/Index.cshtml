@@ -56,17 +56,16 @@
         </div>
     </div>
 
+    <script>
+        $(LoadFeeds("@ViewBag.FeedCategory"));
+        $(document).ready(function () {
+            $("#postmessage").flexselect();
+        });
+    </script>
+
     <div class="tools-container">
         @Html.Partial("_MePartial")
         @Html.Partial("_ShortcutPartial")
     </div>
 
 </div>
-
-<script>
-    $(LoadFeeds("@ViewBag.FeedCategory"));
-    jQuery(document).ready(function () {
-        $("#postmessage").flexselect();
-    });
-</script>
-

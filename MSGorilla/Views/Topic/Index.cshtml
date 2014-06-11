@@ -21,7 +21,7 @@
 
         <div class="posts-feeds">
             <ul id="feedlist" class='list-group'>
-                <li id ="loading_message" class="list-group-item txtaln-c">Loading...</li>
+                <li id="loading_message" class="list-group-item txtaln-c">Loading...</li>
                 @*autofill by js*@
             </ul>
         </div>
@@ -43,13 +43,13 @@
         </div>
     </div>
 
+    <script>
+        $(LoadFeeds("@ViewBag.FeedCategory", "@ViewBag.Topic"));
+    </script>
+
     <div class="tools-container">
         @Html.Partial("_MePartial")
         @Html.Partial("_ShortcutPartial")
     </div>
 
 </div>
-
-<script>
-    $(LoadFeeds("@ViewBag.FeedCategory", "@ViewBag.Topic"));
-</script>
