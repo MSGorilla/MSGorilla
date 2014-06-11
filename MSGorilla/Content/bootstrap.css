@@ -4852,20 +4852,24 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     }
 
     .navbar-default .navbar-nav > li > a {
-        color: #ffffff;
+        color: #cccccc;
+        margin-bottom:-1px;
     }
 
         .navbar-default .navbar-nav > li > a:hover,
         .navbar-default .navbar-nav > li > a:focus {
-            color: lightskyblue;
+            color: #ffffff;
             background-color: #090909;
+            border-bottom: 4px solid #0084B4;
         }
 
     .navbar-default .navbar-nav > .active > a,
     .navbar-default .navbar-nav > .active > a:hover,
     .navbar-default .navbar-nav > .active > a:focus {
-        color: lightskyblue;
+        color: #ffffff;
         background-color: #090909;
+        border-bottom: 4px solid #0084B4;
+        /*border-bottom: 4px solid #8ec1da;*/
     }
 
     .navbar-default .navbar-nav > .disabled > a,

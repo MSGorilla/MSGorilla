@@ -388,7 +388,7 @@
             var i = pos - 1;
             var j = pos;
             while (i >= 0) {
-                if (isValidForUserid(str[i])) {
+                if (isValidForKey(str[i])) {
                     i--;
                     continue;
                 }
@@ -397,7 +397,7 @@
 
             if (i < pos - 1 && (str[i] == '@' || str[i] == '#')) { // found sth.
                 while (j < str.length) {
-                    if (isValidForUserid(str[j])) {
+                    if (isValidForKey(str[j])) {
                         j++;
                         continue;
                     }
@@ -416,7 +416,7 @@
             var i = pos - 1;
             var j = pos;
             while (i >= 0) {
-                if (isValidForUserid(str[i])) {
+                if (isValidForKey(str[i])) {
                     i--;
                     continue;
                 }
@@ -425,7 +425,7 @@
 
             if (i < pos - 1 && (str[i] == '@' || str[i] == '#')) { // found sth.
                 while (j < str.length) {
-                    if (isValidForUserid(str[j])) {
+                    if (isValidForKey(str[j])) {
                         j++;
                         continue;
                     }
@@ -433,6 +433,10 @@
                 }
                 var len = newWord.length + 1;
                 if (str[j] != ' ') newWord += " ";
+                if (i > 0 && (str[i - 1] != ' ' && str[i - 1] != '\n')) {
+                    newWord = " " + newWord;
+                    len++;
+                }
                 this.input.val(str.substring(0, i) + newWord + str.substring(j));
                 this.input.moveCursor(i + len);
             }

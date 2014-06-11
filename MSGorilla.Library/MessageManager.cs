@@ -486,7 +486,7 @@ namespace MSGorilla.Library
             //Merge At user list from the interface 
             //as well as the words found in MessageContent start with @
             List<string> AtUser = new List<string>(message.AtUser);
-            string[] words = message.MessageContent.Split(' ');
+            string[] words = message.MessageContent.Split(new char[] {' ', '\n'}, StringSplitOptions.RemoveEmptyEntries);
             foreach (string word in words)
             {
                 if (word.StartsWith("@"))

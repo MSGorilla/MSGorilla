@@ -54,10 +54,10 @@
                         <li>@Html.ActionLink("Ω Me", "Index", "Profile")</li>
                     }
                 </ul>
-                <form class="navbar-form navbar-left" method="get" action="/Search/index">
-                    <input class="form-control col-lg-12 mw-300" type="text" placeholder="Search for people and topics" name="keyword">
-                </form>
                 @Html.Partial("_LoginPartial")
+                <form class="navbar-form navbar-right" method="get" action="/Search/index">
+                    <input class="form-control col-lg-12" type="text" placeholder="Search for people and topics" name="keyword">
+                </form>
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 ﻿/* common function */
-function isValidForUserid(c) {
+function isValidForKey(c) {
     if ((c >= 'a' && c <= 'z')
         || (c >= '0' && c <= '9')
         || (c >= 'A' && c <= 'Z')
@@ -28,8 +28,8 @@ function encodeHtml(code) {
     code = code.replace(/>/mg, '&#62;');
     code = code.replace(/\"/mg, '&#34;');
     code = code.replace(/\t/g, '  ');
-    code = code.replace(/\r?\n/g, '<br>');
-    code = code.replace(/<br><br>/g, '<br>');
+    code = code.replace(/\r?\n/g, '<br/>');
+    code = code.replace(/<br><br>/g, '<br/>');
     code = code.replace(/ /g, '&nbsp;');
     return code;
 }
@@ -292,13 +292,12 @@ function PostMessage() {
         return;
     }
 
-    var atUser = FindAtUsers(message);
-    
-
     $("#btn_post").button('loading');
     $.ajax({
-        type: "post",
-        url: "/api/message/postmessage?" + "message=" + message,
+        type: "POST",
+        url: "/api/message/postmessage",
+        data: "message=" + message,
+        dataType: "json",
         success: function (data) {
             $("#postmessage").val("");
             // insert the new posted message
@@ -310,10 +309,6 @@ function PostMessage() {
     }).always(function () {
         $("#btn_post").button('reset');
     });
-}
-
-function FindAtUsers(message) {
-    return "";
 }
 
 function PostReply(user, mid) {
@@ -331,8 +326,10 @@ function PostReply(user, mid) {
 
     $("#btn_reply_" + mid).button('loading');
     $.ajax({
-        type: "post",
-        url: "/api/reply/postreply?" + "to=" + touser + "&message=" + message + "&messageUser=" + user + "&messageID=" + mid,
+        type: "POST",
+        url: "/api/reply/postreply",
+        data: "to=" + touser + "&message=" + message + "&messageUser=" + user + "&messageID=" + mid,
+        dataType: "json",
         success: function (data) {
             $("#replymessage_" + mid).val("");
             $("#replylist_" + mid).prepend(CreateReply(data));
@@ -934,9 +931,9 @@ function UpdateNotificationCount()
 
             $("#nav_notification_count").html(notificationCount);
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
-        }
+        //error: function (XMLHttpRequest, textStatus, errorThrown) {
+        //    ShowError(textStatus + ": " + errorThrown);
+        //}
     });
 }
 
@@ -973,9 +970,9 @@ function LoadHotTopics() {
                 $("#shortcut_topic_collapse").append(output);
             })
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
-        }
+        //error: function (XMLHttpRequest, textStatus, errorThrown) {
+        //    ShowError(textStatus + ": " + errorThrown);
+        //}
     });
 }
 
