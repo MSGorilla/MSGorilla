@@ -422,3 +422,11 @@ input[type="checkbox"].input-validation-error {
     padding-right: 3px;
     text-align: right;
 }
+
+.spinner-loading {
+    background-image: url("/Content/Images/small-spinner.gif");
+    background-repeat: no-repeat;
+    background-position-x:left;
+    background-position-y:center;
+    padding-left:20px;
+}

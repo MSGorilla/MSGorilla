@@ -424,7 +424,7 @@ function LoadFeeds(category, id) {
                 $("#hd_token").val("nomore");
             }
             else {
-                $("#lbl_seemore").html("Loading more...");
+                $("#lbl_seemore").html("<span class='spinner-loading'></span> Loading more...");
                 $("#hd_token").val(nexttoken);
             }
         },
@@ -541,7 +541,7 @@ function LoadReplyFeeds(category) {
                 $("#hd_token").val("nomore");
             }
             else {
-                $("#lbl_seemore").html("Loading more...");
+                $("#lbl_seemore").html("<span class='spinner-loading'></span> Loading more...");
                 $("#hd_token").val(nexttoken);
             }
         },
