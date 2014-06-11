@@ -783,7 +783,7 @@ function SearchTopic(keyword) {
                     var topicdesp = item.Description;
                     var topiccount = item.MsgCount;
 
-                    output += "  <a class='btn btn-link' href='/Topic/index?topic=" + topicid + "&topicname=" + topicname + "'>" + topicname + "</a>";
+                    output += "  <a class='btn btn-link btn-xs' href='/Topic/index?topic=" + topicid + "&topicname=" + topicname + "'>#" + topicname + "</a>";
                     $("#topiclist").append(output);
 
                     if (index == 0) {

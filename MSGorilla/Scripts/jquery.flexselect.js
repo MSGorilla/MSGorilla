@@ -9,10 +9,12 @@
             inputIdTransform: function (id) { return id + "_flexselect"; },
             inputNameTransform: function (name) { return; },
             dropdownIdTransform: function (id) { return id + "_flexselect_dropdown"; },
+            counterIdTransform: function (id) { return id + "_counter"; },
             leastResults: 5
         },
         //select: null,
         input: null,
+        counter: null,
         //hidden: null,
         dropdown: null,
         userCache: {},
@@ -28,6 +30,7 @@
         init: function (select, options) {
             $.extend(this.settings, options);
             this.input = $(select);
+            this.counter = $("#"+this.settings.counterIdTransform(this.input.attr("id")));
             this.preloadCache();
             this.renderControls();
             this.wire();
@@ -158,6 +161,7 @@
                             break;
                     }
                 } else {
+                    self.counter.html(140 - self.input.val().length);
                     self.filterResults();
                 }
             });
