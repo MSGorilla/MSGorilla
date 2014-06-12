@@ -515,9 +515,9 @@ function CreateFeed(postData) {
     output += "        <div class='newpost-footer'>";
 
     if (showevents) {
-        output += "      <button id='btn_expandevent' class='btn btn-link' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
+        output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
     }
-    output += "          <button id='btn_showreply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
+    output += "          <button id='btn_showreply' class='btn btn-link btn-sm' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
     output += "        </div>";
     output += "      </div>";
     output += "    </div>";
@@ -776,9 +776,9 @@ function CreateEvent(postData, isHeighlight) {
     }
 
     if (isHeighlight) {
-        output += "  <li class='list-group-item'>";
+        output += "  <li class='list-group-item link-line'>";
     } else {
-        output += "  <li class='list-group-item quote'>";
+        output += "  <li class='list-group-item link-line quote'>";
     }
     output += "    <div>"
     output += "      <div class='feed-pic'>";
