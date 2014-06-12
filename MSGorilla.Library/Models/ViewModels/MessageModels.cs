@@ -37,6 +37,8 @@ namespace MSGorilla.Library.Models.ViewModels
         public string EventID { get; set; }
         public string SchemaID { get; set; }
         public string[] Owner { get; set; }
+        public string[] AtUser { get; set; }
+        public string[] TopicName { get; set; }
         public string MessageContent { get; set; }
         public DateTime PostTime { get; set; }
 
@@ -51,6 +53,8 @@ namespace MSGorilla.Library.Models.ViewModels
             this.EventID = msg.EventID;
             this.SchemaID = msg.SchemaID;
             this.Owner = msg.Owner;
+            this.AtUser = msg.AtUser;
+            this.TopicName = msg.TopicName;
             this.MessageContent = msg.MessageContent;
             this.PostTime = msg.PostTime;
         }

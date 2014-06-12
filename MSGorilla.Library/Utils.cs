@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 
@@ -155,14 +156,20 @@ namespace MSGorilla.Library
                 return AtUser;
             }
          
-            string[] words = message.Split(' ');
-            foreach (string word in words)
+            message = message.Replace("\r\n", "\n");
+            Regex r = new Regex(@"^@([0-9a-z_\\-]+)$");
+
+            foreach (string line in message.Split('\n'))
             {
-                if (word.StartsWith("@"))
+                foreach (string word in line.Split(' '))
                 {
-                    AtUser.Add(word.Replace("@", ""));
+                    if (r.IsMatch(word))
+                    {
+                        AtUser.Add(word.Replace("@", ""));
+                    }
                 }
             }
+
             return AtUser;
         }
 
@@ -174,17 +181,17 @@ namespace MSGorilla.Library
                 return topicNames;
             }
 
-            string[] words = message.Split(' ');
-            foreach (string word in words)
+            message = message.Replace("\r\n", "\n");
+            Regex r = new Regex(@"^#([0-9a-z_\\-]+)#$");
+
+            foreach (string line in message.Split('\n'))
             {
-                if (word.StartsWith("#"))
+                foreach (string word in line.Split(' '))
                 {
-                    string temp = word.Replace("#", "");
-                    if (temp.Length > 0)
+                    if (r.IsMatch(word))
                     {
                         topicNames.Add(word.Replace("#", ""));
                     }
-                    
                 }
             }
             return topicNames;

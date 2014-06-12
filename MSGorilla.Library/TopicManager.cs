@@ -10,7 +10,7 @@ namespace MSGorilla.Library
 {
     public class TopicManager
     {
-        private MSGorillaContext _gorillaCtx;
+        //private MSGorillaContext _gorillaCtx;
 
         public List<Topic> GetAllTopics()
         {
@@ -34,7 +34,7 @@ namespace MSGorilla.Library
         {
             using (var _gorillaCtx = new MSGorillaContext())
             {
-                Topic topic = FindTopic(topicID);
+                Topic topic = FindTopic(topicID, _gorillaCtx);
                 if (topic != null)
                 {
                     topic.MsgCount++;
@@ -47,7 +47,7 @@ namespace MSGorilla.Library
         {
             using (var _gorillaCtx = new MSGorillaContext())
             {
-                Topic topic = FindTopic(topicID);
+                Topic topic = FindTopic(topicID, _gorillaCtx);
                 if (topic != null)
                 {
                     topic.MsgCount++;
@@ -56,20 +56,32 @@ namespace MSGorilla.Library
             }
         }
 
-        public Topic FindTopic(string topicID)
+        public Topic FindTopic(string topicID, MSGorillaContext _gorillaCtx = null)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            Topic ret = null;
+            if (_gorillaCtx == null)
             {
-                Topic ret = null;
-                try
+                using (_gorillaCtx = new MSGorillaContext())
                 {
-                    ret = _gorillaCtx.Topics.Find(int.Parse(topicID));
+                    
+                    try
+                    {
+                        ret = _gorillaCtx.Topics.Find(int.Parse(topicID));
+                    }
+                    catch
+                    {
+                    }
+                    return ret;
                 }
-                catch
-                {
-                }
-                return ret;
-            }            
+            }
+            try
+            {
+                ret = _gorillaCtx.Topics.Find(int.Parse(topicID));
+            }
+            catch
+            {
+            }
+            return ret;
         }
 
         public Topic FindTopicByName(string name)
@@ -89,12 +101,13 @@ namespace MSGorilla.Library
             }            
         }
 
-        public Topic FindTopic(int topicID)
+        public Topic FindTopic(int topicID, MSGorillaContext _gorillaCtx = null)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            if (_gorillaCtx == null)
             {
-                return _gorillaCtx.Topics.Find(topicID);
-            }            
+                _gorillaCtx = new MSGorillaContext();
+            }
+            return _gorillaCtx.Topics.Find(topicID);
         }
 
         public List<Topic> SearchTopic(string keyword)

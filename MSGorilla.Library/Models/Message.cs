@@ -16,7 +16,9 @@ namespace MSGorilla.Library.Models
         public string ID { get; set; }
         public string EventID { get; set; }
         public string SchemaID { get; set; }
-        public string[] Owner { get; set; }
+        public string[] Owner { get; set; }        
+        public string[] AtUser { get; set; }
+        public string[] TopicName { get; set; }
         public string MessageContent { get; set; } 
         public DateTime PostTime { get; set; }
 
@@ -25,13 +27,17 @@ namespace MSGorilla.Library.Models
             DateTime timestamp, 
             string eventID, 
             string schemaID, 
-            string[] owner)
+            string[] owner,
+            string[] atUser,
+            string[] topicName)
         {
             User = userid;
             MessageContent = message;
             EventID = eventID;
             SchemaID = schemaID;
             Owner = owner;
+            AtUser = atUser;
+            TopicName = topicName;
             PostTime = timestamp.ToUniversalTime();
             ID = string.Format("{0}_{1}",
                                 Utils.ToAzureStorageSecondBasedString(PostTime),

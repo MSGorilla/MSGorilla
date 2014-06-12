@@ -401,6 +401,8 @@ namespace MSGorilla.Library
                                     string eventID, 
                                     string schemaID, 
                                     string[] owner, 
+                                    string[] atUser,
+                                    string[] topicName, 
                                     string message, 
                                     DateTime timestamp)
         {
@@ -424,7 +426,7 @@ namespace MSGorilla.Library
                 throw new InvalidIDException("Event");
             }
 
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner);
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, atUser, topicName);
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);
@@ -455,6 +457,10 @@ namespace MSGorilla.Library
  
             //insert into Atline
             List<string> AtUser = Utils.GetAtUserid(message.MessageContent);
+            if (message.AtUser != null)
+            {
+                AtUser = AtUser.Concat(message.AtUser).ToList();
+            }
             foreach (string atUserid in AtUser)
             {
                 UserProfile user = _accManager.FindUser(atUserid);
@@ -469,6 +475,10 @@ namespace MSGorilla.Library
             
             //insert into Topicline
             List<string> topicNames = Utils.GetTopicNames(message.MessageContent);
+            if (message.TopicName != null)
+            {
+                topicNames = topicNames.Concat(message.TopicName).ToList();
+            }
             foreach (string topicName in topicNames)
             {
                 Topic topic = _topicManager.FindTopicByName(topicName);
