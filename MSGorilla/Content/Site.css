@@ -229,7 +229,7 @@ input[type="checkbox"].input-validation-error {
 }
 
 .search-bar {
-    min-width: 300px;
+    max-width: 300px;
 }
 
 .post-btn {

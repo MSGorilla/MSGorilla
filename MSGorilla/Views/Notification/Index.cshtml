@@ -22,14 +22,6 @@
 
         <div class="nav-container">
             <ul class="nav nav-pills">
-                @if (ViewBag.FeedCategory == "replyline")
-                {
-                    <li class="active"><a href="/Notification/index?category=replyline">Replies</a></li>
-                }
-                else
-                {
-                    <li><a href="/Notification/index?category=replyline">Replies</a></li>
-                }
                 @if (ViewBag.FeedCategory == "atline")
                 {
                     <li class="active"><a href="/Notification/index?category=atline">Mentions</a></li>
@@ -45,6 +37,14 @@
                 else
                 {
                     <li><a href="/Notification/index?category=ownerline">My owns</a></li>
+                }
+                @if (ViewBag.FeedCategory == "replyline")
+                {
+                    <li class="active"><a href="/Notification/index?category=replyline">Replies</a></li>
+                }
+                else
+                {
+                    <li><a href="/Notification/index?category=replyline">Replies</a></li>
                 }
             </ul>
         </div>

@@ -23,7 +23,7 @@ namespace MSGorilla.Controllers
 
             if (string.IsNullOrEmpty(category))
             {
-                ViewBag.FeedCategory = "replyline";
+                ViewBag.FeedCategory = "atline";
             }
             else
             {

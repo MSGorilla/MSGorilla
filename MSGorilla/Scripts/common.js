@@ -997,6 +997,7 @@ function LoadHotTopics() {
     $.ajax({
         type: "GET",
         url: apiurl,
+        data : "count=10",
         dataType: "json",
         success: function (data) {
             // create hot topic
