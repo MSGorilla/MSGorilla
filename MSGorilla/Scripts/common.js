@@ -408,7 +408,7 @@ function LoadFeeds(category, id) {
             ShowError("Illegal operation.");
             return;
         }
-        apidata = "topicid=" + id;
+        apidata = "topic=" + id;
     }
     else if (category == "replyline")
         return LoadReplyFeeds(category);
@@ -438,22 +438,28 @@ function LoadFeeds(category, id) {
         dataType: "json",
         data: apidata,
         success: function (data) {
-            nexttoken = data.continuationToken
-            data = data.message
-            //ShowError(data);
-            if (data.length == 0) {
+            var nexttoken = null;
+            if (isNullOrEmpty(data)) {
                 ShowError("No content.");
             }
             else {
-                // create feed list
-                if (isNullOrEmpty(token)) {
-                    // clear feeds at the first time 
-                    $("#feedlist").empty();
+                nexttoken = data.continuationToken
+                data = data.message
+                //ShowError(data);
+                if (data.length == 0) {
+                    ShowError("No content.");
                 }
-                $.each(data, function (index, item) {
-                    $("#feedlist").append(CreateFeed(item));
-                })
+                else {
+                    // create feed list
+                    if (isNullOrEmpty(token)) {
+                        // clear feeds at the first time 
+                        $("#feedlist").empty();
+                    }
+                    $.each(data, function (index, item) {
+                        $("#feedlist").append(CreateFeed(item));
+                    })
 
+                }
             }
 
             if (isNullOrEmpty(nexttoken)) {
@@ -820,11 +826,11 @@ function SearchTopic(keyword) {
                     var topicdesp = item.Description;
                     var topiccount = item.MsgCount;
 
-                    output += "  <a class='btn btn-link btn-xs' href='/Topic/index?topic=" + topicid + "&topicname=" + topicname + "'>#" + topicname + "</a>";
+                    output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + topicname + "'>#" + topicname + " <span class='badge'>" + topiccount + "</span></a>";
                     $("#topiclist").append(output);
 
                     if (index == 0) {
-                        LoadFeeds("topicline", topicid);
+                        LoadFeeds("topicline", topicname);
                     }
                 })
             }
@@ -1004,7 +1010,7 @@ function LoadHotTopics() {
 
                 output += "<li class='sub-list-group-item'>";
                 output += "  <span class='badge'>" + topiccount + "</span>";
-                output += "  <a href='/Topic/index?topic=" + topicid + "&topicname=" + topicname + "'>" + topicname + "</a>";
+                output += "  <a href='/topic/index?topic=" + topicname + "'>" + topicname + "</a>";
                 output += "</li>";
                 $("#shortcut_topic_collapse").append(output);
             })

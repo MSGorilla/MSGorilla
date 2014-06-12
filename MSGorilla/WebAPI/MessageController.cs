@@ -163,10 +163,16 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public DisplayMessagePagination TopicLine(string topicID, int count = 25, string token = null)
+        public DisplayMessagePagination TopicLine(string topic, int count = 25, string token = null)
         {
             string me = whoami();
-            return new DisplayMessagePagination(_messageManager.TopicLine(topicID, count, Utils.String2Token(token)));
+            TopicManager topManager = new TopicManager();
+            var t  = topManager.FindTopicByName(topic);
+            if (t == null)
+            {
+                return null;
+            }
+            return new DisplayMessagePagination(_messageManager.TopicLine(t.Id.ToString(), count, Utils.String2Token(token)));
         }
 
         [HttpGet]
