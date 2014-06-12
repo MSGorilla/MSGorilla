@@ -252,7 +252,8 @@
     <Content Include="Content\css.css" />
     <Content Include="Content\Images\default_avatar.jpg" />
     <Content Include="Content\Images\default_bg.png" />
-    <Content Include="Content\Images\small-spinner.gif" />
+    <Content Include="Content\Images\link_line.png" />
+    <Content Include="Content\Images\small_spinner.gif" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
