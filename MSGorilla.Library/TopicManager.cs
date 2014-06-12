@@ -14,7 +14,7 @@ namespace MSGorilla.Library
 
         public List<Topic> GetAllTopics()
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 return _gorillaCtx.Topics.ToList();
             }            
@@ -22,7 +22,7 @@ namespace MSGorilla.Library
 
         public Topic AddTopic(Topic topic)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 topic = _gorillaCtx.Topics.Add(topic);
                 _gorillaCtx.SaveChanges();
@@ -32,7 +32,7 @@ namespace MSGorilla.Library
 
         public void incrementTopicCount(string topicID)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 Topic topic = FindTopic(topicID);
                 if (topic != null)
@@ -45,7 +45,7 @@ namespace MSGorilla.Library
 
         public void incrementTopicCount(int topicID)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 Topic topic = FindTopic(topicID);
                 if (topic != null)
@@ -58,7 +58,7 @@ namespace MSGorilla.Library
 
         public Topic FindTopic(string topicID)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 Topic ret = null;
                 try
@@ -74,7 +74,7 @@ namespace MSGorilla.Library
 
         public Topic FindTopicByName(string name)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 Topic ret = null;
                 try
@@ -91,7 +91,7 @@ namespace MSGorilla.Library
 
         public Topic FindTopic(int topicID)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 return _gorillaCtx.Topics.Find(topicID);
             }            
@@ -99,7 +99,7 @@ namespace MSGorilla.Library
 
         public List<Topic> SearchTopic(string keyword)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 return _gorillaCtx.Topics.Where(topic => topic.Name.Contains(keyword)).ToList();
             }
@@ -107,7 +107,7 @@ namespace MSGorilla.Library
 
         public List<Topic> GetHotTopics(int count = 5)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 return _gorillaCtx.Topics.SqlQuery(
                     @"select t.id, t.name, t.description, t.msgcount from (

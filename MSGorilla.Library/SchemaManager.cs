@@ -16,7 +16,7 @@ namespace MSGorilla.Library
 
         public SchemaManager()
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 Schema defaultSchema = _gorillaCtx.Schemas.Find("none");
                 if (defaultSchema == null)
@@ -30,7 +30,7 @@ namespace MSGorilla.Library
 
         public bool Contain(string schemaID)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 return !(_gorillaCtx.Schemas.Find(schemaID) == null);
             }
@@ -38,7 +38,7 @@ namespace MSGorilla.Library
 
         public List<Schema> GetSchema()
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 return _gorillaCtx.Schemas.ToList();
             }            
@@ -46,7 +46,7 @@ namespace MSGorilla.Library
 
         public Schema GetSchema(string schemaID)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 Schema schema = _gorillaCtx.Schemas.Find(schemaID);
                 if (schema == null)
@@ -60,7 +60,7 @@ namespace MSGorilla.Library
 
         public void PostSchema(Schema schema)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 if (Contain(schema.SchemaID))
                 {

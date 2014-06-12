@@ -14,13 +14,13 @@ namespace MSGorilla.Library
 {
     public class AccountManager
     {
-        private MSGorillaContext _gorillaCtx;
+        //private MSGorillaContext _gorillaCtx;
         public AccountManager(){
             //_accountCtx = new MSGorillaContext();
         }
 
         public List<UserProfile> GetAllUsers(){
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 return _gorillaCtx.Users.ToList();
             }            
@@ -33,7 +33,7 @@ namespace MSGorilla.Library
                 return false;
             }
 
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 UserProfile user = _gorillaCtx.Users.Find(userid);
 
@@ -51,7 +51,7 @@ namespace MSGorilla.Library
 
         public UserProfile FindUser(string userid)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 return _gorillaCtx.Users.Find(userid);
             }            
@@ -59,7 +59,7 @@ namespace MSGorilla.Library
 
         public List<UserProfile> SearchUser(string keyword)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 var users = _gorillaCtx.Users.Where(u => u.Userid.Contains(keyword));
                 return users.ToList<UserProfile>();
@@ -73,7 +73,7 @@ namespace MSGorilla.Library
                 throw new InvalidIDException("User");
             }
 
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 UserProfile temp = _gorillaCtx.Users.Find(user.Userid);
                 if (temp != null)
@@ -89,7 +89,7 @@ namespace MSGorilla.Library
 
         public UserProfile UpdateUser(UserProfile user)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 UserProfile originUser = _gorillaCtx.Users.Find(user.Userid);
                 if (originUser == null)
@@ -109,7 +109,7 @@ namespace MSGorilla.Library
 
         public async Task<Boolean> Follow(string userid, string followingUserid)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 UserProfile user = _gorillaCtx.Users.Find(userid);
                 UserProfile followingUser = _gorillaCtx.Users.Find(followingUserid);
@@ -139,7 +139,7 @@ namespace MSGorilla.Library
 
         public async Task<Boolean> UnFollow(string userid, string followingUserid)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 Subscription f = _gorillaCtx.Subscriptions.Where(ff => ff.Userid == userid && ff.FollowingUserid == followingUserid).First();
                 if (f != null)
@@ -159,7 +159,7 @@ namespace MSGorilla.Library
 
         public List<UserProfile> Followings(string userid)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 UserProfile user = _gorillaCtx.Users.Find(userid);
                 if (user == null)
@@ -183,7 +183,7 @@ namespace MSGorilla.Library
 
         public List<UserProfile> Followers(string userid)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 UserProfile user = _gorillaCtx.Users.Find(userid);
                 if (user == null)
@@ -207,7 +207,7 @@ namespace MSGorilla.Library
 
         public bool IsFollowing(string userid, string followingUserID)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 if (_gorillaCtx.Subscriptions.Where(f => f.Userid == userid && f.FollowingUserid == followingUserID).ToList().Count > 0)
                 {
@@ -219,7 +219,7 @@ namespace MSGorilla.Library
 
         public void DeleteUser(string userid)
         {
-            using (_gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 UserProfile user = _gorillaCtx.Users.Find(userid);
                 if (user != null)
