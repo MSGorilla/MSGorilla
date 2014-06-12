@@ -9,9 +9,9 @@
     <div class="contents-container">
         <div id="notifications" class="posts-notification">
             @*<div class="alert alert-dismissable alert-warning">
-                <button class="close" type="button" data-dismiss="alert">×</button>
-                <p><a class="alert-link" href="#">You have new messages.</a></p>
-            </div>*@
+                    <button class="close" type="button" data-dismiss="alert">×</button>
+                    <p><a class="alert-link" href="#">You have new messages.</a></p>
+                </div>*@
         </div>
 
         <div class="title-container-single">
@@ -25,6 +25,7 @@
                 <span class="help-block">People for "@@<span class="bold">@ViewBag.SearchKeyword</span>"</span>
             </div>
             <ul id="userlist" class="userlist-group">
+                <li class="center-block txtaln-c"><span class="spinner-loading"></span> Loading...</li>
                 @*autofill by js*@
             </ul>
             <div class="clearfix"></div>
@@ -37,7 +38,7 @@
 
         <div class="posts-feeds">
             <ul id="feedlist" class='list-group'>
-                <li id="loading_message" class="list-group-item txtaln-c">Loading...</li>
+                <li id="loading_message" class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
                 @*autofill by js*@
             </ul>
         </div>
@@ -58,16 +59,15 @@
             </script>
         </div>
     </div>
+
+    <script>
+        $(SearchUser('@ViewBag.SearchKeyword'));
+        $(SearchTopic('@ViewBag.SearchKeyword'));
+    </script>
+
     <div class="tools-container">
         @Html.Partial("_MePartial")
         @Html.Partial("_ShortcutPartial")
     </div>
 
 </div>
-
-<script>
-    $(SearchUser('@ViewBag.SearchKeyword'));
-    $(SearchTopic('@ViewBag.SearchKeyword'));
-</script>
-
-

@@ -1,4 +1,15 @@
 ﻿/* common function */
+function isValidForKey(c) {
+    if ((c >= 'a' && c <= 'z')
+        || (c >= '0' && c <= '9')
+        || (c >= 'A' && c <= 'Z')
+        || c == '_'
+        || c == '-')
+        return true;
+    else
+        return false;
+}
+
 function encodeEmail(code) {
     code = code.replace('@', '-');
     code = code.replace('.', '_');
@@ -13,16 +24,52 @@ function ScrollTo(itemname) {
 }
 
 function encodeHtml(code) {
+    var strRegex = "http[s]?://((([0-9a-z][0-9a-z\\-]*)?[0-9a-z](\\.))+)?[0-9a-z]+(:[0-9]{1,5})?(/[\\w\\-/\\+\\?%#&=\\.:]*)?";
+    var linkre = new RegExp(strRegex, "gi");
+
+    strRegex = "@([0-9a-z_\\-]+)(\\s|$)";
+    var atre = new RegExp(strRegex, "gi");
+
+    strRegex = "#([0-9a-z_\\-]+)(\\s|$)";
+    var topicre = new RegExp(strRegex, "gi");
+
+    code = code.replace(linkre, function (s) {
+        return encodeURIComponent('<a href="' + s + '">' + s + '</a>');
+    });
+
+    code = code.replace(atre, function (s1, s2, s3) {
+        return encodeURIComponent('<a href="/profile/index?user=' + s2 + '">' + s1 + '</a>') + s3;
+    });
+
+    code = code.replace(topicre, function (s1, s2, s3) {
+        return encodeURIComponent('<a href="/topic/index?topic=' + s2 + '">' + s1 + '</a>') + s3;
+    });
+
     code = code.replace(/&/mg, '&#38;');
     code = code.replace(/</mg, '&#60;');
     code = code.replace(/>/mg, '&#62;');
     code = code.replace(/\"/mg, '&#34;');
     code = code.replace(/\t/g, '  ');
-    code = code.replace(/\r?\n/g, '<br>');
+    code = code.replace(/\r?\n/g, '<br/>');
     code = code.replace(/<br><br>/g, '<br>');
     code = code.replace(/ /g, '&nbsp;');
+    code = decodeURIComponent(code);
     return code;
 }
+
+function encodeTxt(code) {
+    //code = code.replace(/&/mg, '&#38;');
+    //code = code.replace(/</mg, '&#60;');
+    //code = code.replace(/>/mg, '&#62;');
+    //code = code.replace(/\"/mg, '&#34;');
+    //code = code.replace(/\t/g, '  ');
+    //code = code.replace(/\r?\n/g, '<br/>');
+    //code = code.replace(/<br><br>/g, '<br>');
+    //code = code.replace(/ /g, '&nbsp;');
+    code = encodeURIComponent(code);
+    return code;
+}
+
 
 function isNullOrEmpty(strVal) {
     if (strVal == null || strVal == undefined || strVal == '') {
@@ -79,7 +126,7 @@ function LoadMyInfo() {
     var apiurl = "/api/account/me";
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         success: function (data) {
             var userid = data.Userid;
@@ -116,7 +163,7 @@ function LoadUserInfo(user) {
     }
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         success: function (data) {
             var userid = data.Userid;
@@ -232,7 +279,7 @@ function SetFollowBtn(user, enabled) {
 function Follow(user) {
     SetUnfollowBtn(user, false);
     $.ajax({
-        type: "get",
+        type: "GET",
         url: "/api/account/follow",
         data: "userid=" + user,
         success: function (data) {
@@ -255,7 +302,7 @@ function Follow(user) {
 function Unfollow(user) {
     SetFollowBtn(user, false);
     $.ajax({
-        type: "get",
+        type: "GET",
         url: "/api/account/unfollow",
         data: "userid=" + user,
         success: function (data) {
@@ -277,15 +324,17 @@ function Unfollow(user) {
 
 /* post function */
 function PostMessage() {
-    var message = $("#postmessage").val().trim();
+    var message = encodeTxt($("#postmessage").val().trim());
     if (message.length === 0) {
         return;
     }
 
     $("#btn_post").button('loading');
     $.ajax({
-        type: "post",
-        url: "/api/message/postmessage?" + "message=" + message,
+        type: "POST",
+        url: "/api/message/postmessage",
+        data: "message=" + message,
+        dataType: "json",
         success: function (data) {
             $("#postmessage").val("");
             // insert the new posted message
@@ -301,17 +350,23 @@ function PostMessage() {
 
 function PostReply(user, mid) {
     var replybox = $("#replymessage_" + mid);
-    var message = replybox.val().trim();
+    var message = encodeTxt(replybox.val().trim());
     var touser = replybox.attr("replyto");
 
     if (message.length === 0) {
         return;
     }
 
+    if (isNullOrEmpty(touser)) {
+        touser = user;
+    }
+
     $("#btn_reply_" + mid).button('loading');
     $.ajax({
-        type: "post",
-        url: "/api/reply/postreply?" + "to=" + touser + "&message=" + message + "&messageUser=" + user + "&messageID=" + mid,
+        type: "POST",
+        url: "/api/reply/postreply",
+        data: "to=" + touser + "&message=" + message + "&messageUser=" + user + "&messageID=" + mid,
+        dataType: "json",
         success: function (data) {
             $("#replymessage_" + mid).val("");
             $("#replylist_" + mid).prepend(CreateReply(data));
@@ -378,7 +433,7 @@ function LoadFeeds(category, id) {
     }
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         dataType: "json",
         data: apidata,
@@ -406,7 +461,7 @@ function LoadFeeds(category, id) {
                 $("#hd_token").val("nomore");
             }
             else {
-                $("#lbl_seemore").html("Loading more...");
+                $("#lbl_seemore").html("<span class='spinner-loading'></span> Loading more...");
                 $("#hd_token").val(nexttoken);
             }
         },
@@ -495,7 +550,7 @@ function LoadReplyFeeds(category) {
     }
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         dataType: "json",
         data: apidata,
@@ -523,7 +578,7 @@ function LoadReplyFeeds(category) {
                 $("#hd_token").val("nomore");
             }
             else {
-                $("#lbl_seemore").html("Loading more...");
+                $("#lbl_seemore").html("<span class='spinner-loading'></span> Loading more...");
                 $("#hd_token").val(nexttoken);
             }
         },
@@ -573,7 +628,7 @@ function ShowReplies(user, mid) {
 
 function LoadReplies(mid) {
     $.ajax({
-        type: "get",
+        type: "GET",
         url: "/api/message/getmessagereply",
         data: "msgID=" + mid,
         success: function (data) {
@@ -652,7 +707,7 @@ function ShowMessage(mid, user) {
     }
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: "/api/message/getdisplaymessage",
         data: "msgUser=" + user + "&msgID=" + mid,
         success: function (data) {
@@ -677,7 +732,7 @@ function ShowEvents(mid, eid) {
     }
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: "/api/message/eventline",
         data: "eventID=" + eid,
         success: function (data) {
@@ -749,7 +804,7 @@ function SearchTopic(keyword) {
         apiurl = "/api/topic/searchtopic?keyword=" + keyword;
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         dataType: "json",
         success: function (data) {
@@ -765,7 +820,7 @@ function SearchTopic(keyword) {
                     var topicdesp = item.Description;
                     var topiccount = item.MsgCount;
 
-                    output += "  <a class='btn btn-link' href='/Topic/index?topic=" + topicid + "&topicname=" + topicname + "'>" + topicname + "</a>";
+                    output += "  <a class='btn btn-link btn-xs' href='/Topic/index?topic=" + topicid + "&topicname=" + topicname + "'>#" + topicname + "</a>";
                     $("#topiclist").append(output);
 
                     if (index == 0) {
@@ -788,7 +843,7 @@ function SearchUser(keyword) {
         apiurl = "/api/account/searchuser?keyword=" + keyword;
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         dataType: "json",
         success: function (data) {
@@ -830,7 +885,7 @@ function LoadUsers(category, user) {
     }
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         data: apidata,
         dataType: "json",
@@ -890,11 +945,10 @@ function CreateUserCard(data) {
     return output;
 }
 
-function UpdateNotificationCount()
-{
+function UpdateNotificationCount() {
     var apiurl = "/api/account/getnotificationcount";
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         dataType: "json",
         success: function (data) {
@@ -911,11 +965,14 @@ function UpdateNotificationCount()
             $("#shortcut_ownerline_count").html(ownerlineCount);
             $("#shortcut_notification_count").html(notificationCount);
 
-            $("#nav_notification_count").html(notificationCount);
+            if (notificationCount > 0)
+                $("#nav_notification_count").html(notificationCount);
+            else
+                $("#nav_notification_count").html("");
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
-        }
+        //error: function (XMLHttpRequest, textStatus, errorThrown) {
+        //    ShowError(textStatus + ": " + errorThrown);
+        //}
     });
 }
 
@@ -932,7 +989,7 @@ function LoadHotTopics() {
     var apiurl = "/api/topic/hottopics";
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         dataType: "json",
         success: function (data) {
@@ -952,8 +1009,10 @@ function LoadHotTopics() {
                 $("#shortcut_topic_collapse").append(output);
             })
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
-        }
+        //error: function (XMLHttpRequest, textStatus, errorThrown) {
+        //    ShowError(textStatus + ": " + errorThrown);
+        //}
     });
 }
+
+

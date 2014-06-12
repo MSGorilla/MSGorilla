@@ -485,7 +485,7 @@ namespace MSGorilla.Library
             {
                 Topic topic = _topicManager.FindTopicByName(topicName);
                 if (topic == null)
-                {
+            {
                     topic = new Topic();
                     topic.Name = topicName;
                     topic.MsgCount = 0;
@@ -498,7 +498,7 @@ namespace MSGorilla.Library
 
                 _topicManager.incrementTopicCount(topic.Id);
             }
-
+            
             //todo:
             //The Userid of owner and AtUser may be ms alais or displayname instead of the
             //real id in MSGorilla System.

@@ -52,7 +52,7 @@
 
         <div class="posts-feeds">
             <ul id="feedlist" class='list-group'>
-                <li id ="loading_message" class="list-group-item txtaln-c">Loading...</li>
+                <li id="loading_message" class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
                 @*autofill by js*@
             </ul>
         </div>
@@ -75,6 +75,11 @@
 
     </div>
 
+    <script>
+        $(LoadUserInfo('@ViewBag.UserId'));
+        $(LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.UserId'));
+    </script>
+
     <div class="tools-container">
         @if (!ViewBag.IsMe)
         {
@@ -83,9 +88,3 @@
     </div>
 
 </div>
-
-<script>
-    $(LoadUserInfo('@ViewBag.UserId'));
-    $(LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.UserId'));
-</script>
-
