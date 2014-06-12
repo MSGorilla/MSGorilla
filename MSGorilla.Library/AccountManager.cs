@@ -14,13 +14,16 @@ namespace MSGorilla.Library
 {
     public class AccountManager
     {
-        private MSGorillaContext _accountCtx;
+        private MSGorillaContext _gorillaCtx;
         public AccountManager(){
-            _accountCtx = new MSGorillaContext();
+            //_accountCtx = new MSGorillaContext();
         }
 
         public List<UserProfile> GetAllUsers(){
-            return _accountCtx.Users.ToList();
+            using (_gorillaCtx = new MSGorillaContext())
+            {
+                return _gorillaCtx.Users.ToList();
+            }            
         }
 
         public bool AuthenticateUser(string userid, string password)
@@ -29,28 +32,38 @@ namespace MSGorilla.Library
             {
                 return false;
             }
-            UserProfile user = _accountCtx.Users.Find(userid);
 
-            if (user.Password == null)
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                return false;
-            }
-            if ("".Equals(user.Password))
-            {
-                return true;
-            }
-            return user.Password.Equals(password);
+                UserProfile user = _gorillaCtx.Users.Find(userid);
+
+                if (user.Password == null)
+                {
+                    return false;
+                }
+                if ("".Equals(user.Password))
+                {
+                    return true;
+                }
+                return user.Password.Equals(password);
+            }            
         }
 
         public UserProfile FindUser(string userid)
         {
-            return _accountCtx.Users.Find(userid);
+            using (_gorillaCtx = new MSGorillaContext())
+            {
+                return _gorillaCtx.Users.Find(userid);
+            }            
         }
 
         public List<UserProfile> SearchUser(string keyword)
         {
-            var users =_accountCtx.Users.Where(u => u.Userid.Contains(keyword));
-            return users.ToList<UserProfile>();
+            using (_gorillaCtx = new MSGorillaContext())
+            {
+                var users = _gorillaCtx.Users.Where(u => u.Userid.Contains(keyword));
+                return users.ToList<UserProfile>();
+            }            
         }
 
         public UserProfile AddUser(UserProfile user)
@@ -59,86 +72,103 @@ namespace MSGorilla.Library
             {
                 throw new InvalidIDException("User");
             }
-            UserProfile temp = _accountCtx.Users.Find(user.Userid);
-            if (temp != null)
+
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                throw new UserAlreadyExistException(user.Userid);
-            }
-            user.MessageCount = 0;
-            _accountCtx.Users.Add(user);
-            _accountCtx.SaveChanges();
-            return user;
+                UserProfile temp = _gorillaCtx.Users.Find(user.Userid);
+                if (temp != null)
+                {
+                    throw new UserAlreadyExistException(user.Userid);
+                }
+                user.MessageCount = 0;
+                _gorillaCtx.Users.Add(user);
+                _gorillaCtx.SaveChanges();
+                return user;
+            }            
         }
 
         public UserProfile UpdateUser(UserProfile user)
         {
-            UserProfile originUser = _accountCtx.Users.Find(user.Userid);
-            if (originUser == null)
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                throw new UserNotFoundException(user.Userid);
+                UserProfile originUser = _gorillaCtx.Users.Find(user.Userid);
+                if (originUser == null)
+                {
+                    throw new UserNotFoundException(user.Userid);
+                }
+
+                originUser.Password = user.Password;
+                originUser.DisplayName = user.DisplayName;
+                originUser.Description = user.Description;
+                originUser.PortraitUrl = user.PortraitUrl;
+                _gorillaCtx.SaveChanges();
+
+                return _gorillaCtx.Users.Find(user.Userid);
             }
-
-            originUser.Password = user.Password;
-            originUser.DisplayName = user.DisplayName;
-            originUser.Description = user.Description;
-            originUser.PortraitUrl = user.PortraitUrl;
-            _accountCtx.SaveChanges();
-
-            return _accountCtx.Users.Find(user.Userid);
         }
 
         public async Task<Boolean> Follow(string userid, string followingUserid)
         {
-            UserProfile user = _accountCtx.Users.Find(userid);
-            UserProfile followingUser = _accountCtx.Users.Find(followingUserid);
-            if (user == null || followingUser == null)
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                throw new UserNotFoundException(string.Format("{0} or {1}", userid, followingUserid));
-            }
+                UserProfile user = _gorillaCtx.Users.Find(userid);
+                UserProfile followingUser = _gorillaCtx.Users.Find(followingUserid);
+                if (user == null || followingUser == null)
+                {
+                    throw new UserNotFoundException(string.Format("{0} or {1}", userid, followingUserid));
+                }
 
-            if(_accountCtx.Subscriptions.Where(f => f.Userid == userid && f.FollowingUserid == followingUserid).ToList().Count > 0){
+                if (_gorillaCtx.Subscriptions.Where(f => f.Userid == userid && f.FollowingUserid == followingUserid).ToList().Count > 0)
+                {
+                    return true;
+                }
+
+                Subscription follow = new Subscription();
+                follow.Userid = userid;
+                follow.FollowingUserid = followingUserid;
+                follow.FollowingUserDisplayName = "";
+                _gorillaCtx.Subscriptions.Add(follow);
+
+                user.FollowingsCount++;
+                followingUser.FollowersCount++;
+                await _gorillaCtx.SaveChangesAsync();
+
                 return true;
             }
-
-            Subscription follow = new Subscription();
-            follow.Userid = userid;
-            follow.FollowingUserid = followingUserid;
-            follow.FollowingUserDisplayName = "";
-            _accountCtx.Subscriptions.Add(follow);
-
-            user.FollowingsCount++;
-            followingUser.FollowersCount++;
-            await _accountCtx.SaveChangesAsync();
-
-            return true;
         }
 
         public async Task<Boolean> UnFollow(string userid, string followingUserid)
         {
-            Subscription f = _accountCtx.Subscriptions.Where(ff => ff.Userid == userid && ff.FollowingUserid == followingUserid).First();
-            if(f != null){
-                _accountCtx.Subscriptions.Remove(f);
+            using (_gorillaCtx = new MSGorillaContext())
+            {
+                Subscription f = _gorillaCtx.Subscriptions.Where(ff => ff.Userid == userid && ff.FollowingUserid == followingUserid).First();
+                if (f != null)
+                {
+                    _gorillaCtx.Subscriptions.Remove(f);
 
-                UserProfile user = _accountCtx.Users.Find(userid);
-                UserProfile followingUser = _accountCtx.Users.Find(followingUserid);
-                user.FollowingsCount--;
-                followingUser.FollowersCount--;
+                    UserProfile user = _gorillaCtx.Users.Find(userid);
+                    UserProfile followingUser = _gorillaCtx.Users.Find(followingUserid);
+                    user.FollowingsCount--;
+                    followingUser.FollowersCount--;
 
-                await _accountCtx.SaveChangesAsync();
-            }
-            return true;
+                    await _gorillaCtx.SaveChangesAsync();
+                }
+                return true;
+            }            
         }
 
         public List<UserProfile> Followings(string userid)
         {
-            UserProfile user = _accountCtx.Users.Find(userid);
-            if (user == null)
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                throw new UserNotFoundException(userid);
-            }
+                UserProfile user = _gorillaCtx.Users.Find(userid);
+                if (user == null)
+                {
+                    throw new UserNotFoundException(userid);
+                }
 
-            return _accountCtx.Users.SqlQuery(
-                @"select FollowingUserid as Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from (
+                return _gorillaCtx.Users.SqlQuery(
+                    @"select FollowingUserid as Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from (
 	                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from 
 		                [Subscription] f
 		                join
@@ -146,31 +176,23 @@ namespace MSGorilla.Library
 		                on f.FollowingUserid = u.Userid 
 		                ) ff 
 	                where ff.userid = {0}",
-                    new object[] { userid }
-                ).ToList();
-//            return _accountCtx.Users.SqlQuery(
-//                @"select FollowingUserid as Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from (
-//	                            select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from 
-//		                            [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[Subscription] f
-//		                            join
-//		                            [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[UserProfile] u
-//		                            on f.FollowingUserid = u.Userid 
-//		                            ) ff 
-//	                            where ff.userid = {0}",
-//                    new object[] { userid }
-//                ).ToList();
+                        new object[] { userid }
+                    ).ToList();
+            }
         }
 
         public List<UserProfile> Followers(string userid)
         {
-            UserProfile user = _accountCtx.Users.Find(userid);
-            if (user == null)
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                throw new UserNotFoundException(userid);
-            }
+                UserProfile user = _gorillaCtx.Users.Find(userid);
+                if (user == null)
+                {
+                    throw new UserNotFoundException(userid);
+                }
 
-            return _accountCtx.Users.SqlQuery(
-                @"select Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from (
+                return _gorillaCtx.Users.SqlQuery(
+                    @"select Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from (
 		                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from 
 			                [Subscription] f
 			                join
@@ -178,41 +200,37 @@ namespace MSGorilla.Library
 			                on f.Userid = u.Userid 
 	                ) ff 
 	                where ff.FollowingUserid = {0}",
-                    new object[] { userid }
-                ).ToList();
-//            return _accountCtx.Users.SqlQuery(
-//                @"select Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from (
-//		                            select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password from 
-//			                            [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[Subscription] f
-//			                            join
-//			                            [MSGorilla.Library.DAL.MSGorillaContext].[dbo].[UserProfile] u
-//			                            on f.Userid = u.Userid 
-//	                            ) ff 
-//	                            where ff.FollowingUserid = {0}",
-//                    new object[] { userid }
-//                ).ToList();
+                        new object[] { userid }
+                    ).ToList();
+            }
         }
 
         public bool IsFollowing(string userid, string followingUserID)
         {
-            if (_accountCtx.Subscriptions.Where(f => f.Userid == userid && f.FollowingUserid == followingUserID).ToList().Count > 0)
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                return true;
-            }
-            return false;
+                if (_gorillaCtx.Subscriptions.Where(f => f.Userid == userid && f.FollowingUserid == followingUserID).ToList().Count > 0)
+                {
+                    return true;
+                }
+                return false;
+            }            
         }
 
         public void DeleteUser(string userid)
         {
-            UserProfile user = _accountCtx.Users.Find(userid);
-            if (user != null)
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                _accountCtx.Users.Remove(user);
-                _accountCtx.SaveChanges();
-            }
-            else
-            {
-                throw new UserNotFoundException(userid);
+                UserProfile user = _gorillaCtx.Users.Find(userid);
+                if (user != null)
+                {
+                    _gorillaCtx.Users.Remove(user);
+                    _gorillaCtx.SaveChanges();
+                }
+                else
+                {
+                    throw new UserNotFoundException(userid);
+                }
             }
         }
     }
