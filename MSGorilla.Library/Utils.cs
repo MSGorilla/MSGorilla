@@ -141,7 +141,7 @@ namespace MSGorilla.Library
                 throw new InvalidIDException();
             }
             UserProfile userprofile = new UserProfile();
-            userprofile.Userid = userprofile.DisplayName = userid;
+            userprofile.Userid = userprofile.DisplayName = userid.ToLower();
             userprofile.Password = null;
             userprofile.FollowersCount = userprofile.FollowingsCount = 0;
             return userprofile;
