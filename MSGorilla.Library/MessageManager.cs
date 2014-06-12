@@ -452,23 +452,9 @@ namespace MSGorilla.Library
             //insert into PublicSquareLine
             insertOperation = TableOperation.InsertOrReplace(new PublicSquareLineEntity(message));
             _publicSquareLine.Execute(insertOperation);
-
-            //Find userid and toopicname from message
-            List<string> AtUser = new List<string>();
-            List<string> topicNames = new List<string>();
-            string[] words = message.MessageContent.Split(' ');
-            foreach (string word in words)
-            {
-                if (word.StartsWith("@"))
-                {
-                    AtUser.Add(word.Replace("@", ""));
-                }
-                else if(word.StartsWith("#"))
-                {
-                    topicNames.Add(word.Replace("#", ""));
-                }
-            }
+ 
             //insert into Atline
+            List<string> AtUser = Utils.GetAtUserid(message.MessageContent);
             foreach (string atUserid in AtUser)
             {
                 UserProfile user = _accManager.FindUser(atUserid);
@@ -480,12 +466,14 @@ namespace MSGorilla.Library
                     _notifManager.incrementAtlineNotifCount(user.Userid);
                 }
             }
+            
             //insert into Topicline
+            List<string> topicNames = Utils.GetTopicNames(message.MessageContent);
             foreach (string topicName in topicNames)
             {
                 Topic topic = _topicManager.FindTopicByName(topicName);
                 if (topic == null)
-            {
+                {
                     topic = new Topic();
                     topic.Name = topicName;
                     topic.MsgCount = 0;

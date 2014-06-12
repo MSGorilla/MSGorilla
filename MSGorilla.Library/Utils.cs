@@ -145,6 +145,44 @@ namespace MSGorilla.Library
             userprofile.Password = null;
             userprofile.FollowersCount = userprofile.FollowingsCount = 0;
             return userprofile;
-        } 
+        }
+
+        public static List<String> GetAtUserid(string message)
+        {
+            List<string> AtUser = new List<string>();
+            if (string.IsNullOrEmpty(message))
+            {
+                return AtUser;
+            }
+         
+            string[] words = message.Split(' ');
+            foreach (string word in words)
+            {
+                if (word.StartsWith("@"))
+                {
+                    AtUser.Add(word.Replace("@", ""));
+                }
+            }
+            return AtUser;
+        }
+
+        public static List<String> GetTopicNames(string message)
+        {
+            List<string> topicNames = new List<string>();
+            if (string.IsNullOrEmpty(message))
+            {
+                return topicNames;
+            }
+
+            string[] words = message.Split(' ');
+            foreach (string word in words)
+            {
+                if (word.StartsWith("#") && word.EndsWith("#"))
+                {
+                    topicNames.Add(word.Replace("#", ""));
+                }
+            }
+            return topicNames;
+        }
     }
 }
