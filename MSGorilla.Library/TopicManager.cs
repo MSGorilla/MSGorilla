@@ -39,6 +39,16 @@ namespace MSGorilla.Library
             }            
         }
 
+        public void incrementTopicCount(int topicID)
+        {
+            Topic topic = FindTopic(topicID);
+            if (topic != null)
+            {
+                topic.MsgCount++;
+                _gorillaCtx.SaveChanges();
+            }
+        }
+
         public Topic FindTopic(string topicID)
         {
             Topic ret = null;
@@ -48,6 +58,20 @@ namespace MSGorilla.Library
             }
             catch
             {
+            }
+            return ret;
+        }
+
+        public Topic FindTopicByName(string name)
+        {
+            Topic ret = null;
+            try
+            {
+                ret = _gorillaCtx.Topics.Where(topic => topic.Name == name).Single();
+            }
+            catch
+            {
+
             }
             return ret;
         }

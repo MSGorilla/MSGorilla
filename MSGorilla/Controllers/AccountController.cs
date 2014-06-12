@@ -123,7 +123,7 @@ namespace MSGorilla.Controllers
 
                 try
                 {
-                    string userid = model.UserName.ToLower();
+                    string userid = model.UserName;
                     string password = model.Password;
                     var newUser =  new UserProfile();
                     newUser.Userid = newUser.DisplayName = newUser.Description = userid;
