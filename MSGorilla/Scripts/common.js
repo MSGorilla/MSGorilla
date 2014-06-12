@@ -126,7 +126,7 @@ function LoadMyInfo() {
     var apiurl = "/api/account/me";
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         success: function (data) {
             var userid = data.Userid;
@@ -163,7 +163,7 @@ function LoadUserInfo(user) {
     }
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         success: function (data) {
             var userid = data.Userid;
@@ -279,7 +279,7 @@ function SetFollowBtn(user, enabled) {
 function Follow(user) {
     SetUnfollowBtn(user, false);
     $.ajax({
-        type: "get",
+        type: "GET",
         url: "/api/account/follow",
         data: "userid=" + user,
         success: function (data) {
@@ -302,7 +302,7 @@ function Follow(user) {
 function Unfollow(user) {
     SetFollowBtn(user, false);
     $.ajax({
-        type: "get",
+        type: "GET",
         url: "/api/account/unfollow",
         data: "userid=" + user,
         success: function (data) {
@@ -433,7 +433,7 @@ function LoadFeeds(category, id) {
     }
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         dataType: "json",
         data: apidata,
@@ -550,7 +550,7 @@ function LoadReplyFeeds(category) {
     }
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         dataType: "json",
         data: apidata,
@@ -628,7 +628,7 @@ function ShowReplies(user, mid) {
 
 function LoadReplies(mid) {
     $.ajax({
-        type: "get",
+        type: "GET",
         url: "/api/message/getmessagereply",
         data: "msgID=" + mid,
         success: function (data) {
@@ -707,7 +707,7 @@ function ShowMessage(mid, user) {
     }
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: "/api/message/getdisplaymessage",
         data: "msgUser=" + user + "&msgID=" + mid,
         success: function (data) {
@@ -732,7 +732,7 @@ function ShowEvents(mid, eid) {
     }
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: "/api/message/eventline",
         data: "eventID=" + eid,
         success: function (data) {
@@ -804,7 +804,7 @@ function SearchTopic(keyword) {
         apiurl = "/api/topic/searchtopic?keyword=" + keyword;
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         dataType: "json",
         success: function (data) {
@@ -843,7 +843,7 @@ function SearchUser(keyword) {
         apiurl = "/api/account/searchuser?keyword=" + keyword;
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         dataType: "json",
         success: function (data) {
@@ -885,7 +885,7 @@ function LoadUsers(category, user) {
     }
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         data: apidata,
         dataType: "json",
@@ -948,7 +948,7 @@ function CreateUserCard(data) {
 function UpdateNotificationCount() {
     var apiurl = "/api/account/getnotificationcount";
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         dataType: "json",
         success: function (data) {
@@ -989,7 +989,7 @@ function LoadHotTopics() {
     var apiurl = "/api/topic/hottopics";
 
     $.ajax({
-        type: "get",
+        type: "GET",
         url: apiurl,
         dataType: "json",
         success: function (data) {

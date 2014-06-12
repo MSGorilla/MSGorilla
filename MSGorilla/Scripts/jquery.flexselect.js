@@ -43,7 +43,7 @@
             //apiurl = "/api/account/user"
             apiurl = "/api/account/followings"
             $.ajax({
-                type: "get",
+                type: "GET",
                 url: apiurl,
                 dataType: "json",
                 success: function (data) {
@@ -59,7 +59,7 @@
             //apiurl = "/api/topic/getalltopic"
             apiurl = "/api/topic/hottopics?count=25"
             $.ajax({
-                type: "get",
+                type: "GET",
                 url: apiurl,
                 dataType: "json",
                 success: function (data) {
@@ -299,7 +299,7 @@
                     apiurl = "/api/account/searchuser?keyword=" + keyword;
 
                     $.ajax({
-                        type: "get",
+                        type: "GET",
                         url: apiurl,
                         dataType: "json",
                         async: false,
@@ -326,7 +326,7 @@
                     apiurl = "/api/topic/searchtopic?keyword=" + keyword;
 
                     $.ajax({
-                        type: "get",
+                        type: "GET",
                         url: apiurl,
                         dataType: "json",
                         async: false,
