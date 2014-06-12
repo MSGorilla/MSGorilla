@@ -12,88 +12,110 @@ namespace MSGorilla.Library
     {
         private MSGorillaContext _gorillaCtx;
 
-        public TopicManager()
-        {
-            _gorillaCtx = new MSGorillaContext();
-        }
-
         public List<Topic> GetAllTopics()
         {
-            return _gorillaCtx.Topics.ToList();
+            using (_gorillaCtx = new MSGorillaContext())
+            {
+                return _gorillaCtx.Topics.ToList();
+            }            
         }
 
         public Topic AddTopic(Topic topic)
         {
-            topic =  _gorillaCtx.Topics.Add(topic);
-            _gorillaCtx.SaveChanges();
-            return topic;
+            using (_gorillaCtx = new MSGorillaContext())
+            {
+                topic = _gorillaCtx.Topics.Add(topic);
+                _gorillaCtx.SaveChanges();
+                return topic;
+            }            
         }
 
         public void incrementTopicCount(string topicID)
         {
-            Topic topic = FindTopic(topicID);
-            if (topic != null)
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                topic.MsgCount++;
-                _gorillaCtx.SaveChanges();
-            }            
+                Topic topic = FindTopic(topicID);
+                if (topic != null)
+                {
+                    topic.MsgCount++;
+                    _gorillaCtx.SaveChanges();
+                }
+            }
         }
 
         public void incrementTopicCount(int topicID)
         {
-            Topic topic = FindTopic(topicID);
-            if (topic != null)
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                topic.MsgCount++;
-                _gorillaCtx.SaveChanges();
+                Topic topic = FindTopic(topicID);
+                if (topic != null)
+                {
+                    topic.MsgCount++;
+                    _gorillaCtx.SaveChanges();
+                }
             }
         }
 
         public Topic FindTopic(string topicID)
         {
-            Topic ret = null;
-            try
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                ret = _gorillaCtx.Topics.Find(int.Parse(topicID));
-            }
-            catch
-            {
-            }
-            return ret;
+                Topic ret = null;
+                try
+                {
+                    ret = _gorillaCtx.Topics.Find(int.Parse(topicID));
+                }
+                catch
+                {
+                }
+                return ret;
+            }            
         }
 
         public Topic FindTopicByName(string name)
         {
-            Topic ret = null;
-            try
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                ret = _gorillaCtx.Topics.Where(topic => topic.Name == name).Single();
-            }
-            catch
-            {
+                Topic ret = null;
+                try
+                {
+                    ret = _gorillaCtx.Topics.Where(topic => topic.Name == name).Single();
+                }
+                catch
+                {
 
-            }
-            return ret;
+                }
+                return ret;
+            }            
         }
 
         public Topic FindTopic(int topicID)
         {
-            return _gorillaCtx.Topics.Find(topicID);
+            using (_gorillaCtx = new MSGorillaContext())
+            {
+                return _gorillaCtx.Topics.Find(topicID);
+            }            
         }
 
         public List<Topic> SearchTopic(string keyword)
         {
-            return _gorillaCtx.Topics.Where(topic => topic.Name.Contains(keyword)).ToList();
+            using (_gorillaCtx = new MSGorillaContext())
+            {
+                return _gorillaCtx.Topics.Where(topic => topic.Name.Contains(keyword)).ToList();
+            }
         }
 
         public List<Topic> GetHotTopics(int count = 5)
         {
-            return _gorillaCtx.Topics.SqlQuery(
+            using (_gorillaCtx = new MSGorillaContext())
+            {
+                return _gorillaCtx.Topics.SqlQuery(
                     @"select t.id, t.name, t.description, t.msgcount from (
                         select * , ROW_NUMBER() OVER (ORDER BY msgcount desc) as row from [topic]
                     )t where t.row > 0 and t.row <= {0}",
                     new object[] { count }
                 ).ToList();
+            }            
         }
     }
 }

@@ -42,7 +42,6 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public string whoami()
         {
-            //_accountManager = new AccountManager();
             string authString = null;
             if(HttpContext.Current.Request.Cookies.Get("Authorization") !=null 
                 && !string.IsNullOrEmpty(HttpContext.Current.Request.Cookies.Get("Authorization").Value))
@@ -82,7 +81,6 @@ namespace MSGorilla.WebApi
                 UserProfile profile = _accountManager.FindUser(userid);
                 if (profile == null)
                 {
-                    //CreateNewAADUser().Wait();
                     CreateNewAADUser(userid);
                 }
                 else if (profile.Password != null)

@@ -16,45 +16,59 @@ namespace MSGorilla.Library
 
         public SchemaManager()
         {
-            _gorillaCtx = new MSGorillaContext();
-            Schema defaultSchema = _gorillaCtx.Schemas.Find("none");
-            if (defaultSchema == null)
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                defaultSchema = new Schema("none", "");
-                _gorillaCtx.Schemas.Add(defaultSchema);
-                _gorillaCtx.SaveChanges();
-            }
+                Schema defaultSchema = _gorillaCtx.Schemas.Find("none");
+                if (defaultSchema == null)
+                {
+                    defaultSchema = new Schema("none", "");
+                    _gorillaCtx.Schemas.Add(defaultSchema);
+                    _gorillaCtx.SaveChanges();
+                }
+            }            
         }
 
         public bool Contain(string schemaID)
         {
-            return !(_gorillaCtx.Schemas.Find(schemaID) == null);
+            using (_gorillaCtx = new MSGorillaContext())
+            {
+                return !(_gorillaCtx.Schemas.Find(schemaID) == null);
+            }
         }
 
         public List<Schema> GetSchema()
         {
-            return _gorillaCtx.Schemas.ToList();
+            using (_gorillaCtx = new MSGorillaContext())
+            {
+                return _gorillaCtx.Schemas.ToList();
+            }            
         }
 
         public Schema GetSchema(string schemaID)
         {
-            Schema schema = _gorillaCtx.Schemas.Find(schemaID);
-            if (schema == null)
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                throw new SchemaNotFoundException();
-            }
+                Schema schema = _gorillaCtx.Schemas.Find(schemaID);
+                if (schema == null)
+                {
+                    throw new SchemaNotFoundException();
+                }
 
-            return schema;
+                return schema;
+            }            
         }
 
         public void PostSchema(Schema schema)
         {
-            if (Contain(schema.SchemaID))
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                throw new SchemaAlreadyExistException();
-            }
-            _gorillaCtx.Schemas.Add(schema);
-            _gorillaCtx.SaveChanges();
+                if (Contain(schema.SchemaID))
+                {
+                    throw new SchemaAlreadyExistException();
+                }
+                _gorillaCtx.Schemas.Add(schema);
+                _gorillaCtx.SaveChanges();
+            }            
         }
     }
 }
