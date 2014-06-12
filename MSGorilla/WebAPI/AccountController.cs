@@ -94,7 +94,7 @@ namespace MSGorilla.WebApi
         {
             UserProfile user = new UserProfile();
             //account.Userid = 0;
-            user.Userid = Username.ToLower();
+            user.Userid = Username;
             user.DisplayName = DisplayName;
             user.Password = Utils.MD5Encoding(Password);
             user.Description = Description;
