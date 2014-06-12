@@ -247,7 +247,7 @@ namespace MSGorilla.Library
             string query = GeneratePKStartWithConditionQuery(topicID);
 
             TableQuery<TopicLine> tableQuery = new TableQuery<TopicLine>().Where(query).Take(count);
-            TableQuerySegment<TopicLine> queryResult = _homeline.ExecuteQuerySegmented(tableQuery, continuationToken);
+            TableQuerySegment<TopicLine> queryResult = _topicline.ExecuteQuerySegmented(tableQuery, continuationToken);
 
             MessagePagination ret = new MessagePagination();
             ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
@@ -400,9 +400,7 @@ namespace MSGorilla.Library
         public Message PostMessage(string userid, 
                                     string eventID, 
                                     string schemaID, 
-                                    string topicID,
                                     string[] owner, 
-                                    string[] atUser, 
                                     string message, 
                                     DateTime timestamp)
         {
@@ -426,7 +424,7 @@ namespace MSGorilla.Library
                 throw new InvalidIDException("Event");
             }
 
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID, topicID, owner, atUser);
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner);
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);
@@ -455,15 +453,51 @@ namespace MSGorilla.Library
             insertOperation = TableOperation.InsertOrReplace(new PublicSquareLineEntity(message));
             _publicSquareLine.Execute(insertOperation);
 
-            if (Utils.IsValidID(message.TopicID))
+            //Find userid and toopicname from message
+            List<string> AtUser = new List<string>();
+            List<string> topicNames = new List<string>();
+            string[] words = message.MessageContent.Split(' ');
+            foreach (string word in words)
             {
-                //insert into TopicLine
-                insertOperation = TableOperation.InsertOrReplace(new TopicLine(message));
+                if (word.StartsWith("@"))
+                {
+                    AtUser.Add(word.Replace("@", ""));
+                }
+                else if(word.StartsWith("#"))
+                {
+                    topicNames.Add(word.Replace("#", ""));
+                }
+            }
+            //insert into Atline
+            foreach (string atUserid in AtUser)
+            {
+                UserProfile user = _accManager.FindUser(atUserid);
+                if (user != null)
+                {
+                    insertOperation = TableOperation.InsertOrReplace(new AtLineEntity(user.Userid, message));
+                    _atline.Execute(insertOperation);
+
+                    _notifManager.incrementAtlineNotifCount(user.Userid);
+                }
+            }
+            //insert into Topicline
+            foreach (string topicName in topicNames)
+            {
+                Topic topic = _topicManager.FindTopicByName(topicName);
+                if (topic == null)
+                {
+                    topic = new Topic();
+                    topic.Name = topicName;
+                    topic.MsgCount = 0;
+                    _topicManager.AddTopic(topic);
+                    topic = _topicManager.FindTopicByName(topicName);
+                }
+
+                insertOperation = TableOperation.InsertOrReplace(new TopicLine(message, topic.Id.ToString()));
                 _topicline.Execute(insertOperation);
 
-                _topicManager.incrementTopicCount(message.TopicID);
+                _topicManager.incrementTopicCount(topic.Id);
             }
-            
 
             //todo:
             //The Userid of owner and AtUser may be ms alais or displayname instead of the
@@ -483,29 +517,7 @@ namespace MSGorilla.Library
                 }
             }
 
-            //Merge At user list from the interface 
-            //as well as the words found in MessageContent start with @
-            List<string> AtUser = new List<string>(message.AtUser);
-            string[] words = message.MessageContent.Split(' ');
-            foreach (string word in words)
-            {
-                if (word.StartsWith("@"))
-                {
-                    AtUser.Add(word.Replace("@", ""));
-                }
-            }
 
-            foreach (string atUserid in AtUser)
-            {
-                UserProfile user = _accManager.FindUser(atUserid);
-                if (user != null)
-                {
-                    insertOperation = TableOperation.InsertOrReplace(new AtLineEntity(user.Userid, message));
-                    _atline.Execute(insertOperation);
-
-                    _notifManager.incrementAtlineNotifCount(user.Userid);
-                }
-            }
 
             List<UserProfile> followers = _accManager.Followers(message.User);
             //followers.Add(_accManager.FindUser(message.User));

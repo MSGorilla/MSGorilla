@@ -17,9 +17,9 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             ;
         }
 
-        public TopicLine( Message msg)
+        public TopicLine( Message msg, string topicID)
         {
-            this.PartitionKey = string.Format("{0}_{1}", msg.TopicID, 
+            this.PartitionKey = string.Format("{0}_{1}", topicID, 
                 Utils.ToAzureStorageDayBasedString(msg.PostTime.ToUniversalTime()));
             this.RowKey = msg.ID;
 

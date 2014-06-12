@@ -200,12 +200,10 @@ namespace MSGorilla.WebApi
         [HttpGet, HttpPost]
         public DisplayMessage PostMessage(string message,
                                     string schemaID = "none", 
-                                    string eventID = "none", 
-                                    string topicID = "none",
-                                    [FromUri]string[] owner = null, 
-                                    [FromUri]string[] atUser = null)
+                                    string eventID = "none",
+                                    [FromUri]string[] owner = null)
         {
-            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, topicID, owner, atUser, message, DateTime.UtcNow), new AccountManager());
+            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, message, DateTime.UtcNow), new AccountManager());
             //return new ActionResult();
         }
 
@@ -234,7 +232,7 @@ namespace MSGorilla.WebApi
             {
                 msg.EventID = "none";
             }
-            return PostMessage(msg.Message, msg.SchemaID, msg.EventID, msg.TopicID, msg.Owner, msg.AtUser);
+            return PostMessage(msg.Message, msg.SchemaID, msg.EventID, msg.Owner);
             //return new ActionResult();
         }
     }
