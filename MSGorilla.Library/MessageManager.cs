@@ -244,7 +244,7 @@ namespace MSGorilla.Library
 
         public MessagePagination TopicLine(string topicID, int count = 25, TableContinuationToken continuationToken = null)
         {
-            string query = GeneratePKStartWithConditionQuery(topicID);
+            string query = GeneratePKStartWithConditionQuery(topicID + "_");
 
             TableQuery<TopicLine> tableQuery = new TableQuery<TopicLine>().Where(query).Take(count);
             TableQuerySegment<TopicLine> queryResult = _topicline.ExecuteQuerySegmented(tableQuery, continuationToken);

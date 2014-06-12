@@ -177,9 +177,14 @@ namespace MSGorilla.Library
             string[] words = message.Split(' ');
             foreach (string word in words)
             {
-                if (word.StartsWith("#") && word.EndsWith("#"))
+                if (word.StartsWith("#"))
                 {
-                    topicNames.Add(word.Replace("#", ""));
+                    string temp = word.Replace("#", "");
+                    if (temp.Length > 0)
+                    {
+                        topicNames.Add(word.Replace("#", ""));
+                    }
+                    
                 }
             }
             return topicNames;
