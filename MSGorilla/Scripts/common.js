@@ -20,7 +20,7 @@ function ScrollTo(itemname) {
     var scroll_offset = $("#" + itemname).offset();
     $("body,html").animate({
         scrollTop: scroll_offset.top
-    }, 0);
+    }, 0.5);
 }
 
 function encodeHtml(code) {
@@ -30,7 +30,7 @@ function encodeHtml(code) {
     strRegex = "@([0-9a-z_\\-]+)(\\s|$)";
     var atre = new RegExp(strRegex, "gi");
 
-    strRegex = "#([0-9a-z_\\-]+)(\\s|$)";
+    strRegex = "#([0-9a-z_\\-]+)#(\\s|$)";
     var topicre = new RegExp(strRegex, "gi");
 
     code = code.replace(linkre, function (s) {
@@ -826,7 +826,7 @@ function SearchTopic(keyword) {
                     var topicdesp = item.Description;
                     var topiccount = item.MsgCount;
 
-                    output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + topicname + "'>#" + topicname + " <span class='badge'>" + topiccount + "</span></a>";
+                    output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + topicname + "'>#" + topicname + "# <span class='badge'>" + topiccount + "</span></a>";
                     $("#topiclist").append(output);
 
                     if (index == 0) {
@@ -1010,7 +1010,7 @@ function LoadHotTopics() {
 
                 output += "<li class='sub-list-group-item'>";
                 output += "  <span class='badge'>" + topiccount + "</span>";
-                output += "  <a href='/topic/index?topic=" + topicname + "'>" + topicname + "</a>";
+                output += "  <a href='/topic/index?topic=" + topicname + "'>#" + topicname + "#</a>";
                 output += "</li>";
                 $("#shortcut_topic_collapse").append(output);
             })

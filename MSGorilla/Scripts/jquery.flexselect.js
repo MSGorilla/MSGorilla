@@ -64,7 +64,7 @@
                 dataType: "json",
                 success: function (data) {
                     data.map(function (item) {
-                        self.topicCache[$.trim(item.Name)] = { key: $.trim(item.Name), value: "#" + $.trim(item.Name), id: $.trim(item.Id), desp: $.trim(item.Description), score: 0.0 };
+                        self.topicCache[$.trim(item.Name)] = { key: $.trim(item.Name), value: "#" + $.trim(item.Name) + "#", id: $.trim(item.Id), desp: $.trim(item.Description), score: 0.0 };
                     });
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -337,7 +337,7 @@
                                 var topicdesp = item.Description;
                                 if (!(topicname in self.topicCache)) {
                                     self.topicCache[topicname] =
-                                        { key: $.trim(item.Name), value: "#" + $.trim(item.Name), id: $.trim(item.Id), desp: $.trim(item.Description), score: LiquidMetal.score(topicname, keyword) };
+                                        { key: $.trim(item.Name), value: "#" + $.trim(item.Name) + "#", id: $.trim(item.Id), desp: $.trim(item.Description), score: LiquidMetal.score(topicname, keyword) };
 
                                     var output = self.CreateTopicItem(topicname, topicdesp);
                                     list.append($("<a class='list-group-item'/>").html(output));
@@ -465,7 +465,7 @@
         CreateTopicItem: function (topic, desp) {
             var output = "";
 
-            output += "<span class='fullname'>#" + topic + "</span>&nbsp;"
+            output += "<span class='fullname'>#" + topic + "#</span>&nbsp;"
                     + "<span class='username' >" + desp + "</span>&nbsp;";
 
             return output;
