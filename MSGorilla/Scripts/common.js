@@ -515,7 +515,7 @@ function CreateFeed(postData) {
     output += "        <div class='newpost-footer'>";
 
     if (showevents) {
-        output += "      <button id='btn_expandevent' class='btn btn-link' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Expand events</button>";
+        output += "      <button id='btn_expandevent' class='btn btn-link' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
     }
     output += "          <button id='btn_showreply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
     output += "        </div>";
