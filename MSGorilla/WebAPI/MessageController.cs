@@ -132,12 +132,14 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public List<DisplayMessage> EventLine()
         {
+            whoami();
             return EventLine("none");
         }
 
         [HttpGet]
         public List<DisplayMessage> EventLine(string eventID)
         {
+            whoami();
             var msglist = _messageManager.EventLine(eventID);
             var msg = new List<DisplayMessage>();
             AccountManager accManager = new AccountManager();
@@ -152,12 +154,14 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public List<Message> PublicSquareLine(DateTime start, DateTime end)
         {
+            whoami();
             return _messageManager.PublicSquareLine(start, end);
         }
 
         [HttpGet]
         public DisplayMessagePagination PublicSquareLine(int count = 25, string token = null)
         {
+            whoami();
             TableContinuationToken tok = Utils.String2Token(token);
             return new DisplayMessagePagination(_messageManager.PublicSquareLine(count, tok));
         }
@@ -192,6 +196,7 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public List<DisplayReply> GetMessageReply(string msgID)
         {
+            whoami();
             var replylist = _messageManager.GetAllReplies(msgID);
             var reply = new List<DisplayReply>();
             AccountManager accManager = new AccountManager();
