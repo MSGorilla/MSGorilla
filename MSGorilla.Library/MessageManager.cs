@@ -147,7 +147,7 @@ namespace MSGorilla.Library
 
         public MessagePagination UserLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
         {
-            string query = GeneratePKStartWithConditionQuery(userid);
+            string query = GeneratePKStartWithConditionQuery(userid + "_");
 
             TableQuery<UserLineEntity> tableQuery = new TableQuery<UserLineEntity>().Where(query).Take(count);
             TableQuerySegment<UserLineEntity> queryResult = _userline.ExecuteQuerySegmented(tableQuery, continuationToken);
@@ -179,7 +179,7 @@ namespace MSGorilla.Library
 
         public MessagePagination OwnerLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
         {
-            string query = GeneratePKStartWithConditionQuery(userid);
+            string query = GeneratePKStartWithConditionQuery(userid + "_");
             TableQuery<OwnerLineEntity> tableQuery = new TableQuery<OwnerLineEntity>().Where(query).Take(count);
             TableQuerySegment<OwnerLineEntity> queryResult = _ownerline.ExecuteQuerySegmented(tableQuery, continuationToken);
 
@@ -195,7 +195,7 @@ namespace MSGorilla.Library
 
         public MessagePagination AtLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
         {
-            string query = GeneratePKStartWithConditionQuery(userid);
+            string query = GeneratePKStartWithConditionQuery(userid + "_");
             TableQuery<AtLineEntity> tableQuery = new TableQuery<AtLineEntity>().Where(query).Take(count);
             TableQuerySegment<AtLineEntity> queryResult = _atline.ExecuteQuerySegmented(tableQuery, continuationToken);
 
@@ -227,7 +227,7 @@ namespace MSGorilla.Library
 
         public MessagePagination HomeLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
         {
-            string query = GeneratePKStartWithConditionQuery(userid);
+            string query = GeneratePKStartWithConditionQuery(userid + "_");
 
             TableQuery<HomeLineEntity> tableQuery = new TableQuery<HomeLineEntity>().Where(query).Take(count);
             TableQuerySegment<HomeLineEntity> queryResult = _homeline.ExecuteQuerySegmented(tableQuery, continuationToken);
@@ -261,7 +261,7 @@ namespace MSGorilla.Library
 
         public List<Message> EventLine(string eventID)
         {
-            string query = GeneratePKStartWithConditionQuery(eventID);
+            string query = GeneratePKStartWithConditionQuery(eventID + "_");
 
             TableQuery<EventLineEntity> rangeQuery = new TableQuery<EventLineEntity>().Where(query);
 
