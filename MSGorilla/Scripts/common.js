@@ -406,15 +406,19 @@ function LoadFeeds(category, id) {
     var count = 0;
     if (isNullOrEmpty(category))
         apiurl = "/api/message/userline";
-    else if (category == "homeline")
+    else if (category == "homeline") {
         apiurl = "/api/message/homeline";
+        count = GetNotificationCount(category);
+    }
     else if (category == "atline") {
         apiurl = "/api/message/atline";
         count = GetNotificationCount(category);
+        if (count > 25) apidata = "count=" + count;
     }
     else if (category == "ownerline") {
         apiurl = "/api/message/ownerline";
         count = GetNotificationCount(category);
+        if (count > 25) apidata = "count=" + count;
     }
     else if (category == "publicsquareline")
         apiurl = "/api/message/publicsquareline";
@@ -434,8 +438,11 @@ function LoadFeeds(category, id) {
         }
         apidata = "topic=" + id;
     }
-    else if (category == "replyline")
-        return LoadReplyFeeds(category);
+    else if (category == "replyline") {
+        apiurl = "/api/reply/getmyreply";
+        count = GetNotificationCount(category);
+        if (count > 25) apidata = "count=" + count;
+    }
     else {
         ShowError("Illegal operation.");
         return;
@@ -468,7 +475,10 @@ function LoadFeeds(category, id) {
             }
             else {
                 nexttoken = data.continuationToken
-                data = data.message
+                if (category == "replyline")
+                    data = data.reply;
+                else
+                    data = data.message
                 //ShowError(data);
                 if (data.length == 0) {
                     ShowError("No content.");
@@ -484,7 +494,10 @@ function LoadFeeds(category, id) {
                         if (index < count) {
                             isNew = true;
                         }
-                        $("#feedlist").append(CreateFeed(item, isNew));
+                        if (category == "replyline")
+                            $("#feedlist").append(CreateReply(item, true, isNew));
+                        else
+                            $("#feedlist").append(CreateFeed(item, isNew));
                     })
                 }
             }
@@ -562,10 +575,11 @@ function CreateFeed(postData, isNew) {
     output += "        <div class='newpost-footer'>";
 
     if (showevents) {
-        output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
+        // event button
+        //output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
     }
 
-    output += "          <button id='btn_showreply' class='btn btn-link btn-sm' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
+    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Expand</button>";
     output += "        </div>";
     output += "      </div>";
     output += "    </div>";
@@ -578,88 +592,17 @@ function CreateFeed(postData, isNew) {
     return output;
 }
 
-function LoadReplyFeeds(category) {
-    var apiurl = "";
-    var apidata = "";
-    var count = 0;
-    if (category == "replyline") {
-        apiurl = "/api/reply/getmyreply";
-        count = GetNotificationCount(category);
-    }
-    else {
-        ShowError("Illegal operation.");
-        return;
-    }
-
-    var token = $("#hd_token").val();
-    if (!isNullOrEmpty(token)) {
-        if (token == "nomore") {
-            // already no more feeds, don't load any more
-            return;
-        }
-
-        if (isNullOrEmpty(apidata)) {
-            apidata = "token=" + token;
-        }
-        else {
-            apidata += "&token=" + token;
-        }
-    }
-
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        dataType: "json",
-        data: apidata,
-        success: function (data) {
-            nexttoken = data.continuationToken
-            data = data.reply
-            //ShowError(data);
-            if (data.length == 0) {
-                ShowError("No content.");
-            }
-            else {
-                // create feed list
-                if (isNullOrEmpty(token)) {
-                    // clear feeds at the first time 
-                    $("#feedlist").empty();
-                }
-                $.each(data, function (index, item) {
-                    var isNew = false;
-                    if (index < count) {
-                        isNew = true;
-                    }
-                    $("#feedlist").append(CreateReply(item, true, isNew));
-                })
-
-            }
-
-            if (isNullOrEmpty(nexttoken)) {
-                $("#lbl_seemore").html("");
-                $("#hd_token").val("nomore");
-            }
-            else {
-                $("#lbl_seemore").html("<span class='spinner-loading'></span> Loading more...");
-                $("#hd_token").val(nexttoken);
-            }
-
-            UpdateNotificationCount();
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
-        }
-    });
-}
-
 
 // reply function
 function ShowReplies(user, mid) {
-    var show = $("#isshowreplies_" + mid);
+    var showbtn = $("#btn_showreply_" + mid);
+    var show = showbtn.attr("isshow");
     var replydiv = $("#reply_" + mid);
 
-    if (show.val() == "false") {
+    if (show == "false") {
         // show replies
-        show.val("true");
+        showbtn.attr("isshow", "true");
+        showbtn.text("Collapse");
 
         var html = "";
         html = "<div class='replies-container well'>";
@@ -684,7 +627,9 @@ function ShowReplies(user, mid) {
     }
     else {
         // clear replies
-        show.val("false");
+        showbtn.attr("isshow", "false");
+        showbtn.text("Expand");
+
         replydiv.html("");
     }
 }
@@ -1052,6 +997,9 @@ function GetNotificationCount(category) {
                     break;
                 case "replyline":
                     count = replyCount;
+                    break;
+                case "homeline":
+                    count = homelineCount;
                     break;
                 default:
                     break;
