@@ -23,27 +23,44 @@ function ScrollTo(itemname) {
     }, 0.5);
 }
 
-function encodeHtml(code) {
+function encodeHtml(code, atusers, topics) {
     var strRegex = "http[s]?://((([0-9a-z][0-9a-z\\-]*)?[0-9a-z](\\.))+)?[0-9a-z]+(:[0-9]{1,5})?(/[\\w\\-/\\+\\?%#&=\\.:]*)?";
     var linkre = new RegExp(strRegex, "gi");
 
-    strRegex = "@([0-9a-z_\\-]+)(\\s|$)";
-    var atre = new RegExp(strRegex, "gi");
-
-    strRegex = "#([0-9a-z_\\-]+)#(\\s|$)";
-    var topicre = new RegExp(strRegex, "gi");
-
+    // autolink http[s]
     code = code.replace(linkre, function (s) {
         return encodeURIComponent('<a href="' + s + '">' + s + '</a>');
     });
 
-    code = code.replace(atre, function (s1, s2, s3) {
-        return encodeURIComponent('<a href="/profile/index?user=' + s2 + '">' + s1 + '</a>') + s3;
-    });
+    if (!isNullOrEmpty(atusers)) {
+        // autolink @user
+        strRegex = "@([0-9a-z_\\-]+)(\\s|$)";
+        var atre = new RegExp(strRegex, "gi");
 
-    code = code.replace(topicre, function (s1, s2, s3) {
-        return encodeURIComponent('<a href="/topic/index?topic=' + s2 + '">' + s1 + '</a>') + s3;
-    });
+        code = code.replace(atre, function (s1, s2, s3) {
+            if ($.inArray(s2, atusers) >= 0) {
+                return encodeURIComponent('<a href="/profile/index?user=' + s2 + '">@' + s2 + '</a>') + s3;
+            }
+            else {
+                return s1;
+            }
+        });
+    }
+
+    if (!isNullOrEmpty(topics)) {
+        // autolink #topic#
+        strRegex = "#([0-9a-z_\\-]+)#(\\s|$)";
+        var topicre = new RegExp(strRegex, "gi");
+
+        code = code.replace(topicre, function (s1, s2, s3) {
+            if ($.inArray(s2, topics) >= 0) {
+                return encodeURIComponent('<a href="/topic/index?topic=' + s2 + '">#' + s2 + '#</a>') + s3;
+            }
+            else {
+                return s1;
+            }
+        });
+    }
 
     code = code.replace(/&/mg, '&#38;');
     code = code.replace(/</mg, '&#60;');
@@ -479,15 +496,18 @@ function LoadFeeds(category, id) {
 
 function CreateFeed(postData) {
     var output = "";
-    var user = postData.User.Userid;
     var mid = postData.ID;
     var sid = postData.SchemaID;
     var eid = postData.EventID;
     var msg = postData.MessageContent;
     var posttime = postData.PostTime;
+    var user = postData.User.Userid;
     var username = postData.User.DisplayName;
     var picurl = postData.User.PortraitUrl;
     var userdesp = postData.User.Description;
+    var owners = postData.Owner;
+    var atusers = postData.AtUser;
+    var topics = postData.TopicName;
     var showevents = false;
 
     //alert(user);
@@ -509,14 +529,26 @@ function CreateFeed(postData) {
     output += "        <img class='img-rounded' id='user_pic_" + mid + "' src='" + picurl + "' width='100' height='100' />";
     output += "      </div>";
     output += "      <div class='feed-content'>";
-    output += "        <div class='newpost-header'><a id='username_" + mid + "' class='fullname' href='/profile/index?user=" + user + "'>" + username + "</a>";
-    output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span></div>";
-    output += "        <div class='newpost-input'>" + encodeHtml(msg) + "</div>";
+    output += "        <div class='newpost-header'>";
+    output += "          <a id='username_" + mid + "' class='fullname' href='/profile/index?user=" + user + "'>" + username + "</a>&nbsp;";
+    output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
+    output += "        </div>";
+
+    if (!isNullOrEmpty(owners)) {
+        output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
+        for (var owner in owners) {
+            output += "  <a href='/profile/index?user=" + owner + "'>@" + owner + "</a>&nbsp;";
+        }
+        output += "    </div>";
+    }
+
+    output += "        <div class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
     output += "        <div class='newpost-footer'>";
 
     if (showevents) {
         output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
     }
+
     output += "          <button id='btn_showreply' class='btn btn-link btn-sm' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
     output += "        </div>";
     output += "      </div>";
@@ -971,6 +1003,11 @@ function UpdateNotificationCount() {
             $("#shortcut_ownerline_count").html(ownerlineCount);
             $("#shortcut_notification_count").html(notificationCount);
 
+            if (homelineCount > 0)
+                $("#nav_home_count").html(homelineCount);
+            else
+                $("#nav_home_count").html("");
+
             if (notificationCount > 0)
                 $("#nav_notification_count").html(notificationCount);
             else
@@ -997,7 +1034,7 @@ function LoadHotTopics() {
     $.ajax({
         type: "GET",
         url: apiurl,
-        data : "count=10",
+        data: "count=10",
         dataType: "json",
         success: function (data) {
             // create hot topic

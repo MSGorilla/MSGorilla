@@ -23,11 +23,13 @@
                 <ul class="nav navbar-nav">
                     @if (ViewBag.Title == "Home")
                     {
-                        <li class="active">@Html.ActionLink("⌂ Home", "Index", "Home")</li>
+                        @*<li class="active">@Html.ActionLink("⌂ Home", "Index", "Home")</li>*@
+                        <li class="active"><a href="/Home">⌂ Home <span class="badge" id="nav_home_count"></span></a></li>
                     }
                     else
                     {
-                        <li>@Html.ActionLink("⌂ Home", "Index", "Home")</li>
+                        @*<li>@Html.ActionLink("⌂ Home", "Index", "Home")</li>*@
+                        <li><a href="/Home">⌂ Home <span class="badge" id="nav_home_count"></span></a></li>
                     }
                     @if (ViewBag.Title == "Notifications")
                     {

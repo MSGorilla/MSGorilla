@@ -426,39 +426,33 @@ namespace MSGorilla.Library
                 throw new InvalidIDException("Event");
             }
 
-            //merge userid
-            UserProfile temp;
+            //merge userid from argument as well as message
+            HashSet<string> validAtUsers = new HashSet<string>();
             HashSet<string> atUserids = new HashSet<string>();
-            foreach(string uid in Utils.GetAtUserid(message))
-            {
-                temp = _accManager.FindUser(uid);
-                if(temp != null){
-                    atUserids.Add(temp.Userid);
-                }
-            }
+            atUserids.UnionWith(Utils.GetAtUserid(message));
             if (atUser != null)
             {
-                foreach (string uid in atUser)
+                atUserids.UnionWith(atUser);
+            }
+            foreach (string uid in atUserids)
+            {
+                var temp = _accManager.FindUser(uid);
+                if(temp != null)
                 {
-                    temp = _accManager.FindUser(uid);
-                    if (temp != null)
-                    {
-                        atUserids.Add(temp.Userid);
-                    }
+                    validAtUsers.Add(temp.Userid);
                 }
             }
 
             //merge topic from argument as well as message
-            HashSet<string> topic = new HashSet<string>(Utils.GetTopicNames(message));
+            HashSet<string> topic = new HashSet<string>();
+            topic.UnionWith(Utils.GetTopicNames(message));
             if (topicName != null)
             {
-                foreach (string t in topicName)
-                {
-                    topic.Add(t);
-                }
+                topic.UnionWith(topicName);
             }
 
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, atUser, topic.ToArray());
+            // create message
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray());
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);

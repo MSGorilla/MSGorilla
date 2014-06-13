@@ -156,18 +156,12 @@ namespace MSGorilla.Library
                 return AtUser;
             }
          
-            message = message.Replace("\r\n", "\n");
-            Regex r = new Regex(@"^@([0-9a-z_\\-]+)$");
+            Regex r = new Regex(@"@([0-9a-z_\-]+)(\s|$)", RegexOptions.IgnoreCase);
+            MatchCollection matches = r.Matches(message);
 
-            foreach (string line in message.Split('\n'))
+            foreach (Match m in matches)
             {
-                foreach (string word in line.Split(' '))
-                {
-                    if (r.IsMatch(word))
-                    {
-                        AtUser.Add(word.Replace("@", ""));
-                    }
-                }
+                AtUser.Add(m.Value.Replace("@","").Trim());
             }
 
             return AtUser;
@@ -181,19 +175,14 @@ namespace MSGorilla.Library
                 return topicNames;
             }
 
-            message = message.Replace("\r\n", "\n");
-            Regex r = new Regex(@"^#([0-9a-z_\\-]+)#$");
+            Regex r = new Regex(@"#([0-9a-z_\\-]+)#(\s|$)", RegexOptions.IgnoreCase);
+            MatchCollection matches = r.Matches(message);
 
-            foreach (string line in message.Split('\n'))
+            foreach (Match m in matches)
             {
-                foreach (string word in line.Split(' '))
-                {
-                    if (r.IsMatch(word))
-                    {
-                        topicNames.Add(word.Replace("#", ""));
-                    }
-                }
+                topicNames.Add(m.Value.Replace("#", "").Trim());
             }
+
             return topicNames;
         }
     }
