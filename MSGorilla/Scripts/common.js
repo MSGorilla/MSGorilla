@@ -3,7 +3,6 @@ function isValidForKey(c) {
     if ((c >= 'a' && c <= 'z')
         || (c >= '0' && c <= '9')
         || (c >= 'A' && c <= 'Z')
-        || c == '_'
         || c == '-')
         return true;
     else
@@ -11,7 +10,7 @@ function isValidForKey(c) {
 }
 
 function encodeEmail(code) {
-    code = code.replace('@', '-');
+    code = code.replace('@', '_');
     code = code.replace('.', '_');
     return code;
 }
@@ -34,7 +33,7 @@ function encodeHtml(code, atusers, topics) {
 
     if (!isNullOrEmpty(atusers)) {
         // autolink @user
-        strRegex = "@([0-9a-z_\\-]+)(\\s|$)";
+        strRegex = "@([0-9a-z\\-]+)(\\s|$)";
         var atre = new RegExp(strRegex, "gi");
 
         code = code.replace(atre, function (s1, s2, s3) {
@@ -49,7 +48,7 @@ function encodeHtml(code, atusers, topics) {
 
     if (!isNullOrEmpty(topics)) {
         // autolink #topic#
-        strRegex = "#([0-9a-z_\\-]+)#(\\s|$)";
+        strRegex = "#([0-9a-z\\-]+)#(\\s|$)";
         var topicre = new RegExp(strRegex, "gi");
 
         code = code.replace(topicre, function (s1, s2, s3) {
@@ -130,11 +129,14 @@ function Time2Now(datestring) {
 
 
 /* show message function */
-function ShowError(msg) {
+function ShowError(msg, boxno) {
     var msghtml = "<div class='alert alert-dismissable alert-warning'><button class='close' type='button' data-dismiss='alert'>×</button><p>" + msg + "</p></div>";
     $("#notifications").append(msghtml);
-
-    $("#loading_message").html(msg);
+    if (isNullOrEmpty(boxno)) {
+        $("#loading_message").html(msg);
+    } else {
+        $("#loading_message_"+boxno).html(msg);
+    }
 }
 
 
@@ -487,6 +489,8 @@ function LoadFeeds(category, id) {
                 $("#lbl_seemore").html("<span class='spinner-loading'></span> Loading more...");
                 $("#hd_token").val(nexttoken);
             }
+
+            UpdateNotificationCount();
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowError(textStatus + ": " + errorThrown);
@@ -536,8 +540,8 @@ function CreateFeed(postData) {
 
     if (!isNullOrEmpty(owners)) {
         output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
-        for (var owner in owners) {
-            output += "  <a href='/profile/index?user=" + owner + "'>@" + owner + "</a>&nbsp;";
+        for (var key in owners) {
+            output += "  <a href='/profile/index?user=" + owners[key] + "'>@" + owners[key] + "</a>&nbsp;";
         }
         output += "    </div>";
     }
@@ -619,6 +623,8 @@ function LoadReplyFeeds(category) {
                 $("#lbl_seemore").html("<span class='spinner-loading'></span> Loading more...");
                 $("#hd_token").val(nexttoken);
             }
+
+            UpdateNotificationCount();
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowError(textStatus + ": " + errorThrown);
@@ -793,15 +799,18 @@ function ShowEvents(mid, eid) {
 
 function CreateEvent(postData, isHeighlight) {
     var output = "";
-    var user = postData.User.Userid;
     var mid = postData.ID;
     var sid = postData.SchemaID;
     var eid = postData.EventID;
     var msg = postData.MessageContent;
     var posttime = postData.PostTime;
+    var user = postData.User.Userid;
     var username = postData.User.DisplayName;
     var picurl = postData.User.PortraitUrl;
     var userdesp = postData.User.Description;
+    var owners = postData.Owner;
+    var atusers = postData.AtUser;
+    var topics = postData.TopicName;
 
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";
@@ -819,6 +828,15 @@ function CreateEvent(postData, isHeighlight) {
     output += "      <div class='feed-content'>";
     output += "        <div class='newpost-header'><a id='event_username_" + eid + "' class='fullname' href='/profile/index?user=" + user + "'>" + username + "</a>";
     output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span></div>";
+
+    if (!isNullOrEmpty(owners)) {
+        output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
+        for (var key in owners) {
+            output += "  <a href='/profile/index?user=" + owners[key] + "'>@" + owners[key] + "</a>&nbsp;";
+        }
+        output += "    </div>";
+    }
+
     output += "        <div class='newpost-input'>" + encodeHtml(msg) + "</div>";
     //output += "        <div class='newpost-footer'>";
     //output += "          <button id='btn_reply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Comments</button>";
@@ -886,7 +904,7 @@ function SearchUser(keyword) {
         dataType: "json",
         success: function (data) {
             if (data.length == 0) {
-                ShowError("No content.");
+                ShowError("No content.", "1");
             }
             else {
                 // create user list
@@ -899,7 +917,7 @@ function SearchUser(keyword) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowError(textStatus + ": " + errorThrown, "1");
         }
     });
 }
@@ -1021,7 +1039,6 @@ function UpdateNotificationCount() {
 
 // notification count function
 function SetNotificationCount() {
-    //var apiurl = "/api/account/getnotificationcount";
     UpdateNotificationCount();
     var timer = $.timer(UpdateNotificationCount, 30000, true);
 }
