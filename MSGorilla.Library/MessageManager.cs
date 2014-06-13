@@ -426,7 +426,39 @@ namespace MSGorilla.Library
                 throw new InvalidIDException("Event");
             }
 
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, atUser, topicName);
+            //merge userid
+            UserProfile temp;
+            HashSet<string> atUserids = new HashSet<string>();
+            foreach(string uid in Utils.GetAtUserid(message))
+            {
+                temp = _accManager.FindUser(uid);
+                if(temp != null){
+                    atUserids.Add(temp.Userid);
+                }
+            }
+            if (atUser != null)
+            {
+                foreach (string uid in atUser)
+                {
+                    temp = _accManager.FindUser(uid);
+                    if (temp != null)
+                    {
+                        atUserids.Add(temp.Userid);
+                    }
+                }
+            }
+
+            //merge topic from argument as well as message
+            HashSet<string> topic = new HashSet<string>(Utils.GetTopicNames(message));
+            if (topicName != null)
+            {
+                foreach (string t in topicName)
+                {
+                    topic.Add(t);
+                }
+            }
+
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, atUser, topic.ToArray());
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);
@@ -456,46 +488,43 @@ namespace MSGorilla.Library
             _publicSquareLine.Execute(insertOperation);
  
             //insert into Atline
-            List<string> AtUser = Utils.GetAtUserid(message.MessageContent);
             if (message.AtUser != null)
             {
-                AtUser = AtUser.Concat(message.AtUser).ToList();
-            }
-            foreach (string atUserid in AtUser)
-            {
-                UserProfile user = _accManager.FindUser(atUserid);
-                if (user != null)
+                foreach (string atUserid in message.AtUser)
                 {
-                    insertOperation = TableOperation.InsertOrReplace(new AtLineEntity(user.Userid, message));
-                    _atline.Execute(insertOperation);
+                    UserProfile user = _accManager.FindUser(atUserid);
+                    if (user != null)
+                    {
+                        insertOperation = TableOperation.InsertOrReplace(new AtLineEntity(user.Userid, message));
+                        _atline.Execute(insertOperation);
 
-                    _notifManager.incrementAtlineNotifCount(user.Userid);
+                        _notifManager.incrementAtlineNotifCount(user.Userid);
+                    }
+                }
+            }            
+            
+            //insert into Topicline
+            if (message.TopicName != null)
+            {
+                foreach (string topicName in message.TopicName)
+                {
+                    Topic topic = _topicManager.FindTopicByName(topicName);
+                    if (topic == null)
+                    {
+                        topic = new Topic();
+                        topic.Name = topicName;
+                        topic.MsgCount = 0;
+                        _topicManager.AddTopic(topic);
+                        topic = _topicManager.FindTopicByName(topicName);
+                    }
+
+                    insertOperation = TableOperation.InsertOrReplace(new TopicLine(message, topic.Id.ToString()));
+                    _topicline.Execute(insertOperation);
+
+                    _topicManager.incrementTopicCount(topic.Id);
                 }
             }
             
-            //insert into Topicline
-            List<string> topicNames = Utils.GetTopicNames(message.MessageContent);
-            if (message.TopicName != null)
-            {
-                topicNames = topicNames.Concat(message.TopicName).ToList();
-            }
-            foreach (string topicName in topicNames)
-            {
-                Topic topic = _topicManager.FindTopicByName(topicName);
-                if (topic == null)
-                {
-                    topic = new Topic();
-                    topic.Name = topicName;
-                    topic.MsgCount = 0;
-                    _topicManager.AddTopic(topic);
-                    topic = _topicManager.FindTopicByName(topicName);
-                }
-
-                insertOperation = TableOperation.InsertOrReplace(new TopicLine(message, topic.Id.ToString()));
-                _topicline.Execute(insertOperation);
-
-                _topicManager.incrementTopicCount(topic.Id);
-            }
             
             //todo:
             //The Userid of owner and AtUser may be ms alais or displayname instead of the
