@@ -71,7 +71,7 @@ namespace MSGorilla.WebAPI.Client
             return sb.ToString();
         }
 
-        public string PostMessage(string message, string schemaID = "none", string eventID = "none", string topicID = "none", string[] owner = null, string[] atUser = null)
+        public string PostMessage(string message, string schemaID = "none", string eventID = "none", string[] topicName = null, string[] owner = null, string[] atUser = null)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + Constant.UriPostMessage);
             request.Method = "POST";
@@ -82,6 +82,7 @@ namespace MSGorilla.WebAPI.Client
             {
                 var ownerStr = "";
                 var atUserStr = "";
+                var topicNameStr = "";
                 if (owner != null)
                 {
                     ownerStr = "&owner=" + string.Join("&owner=", owner); 
@@ -90,8 +91,12 @@ namespace MSGorilla.WebAPI.Client
                 {
                     atUserStr = "&atUser=" + string.Join("&atUser=", atUser) ;
                 }
+                if (topicName != null)
+                {
+                    topicNameStr = "&topicName=" + string.Join("&topicName=", topicName);
+                }
 
-                writer.Write(string.Format("Message={0}&SchemaID={1}&EventID={2}&TopicID={3}{4}{5}", message, schemaID, eventID, topicID, ownerStr, atUserStr));
+                writer.Write(string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}", message, schemaID, eventID, topicNameStr, ownerStr, atUserStr));
             }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return _readResponseContent(response);
