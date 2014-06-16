@@ -233,5 +233,39 @@ namespace MSGorilla.Library
                 }
             }
         }
+
+        public void AddFavouriteTopic(string userid, int topicID)
+        {
+            using(var _gorillaCtx = new MSGorillaContext())
+            {
+                if (_gorillaCtx.Users.Find(userid) == null)
+                {
+                    return;
+                }
+                if (_gorillaCtx.Topics.Find(topicID) == null)
+                {
+                    return;
+                }
+                if (_gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).Count() == 0)
+                {
+                    FavouriteTopic ftopic = new FavouriteTopic();
+                    ftopic.TopicID = topicID;
+                    ftopic.Userid = userid;
+                    ftopic.UnreadMsgCount = 0;
+                    _gorillaCtx.favouriteTopic.Add(ftopic);
+                    _gorillaCtx.SaveChanges();
+                }
+            }            
+        }
+
+        public void DeleteFavouriteTopic(string userid, int topicID)
+        {
+            using (var _gorillaCtx = new MSGorillaContext())
+            {
+                List<FavouriteTopic> finds = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).ToList();
+                _gorillaCtx.favouriteTopic.RemoveRange(finds);
+                _gorillaCtx.SaveChanges();
+            }
+        }
     }
 }

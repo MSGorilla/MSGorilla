@@ -92,6 +92,10 @@
     <Compile Include="Migrations\201406050724557_AddNotifAndTopic.Designer.cs">
       <DependentUpon>201406050724557_AddNotifAndTopic.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201406160753225_AddFavourateTopic.cs" />
+    <Compile Include="Migrations\201406160753225_AddFavourateTopic.Designer.cs">
+      <DependentUpon>201406160753225_AddFavourateTopic.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActionResult.cs" />
     <Compile Include="Models\AzureModels\Entity\AtLineEntity.cs" />
@@ -107,6 +111,7 @@
     <Compile Include="Models\AzureModels\Entity\UserLineEntity.cs" />
     <Compile Include="Models\AzureModels\Queue\QueueMessage.cs" />
     <Compile Include="Models\Reply.cs" />
+    <Compile Include="Models\SqlModels\FavouriteTopic.cs" />
     <Compile Include="Models\SqlModels\Group.cs" />
     <Compile Include="Models\SqlModels\Membership.cs" />
     <Compile Include="Models\SqlModels\NotificationCount.cs" />
@@ -143,6 +148,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201406050724557_AddNotifAndTopic.resx">
       <DependentUpon>201406050724557_AddNotifAndTopic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201406160753225_AddFavourateTopic.resx">
+      <DependentUpon>201406160753225_AddFavourateTopic.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
