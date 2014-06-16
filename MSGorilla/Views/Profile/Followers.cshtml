@@ -50,7 +50,7 @@
                 <span class="help-block">Followers</span>
             </div>
             <ul id="userlist" class="userlist-group">
-                <li class="center-block txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+                <li id="loading_message" class="center-block txtaln-c"><span class="spinner-loading"></span> Loading...</li>
                 @*autofill by js*@
             </ul>
             <div class="clearfix"></div>
@@ -67,6 +67,7 @@
         {
             @Html.Partial("_MePartial")
         }
+        @Html.Partial("_ShortcutPartial")
     </div>
 
 </div>

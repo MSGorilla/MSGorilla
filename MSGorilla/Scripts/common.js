@@ -3,7 +3,6 @@ function isValidForKey(c) {
     if ((c >= 'a' && c <= 'z')
         || (c >= '0' && c <= '9')
         || (c >= 'A' && c <= 'Z')
-        || c == '_'
         || c == '-')
         return true;
     else
@@ -11,7 +10,7 @@ function isValidForKey(c) {
 }
 
 function encodeEmail(code) {
-    code = code.replace('@', '-');
+    code = code.replace('@', '_');
     code = code.replace('.', '_');
     return code;
 }
@@ -34,7 +33,7 @@ function encodeHtml(code, atusers, topics) {
 
     if (!isNullOrEmpty(atusers)) {
         // autolink @user
-        strRegex = "@([0-9a-z_\\-]+)(\\s|$)";
+        strRegex = "@([0-9a-z\\-]+)(\\s|$)";
         var atre = new RegExp(strRegex, "gi");
 
         code = code.replace(atre, function (s1, s2, s3) {
@@ -49,7 +48,7 @@ function encodeHtml(code, atusers, topics) {
 
     if (!isNullOrEmpty(topics)) {
         // autolink #topic#
-        strRegex = "#([0-9a-z_\\-]+)#(\\s|$)";
+        strRegex = "#([0-9a-z\\-]+)#(\\s|$)";
         var topicre = new RegExp(strRegex, "gi");
 
         code = code.replace(topicre, function (s1, s2, s3) {
@@ -130,11 +129,14 @@ function Time2Now(datestring) {
 
 
 /* show message function */
-function ShowError(msg) {
+function ShowError(msg, boxno) {
     var msghtml = "<div class='alert alert-dismissable alert-warning'><button class='close' type='button' data-dismiss='alert'>×</button><p>" + msg + "</p></div>";
     $("#notifications").append(msghtml);
-
-    $("#loading_message").html(msg);
+    if (isNullOrEmpty(boxno)) {
+        $("#loading_message").html(msg);
+    } else {
+        $("#loading_message_" + boxno).html(msg);
+    }
 }
 
 
@@ -401,14 +403,23 @@ function PostReply(user, mid) {
 function LoadFeeds(category, id) {
     var apiurl = "";
     var apidata = "";
+    var count = 0;
     if (isNullOrEmpty(category))
         apiurl = "/api/message/userline";
-    else if (category == "homeline")
+    else if (category == "homeline") {
         apiurl = "/api/message/homeline";
-    else if (category == "atline")
+        count = GetNotificationCount(category);
+    }
+    else if (category == "atline") {
         apiurl = "/api/message/atline";
-    else if (category == "ownerline")
+        count = GetNotificationCount(category);
+        if (count > 25) apidata = "count=" + count;
+    }
+    else if (category == "ownerline") {
         apiurl = "/api/message/ownerline";
+        count = GetNotificationCount(category);
+        if (count > 25) apidata = "count=" + count;
+    }
     else if (category == "publicsquareline")
         apiurl = "/api/message/publicsquareline";
     else if (category == "userline") {
@@ -427,8 +438,11 @@ function LoadFeeds(category, id) {
         }
         apidata = "topic=" + id;
     }
-    else if (category == "replyline")
-        return LoadReplyFeeds(category);
+    else if (category == "replyline") {
+        apiurl = "/api/reply/getmyreply";
+        count = GetNotificationCount(category);
+        if (count > 25) apidata = "count=" + count;
+    }
     else {
         ShowError("Illegal operation.");
         return;
@@ -461,7 +475,10 @@ function LoadFeeds(category, id) {
             }
             else {
                 nexttoken = data.continuationToken
-                data = data.message
+                if (category == "replyline")
+                    data = data.reply;
+                else
+                    data = data.message
                 //ShowError(data);
                 if (data.length == 0) {
                     ShowError("No content.");
@@ -473,9 +490,15 @@ function LoadFeeds(category, id) {
                         $("#feedlist").empty();
                     }
                     $.each(data, function (index, item) {
-                        $("#feedlist").append(CreateFeed(item));
+                        var isNew = false;
+                        if (index < count) {
+                            isNew = true;
+                        }
+                        if (category == "replyline")
+                            $("#feedlist").append(CreateReply(item, true, isNew));
+                        else
+                            $("#feedlist").append(CreateFeed(item, isNew));
                     })
-
                 }
             }
 
@@ -487,6 +510,8 @@ function LoadFeeds(category, id) {
                 $("#lbl_seemore").html("<span class='spinner-loading'></span> Loading more...");
                 $("#hd_token").val(nexttoken);
             }
+
+            UpdateNotificationCount();
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowError(textStatus + ": " + errorThrown);
@@ -494,7 +519,7 @@ function LoadFeeds(category, id) {
     });
 }
 
-function CreateFeed(postData) {
+function CreateFeed(postData, isNew) {
     var output = "";
     var mid = postData.ID;
     var sid = postData.SchemaID;
@@ -522,8 +547,12 @@ function CreateFeed(postData) {
     }
 
     //output += "<ul class='list-group'>";
-
-    output += "  <li class='list-group-item'>";
+    if (isNew == true) {
+        output += "  <li class='list-group-item new-notification'>";
+    }
+    else {
+        output += "  <li class='list-group-item'>";
+    }
     output += "    <div>"
     output += "      <div class='feed-pic'>";
     output += "        <img class='img-rounded' id='user_pic_" + mid + "' src='" + picurl + "' width='100' height='100' />";
@@ -536,8 +565,8 @@ function CreateFeed(postData) {
 
     if (!isNullOrEmpty(owners)) {
         output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
-        for (var owner in owners) {
-            output += "  <a href='/profile/index?user=" + owner + "'>@" + owner + "</a>&nbsp;";
+        for (var key in owners) {
+            output += "  <a href='/profile/index?user=" + owners[key] + "'>@" + owners[key] + "</a>&nbsp;";
         }
         output += "    </div>";
     }
@@ -546,10 +575,11 @@ function CreateFeed(postData) {
     output += "        <div class='newpost-footer'>";
 
     if (showevents) {
-        output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
+        // event button
+        //output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
     }
 
-    output += "          <button id='btn_showreply' class='btn btn-link btn-sm' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
+    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Expand</button>";
     output += "        </div>";
     output += "      </div>";
     output += "    </div>";
@@ -562,79 +592,17 @@ function CreateFeed(postData) {
     return output;
 }
 
-function LoadReplyFeeds(category) {
-    var apiurl = "";
-    var apidata = "";
-    if (category == "replyline")
-        apiurl = "/api/reply/getmyreply";
-    else {
-        ShowError("Illegal operation.");
-        return;
-    }
-
-    var token = $("#hd_token").val();
-    if (!isNullOrEmpty(token)) {
-        if (token == "nomore") {
-            // already no more feeds, don't load any more
-            return;
-        }
-
-        if (isNullOrEmpty(apidata)) {
-            apidata = "token=" + token;
-        }
-        else {
-            apidata += "&token=" + token;
-        }
-    }
-
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        dataType: "json",
-        data: apidata,
-        success: function (data) {
-            nexttoken = data.continuationToken
-            data = data.reply
-            //ShowError(data);
-            if (data.length == 0) {
-                ShowError("No content.");
-            }
-            else {
-                // create feed list
-                if (isNullOrEmpty(token)) {
-                    // clear feeds at the first time 
-                    $("#feedlist").empty();
-                }
-                $.each(data, function (index, item) {
-                    $("#feedlist").append(CreateReply(item, true));
-                })
-
-            }
-
-            if (isNullOrEmpty(nexttoken)) {
-                $("#lbl_seemore").html("");
-                $("#hd_token").val("nomore");
-            }
-            else {
-                $("#lbl_seemore").html("<span class='spinner-loading'></span> Loading more...");
-                $("#hd_token").val(nexttoken);
-            }
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
-        }
-    });
-}
-
 
 // reply function
 function ShowReplies(user, mid) {
-    var show = $("#isshowreplies_" + mid);
+    var showbtn = $("#btn_showreply_" + mid);
+    var show = showbtn.attr("isshow");
     var replydiv = $("#reply_" + mid);
 
-    if (show.val() == "false") {
+    if (show == "false") {
         // show replies
-        show.val("true");
+        showbtn.attr("isshow", "true");
+        showbtn.text("Collapse");
 
         var html = "";
         html = "<div class='replies-container well'>";
@@ -659,7 +627,9 @@ function ShowReplies(user, mid) {
     }
     else {
         // clear replies
-        show.val("false");
+        showbtn.attr("isshow", "false");
+        showbtn.text("Expand");
+
         replydiv.html("");
     }
 }
@@ -682,7 +652,7 @@ function LoadReplies(mid) {
     });
 }
 
-function CreateReply(replyData, isReplyFeed) {
+function CreateReply(replyData, isReplyFeed, isNew) {
     var output = "";
     var user = replyData.FromUser.Userid;
     var username = replyData.FromUser.DisplayName;
@@ -702,7 +672,12 @@ function CreateReply(replyData, isReplyFeed) {
     }
 
     if (isReplyFeed) {
-        output += "<li class='list-group-item clickable' onclick='ShowMessage(\"" + mid + "\", \"" + msguser + "\");'>";
+        if (isNew == true) {
+            output += "<li class='list-group-item clickable new-notification' onclick='ShowMessage(\"" + mid + "\", \"" + msguser + "\");'>";
+        }
+        else {
+            output += "<li class='list-group-item clickable' onclick='ShowMessage(\"" + mid + "\", \"" + msguser + "\");'>";
+        }
     } else {
         output += "<li class='list-group-item clickable' onclick='SetReplyTo(\"" + mid + "\", \"" + user + "\");'>";
     }
@@ -793,15 +768,18 @@ function ShowEvents(mid, eid) {
 
 function CreateEvent(postData, isHeighlight) {
     var output = "";
-    var user = postData.User.Userid;
     var mid = postData.ID;
     var sid = postData.SchemaID;
     var eid = postData.EventID;
     var msg = postData.MessageContent;
     var posttime = postData.PostTime;
+    var user = postData.User.Userid;
     var username = postData.User.DisplayName;
     var picurl = postData.User.PortraitUrl;
     var userdesp = postData.User.Description;
+    var owners = postData.Owner;
+    var atusers = postData.AtUser;
+    var topics = postData.TopicName;
 
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";
@@ -819,6 +797,15 @@ function CreateEvent(postData, isHeighlight) {
     output += "      <div class='feed-content'>";
     output += "        <div class='newpost-header'><a id='event_username_" + eid + "' class='fullname' href='/profile/index?user=" + user + "'>" + username + "</a>";
     output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span></div>";
+
+    if (!isNullOrEmpty(owners)) {
+        output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
+        for (var key in owners) {
+            output += "  <a href='/profile/index?user=" + owners[key] + "'>@" + owners[key] + "</a>&nbsp;";
+        }
+        output += "    </div>";
+    }
+
     output += "        <div class='newpost-input'>" + encodeHtml(msg) + "</div>";
     //output += "        <div class='newpost-footer'>";
     //output += "          <button id='btn_reply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Comments</button>";
@@ -886,7 +873,7 @@ function SearchUser(keyword) {
         dataType: "json",
         success: function (data) {
             if (data.length == 0) {
-                ShowError("No content.");
+                ShowError("No content.", "1");
             }
             else {
                 // create user list
@@ -899,7 +886,7 @@ function SearchUser(keyword) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowError(textStatus + ": " + errorThrown, "1");
         }
     });
 }
@@ -983,6 +970,46 @@ function CreateUserCard(data) {
     return output;
 }
 
+
+// notification count function
+function GetNotificationCount(category) {
+    var count = 0;
+    var apiurl = "/api/account/getnotificationcount";
+    $.ajax({
+        type: "GET",
+        url: apiurl,
+        dataType: "json",
+        async: false,
+        success: function (data) {
+            var homelineCount = data.UnreadHomelineMsgCount;
+            var ownerlineCount = data.UnreadOwnerlineMsgCount;
+            var atlineCount = data.UnreadAtlineMsgCount;
+            var replyCount = data.UnreadReplyCount;
+            var userid = data.Userid;
+            var notificationCount = ownerlineCount + replyCount + atlineCount;
+
+            switch (category) {
+                case "atline":
+                    count = atlineCount;
+                    break;
+                case "ownerline":
+                    count = ownerlineCount;
+                    break;
+                case "replyline":
+                    count = replyCount;
+                    break;
+                case "homeline":
+                    count = homelineCount;
+                    break;
+                default:
+                    break;
+            }
+        },
+    });
+
+    return count;
+}
+
 function UpdateNotificationCount() {
     var apiurl = "/api/account/getnotificationcount";
     $.ajax({
@@ -1019,9 +1046,7 @@ function UpdateNotificationCount() {
     });
 }
 
-// notification count function
 function SetNotificationCount() {
-    //var apiurl = "/api/account/getnotificationcount";
     UpdateNotificationCount();
     var timer = $.timer(UpdateNotificationCount, 30000, true);
 }

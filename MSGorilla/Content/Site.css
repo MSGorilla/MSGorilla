@@ -453,3 +453,10 @@ input[type="checkbox"].input-validation-error {
     .link-line:only-child {
         background-image: none;
     }
+
+.new-notification {
+    background-image: url("/Content/Images/new_flag.png");
+    background-repeat: no-repeat;
+    background-position-x: left;
+    background-position-y: top;
+}
