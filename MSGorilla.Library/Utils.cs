@@ -135,7 +135,7 @@ namespace MSGorilla.Library
             return ret;
         }
 
-        public static UserProfile CreateNewUser(string userid)
+        public static UserProfile CreateNewUser(string userid, string displayName = null)
         {
             if (!IsValidID(userid))
             {
@@ -143,6 +143,10 @@ namespace MSGorilla.Library
             }
             UserProfile userprofile = new UserProfile();
             userprofile.Userid = userprofile.DisplayName = userid;
+            if (displayName != null)
+            {
+                userprofile.DisplayName = displayName;
+            }
             userprofile.Password = null;
             userprofile.FollowersCount = userprofile.FollowingsCount = 0;
             return userprofile;

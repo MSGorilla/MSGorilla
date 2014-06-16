@@ -420,12 +420,12 @@ namespace MSGorilla.Controllers
                     Response.Cookies.Add(myCookie);
                 }
 
-                if (System.Web.HttpContext.Current.User.Identity.IsAuthenticated)
-                {
-                    TokenCacheUtils.RemoveAllFromCache();
-                    HttpContext.GetOwinContext().Authentication.SignOut(
-                        OpenIdConnectAuthenticationDefaults.AuthenticationType, CookieAuthenticationDefaults.AuthenticationType);
-                }
+                //if (System.Web.HttpContext.Current.User.Identity.IsAuthenticated)
+                //{
+                //    TokenCacheUtils.RemoveAllFromCache();
+                //    HttpContext.GetOwinContext().Authentication.SignOut(
+                //        OpenIdConnectAuthenticationDefaults.AuthenticationType, CookieAuthenticationDefaults.AuthenticationType);
+                //}
             }
             catch {}
 
