@@ -3,7 +3,8 @@ function isValidForKey(c) {
     if ((c >= 'a' && c <= 'z')
         || (c >= '0' && c <= '9')
         || (c >= 'A' && c <= 'Z')
-        || c == '-')
+        || c == '-'
+        )
         return true;
     else
         return false;
@@ -31,34 +32,42 @@ function encodeHtml(code, atusers, topics) {
         return encodeURIComponent('<a href="' + s + '">' + s + '</a>');
     });
 
+    // autolink @user
     if (!isNullOrEmpty(atusers)) {
-        // autolink @user
-        strRegex = "@([0-9a-z\\-]+)(\\s|$)";
-        var atre = new RegExp(strRegex, "gi");
+        for (var key in atusers) {
+            code = code.replace("@" + atusers[key], encodeURIComponent('<a href="/profile/index?user=' + encodeURIComponent(atusers[key]) + '">@' + atusers[key] + '</a>'));
+        }
 
-        code = code.replace(atre, function (s1, s2, s3) {
-            if ($.inArray(s2, atusers) >= 0) {
-                return encodeURIComponent('<a href="/profile/index?user=' + s2 + '">@' + s2 + '</a>') + s3;
-            }
-            else {
-                return s1;
-            }
-        });
+        //strRegex = "@([0-9a-z\\-]+)(\\s|$)";
+        //var atre = new RegExp(strRegex, "gi");
+
+        //code = code.replace(atre, function (s1, s2, s3) {
+        //    if ($.inArray(s2, atusers) >= 0) {
+        //        return encodeURIComponent('<a href="/profile/index?user=' + s2 + '">@' + s2 + '</a>') + s3;
+        //    }
+        //    else {
+        //        return s1;
+        //    }
+        //});
     }
 
+    // autolink #topic#
     if (!isNullOrEmpty(topics)) {
-        // autolink #topic#
-        strRegex = "#([0-9a-z\\-]+)#(\\s|$)";
-        var topicre = new RegExp(strRegex, "gi");
+        for (var key in topics) {
+            code = code.replace("#" + topics[key] + "#", encodeURIComponent('<a href="/topic/index?topic=' + encodeURIComponent(topics[key]) + '">#' + topics[key] + '#</a>'));
+        }
 
-        code = code.replace(topicre, function (s1, s2, s3) {
-            if ($.inArray(s2, topics) >= 0) {
-                return encodeURIComponent('<a href="/topic/index?topic=' + s2 + '">#' + s2 + '#</a>') + s3;
-            }
-            else {
-                return s1;
-            }
-        });
+        //strRegex = "#(([\\w \\-]+(#{2,})?)*[\\w \\-]+)#(\\s|$)";
+        //var topicre = new RegExp(strRegex, "gi");
+
+        //code = code.replace(topicre, function (s1, s2, s3, s4,s5,s6,s7) {
+        //    if ($.inArray(s2, topics) >= 0) {
+        //        return encodeURIComponent('<a href="/topic/index?topic=' + s2 + '">#' + s2 + '#</a>') + s5;
+        //    }
+        //    else {
+        //        return s1;
+        //    }
+        //});
     }
 
     code = code.replace(/&/mg, '&#38;');
@@ -178,7 +187,7 @@ function LoadUserInfo(user) {
         apiurl = "/api/account/me";
     }
     else {
-        apiurl = "/api/account/user?userid=" + user;
+        apiurl = "/api/account/user?userid=" + encodeURIComponent(user);
     }
 
     $.ajax({
@@ -300,7 +309,7 @@ function Follow(user) {
     $.ajax({
         type: "GET",
         url: "/api/account/follow",
-        data: "userid=" + user,
+        data: "userid=" + encodeURIComponent(user),
         success: function (data) {
             var code = data.ActionResultCode;
             var msg = data.Message;
@@ -323,7 +332,7 @@ function Unfollow(user) {
     $.ajax({
         type: "GET",
         url: "/api/account/unfollow",
-        data: "userid=" + user,
+        data: "userid=" + encodeURIComponent(user),
         success: function (data) {
             var code = data.ActionResultCode;
             var msg = data.Message;
@@ -428,7 +437,7 @@ function LoadFeeds(category, id) {
             ShowError("Illegal operation.");
             return;
         }
-        apidata = "userid=" + id;
+        apidata = "userid=" + encodeURIComponent(id);
     }
     else if (category == "topicline") {
         apiurl = "/api/message/topicline";
@@ -436,7 +445,7 @@ function LoadFeeds(category, id) {
             ShowError("Illegal operation.");
             return;
         }
-        apidata = "topic=" + id;
+        apidata = "topic=" + encodeURIComponent(id);
     }
     else if (category == "replyline") {
         apiurl = "/api/reply/getmyreply";
@@ -559,14 +568,14 @@ function CreateFeed(postData, isNew) {
     output += "      </div>";
     output += "      <div class='feed-content'>";
     output += "        <div class='newpost-header'>";
-    output += "          <a id='username_" + mid + "' class='fullname' href='/profile/index?user=" + user + "'>" + username + "</a>&nbsp;";
+    output += "          <a id='username_" + mid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>&nbsp;";
     output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
     output += "        </div>";
 
     if (!isNullOrEmpty(owners)) {
         output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
         for (var key in owners) {
-            output += "  <a href='/profile/index?user=" + owners[key] + "'>@" + owners[key] + "</a>&nbsp;";
+            output += "  <a href='/profile/index?user=" + encodeURIComponent(owners[key]) + "'>@" + owners[key] + "</a>&nbsp;";
         }
         output += "    </div>";
     }
@@ -688,11 +697,11 @@ function CreateReply(replyData, isReplyFeed, isNew) {
     output += "    </div>";
     output += "    <div class='reply-content'>";
     output += "      <div class='reply-header'>"
-    output += "        <a id='reply_username_" + rid + "' class='fullname' href='/profile/index?user=" + user + "'>" + username + "</a>";
+    output += "        <a id='reply_username_" + rid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>";
     output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
     output += "      </div>";
     output += "      <div class='reply-input'>";
-    output += "        <a id='reply_tousername_" + rid + "' href='/profile/index?user=" + touser + "'>@" + touser + "</a>&nbsp;";
+    output += "        <a id='reply_tousername_" + rid + "' href='/profile/index?user=" + encodeURIComponent(touser) + "'>@" + touser + "</a>&nbsp;";
     output += "        " + encodeHtml(msg);
     output += "      </div>";
     output += "    </div>";
@@ -722,7 +731,7 @@ function ShowMessage(mid, user) {
     $.ajax({
         type: "GET",
         url: "/api/message/getdisplaymessage",
-        data: "msgUser=" + user + "&msgID=" + mid,
+        data: "msgUser=" + encodeURIComponent(user) + "&msgID=" + encodeURIComponent(mid),
         success: function (data) {
             message_div.empty();
             // create message
@@ -747,7 +756,7 @@ function ShowEvents(mid, eid) {
     $.ajax({
         type: "GET",
         url: "/api/message/eventline",
-        data: "eventID=" + eid,
+        data: "eventID=" + encodeURIComponent(eid),
         success: function (data) {
             events_div.empty();
             // create events list
@@ -795,13 +804,13 @@ function CreateEvent(postData, isHeighlight) {
     output += "        <img class='img-rounded' id='event_user_pic_" + eid + "' src='" + picurl + "' width='100' height='100' />";
     output += "      </div>";
     output += "      <div class='feed-content'>";
-    output += "        <div class='newpost-header'><a id='event_username_" + eid + "' class='fullname' href='/profile/index?user=" + user + "'>" + username + "</a>";
+    output += "        <div class='newpost-header'><a id='event_username_" + eid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>";
     output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span></div>";
 
     if (!isNullOrEmpty(owners)) {
         output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
         for (var key in owners) {
-            output += "  <a href='/profile/index?user=" + owners[key] + "'>@" + owners[key] + "</a>&nbsp;";
+            output += "  <a href='/profile/index?user=" + encodeURIComponent(owners[key]) + "'>@" + owners[key] + "</a>&nbsp;";
         }
         output += "    </div>";
     }
@@ -823,14 +832,18 @@ function CreateEvent(postData, isHeighlight) {
 // search function
 function SearchTopic(keyword) {
     var apiurl = "";
+    var apidata = "";
     if (isNullOrEmpty(keyword))
         apiurl = "/api/topic/getalltopic";
-    else
-        apiurl = "/api/topic/searchtopic?keyword=" + keyword;
+    else {
+        apiurl = "/api/topic/searchtopic";
+        apidata = "keyword=" + encodeURIComponent(keyword);
+    }
 
     $.ajax({
         type: "GET",
         url: apiurl,
+        data: apidata,
         dataType: "json",
         success: function (data) {
             if (data.length == 0) {
@@ -845,7 +858,7 @@ function SearchTopic(keyword) {
                     var topicdesp = item.Description;
                     var topiccount = item.MsgCount;
 
-                    output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + topicname + "'>#" + topicname + "# <span class='badge'>" + topiccount + "</span></a>";
+                    output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "# <span class='badge'>" + topiccount + "</span></a>";
                     $("#topiclist").append(output);
 
                     if (index == 0) {
@@ -862,14 +875,18 @@ function SearchTopic(keyword) {
 
 function SearchUser(keyword) {
     var apiurl = "";
+    var apidata = "";
     if (isNullOrEmpty(keyword))
         apiurl = "/api/account/user";
-    else
-        apiurl = "/api/account/searchuser?keyword=" + keyword;
+    else {
+        apiurl = "/api/account/searchuser";
+        apidata = "keyword=" + encodeURIComponent(keyword);
+    }
 
     $.ajax({
         type: "GET",
         url: apiurl,
+        data: apidata,
         dataType: "json",
         success: function (data) {
             if (data.length == 0) {
@@ -906,7 +923,7 @@ function LoadUsers(category, user) {
     }
 
     if (!isNullOrEmpty(user)) {
-        apidata = "userid=" + user;
+        apidata = "userid=" + encodeURIComponent(user);
     }
 
     $.ajax({
@@ -954,7 +971,7 @@ function CreateUserCard(data) {
            + "        <img class='img-rounded' id='user_pic_" + encodeEmail(userid) + "' src='" + picurl + "' width='100' height='100' />"
            + "      </div>"
            + "      <div>"
-           + "        <a class='' id='user_name_" + encodeEmail(userid) + "' href='/profile/index?user=" + userid + "'>" + username + "</a>"
+           + "        <a class='' id='user_name_" + encodeEmail(userid) + "' href='/profile/index?user=" + encodeURIComponent(userid) + "'>" + username + "</a>"
            + "      </div>"
            + "      <div>"
            + "        <span id='user_id_" + encodeEmail(userid) + "'>@" + userid + "</span>"
@@ -1073,7 +1090,7 @@ function LoadHotTopics() {
 
                 output += "<li class='sub-list-group-item'>";
                 output += "  <span class='badge'>" + topiccount + "</span>";
-                output += "  <a href='/topic/index?topic=" + topicname + "'>#" + topicname + "#</a>";
+                output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
                 output += "</li>";
                 $("#shortcut_topic_collapse").append(output);
             })
