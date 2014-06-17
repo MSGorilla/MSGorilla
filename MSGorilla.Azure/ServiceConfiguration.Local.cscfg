@@ -27,7 +27,7 @@
     </ConfigurationSettings>
     <Certificates>
       <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="3D5300F6333137F4F3E24D5B8D0E4ECCB54104A0" thumbprintAlgorithm="sha1" />
-      <Certificate name="Msgorilla" thumbprint="D0433E4AF525A9F6B700882BC19D38B1618980D2" thumbprintAlgorithm="sha1" />
+      <Certificate name="Msgorilla" thumbprint="79688BB9D583499509BC0E6201E215FE4B3BB4D7" thumbprintAlgorithm="sha1" />
     </Certificates>
   </Role>
 </ServiceConfiguration>
