@@ -19,6 +19,6 @@
     <AzureStorageAccountName>msgorilla</AzureStorageAccountName>
     <AzureAppendTimestampToDeploymentLabel>True</AzureAppendTimestampToDeploymentLabel>
     <EnableRemoteDebugger>True</EnableRemoteDebugger>
-    <RemoteDebuggerConnectorCertificateThumbprint>1892B69F291D7824789D34BE3CEF6DBA610D8BBC</RemoteDebuggerConnectorCertificateThumbprint>
+    <RemoteDebuggerConnectorCertificateThumbprint>3119265354433AB0FEA4BEEDDDC19F271F3F80E9</RemoteDebuggerConnectorCertificateThumbprint>
   </PropertyGroup>
 </Project>
