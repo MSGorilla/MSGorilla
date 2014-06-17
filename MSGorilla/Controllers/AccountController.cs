@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Configuration;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
@@ -434,7 +435,7 @@ namespace MSGorilla.Controllers
 
         public RedirectResult SignIn()
         {
-            return Redirect("https://corp.sts.microsoft.com/adfs/ls/?wa=wsignin1.0&wtrealm=https://msgorilla_dev/&wctx=rm=1&id=passive&ru=%2f&wrefresh=0&whr=http://corp.sts.microsoft.com");
+            return Redirect(ConfigurationManager.AppSettings["adfs:loginuri"]);
             //// Send an OpenID Connect sign-in request.
             //if (!Request.IsAuthenticated)
             //{
