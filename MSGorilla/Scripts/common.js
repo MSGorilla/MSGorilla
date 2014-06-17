@@ -432,25 +432,36 @@ function PostReply(user, mid) {
 
 
 // feed function
+var isLoadFeeds = false;
 function LoadFeeds(category, id) {
+    if (isLoadFeeds) return;
+    isLoadFeeds = true;
+
+    var token = $("#hd_token").val();
+    if (!isNullOrEmpty(token)) {
+        if (token == "nomore") {
+            // already no more feeds, don't load any more
+            isLoadFeeds = false;
+            return;
+        }
+    }
+
     var apiurl = "";
     var apidata = "";
-    var count = 0;
+    var count = $("#hd_newcount").val();
     if (isNullOrEmpty(category))
         apiurl = "/api/message/userline";
     else if (category == "homeline") {
         apiurl = "/api/message/homeline";
-        count = GetNotificationCount(category);
     }
     else if (category == "atline") {
         apiurl = "/api/message/atline";
-        count = GetNotificationCount(category);
-        if (count > 25) apidata = "count=" + count;
     }
     else if (category == "ownerline") {
         apiurl = "/api/message/ownerline";
-        count = GetNotificationCount(category);
-        if (count > 25) apidata = "count=" + count;
+    }
+    else if (category == "replyline") {
+        apiurl = "/api/reply/getmyreply";
     }
     else if (category == "publicsquareline")
         apiurl = "/api/message/publicsquareline";
@@ -458,6 +469,7 @@ function LoadFeeds(category, id) {
         apiurl = "/api/message/userline";
         if (isNullOrEmpty(id)) {
             ShowError("Illegal operation.");
+            isLoadFeeds = false;
             return;
         }
         apidata = "userid=" + encodeURIComponent(id);
@@ -466,27 +478,21 @@ function LoadFeeds(category, id) {
         apiurl = "/api/message/topicline";
         if (isNullOrEmpty(id)) {
             ShowError("Illegal operation.");
+            isLoadFeeds = false;
             return;
         }
         apidata = "topic=" + encodeURIComponent(id);
     }
-    else if (category == "replyline") {
-        apiurl = "/api/reply/getmyreply";
-        count = GetNotificationCount(category);
-        if (count > 25) apidata = "count=" + count;
-    }
     else {
         ShowError("Illegal operation.");
+        isLoadFeeds = false;
         return;
     }
 
-    var token = $("#hd_token").val();
-    if (!isNullOrEmpty(token)) {
-        if (token == "nomore") {
-            // already no more feeds, don't load any more
-            return;
-        }
-
+    if (isNullOrEmpty(token)) { // first time load
+        count = GetNotificationCount(category);
+        $("#hd_newcount").val(count);
+    } else {    // load more
         if (isNullOrEmpty(apidata)) {
             apidata = "token=" + token;
         }
@@ -523,8 +529,9 @@ function LoadFeeds(category, id) {
                     }
                     $.each(data, function (index, item) {
                         var isNew = false;
-                        if (index < count) {
+                        if (count > 0) {
                             isNew = true;
+                            count--;
                         }
                         if (category == "replyline")
                             $("#feedlist").append(CreateReply(item, true, isNew));
@@ -537,16 +544,22 @@ function LoadFeeds(category, id) {
             if (isNullOrEmpty(nexttoken)) {
                 $("#lbl_seemore").html("");
                 $("#hd_token").val("nomore");
+                $("#hd_newcount").val(0);
             }
             else {
                 $("#lbl_seemore").html("<span class='spinner-loading'></span> Loading more...");
                 $("#hd_token").val(nexttoken);
+                $("#hd_newcount").val(count);
             }
 
             UpdateNotificationCount();
+            isLoadFeeds = false;
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowError(textStatus + ": " + errorThrown);
+            $("#lbl_seemore").html("");
+            $("#hd_token").val("nomore");
+            isLoadFeeds = false;
         }
     });
 }
@@ -1014,6 +1027,15 @@ function CreateUserCard(data) {
 // notification count function
 function GetNotificationCount(category) {
     var count = 0;
+
+    if (category != "atline"
+        && category != "ownerline"
+        && category != "replyline"
+        && category != "homeline"
+        ) {
+        return count;
+    }
+
     var apiurl = "/api/account/getnotificationcount";
     $.ajax({
         type: "GET",
