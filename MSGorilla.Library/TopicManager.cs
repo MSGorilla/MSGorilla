@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using MSGorilla.Library.DAL;
 using MSGorilla.Library.Models.SqlModels;
+using MSGorilla.Library.Models.ViewModels;
 namespace MSGorilla.Library
 {
     public class TopicManager
@@ -188,12 +189,31 @@ namespace MSGorilla.Library
             }
         }
 
-        public List<FavouriteTopic> GetFavouriteTopic(string userid)
+        public List<DisplayFavouriteTopic> GetFavouriteTopic(string userid)
         {
             using(var _gorillaCtx = new MSGorillaContext())
             {
                 List<FavouriteTopic> topics = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid)).ToList();
-                return topics;
+                List<DisplayFavouriteTopic> dtopic = new List<DisplayFavouriteTopic>();
+
+                foreach (FavouriteTopic t in topics)
+                {
+                    dtopic.Add(new DisplayFavouriteTopic(t, _gorillaCtx));
+                }
+                return dtopic;
+            }
+        }
+
+        public bool IsFavouriteTopic(string userid, int topicID)
+        {
+            using (var _gorillaCtx = new MSGorillaContext())
+            {
+                FavouriteTopic ftopic = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).FirstOrDefault();
+                if (ftopic != null)
+                {
+                    return true;
+                }
+                return false;
             }
         }
     }

@@ -8,6 +8,7 @@ using System.Web.Http;
 using MSGorilla.Library;
 using MSGorilla.Filters;
 using MSGorilla.Library.Models;
+using MSGorilla.Library.Models.ViewModels;
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.SqlModels;
 
@@ -67,9 +68,15 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public List<FavouriteTopic> GetMyFavouriteTopic()
+        public List<DisplayFavouriteTopic> GetMyFavouriteTopic()
         {
             return _topicManager.GetFavouriteTopic(whoami());
+        }
+
+        [HttpGet]
+        public bool IsFavouriteTopic(int topicID)
+        {
+            return _topicManager.IsFavouriteTopic(whoami(), topicID);
         }
     }
 }

@@ -121,6 +121,7 @@
     <Compile Include="Models\SqlModels\UserProfile.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\MessageDetail.cs" />
+    <Compile Include="Models\ViewModels\DisplayFavouriteTopic.cs" />
     <Compile Include="Models\ViewModels\MessageModels.cs" />
     <Compile Include="Models\ViewModels\ReplyModels.cs" />
     <Compile Include="Models\ViewModels\SimpleUserProfile.cs" />
