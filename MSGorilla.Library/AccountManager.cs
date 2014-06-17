@@ -141,7 +141,7 @@ namespace MSGorilla.Library
         {
             using (var _gorillaCtx = new MSGorillaContext())
             {
-                Subscription f = _gorillaCtx.Subscriptions.Where(ff => ff.Userid == userid && ff.FollowingUserid == followingUserid).First();
+                Subscription f = _gorillaCtx.Subscriptions.Where(ff => ff.Userid == userid && ff.FollowingUserid == followingUserid).FirstOrDefault();
                 if (f != null)
                 {
                     _gorillaCtx.Subscriptions.Remove(f);

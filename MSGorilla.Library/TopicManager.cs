@@ -60,7 +60,7 @@ namespace MSGorilla.Library
         {
             using (var _gorillaCtx = new MSGorillaContext())
             {
-                FavouriteTopic ftopic = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).First();
+                FavouriteTopic ftopic = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).FirstOrDefault();
                 if (ftopic != null)
                 {
                     ftopic.UnreadMsgCount = 0;
