@@ -23,19 +23,49 @@ function ScrollTo(itemname) {
     }, 0.5);
 }
 
+function Txt2Html(code) {
+    code = code.replace(/&/mg, '&#38;');
+    code = code.replace(/</mg, '&#60;');
+    code = code.replace(/>/mg, '&#62;');
+    code = code.replace(/\"/mg, '&#34;');
+    code = code.replace(/\t/g, '  ');
+    code = code.replace(/\r?\n/g, '<br/>');
+    code = code.replace(/ /g, '&nbsp;');
+
+    return code;
+}
+
+function Html2Txt(code) {
+    code = code.replace('&nbsp;', ' ');
+    code = code.replace('<br/>', '\n');
+    code = code.replace('<br>', '\n');
+    code = code.replace('</br>', '');
+    code = code.replace('&#34;', '"');
+    code = code.replace('&#62;', '>');
+    code = code.replace('&#60;', '<');
+    code = code.replace('&#38;', '&');
+
+    return code;
+}
+
 function encodeHtml(code, atusers, topics) {
-    var strRegex = "http[s]?://((([0-9a-z][0-9a-z\\-]*)?[0-9a-z](\\.))+)?[0-9a-z]+(:[0-9]{1,5})?(/[\\w\\-/\\+\\?%#&=\\.:]*)?";
-    var linkre = new RegExp(strRegex, "gi");
+    var txtcode = code;
+    var code = Txt2Html(code);
 
     // autolink http[s]
+    var strRegex = "http[s]?://(([0-9a-z]+(\\-)?)*[0-9a-z]+(\\.))*[0-9a-z]+(:[0-9]{1,5})?(/([\\w\\-/\\+\\?%#=\\.:{}]|(&#38;))*)?";
+    var linkre = new RegExp(strRegex, "gi");
+
     code = code.replace(linkre, function (s) {
-        return encodeURIComponent('<a href="' + s + '">' + s + '</a>');
+        return ('<a href="' + (Html2Txt(s)) + '">' + s + '</a>');
     });
 
     // autolink @user
     if (!isNullOrEmpty(atusers)) {
         for (var key in atusers) {
-            code = code.replace("@" + atusers[key], encodeURIComponent('<a href="/profile/index?user=' + encodeURIComponent(atusers[key]) + '">@' + atusers[key] + '</a>'));
+            var user = atusers[key];
+            var htmluser = Txt2Html(user);
+            code = code.replace("@" + htmluser, ('<a href="/profile/index?user=' + encodeURIComponent(user) + '">@' + htmluser + '</a>'));
         }
 
         //strRegex = "@([0-9a-z\\-]+)(\\s|$)";
@@ -54,7 +84,10 @@ function encodeHtml(code, atusers, topics) {
     // autolink #topic#
     if (!isNullOrEmpty(topics)) {
         for (var key in topics) {
-            code = code.replace("#" + topics[key] + "#", encodeURIComponent('<a href="/topic/index?topic=' + encodeURIComponent(topics[key]) + '">#' + topics[key] + '#</a>'));
+            var topic = topics[key];
+            var htmltopic = Txt2Html(topic);
+
+            code = code.replace("#" + htmltopic + "#", ('<a href="/topic/index?topic=' + encodeURIComponent(topic) + '">#' + htmltopic + '#</a>'));
         }
 
         //strRegex = "#(([\\w \\-]+(#{2,})?)*[\\w \\-]+)#(\\s|$)";
@@ -70,27 +103,10 @@ function encodeHtml(code, atusers, topics) {
         //});
     }
 
-    code = code.replace(/&/mg, '&#38;');
-    code = code.replace(/</mg, '&#60;');
-    code = code.replace(/>/mg, '&#62;');
-    code = code.replace(/\"/mg, '&#34;');
-    code = code.replace(/\t/g, '  ');
-    code = code.replace(/\r?\n/g, '<br/>');
-    code = code.replace(/<br><br>/g, '<br>');
-    code = code.replace(/ /g, '&nbsp;');
-    code = decodeURIComponent(code);
     return code;
 }
 
 function encodeTxt(code) {
-    //code = code.replace(/&/mg, '&#38;');
-    //code = code.replace(/</mg, '&#60;');
-    //code = code.replace(/>/mg, '&#62;');
-    //code = code.replace(/\"/mg, '&#34;');
-    //code = code.replace(/\t/g, '  ');
-    //code = code.replace(/\r?\n/g, '<br/>');
-    //code = code.replace(/<br><br>/g, '<br>');
-    //code = code.replace(/ /g, '&nbsp;');
     code = encodeURIComponent(code);
     return code;
 }
@@ -1087,7 +1103,7 @@ function LoadHotTopics() {
         dataType: "json",
         success: function (data) {
             // create hot topic
-            $("#shortcut_topic_collapse").empty();
+            $("#topic_collapse").empty();
             $.each(data, function (index, item) {
                 var output = "";
                 var topicid = item.Id;
@@ -1099,7 +1115,7 @@ function LoadHotTopics() {
                 output += "  <span class='badge'>" + topiccount + "</span>";
                 output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
                 output += "</li>";
-                $("#shortcut_topic_collapse").append(output);
+                $("#topic_collapse").append(output);
             })
         },
         //error: function (XMLHttpRequest, textStatus, errorThrown) {
