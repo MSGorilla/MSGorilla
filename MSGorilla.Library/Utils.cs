@@ -165,7 +165,8 @@ namespace MSGorilla.Library
 
             foreach (Match m in matches)
             {
-                AtUser.Add(m.Value.Replace("@","").Trim());
+                string u = m.Value.Trim();
+                AtUser.Add(u.Substring(1));
             }
 
             return AtUser;
@@ -179,12 +180,14 @@ namespace MSGorilla.Library
                 return topicNames;
             }
 
-            Regex r = new Regex(@"#([0-9a-z\-]+)#(\s|$)", RegexOptions.IgnoreCase);
+            Regex r = new Regex(@"#(([\w \-]+(#{2,})?)*[\w \-]+)#(\s|$)", RegexOptions.IgnoreCase);
+            //Regex r = new Regex(@"#(([\w \-]+(#{2})?)*[\w \-]+)#(\s|$)", RegexOptions.IgnoreCase);
             MatchCollection matches = r.Matches(message);
 
             foreach (Match m in matches)
             {
-                topicNames.Add(m.Value.Replace("#", "").Trim());
+                string t = m.Value.Trim();
+                topicNames.Add(t.Substring(1, t.Length - 2));
             }
 
             return topicNames;
