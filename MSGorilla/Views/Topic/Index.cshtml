@@ -15,8 +15,13 @@
         </div>
 
         <div class="title-container">
-            <h4>@ViewBag.Title for "#<span class="bold">@ViewBag.Topic</span>#" <a class='btn btn-default' id='btn_topic_like_@ViewBag.TopicId'></a></h4>
-            
+            <h4>
+                @ViewBag.Title for "#<span class="bold">@ViewBag.Topic</span>#"
+                @if (@ViewBag.TopicId >= 0)
+                {
+                    <a class='btn btn-default like-btn' id='btn_topic_like'>&nbsp;</a>
+                }
+            </h4>
             <span class="help-block"> See topics you’re interested in.</span>
         </div>
 
@@ -45,7 +50,7 @@
     </div>
 
     <script>
-        $(LoadTopicLikeBtn("@ViewBag.TopicId"));
+        $(LoadTopicLikeBtn("btn_topic_like", "@ViewBag.TopicId"));
         $(LoadFeeds("@ViewBag.FeedCategory", "@ViewBag.Topic"));
     </script>
 

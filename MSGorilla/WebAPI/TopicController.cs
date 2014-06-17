@@ -74,6 +74,12 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
+        public List<DisplayFavouriteTopic> GetUserFavouriteTopic(string userid)
+        {
+            return _topicManager.GetFavouriteTopic(userid);
+        }
+
+        [HttpGet]
         public bool IsFavouriteTopic(int topicID)
         {
             return _topicManager.IsFavouriteTopic(whoami(), topicID);

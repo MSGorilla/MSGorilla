@@ -459,6 +459,9 @@ function LoadFeeds(category, id) {
     }
     else if (category == "ownerline") {
         apiurl = "/api/message/ownerline";
+        if (!isNullOrEmpty(id)) {
+            apidata = "userid=" + encodeURIComponent(id);
+        }
     }
     else if (category == "replyline") {
         apiurl = "/api/reply/getmyreply";
@@ -888,18 +891,13 @@ function SearchTopic(keyword) {
             else {
                 $("#topiclist").empty();
                 $.each(data, function (index, item) {
-                    var output = "";
                     var topicid = item.Id;
                     var topicname = item.Name;
                     var topicdesp = item.Description;
                     var topiccount = item.MsgCount;
 
-                    output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "# <span class='badge'>" + topiccount + "</span></a>";
-                    $("#topiclist").append(output);
-
-                    if (index == 0) {
-                        LoadFeeds("topicline", topicname);
-                    }
+                    $("#topiclist").append(CreateTopic(topicid, topicname, topicdesp, topiccount));
+                    LoadTopicLikeBtn("btn_topic_like_" + topicid, topicid);
                 })
             }
         },
@@ -1134,15 +1132,49 @@ function LoadHotTopics() {
                 var topiccount = item.MsgCount;
 
                 output += "<li class='sub-list-group-item'>";
-                output += "  <span class='badge'>" + topiccount + "</span>";
+                output += "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "'>&nbsp;</a>";
+                //output += "  <span class='badge'>" + topiccount + "</span>";
                 output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
                 output += "</li>";
                 $("#topic_collapse").append(output);
+                LoadTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid);
             })
         },
         //error: function (XMLHttpRequest, textStatus, errorThrown) {
         //    ShowError(textStatus + ": " + errorThrown);
         //}
+    });
+}
+
+function LoadUserFavoriteTopics(user) {
+    var apiurl = "/api/topic/getuserfavouritetopic";
+    var apidata = "userid=" + user;
+
+    $.ajax({
+        type: "GET",
+        url: apiurl,
+        data: apidata,
+        dataType: "json",
+        success: function (data) {
+            if (data.length == 0) {
+                ShowError("No content.");
+            }
+            else {
+                $("#topiclist").empty();
+                $.each(data, function (index, item) {
+                    var topicid = item.topicID;
+                    var topicname = item.topicName;
+                    var topicdesp = item.topicDescription;
+                    var topiccount = item.topicMsgCount;
+
+                    $("#topiclist").append(CreateTopic(topicid, topicname, topicdesp, topiccount));
+                    LoadTopicLikeBtn("btn_topic_like_" + topicid, topicid);
+                })
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
     });
 }
 
@@ -1178,8 +1210,8 @@ function LoadMyFavoriteTopics() {
     });
 }
 
-function LoadTopicLikeBtn(topicid) {
-    var btn = $("#btn_topic_like_" + topicid);
+function LoadTopicLikeBtn(btnid, topicid) {
+    var btn = $("#" + btnid);
     if (btn.length == 0) {
         return;
     }
@@ -1194,10 +1226,10 @@ function LoadTopicLikeBtn(topicid) {
         dataType: "json",
         success: function (data) {
             if (data == true) {
-                SetUnlikeBtn(topicid, true);
+                SetUnlikeBtn(btnid, topicid, true);
             }
             else {
-                SetLikeBtn(topicid, true);
+                SetLikeBtn(btnid, topicid, true);
 
             }
         },
@@ -1207,54 +1239,54 @@ function LoadTopicLikeBtn(topicid) {
     });
 }
 
-function SetUnlikeBtn(topicid, enabled) {
-    var btn = $("#btn_topic_like_" + topicid);
+function SetUnlikeBtn(btnid, topicid, enabled) {
+    var btn = $("#" + btnid);
     if (btn.length == 0) {
         return;
     }
 
     btn.text("Liked");
-    btn.attr("class", "btn btn-success btn-xs");
+    btn.attr("class", "btn btn-success like-btn");
     if (enabled) {
-        btn.attr("onclick", "Unlike('" + topicid + "');");
+        btn.attr("onclick", "Unlike('" + btnid + "', '" + topicid + "');");
     }
     else {
         btn.attr("onclick", "");
     }
-    btn.attr("onmouseover", "UnlikeBtnMouseOver('" + topicid + "');")
-    btn.attr("onmouseout", "UnlikeBtnMouseOut('" + topicid + "');")
+    btn.attr("onmouseover", "UnlikeBtnMouseOver('" + btnid + "');")
+    btn.attr("onmouseout", "UnlikeBtnMouseOut('" + btnid + "');")
 }
 
-function UnlikeBtnMouseOver(topicid) {
-    var btn = $("#btn_topic_like_" +topicid);
+function UnlikeBtnMouseOver(btnid) {
+    var btn = $("#" + btnid);
     if (btn.length == 0) {
         return;
     }
 
-    btn.attr("class", "btn btn-danger btn-xs");
+    btn.attr("class", "btn btn-danger like-btn");
     btn.text("Unlike");
 }
 
-function UnlikeBtnMouseOut(topicid) {
-    var btn = $("#btn_topic_like_" + topicid);
+function UnlikeBtnMouseOut(btnid) {
+    var btn = $("#" + btnid);
     if (btn.length == 0) {
         return;
     }
 
-    btn.attr("class", "btn btn-success btn-xs");
+    btn.attr("class", "btn btn-success like-btn");
     btn.text("Liked");
 }
 
-function SetLikeBtn(topicid, enabled) {
-    var btn = $("#btn_topic_like_" + topicid);
+function SetLikeBtn(btnid, topicid, enabled) {
+    var btn = $("#" + btnid);
     if (btn.length == 0) {
         return;
     }
 
     btn.text("Like");
-    btn.attr("class", "btn btn-primary btn-xs");
+    btn.attr("class", "btn btn-primary like-btn");
     if (enabled) {
-        btn.attr("onclick", "Like('" + topicid + "');");
+        btn.attr("onclick", "Like('" + btnid + "', '" + topicid + "');");
     }
     else {
         btn.attr("onclick", "");
@@ -1263,8 +1295,8 @@ function SetLikeBtn(topicid, enabled) {
     btn.attr("onmouseout", "")
 }
 
-function Like(topicid) {
-    SetUnlikeBtn(topicid, false);
+function Like(btnid, topicid) {
+    SetUnlikeBtn(btnid, topicid, false);
     $.ajax({
         type: "GET",
         url: "/api/topic/addfavouritetopic",
@@ -1273,7 +1305,8 @@ function Like(topicid) {
             var code = data.ActionResultCode;
             var msg = data.Message;
             if (code == "0") {
-                SetUnlikeBtn(topicid, true);
+                LoadMyFavoriteTopics();
+                SetUnlikeBtn(btnid, topicid, true);
             }
             else {
                 ShowError(msg);
@@ -1285,8 +1318,8 @@ function Like(topicid) {
     });
 }
 
-function Unlike(topicid) {
-    SetLikeBtn(topicid, false);
+function Unlike(btnid, topicid) {
+    SetLikeBtn(btnid, topicid, false);
     $.ajax({
         type: "GET",
         url: "/api/topic/removefavouritetopic",
@@ -1295,7 +1328,8 @@ function Unlike(topicid) {
             var code = data.ActionResultCode;
             var msg = data.Message;
             if (code == "0") {
-                SetLikeBtn(topicid, true);
+                LoadMyFavoriteTopics();
+                SetLikeBtn(btnid, topicid, true);
             }
             else {
                 ShowError(msg);
@@ -1307,6 +1341,17 @@ function Unlike(topicid) {
     });
 }
 
+function CreateTopic(topicid, topicname, topicdesp, topiccount) {
+    var output = "";
 
+    output += "<li class='list-group-item'>";
+    output += "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "'>&nbsp;</a>";
+    output += "  <span class='badge'>" + topiccount + "</span>";
+    output += "  <a class='fullname' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
+    output += "  <span class='username' >" + (isNullOrEmpty(topicdesp) ? "" : topicdesp) + "</span>&nbsp;";
+    output += "</li>";
+
+    return output;
+}
 
 

@@ -321,6 +321,8 @@
     <Content Include="Views\Profile\Followers.cshtml" />
     <Content Include="Views\Shared\_EventModalPartial.cshtml" />
     <Content Include="Views\Shared\_MessageModalPartial.cshtml" />
+    <Content Include="Views\Profile\Favorites.cshtml" />
+    <Content Include="Views\Profile\Owned.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

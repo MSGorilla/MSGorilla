@@ -33,15 +33,21 @@
 
         <div class="title-container">
             <span class="help-block">Topics for "#<span class="bold">@ViewBag.SearchKeyword</span>#"</span>
-            <div id="topiclist"></div>
         </div>
 
         <div class="posts-feeds">
-            <ul id="feedlist" class='list-group'>
+            <ul id="topiclist" class='list-group'>
                 <li id="loading_message" class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
                 @*autofill by js*@
             </ul>
         </div>
+
+        @*<div class="posts-feeds">
+            <ul id="feedlist" class='list-group'>
+                <li id="loading_message" class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+                autofill by js
+            </ul>
+        </div>*@
 
         @*<div class="txtaln-c">
             <span id="lbl_seemore" class="help-block">Loading more...</span>

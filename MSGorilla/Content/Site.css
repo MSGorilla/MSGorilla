@@ -196,6 +196,14 @@ input[type="checkbox"].input-validation-error {
     padding-right: 30px;
 }
 
+.fr {
+    float: right;
+}
+
+.fl {
+    float: left;
+}
+
 .ma-5 {
     margin: 5px;
 }
@@ -460,3 +468,22 @@ input[type="checkbox"].input-validation-error {
     background-position-x: left;
     background-position-y: top;
 }
+
+.like-btn {
+    margin-left: 10px;
+    display: inline-block;
+    min-width: 100px;
+    vertical-align: middle;
+    white-space: nowrap;
+    text-align: center;
+    float: right;
+}
+
+.list-group-item > .like-btn, .sub-list-group-item > .like-btn {
+    font-size: 11px;
+    padding: 1px 5px;
+    line-height: 1.5;
+    min-width: 50px;
+}
+
+
