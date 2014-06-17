@@ -119,20 +119,27 @@ function Time2Now(datestring) {
     var min = 60 * sec;
     var hour = 60 * min;
     var day = 24 * hour;
+
     if (diff / day > 1) {
         return date.toDateString();
     }
+    else if (diff / hour > 2) {
+        return Math.floor(diff / hour) + " hrs";
+    }
     else if (diff / hour > 1) {
-        return Math.ceil(diff / hour) + "h";
+        return "1 hr";
+    }
+    else if (diff / min > 2) {
+        return Math.floor(diff / min) + " mins";
     }
     else if (diff / min > 1) {
-        return Math.ceil(diff / min) + "m";
+        return "1 min";
     }
-    else if (diff / sec > 1) {
-        return Math.ceil(diff / sec) + "s";
-    }
+    //else if (diff / sec > 1) {
+    //    return Math.floor(diff / sec) + "secs";
+    //}
     else {
-        return "1s";
+        return "Just now";
     }
 }
 
