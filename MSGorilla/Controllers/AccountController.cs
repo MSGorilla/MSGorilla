@@ -432,13 +432,14 @@ namespace MSGorilla.Controllers
             return RedirectToAction("Login", "Account");
         }
 
-        public void SignIn()
+        public RedirectResult SignIn()
         {
-            // Send an OpenID Connect sign-in request.
-            if (!Request.IsAuthenticated)
-            {
-                HttpContext.GetOwinContext().Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" }, OpenIdConnectAuthenticationDefaults.AuthenticationType);
-            }
+            return Redirect("https://corp.sts.microsoft.com/adfs/ls/?wa=wsignin1.0&wtrealm=https://msgorilla_dev/&wctx=rm=1&id=passive&ru=%2f&wrefresh=0&whr=http://corp.sts.microsoft.com");
+            //// Send an OpenID Connect sign-in request.
+            //if (!Request.IsAuthenticated)
+            //{
+            //    HttpContext.GetOwinContext().Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" }, OpenIdConnectAuthenticationDefaults.AuthenticationType);
+            //}
         }
         public void SignOut()
         {
