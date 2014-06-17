@@ -16,13 +16,14 @@ namespace MSGorilla.Library.Models.ViewModels
         public int UnreadMsgCount { get; set; }
         public string topicName { get; set; }
         public string topicDescription { get; set; }
+        public int topicMsgCount { get; set; }
 
         public DisplayFavouriteTopic(FavouriteTopic ftopic, MSGorillaContext _gorillaCtx)
         {
             Topic topic;
             if (ftopic == null || ((topic = _gorillaCtx.Topics.Find(ftopic.TopicID)) == null))
             {
-                topicID = UnreadMsgCount = 0;
+                topicID = UnreadMsgCount = topicMsgCount = 0;
                 userid = topicName = topicDescription = null;
             }
             else
@@ -32,6 +33,7 @@ namespace MSGorilla.Library.Models.ViewModels
                 UnreadMsgCount = ftopic.UnreadMsgCount;
                 topicName = topic.Name;
                 topicDescription = topic.Description;
+                topicMsgCount = topic.MsgCount;
             }
         }
     }
