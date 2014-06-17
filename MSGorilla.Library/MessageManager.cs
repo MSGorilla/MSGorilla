@@ -516,6 +516,7 @@ namespace MSGorilla.Library
                     _topicline.Execute(insertOperation);
 
                     _topicManager.incrementTopicCount(topic.Id);
+                    _topicManager.incrementUnreadMsgCountOfFavouriteTopic(topic.Id);
                 }
             }
             

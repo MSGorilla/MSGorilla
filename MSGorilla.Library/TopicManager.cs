@@ -56,6 +56,29 @@ namespace MSGorilla.Library
             }
         }
 
+        public void clearUnreadMsgCountOfFavouriteTopic(string userid, int topicID)
+        {
+            using (var _gorillaCtx = new MSGorillaContext())
+            {
+                FavouriteTopic ftopic = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).First();
+                if (ftopic != null)
+                {
+                    ftopic.UnreadMsgCount = 0;
+                    _gorillaCtx.SaveChanges();
+                }
+            }
+        }
+
+        public void incrementUnreadMsgCountOfFavouriteTopic(int topicID)
+        {
+            using (var _gorillaCtx = new MSGorillaContext())
+            {
+                _gorillaCtx.Database.ExecuteSqlCommand(
+                    "update [favouritetopic] set UnreadMsgcount = UnreadMsgcount  + 1 where topicid={0}",
+                    topicID);
+            }
+        }
+
         public Topic FindTopic(string topicID, MSGorillaContext _gorillaCtx = null)
         {
             Topic ret = null;
@@ -129,6 +152,49 @@ namespace MSGorilla.Library
                     new object[] { count }
                 ).ToList();
             }            
+        }
+
+        public void AddFavouriteTopic(string userid, int topicID)
+        {
+            using (var _gorillaCtx = new MSGorillaContext())
+            {
+                if (_gorillaCtx.Users.Find(userid) == null)
+                {
+                    return;
+                }
+                if (_gorillaCtx.Topics.Find(topicID) == null)
+                {
+                    return;
+                }
+                if (_gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).Count() == 0)
+                {
+                    FavouriteTopic ftopic = new FavouriteTopic();
+                    ftopic.TopicID = topicID;
+                    ftopic.Userid = userid;
+                    ftopic.UnreadMsgCount = 0;
+                    _gorillaCtx.favouriteTopic.Add(ftopic);
+                    _gorillaCtx.SaveChanges();
+                }
+            }
+        }
+
+        public void Remove(string userid, int topicID)
+        {
+            using (var _gorillaCtx = new MSGorillaContext())
+            {
+                List<FavouriteTopic> finds = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).ToList();
+                _gorillaCtx.favouriteTopic.RemoveRange(finds);
+                _gorillaCtx.SaveChanges();
+            }
+        }
+
+        public List<FavouriteTopic> GetFavouriteTopic(string userid)
+        {
+            using(var _gorillaCtx = new MSGorillaContext())
+            {
+                List<FavouriteTopic> topics = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid)).ToList();
+                return topics;
+            }
         }
     }
 }

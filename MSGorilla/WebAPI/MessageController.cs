@@ -21,6 +21,7 @@ namespace MSGorilla.WebApi
     {
         MessageManager _messageManager = new MessageManager();
         NotifManager _notifManager = new NotifManager();
+        TopicManager _topicManager = new TopicManager();
 
         [HttpGet]
         public DisplayMessagePagination UserLine(int count = 25, string token = null)
@@ -170,13 +171,18 @@ namespace MSGorilla.WebApi
         public DisplayMessagePagination TopicLine(string topic, int count = 25, string token = null)
         {
             string me = whoami();
-            TopicManager topManager = new TopicManager();
-            var t  = topManager.FindTopicByName(topic);
+            var t  = _topicManager.FindTopicByName(topic);
             if (t == null)
             {
                 return null;
             }
-            return new DisplayMessagePagination(_messageManager.TopicLine(t.Id.ToString(), count, Utils.String2Token(token)));
+
+            TableContinuationToken tok = Utils.String2Token(token);
+            if (tok == null)
+            {
+                _topicManager.clearUnreadMsgCountOfFavouriteTopic(me, t.Id);
+            }
+            return new DisplayMessagePagination(_messageManager.TopicLine(t.Id.ToString(), count, tok));
         }
 
         [HttpGet]

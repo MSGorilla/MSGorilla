@@ -51,5 +51,39 @@ namespace MSGorilla.WebApi
         {
             return _topicManager.GetHotTopics(count);
         }
+
+        [HttpGet]
+        public ActionResult AddFavouriteTopic(int topicID)
+        {
+            _topicManager.AddFavouriteTopic(whoami(), topicID);
+            return new ActionResult();
+        }
+
+        [HttpGet]
+        public ActionResult RemoveFavouriteTopic(int topicID)
+        {
+            _topicManager.Remove(whoami(), topicID);
+            return new ActionResult();
+        }
+
+        [HttpGet]
+        public List<FavouriteTopic> GetMyFavouriteTopic()
+        {
+            return _topicManager.GetFavouriteTopic(whoami());
+        }
+
+        [HttpGet]
+        public ActionResult clearUnreadMsgCountOfFavouriteTopic(int topicID)
+        {
+            _topicManager.clearUnreadMsgCountOfFavouriteTopic(whoami(), topicID);
+            return new ActionResult();
+        }
+
+        [HttpGet]
+        public ActionResult incrementUnreadMsgCountOfFavouriteTopic(int topicID)
+        {
+            _topicManager.incrementUnreadMsgCountOfFavouriteTopic(topicID);
+            return new ActionResult();
+        }
     }
 }
