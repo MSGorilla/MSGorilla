@@ -151,9 +151,9 @@ function Time2Now(datestring) {
     else if (diff / min > 1) {
         return "1 min";
     }
-    //else if (diff / sec > 1) {
-    //    return Math.floor(diff / sec) + "secs";
-    //}
+        //else if (diff / sec > 1) {
+        //    return Math.floor(diff / sec) + "secs";
+        //}
     else {
         return "Just now";
     }
@@ -1145,5 +1145,168 @@ function LoadHotTopics() {
         //}
     });
 }
+
+function LoadMyFavoriteTopics() {
+    var apiurl = "/api/topic/getmyfavouritetopic";
+
+    $.ajax({
+        type: "GET",
+        url: apiurl,
+        dataType: "json",
+        success: function (data) {
+            // create hot topic
+            $("#favorite_collapse").empty();
+            $.each(data, function (index, item) {
+                var output = "";
+                var userid = item.userid;
+                var topicid = item.topicID;
+                var unreadcount = item.UnreadMsgCount;
+                var topicname = item.topicName;
+                var topicdesp = item.topicDescription;
+                var topiccount = item.topicMsgCount;
+
+                output += "<li class='sub-list-group-item'>";
+                output += "  <span class='badge'>" + unreadcount + "</span>";
+                output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
+                output += "</li>";
+                $("#favorite_collapse").append(output);
+            })
+        },
+        //error: function (XMLHttpRequest, textStatus, errorThrown) {
+        //    ShowError(textStatus + ": " + errorThrown);
+        //}
+    });
+}
+
+function LoadTopicLikeBtn(topicid) {
+    var btn = $("#btn_topic_like_" + topicid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    var apiurl = "/api/topic/isfavouritetopic";
+    var apidata = "topicID=" + encodeURIComponent(topicid);
+
+    $.ajax({
+        type: "GET",
+        url: apiurl,
+        data: apidata,
+        dataType: "json",
+        success: function (data) {
+            if (data == true) {
+                SetUnlikeBtn(topicid, true);
+            }
+            else {
+                SetLikeBtn(topicid, true);
+
+            }
+        },
+        //error: function (XMLHttpRequest, textStatus, errorThrown) {
+        //    ShowError(textStatus + ": " + errorThrown);
+        //}
+    });
+}
+
+function SetUnlikeBtn(topicid, enabled) {
+    var btn = $("#btn_topic_like_" + topicid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Liked");
+    btn.attr("class", "btn btn-success btn-xs");
+    if (enabled) {
+        btn.attr("onclick", "Unlike('" + topicid + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "UnlikeBtnMouseOver('" + topicid + "');")
+    btn.attr("onmouseout", "UnlikeBtnMouseOut('" + topicid + "');")
+}
+
+function UnlikeBtnMouseOver(topicid) {
+    var btn = $("#btn_topic_like_" +topicid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-danger btn-xs");
+    btn.text("Unlike");
+}
+
+function UnlikeBtnMouseOut(topicid) {
+    var btn = $("#btn_topic_like_" + topicid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-success btn-xs");
+    btn.text("Liked");
+}
+
+function SetLikeBtn(topicid, enabled) {
+    var btn = $("#btn_topic_like_" + topicid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Like");
+    btn.attr("class", "btn btn-primary btn-xs");
+    if (enabled) {
+        btn.attr("onclick", "Like('" + topicid + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
+}
+
+function Like(topicid) {
+    SetUnlikeBtn(topicid, false);
+    $.ajax({
+        type: "GET",
+        url: "/api/topic/addfavouritetopic",
+        data: "topicID=" + encodeURIComponent(topicid),
+        success: function (data) {
+            var code = data.ActionResultCode;
+            var msg = data.Message;
+            if (code == "0") {
+                SetUnlikeBtn(topicid, true);
+            }
+            else {
+                ShowError(msg);
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+function Unlike(topicid) {
+    SetLikeBtn(topicid, false);
+    $.ajax({
+        type: "GET",
+        url: "/api/topic/removefavouritetopic",
+        data: "topicID=" + encodeURIComponent(topicid),
+        success: function (data) {
+            var code = data.ActionResultCode;
+            var msg = data.Message;
+            if (code == "0") {
+                SetLikeBtn(topicid, true);
+            }
+            else {
+                ShowError(msg);
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+
 
 

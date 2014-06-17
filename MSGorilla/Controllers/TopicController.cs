@@ -12,6 +12,7 @@ namespace MSGorilla.Controllers
     public class TopicController : Controller
     {
         AccountManager _accManager = new AccountManager();
+        TopicManager _topicManager = new TopicManager();
 
         [TokenAuthAttribute]
         public ActionResult Index(string topic)
@@ -23,11 +24,17 @@ namespace MSGorilla.Controllers
 
             ViewBag.FeedCategory = "topicline";
 
-            if (string.IsNullOrEmpty(topic))
+            var t = _topicManager.FindTopicByName(topic);
+            if (t == null)
             {
-                topic = "";
+                ViewBag.TopicId = -1;
+                ViewBag.Topic = "";
             }
-            ViewBag.Topic = topic;
+            else
+            {
+                ViewBag.TopicId = t.Id;
+                ViewBag.Topic = topic;
+            }
 
             return View();
         }

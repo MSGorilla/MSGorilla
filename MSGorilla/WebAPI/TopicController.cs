@@ -78,5 +78,17 @@ namespace MSGorilla.WebApi
         {
             return _topicManager.IsFavouriteTopic(whoami(), topicID);
         }
+
+        [HttpGet]
+        public bool IsFavouriteTopic(string topic)
+        {
+            var t = _topicManager.FindTopicByName(topic);
+            if (t == null)
+            {
+                return false;
+            }
+
+            return _topicManager.IsFavouriteTopic(whoami(), t.Id);
+        }
     }
 }
