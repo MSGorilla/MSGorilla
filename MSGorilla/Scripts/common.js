@@ -67,7 +67,6 @@ function Html2Txt(code) {
 }
 
 function encodeHtml(code, atusers, topics) {
-    var txtcode = code;
     var code = Txt2Html(code);
 
     // autolink http[s]
