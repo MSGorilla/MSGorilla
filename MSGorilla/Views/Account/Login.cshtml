@@ -8,24 +8,30 @@
 <div class="main-container">
     <div class="row">
         <div class="block-container">
-            <section id="loginForm">
-                @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.ValidationSummary(true)
+            <h4>@ViewBag.Title</h4>
+            <span class="help-block">to see what's happening now.</span>
 
-                    <h4>@ViewBag.Title</h4>
-                    <span class="help-block">to see what's happening now.</span>
+            <div class="col-lg-7">
+                <img src="/Content/Images/MSFTE_photo.jpg" />
+            </div>
 
-                    <div class="col-lg-7">
-                        <img src="/Content/Images/MSFTE_photo.jpg" />
-                    </div>
+            <div class="col-lg-5">
+                <h1>You can @Html.ActionLink("Log in", "Signin", "Account") with your Microsoft domain account ...</h1>
+                <br />
+                <br />
+                <a id="btn_signin" class="btn btn-primary post-btn" href="/Account/Signin">Log in</a>
+                <br />
+                <br />
+                <br />
+                <br />
+                <h5><a data-toggle="collapse" data-parent="#accordion" href="#login_collapse">Or log in as a local account. <span class="caret"></span></a></h5>
+                <div id="login_collapse" class="panel-collapse collapse out">
+                    <section id="loginForm">
+                        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                        {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
 
-                    <div class="col-lg-5">
-                        <h1>You can @Html.ActionLink("Log in", "Signin", "Account") with your Microsoft domain account ...</h1>
-                        <br /><br />
-
-                        <h5>Or log in as a local account.</h5>
                         <div class="form-group">
                             @*@Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })*@
                             <div class="col-md-10">
@@ -56,9 +62,10 @@
                         <p>
                             @Html.ActionLink("Register", "Register") if you don't have an account.
                         </p>
-                    </div>
-                }
-            </section>
+                        }
+                    </section>
+                </div>
+            </div>
             <div class="clearfix ma-btm-20">&nbsp;</div>
         </div>
     </div>
