@@ -37,7 +37,7 @@ function encodeEmail(code) {
 function ScrollTo(itemname) {
     var scroll_offset = $("#" + itemname).offset();
     $("body,html").animate({
-        scrollTop: scroll_offset.top - 30
+        scrollTop: scroll_offset.top - 50
     }, "slow");
 }
 
@@ -636,18 +636,25 @@ function CreateFeed(postData, isNew) {
 
     output += "        <div class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
 
+    // fordebug
+    //richmsg = " <img src='/Content/Images/MSFTE_photo.jpg' />";
+    // richmsg div
     if (!isNullOrEmpty(richmsg)) {
         output += "        <div id='rich_message_" + mid + "' class='newpost-input' style='display:none;'>" + richmsg + "</div>";
     }
 
     output += "        <div class='newpost-footer'>";
 
-    if (showevents) {
-        // event button
-        //output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
-    }
+    // event button
+    //if (showevents) {
+    //    output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
+    //}
 
-    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Expand</button>";
+    // richmsg btn
+    if (!isNullOrEmpty(richmsg)) {
+        output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowRichMsg(\"" + user + "\", \"" + mid + "\");'>More</button>";
+    }
+    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Replies</button>";
     output += "        </div>";
     output += "      </div>";
     output += "    </div>";
@@ -675,13 +682,35 @@ function CreateFeed(postData, isNew) {
     return output;
 }
 
+function ShowRichMsg(user, mid) {
+    var showbtn = $("#btn_showrichmsg_" +mid);
+    var show = showbtn.attr("isshow");
+    var richmsgdiv = $("#rich_message_" + mid);
+
+    if (show == "false") {
+        // show replies
+        showbtn.attr("isshow", "true");
+        showbtn.text("Less");
+
+        richmsgdiv.show();
+    }
+    else {
+        // clear replies
+        showbtn.attr("isshow", "false");
+        showbtn.text("More");
+
+        richmsgdiv.hide();
+    }
+
+    ScrollTo("feed_" +mid);
+}
+
 
 // reply function
 function ShowReplies(user, mid) {
     var showbtn = $("#btn_showreply_" + mid);
     var show = showbtn.attr("isshow");
     var replydiv = $("#reply_" + mid);
-    var richmsgdiv = $("#rich_message_" + mid);
 
     if (show == "false") {
         // show replies
@@ -689,7 +718,6 @@ function ShowReplies(user, mid) {
         showbtn.text("Collapse");
 
         replydiv.show();
-        richmsgdiv.show();
 
         // show reply
         LoadReplies(mid);
@@ -697,12 +725,10 @@ function ShowReplies(user, mid) {
     else {
         // clear replies
         showbtn.attr("isshow", "false");
-        showbtn.text("Expand");
+        showbtn.text("Replies");
 
         replydiv.hide();
-        richmsgdiv.hide();
     }
-    ScrollTo("feed_" + mid);
 }
 
 function LoadReplies(mid) {
