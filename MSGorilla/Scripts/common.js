@@ -1,9 +1,27 @@
 ﻿/* common function */
-function isValidForKey(c) {
+function isValidForUserid(c) {
     if ((c >= 'a' && c <= 'z')
         || (c >= '0' && c <= '9')
         || (c >= 'A' && c <= 'Z')
         || c == '-'
+        )
+        return true;
+    else
+        return false;
+}
+
+function isValidForTopic(c) {
+    if ((c >= 'a' && c <= 'z')
+        || (c >= '0' && c <= '9')
+        || (c >= 'A' && c <= 'Z')
+        //|| c == ' '
+        || c == '-'
+        || c == '.'
+        || c == ','
+        || c == ':'
+        || c == '&'
+        || c == '*'
+        || c == '+'
         )
         return true;
     else
