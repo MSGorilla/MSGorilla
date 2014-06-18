@@ -220,9 +220,10 @@ namespace MSGorilla.WebApi
                                     string eventID = "none",
                                     [FromUri]string[] owner = null,
                                     [FromUri]string[] atUser = null,
-                                    [FromUri]string[] topicName = null)
+                                    [FromUri]string[] topicName = null,
+                                    string richMessage = null)
         {
-            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, topicName, message, DateTime.UtcNow), new AccountManager());
+            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, topicName, message, richMessage, DateTime.UtcNow), new AccountManager());
             //return new ActionResult();
         }
 
