@@ -96,7 +96,7 @@ namespace MSGorilla.WebAPI.Client
                     topicNameStr = "&topicName=" + string.Join("&topicName=", topicName);
                 }
 
-                writer.Write(string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}", message, schemaID, eventID, topicNameStr, ownerStr, atUserStr));
+                writer.Write(string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}", Uri.EscapeDataString(message), schemaID, eventID, topicNameStr, ownerStr, atUserStr));
             }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return _readResponseContent(response);
@@ -135,7 +135,7 @@ namespace MSGorilla.WebAPI.Client
 
             using (var writer = new StreamWriter(request.GetRequestStream()))
             {
-                writer.Write(string.Format("To={0}&Message={1}&MessageID={2}&MessageUser", toUserId, message, originMessageID, originMessageID));
+                writer.Write(string.Format("To={0}&Message={1}&MessageID={2}&MessageUser", toUserId, Uri.EscapeDataString(message), originMessageID, originMessageID));
             }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return _readResponseContent(response);
