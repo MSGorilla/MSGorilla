@@ -257,6 +257,7 @@
     <Content Include="Content\Images\default_avatar.jpg" />
     <Content Include="Content\Images\default_bg.png" />
     <Content Include="Content\Images\link_line.png" />
+    <Content Include="Content\Images\MSFTE_photo.jpg" />
     <Content Include="Content\Images\new_flag.png" />
     <Content Include="Content\Images\small_spinner.gif" />
     <Content Include="favicon.ico" />
