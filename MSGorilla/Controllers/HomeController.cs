@@ -13,6 +13,7 @@ using MSGorilla.Library.Models.SqlModels;
 
 namespace MSGorilla.Controllers
 {
+    [CryptographicExceptionHandlerAttribute]
     public class HomeController : Controller
     {
         AccountManager _accManager = new AccountManager();
@@ -26,12 +27,12 @@ namespace MSGorilla.Controllers
             ViewBag.Me = me;
 
             ViewBag.FeedCategory = "homeline";
-
             return View();
         }
 
         public ActionResult About()
         {
+            throw new AccessViolationException();
             return View();
         }
 

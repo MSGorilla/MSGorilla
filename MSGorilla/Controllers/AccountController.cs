@@ -406,8 +406,8 @@ namespace MSGorilla.Controllers
         //
         // POST: /Account/LogOff
         
-        [HttpPost]
-        [TokenAuthAttribute]
+        //[HttpPost, HttpGet]
+        //[TokenAuthAttribute]
         public ActionResult LogOff()
         {
             //AuthenticationManager.SignOut();
@@ -420,6 +420,18 @@ namespace MSGorilla.Controllers
                     myCookie.Expires = DateTime.Now.AddDays(-1d);
                     Response.Cookies.Add(myCookie);
                 }
+
+                HttpCookie cookie = new HttpCookie("ASP.NET_SessionId");
+                cookie.Expires = DateTime.Now.AddDays(-1d);
+                Response.Cookies.Add(cookie);
+
+                cookie = new HttpCookie("FedAuth");
+                cookie.Expires = DateTime.Now.AddDays(-1d);
+                Response.Cookies.Add(cookie);
+
+                cookie = new HttpCookie("FedAuth1");
+                cookie.Expires = DateTime.Now.AddDays(-1d);
+                Response.Cookies.Add(cookie);
 
                 //if (System.Web.HttpContext.Current.User.Identity.IsAuthenticated)
                 //{
