@@ -143,4 +143,13 @@ namespace MSGorilla.Library.Exceptions
             Code = 4002;
         }
     }
+
+    public class AttachmentNotFoundException : MSGorillaBaseException
+    {
+        public AttachmentNotFoundException()
+        {
+            Description = "Attachment Not Found.";
+            Code = 5001;
+        }
+    }
 }
