@@ -98,13 +98,41 @@ namespace MSGorilla.WebAPI.Client
                 }
                 if (richMessage != null)
                 {
-                    richMessageStr = "&richMessage=" + Uri.EscapeDataString(richMessage);
+                    richMessageStr = "&richMessage=" + EscapeString(richMessage);
                 }
 
                 writer.Write(string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}{6}", Uri.EscapeDataString(message), schemaID, eventID, topicNameStr, ownerStr, atUserStr, richMessageStr));
             }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return _readResponseContent(response);
+        }
+
+        private string EscapeString(string longStr)
+        {
+            int limit = 2000;
+            if (!string.IsNullOrEmpty(longStr))
+            {
+                if (longStr.Length > limit)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    int loops = longStr.Length / limit;
+
+                    for (int i = 0; i <= loops; i++)
+                    {
+                        if (i < loops)
+                        {
+                            sb.Append(Uri.EscapeDataString(longStr.Substring(limit * i, limit)));
+                        }
+                        else
+                        {
+                            sb.Append(Uri.EscapeDataString(longStr.Substring(limit * i)));
+                        }
+                    }
+
+                    return sb.ToString();
+                }
+            }
+            return longStr;
         }
 
         public List<Message> HomeLine(DateTime start, DateTime end)
