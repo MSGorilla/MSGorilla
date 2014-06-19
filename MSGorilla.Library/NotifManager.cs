@@ -11,8 +11,6 @@ namespace MSGorilla.Library
 {
     public class NotifManager
     {
-        //private MSGorillaContext _gorillaCtx;
-
         public NotificationCount FindUserNotif(string userid, MSGorillaContext _gorillaCtx)
         {
             NotificationCount notifCount = _gorillaCtx.NotifCounts.Find(userid);

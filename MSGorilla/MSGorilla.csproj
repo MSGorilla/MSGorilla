@@ -242,6 +242,7 @@
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Utility\TokenCacheUtils.cs" />
     <Compile Include="WebAPI\AccountController.cs" />
+    <Compile Include="WebAPI\AttachmentController.cs" />
     <Compile Include="WebAPI\BaseController.cs" />
     <Compile Include="WebAPI\MessageController.cs">
       <SubType>Code</SubType>
@@ -324,6 +325,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Attachment\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
