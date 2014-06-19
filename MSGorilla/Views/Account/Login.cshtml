@@ -49,7 +49,7 @@
                         <div class="form-group">
                             <div class="col-md-offset-0 col-md-12">
                                 <div class="checkbox">
-                                    @Html.CheckBoxFor(m => m.RememberMe)
+                                    @Html.CheckBoxFor(m => m.RememberMe, new { @checked = true })
                                     @Html.LabelFor(m => m.RememberMe)
                                 </div>
                             </div>

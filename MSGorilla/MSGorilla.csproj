@@ -227,6 +227,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\SquareController.cs" />
     <Compile Include="Controllers\TopicController.cs" />
     <Compile Include="Filters\BasicAuthAttribute.cs" />
@@ -324,6 +325,7 @@
     <Content Include="Views\Shared\_MessageModalPartial.cshtml" />
     <Content Include="Views\Profile\Favorites.cshtml" />
     <Content Include="Views\Profile\Owned.cshtml" />
+    <Content Include="Views\Error\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

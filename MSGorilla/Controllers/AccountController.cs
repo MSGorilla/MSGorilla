@@ -68,7 +68,7 @@ namespace MSGorilla.Controllers
 
                 try
                 {
-                    string userid = model.UserName.ToLower();
+                    string userid = model.UserName;
                     string password = model.Password;
                     if (_accManager.AuthenticateUser(userid, Utils.MD5Encoding(password)))
                     {
@@ -511,7 +511,7 @@ namespace MSGorilla.Controllers
             this.Session.Add("userid", userid);
 
             // remember me?
-            int days = 1;
+            int days = 7;
             if (isPersistent)
             {
                 days = 30;
