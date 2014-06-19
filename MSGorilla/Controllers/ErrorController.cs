@@ -10,8 +10,7 @@ using MSGorilla.Library.Models.SqlModels;
 namespace MSGorilla.Views
 {
     public class ErrorController : Controller
-    {
-       
+    {       
         public ActionResult Index(string message, string returnUrl)
         {
             ViewBag.ErrorMessage = message;

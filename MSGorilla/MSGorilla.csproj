@@ -232,7 +232,6 @@
     <Compile Include="Controllers\TopicController.cs" />
     <Compile Include="Filters\BasicAuthAttribute.cs" />
     <Compile Include="Filters\ExceptionHandleAttribute.cs" />
-    <Compile Include="Filters\CryptographicExceptionHandlerAttribute.cs" />
     <Compile Include="Filters\TokenAuthAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

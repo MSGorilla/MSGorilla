@@ -9,7 +9,6 @@ using MSGorilla.Library.Models.SqlModels;
 
 namespace MSGorilla.Controllers
 {
-    [CryptographicExceptionHandlerAttribute]
     public class SquareController : Controller
     {
         AccountManager _accManager = new AccountManager();

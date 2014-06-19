@@ -10,7 +10,7 @@
       <Setting name="StorageConnectionString" />
     </ConfigurationSettings>
   </WorkerRole>
-  <WebRole name="MSGorilla" vmsize="Small">
+  <WebRole name="MSGorilla" vmsize="ExtraLarge">
     <Sites>
       <Site name="Web">
         <Bindings>
