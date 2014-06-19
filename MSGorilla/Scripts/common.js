@@ -599,6 +599,7 @@ function CreateFeed(postData, isNew) {
     var owners = postData.Owner;
     var atusers = postData.AtUser;
     var topics = postData.TopicName;
+    var attach = postData.Attachment;
     var showevents = false;
 
     if (isNullOrEmpty(picurl)) {
@@ -616,16 +617,19 @@ function CreateFeed(postData, isNew) {
     else {
         output += "  <li id='feed_" + mid + "' class='list-group-item'>";
     }
+
     output += "    <div>"
     output += "      <div class='feed-pic'>";
     output += "        <img class='img-rounded' id='user_pic_" + mid + "' src='" + picurl + "' width='100' height='100' />";
     output += "      </div>";
+
     output += "      <div class='feed-content'>";
     output += "        <div class='newpost-header'>";
     output += "          <a id='username_" + mid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>&nbsp;";
     output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
     output += "        </div>";
 
+    // owners
     if (!isNullOrEmpty(owners)) {
         output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
         for (var key in owners) {
@@ -634,15 +638,27 @@ function CreateFeed(postData, isNew) {
         output += "    </div>";
     }
 
+    // message
     output += "        <div class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
 
     // fordebug
     //richmsg = " <img src='/Content/Images/MSFTE_photo.jpg' />";
-    // richmsg div
+    // richmsg
     if (!isNullOrEmpty(richmsg)) {
-        output += "        <div id='rich_message_" + mid + "' class='newpost-input' style='display:none;'>" + richmsg + "</div>";
+        output += "    <div id='rich_message_" + mid + "' class='newpost-input' style='display:none;'>" + richmsg + "</div>";
     }
 
+    // attachment
+    if (!isNullOrEmpty(attach)) {
+        output += "    <div class='newpost-input'><span class=''>Attachment: </span>";
+        for (var key in attach) {
+            output += "  <a class='btn btn-link btn-xs' onclick='ShowAttach(\"" + attach[key].AttachmentID + "\", \"" + attach[key].Filetype + "\", \"" + mid + "\");' >" + attach[key].Filename + " (" + Filesize + ")</a>&nbsp;";
+        }
+        output += "    </div>";
+        output += "    <div id='attachment_" + mid + "' class='newpost-input' style='display:none;'></div>";
+    }
+
+    // footer btns
     output += "        <div class='newpost-footer'>";
 
     // event button
@@ -650,7 +666,7 @@ function CreateFeed(postData, isNew) {
     //    output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
     //}
 
-    // richmsg btn
+    // btns
     if (!isNullOrEmpty(richmsg)) {
         output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowRichMsg(\"" + user + "\", \"" + mid + "\");'>More</button>";
     }
@@ -658,6 +674,8 @@ function CreateFeed(postData, isNew) {
     output += "        </div>";
     output += "      </div>";
     output += "    </div>";
+
+    // reply
     output += "    <div style='display:none;' id='reply_" + mid + "'>";
     // add reply box
     output += "      <div class='replies-container well'>";
@@ -674,12 +692,24 @@ function CreateFeed(postData, isNew) {
     output += "        <ul id='replylist_" + mid + "' class='list-group'></ul>";
     output += "      </div>";
     output += "    </div>";
-    output += "    <input type='hidden' id='isshowreplies_" + mid + "' value='false'/>";
+
     output += "  </li>";
 
     //output += "</ul>";
 
     return output;
+}
+
+function ShowAttach(aid, type, mid) {
+    var attadiv = $("#attachment_" + mid);
+    var apiurl = "/api/attachment/download?attachmentid=" + aid;
+
+    attadiv.empty();
+    switch (type) {
+        default:
+            window.open(apiurl);
+            break;
+    }
 }
 
 function ShowRichMsg(user, mid) {
