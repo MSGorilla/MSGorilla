@@ -87,5 +87,55 @@ namespace MSGorilla.Controllers
 
             return View();
         }
+
+        [TokenAuthAttribute]
+        public ActionResult Favorites(string user)
+        {
+            string myid = this.Session["userid"].ToString();
+            UserProfile me = _accManager.FindUser(myid);
+            ViewBag.Myid = me.Userid;
+            ViewBag.Me = me;
+
+            if (string.IsNullOrEmpty(user) || user.Equals(myid, StringComparison.CurrentCultureIgnoreCase))
+            {
+                ViewBag.IsMe = true;
+                user = myid;
+            }
+            else
+            {
+                ViewBag.IsMe = false;
+            }
+
+            ViewBag.UserId = user;
+
+            ViewBag.FeedCategory = "userline";
+
+            return View();
+        }
+
+        [TokenAuthAttribute]
+        public ActionResult Owned(string user)
+        {
+            string myid = this.Session["userid"].ToString();
+            UserProfile me = _accManager.FindUser(myid);
+            ViewBag.Myid = me.Userid;
+            ViewBag.Me = me;
+
+            if (string.IsNullOrEmpty(user) || user.Equals(myid, StringComparison.CurrentCultureIgnoreCase))
+            {
+                ViewBag.IsMe = true;
+                user = myid;
+            }
+            else
+            {
+                ViewBag.IsMe = false;
+            }
+
+            ViewBag.UserId = user;
+
+            ViewBag.FeedCategory = "ownerline";
+
+            return View();
+        }
     }
 }

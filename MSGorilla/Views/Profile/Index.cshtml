@@ -32,9 +32,10 @@
             <div class="user-postinfo">
                 <div class="btn-group btn-group-justified">
                     <a class="btn btn-default disabled">POSTS &nbsp;<span id="user_posts" class="badge">0</span></a>
+                    <a class="btn btn-default" href="/Profile/Owned?user=@ViewBag.UserId">OWNED &nbsp;<span id="user_owned" class="badge"></span></a>
                     <a class="btn btn-default" href="/Profile/Following?user=@ViewBag.UserId">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
                     <a class="btn btn-default" href="/Profile/Followers?user=@ViewBag.UserId">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
-                    <a class="btn btn-default" href="#">FAVORITES &nbsp;<span id="user_favorites" class="badge">0</span></a>
+                    <a class="btn btn-default" href="/Profile/Favorites?user=@ViewBag.UserId">FAVORITES &nbsp;<span id="user_favorites" class="badge"></span></a>
                     <a class='btn btn-default' id='btn_user_follow_@ViewBag.UserId.Replace("@","-").Replace(".","_")'></a>
                 </div>
             </div>
@@ -60,7 +61,7 @@
 
         <div class="txtaln-c">
             <span id="lbl_seemore" class="help-block">Loading more...</span>
-            <input id="hd_token" type="hidden" value="" />
+            <input id="hd_token" type="hidden" value="" /><input id="hd_newcount" type="hidden" value="0" />
 
             <script type="text/javascript">
                 $(window).scroll(function () {

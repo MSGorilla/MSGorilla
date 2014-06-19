@@ -9,6 +9,7 @@ using CodeFlowMonitor.CodeFlowService;
 using Newtonsoft.Json;
 using System.IO;
 using MSGorilla.WebAPI.Client;
+using System.Text.RegularExpressions;
 
 namespace CodeFlowMonitor
 {
@@ -141,12 +142,30 @@ namespace CodeFlowMonitor
                                     CodePackage pkg = r.codePackages[i];
                                     StringBuilder reviewers = new StringBuilder();
                                     foreach (var reviewer in r.reviewers)
-                                        reviewers.Append(string.Format("{0},", reviewer.DisplayName));
-                                    string message = string.Format("CodeReview {0}Iteration {2} {4}\nAuthor: {1}\nReviewer: {3}",
-                                        pkg.Description, pkg.Author, pkg.Revision, reviewers.ToString().TrimEnd(new char[] { ',' }), pkg.IterationComment);
+                                        reviewers.Append(string.Format(" @{0},", reviewer.Name.Substring(reviewer.Name.IndexOf('\\') + 1)));
+
+                                    string description = pkg.Description;
+                                    string newDescription = description;
+                                    string pat = @"(\d{4,})";
+
+                                    // Instantiate the regular expression object.
+                                    Regex reg = new Regex(pat, RegexOptions.IgnoreCase);
+
+                                    // Match the regular expression pattern against a text string.
+                                    Match m = reg.Match(description);
+                                    while (m.Success)
+                                    {
+                                        //Console.WriteLine("Match" + (++matchCount));
+                                        newDescription = newDescription.Replace(m.Value, string.Format(" #WOSS TFS {0}# ", m.Value));
+                                        m = m.NextMatch();
+                                    }
+
+                                    string message = string.Format("#WOSS Codeflow# {0}\nIteration {2} {4}\nAuthor: {1}\nReviewer: {3}\n#WOSS Change {5}#\nReview: http://codeflow/Client/CodeFlow2010.application?server=http://codeflow/Services/DiscoveryService.svc&review={6}",
+                                        newDescription.Trim(), pkg.Author.Substring(pkg.Author.IndexOf('\\') + 1), pkg.Revision, reviewers.ToString().TrimEnd(new char[] { ',' }), 
+                                        pkg.IterationComment, pkg.SourceInfo.SourceName, codeReviewSummary.Key);
                                     Logger.WriteInfo(message);
 
-                                    webapi.PostMessage(message, "none", r.Key.Replace('-', '0'));
+                                    webapi.PostMessage(message, "none", r.Key, new string[]{"WOSS Codeflow"}, new string[]{pkg.Author.Substring(pkg.Author.IndexOf('\\') + 1)});
                                 }
                                 _MonitoredReviewDict[username][r.Key] = r.codePackages.Length;
                             }

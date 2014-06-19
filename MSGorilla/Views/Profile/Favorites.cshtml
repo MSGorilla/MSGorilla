@@ -33,8 +33,8 @@
                     <a class="btn btn-default" href="/Profile/Index?user=@ViewBag.UserId">POSTS &nbsp;<span id="user_posts" class="badge">0</span></a>
                     <a class="btn btn-default" href="/Profile/Owned?user=@ViewBag.UserId">OWNED &nbsp;<span id="user_owned" class="badge"></span></a>
                     <a class="btn btn-default" href="/Profile/Following?user=@ViewBag.UserId">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
-                    <a class="btn btn-default disabled">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
-                    <a class="btn btn-default" href="/Profile/Favorites?user=@ViewBag.UserId">FAVORITES &nbsp;<span id="user_favorites" class="badge"></span></a>
+                    <a class="btn btn-default" href="/Profile/Followers?user=@ViewBag.UserId">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
+                    <a class="btn btn-default disabled">FAVORITES &nbsp;<span id="user_favorites" class="badge"></span></a>
                     <a class='btn btn-default' id='btn_user_follow_@ViewBag.UserId.Replace("@","-").Replace(".","_")'></a>
                 </div>
             </div>
@@ -47,21 +47,38 @@
                 </div>*@
         </div>
 
-        <div class="block-container">
-            <div>
-                <span class="help-block">Followers</span>
-            </div>
-            <ul id="userlist" class="userlist-group">
-                <li id="loading_message" class="center-block txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+        <div class="title-container">
+            <h4>Favorites</h4>
+        </div>
+
+        <div class="posts-feeds">
+            <ul id="topiclist" class='list-group'>
+                <li id="loading_message" class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
                 @*autofill by js*@
             </ul>
-            <div class="clearfix"></div>
         </div>
+
+        @*<div class="txtaln-c">
+            <span id="lbl_seemore" class="help-block">Loading more...</span>
+            <input id="hd_token" type="hidden" value="" /><input id="hd_newcount" type="hidden" value="0" />
+
+            <script type="text/javascript">
+                $(window).scroll(function () {
+                    var documentTop = $(document).scrollTop();
+                    var windowHeight = $(window).height();
+                    var documentHeight = $(document).height();
+                    if (documentTop >= (documentHeight - windowHeight)) {
+                        LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.UserId');
+                    }
+                })
+            </script>
+        </div>*@
+
     </div>
 
     <script>
         $(LoadUserInfo('@ViewBag.UserId'));
-        $(LoadUsers('followers', '@ViewBag.UserId'));
+        $(LoadUserFavoriteTopics('@ViewBag.UserId'));
     </script>
 
     <div class="tools-container">

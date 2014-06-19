@@ -252,12 +252,13 @@
     <Compile Include="WebAPI\TopicController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\ms-bootstrap.css" />
+    <Content Include="Content\ms-bootstrap.min.css" />
     <Content Include="Content\css.css" />
     <Content Include="Content\Images\default_avatar.jpg" />
     <Content Include="Content\Images\default_bg.png" />
     <Content Include="Content\Images\link_line.png" />
+    <Content Include="Content\Images\MSFTE_photo.jpg" />
     <Content Include="Content\Images\new_flag.png" />
     <Content Include="Content\Images\small_spinner.gif" />
     <Content Include="favicon.ico" />
@@ -322,6 +323,8 @@
     <Content Include="Views\Profile\Followers.cshtml" />
     <Content Include="Views\Shared\_EventModalPartial.cshtml" />
     <Content Include="Views\Shared\_MessageModalPartial.cshtml" />
+    <Content Include="Views\Profile\Favorites.cshtml" />
+    <Content Include="Views\Profile\Owned.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

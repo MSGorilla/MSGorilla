@@ -71,7 +71,7 @@ namespace MSGorilla.WebAPI.Client
             return sb.ToString();
         }
 
-        public string PostMessage(string message, string schemaID = "none", string eventID = "none", string[] topicName = null, string[] owner = null, string[] atUser = null)
+        public string PostMessage(string message, string schemaID = "none", string eventID = "none", string[] topicName = null, string[] owner = null, string[] atUser = null, string richMessage = null)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + Constant.UriPostMessage);
             request.Method = "POST";
@@ -83,6 +83,7 @@ namespace MSGorilla.WebAPI.Client
                 var ownerStr = "";
                 var atUserStr = "";
                 var topicNameStr = "";
+                var richMessageStr = "";
                 if (owner != null)
                 {
                     ownerStr = "&owner=" + string.Join("&owner=", owner); 
@@ -95,11 +96,43 @@ namespace MSGorilla.WebAPI.Client
                 {
                     topicNameStr = "&topicName=" + string.Join("&topicName=", topicName);
                 }
+                if (richMessage != null)
+                {
+                    richMessageStr = "&richMessage=" + EscapeString(richMessage);
+                }
 
-                writer.Write(string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}", message, schemaID, eventID, topicNameStr, ownerStr, atUserStr));
+                writer.Write(string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}{6}", Uri.EscapeDataString(message), schemaID, eventID, topicNameStr, ownerStr, atUserStr, richMessageStr));
             }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return _readResponseContent(response);
+        }
+
+        private string EscapeString(string longStr)
+        {
+            int limit = 2000;
+            if (!string.IsNullOrEmpty(longStr))
+            {
+                if (longStr.Length > limit)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    int loops = longStr.Length / limit;
+
+                    for (int i = 0; i <= loops; i++)
+                    {
+                        if (i < loops)
+                        {
+                            sb.Append(Uri.EscapeDataString(longStr.Substring(limit * i, limit)));
+                        }
+                        else
+                        {
+                            sb.Append(Uri.EscapeDataString(longStr.Substring(limit * i)));
+                        }
+                    }
+
+                    return sb.ToString();
+                }
+            }
+            return longStr;
         }
 
         public List<Message> HomeLine(DateTime start, DateTime end)
@@ -135,7 +168,7 @@ namespace MSGorilla.WebAPI.Client
 
             using (var writer = new StreamWriter(request.GetRequestStream()))
             {
-                writer.Write(string.Format("To={0}&Message={1}&MessageID={2}&MessageUser", toUserId, message, originMessageID, originMessageID));
+                writer.Write(string.Format("To={0}&Message={1}&MessageID={2}&MessageUser", toUserId, Uri.EscapeDataString(message), originMessageID, originMessageID));
             }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return _readResponseContent(response);

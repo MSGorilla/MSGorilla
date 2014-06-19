@@ -404,6 +404,7 @@ namespace MSGorilla.Library
                                     string[] atUser,
                                     string[] topicName, 
                                     string message, 
+                                    string richMessage,
                                     DateTime timestamp)
         {
             if (message.Length > 2048)
@@ -452,7 +453,7 @@ namespace MSGorilla.Library
             }
 
             // create message
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray());
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray(), richMessage);
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);

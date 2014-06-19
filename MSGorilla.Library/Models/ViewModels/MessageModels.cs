@@ -40,6 +40,7 @@ namespace MSGorilla.Library.Models.ViewModels
         public string[] AtUser { get; set; }
         public string[] TopicName { get; set; }
         public string MessageContent { get; set; }
+        public string RichMessage { get; set; }
         public DateTime PostTime { get; set; }
 
         public DisplayMessage(Message msg, AccountManager accManager)
@@ -56,6 +57,7 @@ namespace MSGorilla.Library.Models.ViewModels
             this.AtUser = msg.AtUser;
             this.TopicName = msg.TopicName;
             this.MessageContent = msg.MessageContent;
+            this.RichMessage = msg.RichMessage;
             this.PostTime = msg.PostTime;
         }
     }

@@ -15,8 +15,14 @@
         </div>
 
         <div class="title-container">
-            <h4>@ViewBag.Title for "#<span class="bold">@ViewBag.Topic</span>#"</h4>
-            <span class="help-block">See topics you’re interested in.</span>
+            <h4>
+                @ViewBag.Title for "#<span class="bold">@ViewBag.Topic</span>#"
+                @if (@ViewBag.TopicId >= 0)
+                {
+                    <a class='btn btn-default like-btn' id='btn_topic_like'>&nbsp;</a>
+                }
+            </h4>
+            <span class="help-block"> See topics you’re interested in.</span>
         </div>
 
         <div class="posts-feeds">
@@ -28,7 +34,7 @@
 
         <div class="txtaln-c">
             <span id="lbl_seemore" class="help-block">Loading more...</span>
-            <input id="hd_token" type="hidden" value="" />
+            <input id="hd_token" type="hidden" value="" /><input id="hd_newcount" type="hidden" value="0" />
 
             <script type="text/javascript">
                 $(window).scroll(function () {
@@ -44,6 +50,7 @@
     </div>
 
     <script>
+        $(LoadTopicLikeBtn("btn_topic_like", "@ViewBag.TopicId"));
         $(LoadFeeds("@ViewBag.FeedCategory", "@ViewBag.Topic"));
     </script>
 

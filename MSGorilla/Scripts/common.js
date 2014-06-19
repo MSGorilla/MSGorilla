@@ -1,9 +1,27 @@
 ﻿/* common function */
-function isValidForKey(c) {
+function isValidForUserid(c) {
     if ((c >= 'a' && c <= 'z')
         || (c >= '0' && c <= '9')
         || (c >= 'A' && c <= 'Z')
         || c == '-'
+        )
+        return true;
+    else
+        return false;
+}
+
+function isValidForTopic(c) {
+    if ((c >= 'a' && c <= 'z')
+        || (c >= '0' && c <= '9')
+        || (c >= 'A' && c <= 'Z')
+        //|| c == ' '
+        || c == '-'
+        || c == '.'
+        || c == ','
+        || c == ':'
+        || c == '&'
+        || c == '*'
+        || c == '+'
         )
         return true;
     else
@@ -19,8 +37,8 @@ function encodeEmail(code) {
 function ScrollTo(itemname) {
     var scroll_offset = $("#" + itemname).offset();
     $("body,html").animate({
-        scrollTop: scroll_offset.top
-    }, 0.5);
+        scrollTop: scroll_offset.top - 50
+    }, "slow");
 }
 
 function Txt2Html(code) {
@@ -49,7 +67,6 @@ function Html2Txt(code) {
 }
 
 function encodeHtml(code, atusers, topics) {
-    var txtcode = code;
     var code = Txt2Html(code);
 
     // autolink http[s]
@@ -151,9 +168,9 @@ function Time2Now(datestring) {
     else if (diff / min > 1) {
         return "1 min";
     }
-    //else if (diff / sec > 1) {
-    //    return Math.floor(diff / sec) + "secs";
-    //}
+        //else if (diff / sec > 1) {
+        //    return Math.floor(diff / sec) + "secs";
+        //}
     else {
         return "Just now";
     }
@@ -432,25 +449,39 @@ function PostReply(user, mid) {
 
 
 // feed function
+var isLoadFeeds = false;
 function LoadFeeds(category, id) {
+    if (isLoadFeeds) return;
+    isLoadFeeds = true;
+
+    var token = $("#hd_token").val();
+    if (!isNullOrEmpty(token)) {
+        if (token == "nomore") {
+            // already no more feeds, don't load any more
+            isLoadFeeds = false;
+            return;
+        }
+    }
+
     var apiurl = "";
     var apidata = "";
-    var count = 0;
+    var count = $("#hd_newcount").val();
     if (isNullOrEmpty(category))
         apiurl = "/api/message/userline";
     else if (category == "homeline") {
         apiurl = "/api/message/homeline";
-        count = GetNotificationCount(category);
     }
     else if (category == "atline") {
         apiurl = "/api/message/atline";
-        count = GetNotificationCount(category);
-        if (count > 25) apidata = "count=" + count;
     }
     else if (category == "ownerline") {
         apiurl = "/api/message/ownerline";
-        count = GetNotificationCount(category);
-        if (count > 25) apidata = "count=" + count;
+        if (!isNullOrEmpty(id)) {
+            apidata = "userid=" + encodeURIComponent(id);
+        }
+    }
+    else if (category == "replyline") {
+        apiurl = "/api/reply/getmyreply";
     }
     else if (category == "publicsquareline")
         apiurl = "/api/message/publicsquareline";
@@ -458,6 +489,7 @@ function LoadFeeds(category, id) {
         apiurl = "/api/message/userline";
         if (isNullOrEmpty(id)) {
             ShowError("Illegal operation.");
+            isLoadFeeds = false;
             return;
         }
         apidata = "userid=" + encodeURIComponent(id);
@@ -466,27 +498,21 @@ function LoadFeeds(category, id) {
         apiurl = "/api/message/topicline";
         if (isNullOrEmpty(id)) {
             ShowError("Illegal operation.");
+            isLoadFeeds = false;
             return;
         }
         apidata = "topic=" + encodeURIComponent(id);
     }
-    else if (category == "replyline") {
-        apiurl = "/api/reply/getmyreply";
-        count = GetNotificationCount(category);
-        if (count > 25) apidata = "count=" + count;
-    }
     else {
         ShowError("Illegal operation.");
+        isLoadFeeds = false;
         return;
     }
 
-    var token = $("#hd_token").val();
-    if (!isNullOrEmpty(token)) {
-        if (token == "nomore") {
-            // already no more feeds, don't load any more
-            return;
-        }
-
+    if (isNullOrEmpty(token)) { // first time load
+        count = GetNotificationCount(category);
+        $("#hd_newcount").val(count);
+    } else {    // load more
         if (isNullOrEmpty(apidata)) {
             apidata = "token=" + token;
         }
@@ -523,8 +549,9 @@ function LoadFeeds(category, id) {
                     }
                     $.each(data, function (index, item) {
                         var isNew = false;
-                        if (index < count) {
+                        if (count > 0) {
                             isNew = true;
+                            count--;
                         }
                         if (category == "replyline")
                             $("#feedlist").append(CreateReply(item, true, isNew));
@@ -537,16 +564,22 @@ function LoadFeeds(category, id) {
             if (isNullOrEmpty(nexttoken)) {
                 $("#lbl_seemore").html("");
                 $("#hd_token").val("nomore");
+                $("#hd_newcount").val(0);
             }
             else {
                 $("#lbl_seemore").html("<span class='spinner-loading'></span> Loading more...");
                 $("#hd_token").val(nexttoken);
+                $("#hd_newcount").val(count);
             }
 
             UpdateNotificationCount();
+            isLoadFeeds = false;
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowError(textStatus + ": " + errorThrown);
+            $("#lbl_seemore").html("");
+            $("#hd_token").val("nomore");
+            isLoadFeeds = false;
         }
     });
 }
@@ -557,6 +590,7 @@ function CreateFeed(postData, isNew) {
     var sid = postData.SchemaID;
     var eid = postData.EventID;
     var msg = postData.MessageContent;
+    var richmsg = postData.RichMessage;
     var posttime = postData.PostTime;
     var user = postData.User.Userid;
     var username = postData.User.DisplayName;
@@ -566,9 +600,6 @@ function CreateFeed(postData, isNew) {
     var atusers = postData.AtUser;
     var topics = postData.TopicName;
     var showevents = false;
-
-    //alert(user);
-    //alert(username);
 
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";
@@ -580,10 +611,10 @@ function CreateFeed(postData, isNew) {
 
     //output += "<ul class='list-group'>";
     if (isNew == true) {
-        output += "  <li class='list-group-item new-notification'>";
+        output += "  <li id='feed_" + mid + "' class='list-group-item new-notification'>";
     }
     else {
-        output += "  <li class='list-group-item'>";
+        output += "  <li id='feed_" + mid + "' class='list-group-item'>";
     }
     output += "    <div>"
     output += "      <div class='feed-pic'>";
@@ -604,24 +635,74 @@ function CreateFeed(postData, isNew) {
     }
 
     output += "        <div class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
-    output += "        <div class='newpost-footer'>";
 
-    if (showevents) {
-        // event button
-        //output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
+    // fordebug
+    //richmsg = " <img src='/Content/Images/MSFTE_photo.jpg' />";
+    // richmsg div
+    if (!isNullOrEmpty(richmsg)) {
+        output += "        <div id='rich_message_" + mid + "' class='newpost-input' style='display:none;'>" + richmsg + "</div>";
     }
 
-    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Expand</button>";
+    output += "        <div class='newpost-footer'>";
+
+    // event button
+    //if (showevents) {
+    //    output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
+    //}
+
+    // richmsg btn
+    if (!isNullOrEmpty(richmsg)) {
+        output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowRichMsg(\"" + user + "\", \"" + mid + "\");'>More</button>";
+    }
+    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Replies</button>";
     output += "        </div>";
     output += "      </div>";
     output += "    </div>";
-    output += "    <div id='reply_" + mid + "'></div>";
+    output += "    <div style='display:none;' id='reply_" + mid + "'>";
+    // add reply box
+    output += "      <div class='replies-container well'>";
+    output += "        <div class='input-group'>";
+    //output += "         <span class='input-group-addon'>Comment</span>";
+    output += "          <input class='form-control' type='text' id='replymessage_" + mid + "' replyto='" + user + "' placeholder='Reply to @" + user + "'>";
+    output += "          <span class='input-group-btn'>";
+    output += "            <button class='btn btn-primary' type='button' id='btn_reply_" + mid + "' data-loading-text='Replying...' onclick='PostReply(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
+    output += "          </span>";
+    output += "        </div>";
+    output += "      </div>";
+    // add replies
+    output += "      <div class='replies-feeds'>";
+    output += "        <ul id='replylist_" + mid + "' class='list-group'></ul>";
+    output += "      </div>";
+    output += "    </div>";
     output += "    <input type='hidden' id='isshowreplies_" + mid + "' value='false'/>";
     output += "  </li>";
 
     //output += "</ul>";
 
     return output;
+}
+
+function ShowRichMsg(user, mid) {
+    var showbtn = $("#btn_showrichmsg_" +mid);
+    var show = showbtn.attr("isshow");
+    var richmsgdiv = $("#rich_message_" + mid);
+
+    if (show == "false") {
+        // show replies
+        showbtn.attr("isshow", "true");
+        showbtn.text("Less");
+
+        richmsgdiv.show();
+    }
+    else {
+        // clear replies
+        showbtn.attr("isshow", "false");
+        showbtn.text("More");
+
+        richmsgdiv.hide();
+    }
+
+    ScrollTo("feed_" +mid);
 }
 
 
@@ -636,23 +717,7 @@ function ShowReplies(user, mid) {
         showbtn.attr("isshow", "true");
         showbtn.text("Collapse");
 
-        var html = "";
-        html = "<div class='replies-container well'>";
-        // add reply box
-        html += "  <div class='input-group'>";
-        //html += "     <span class='input-group-addon'>Comment</span>";
-        html += "     <input class='form-control' type='text' id='replymessage_" + mid + "' replyto='" + user + "' placeholder='Reply to @" + user + "'>";
-        html += "     <span class='input-group-btn'>";
-        html += "       <button class='btn btn-primary' type='button' id='btn_reply_" + mid + "' data-loading-text='Replying...' onclick='PostReply(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
-        html += "     </span>";
-        html += "  </div>";
-        // add replies
-        html += "  <div class='replies-feeds'>";
-        html += "    <ul id='replylist_" + mid + "' class='list-group'></ul>";
-        html += "  </div>";
-        html += "</div>";
-
-        replydiv.html(html);
+        replydiv.show();
 
         // show reply
         LoadReplies(mid);
@@ -660,9 +725,9 @@ function ShowReplies(user, mid) {
     else {
         // clear replies
         showbtn.attr("isshow", "false");
-        showbtn.text("Expand");
+        showbtn.text("Replies");
 
-        replydiv.html("");
+        replydiv.hide();
     }
 }
 
@@ -804,6 +869,7 @@ function CreateEvent(postData, isHeighlight) {
     var sid = postData.SchemaID;
     var eid = postData.EventID;
     var msg = postData.MessageContent;
+    var richmsg = postData.RichMessage;
     var posttime = postData.PostTime;
     var user = postData.User.Userid;
     var username = postData.User.DisplayName;
@@ -827,8 +893,10 @@ function CreateEvent(postData, isHeighlight) {
     output += "        <img class='img-rounded' id='event_user_pic_" + eid + "' src='" + picurl + "' width='100' height='100' />";
     output += "      </div>";
     output += "      <div class='feed-content'>";
-    output += "        <div class='newpost-header'><a id='event_username_" + eid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>";
-    output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span></div>";
+    output += "        <div class='newpost-header'>";
+    output += "          <a id='event_username_" + eid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>&nbsp;";
+    output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
+    output += "        </div>";
 
     if (!isNullOrEmpty(owners)) {
         output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
@@ -839,13 +907,13 @@ function CreateEvent(postData, isHeighlight) {
     }
 
     output += "        <div class='newpost-input'>" + encodeHtml(msg) + "</div>";
-    //output += "        <div class='newpost-footer'>";
-    //output += "          <button id='btn_reply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Comments</button>";
-    //output += "        </div>";
+
+    if (!isNullOrEmpty(richmsg)) {
+        output += "        <div class='newpost-input'>" + richmsg + "</div>";
+    }
+
     output += "      </div>";
     output += "    </div>";
-    //output += "    <div id='reply_" + mid + "'></div>";
-    //output += "    <input type='hidden' id='isshowreplies_" + mid + "' value='false'/>";
     output += "  </li>";
 
     return output;
@@ -875,18 +943,13 @@ function SearchTopic(keyword) {
             else {
                 $("#topiclist").empty();
                 $.each(data, function (index, item) {
-                    var output = "";
                     var topicid = item.Id;
                     var topicname = item.Name;
                     var topicdesp = item.Description;
                     var topiccount = item.MsgCount;
 
-                    output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "# <span class='badge'>" + topiccount + "</span></a>";
-                    $("#topiclist").append(output);
-
-                    if (index == 0) {
-                        LoadFeeds("topicline", topicname);
-                    }
+                    $("#topiclist").append(CreateTopic(topicid, topicname, topicdesp, topiccount));
+                    LoadTopicLikeBtn("btn_topic_like_" + topicid, topicid);
                 })
             }
         },
@@ -1014,6 +1077,15 @@ function CreateUserCard(data) {
 // notification count function
 function GetNotificationCount(category) {
     var count = 0;
+
+    if (category != "atline"
+        && category != "ownerline"
+        && category != "replyline"
+        && category != "homeline"
+        ) {
+        return count;
+    }
+
     var apiurl = "/api/account/getnotificationcount";
     $.ajax({
         type: "GET",
@@ -1112,16 +1184,226 @@ function LoadHotTopics() {
                 var topiccount = item.MsgCount;
 
                 output += "<li class='sub-list-group-item'>";
-                output += "  <span class='badge'>" + topiccount + "</span>";
+                output += "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "'>&nbsp;</a>";
+                //output += "  <span class='badge'>" + topiccount + "</span>";
                 output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
                 output += "</li>";
                 $("#topic_collapse").append(output);
+                LoadTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid);
             })
         },
         //error: function (XMLHttpRequest, textStatus, errorThrown) {
         //    ShowError(textStatus + ": " + errorThrown);
         //}
     });
+}
+
+function LoadUserFavoriteTopics(user) {
+    var apiurl = "/api/topic/getuserfavouritetopic";
+    var apidata = "userid=" + user;
+
+    $.ajax({
+        type: "GET",
+        url: apiurl,
+        data: apidata,
+        dataType: "json",
+        success: function (data) {
+            if (data.length == 0) {
+                ShowError("No content.");
+            }
+            else {
+                $("#topiclist").empty();
+                $.each(data, function (index, item) {
+                    var topicid = item.topicID;
+                    var topicname = item.topicName;
+                    var topicdesp = item.topicDescription;
+                    var topiccount = item.topicMsgCount;
+
+                    $("#topiclist").append(CreateTopic(topicid, topicname, topicdesp, topiccount));
+                    LoadTopicLikeBtn("btn_topic_like_" + topicid, topicid);
+                })
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+function LoadMyFavoriteTopics() {
+    var apiurl = "/api/topic/getmyfavouritetopic";
+
+    $.ajax({
+        type: "GET",
+        url: apiurl,
+        dataType: "json",
+        success: function (data) {
+            // create hot topic
+            $("#favorite_collapse").empty();
+            $.each(data, function (index, item) {
+                var output = "";
+                var userid = item.userid;
+                var topicid = item.topicID;
+                var unreadcount = item.UnreadMsgCount;
+                var topicname = item.topicName;
+                var topicdesp = item.topicDescription;
+                var topiccount = item.topicMsgCount;
+
+                output += "<li class='sub-list-group-item'>";
+                output += "  <span class='badge'>" + unreadcount + "</span>";
+                output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
+                output += "</li>";
+                $("#favorite_collapse").append(output);
+            })
+        },
+        //error: function (XMLHttpRequest, textStatus, errorThrown) {
+        //    ShowError(textStatus + ": " + errorThrown);
+        //}
+    });
+}
+
+function LoadTopicLikeBtn(btnid, topicid) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    var apiurl = "/api/topic/isfavouritetopic";
+    var apidata = "topicID=" + encodeURIComponent(topicid);
+
+    $.ajax({
+        type: "GET",
+        url: apiurl,
+        data: apidata,
+        dataType: "json",
+        success: function (data) {
+            if (data == true) {
+                SetUnlikeBtn(btnid, topicid, true);
+            }
+            else {
+                SetLikeBtn(btnid, topicid, true);
+
+            }
+        },
+        //error: function (XMLHttpRequest, textStatus, errorThrown) {
+        //    ShowError(textStatus + ": " + errorThrown);
+        //}
+    });
+}
+
+function SetUnlikeBtn(btnid, topicid, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Liked");
+    btn.attr("class", "btn btn-success like-btn");
+    if (enabled) {
+        btn.attr("onclick", "Unlike('" + btnid + "', '" + topicid + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "UnlikeBtnMouseOver('" + btnid + "');")
+    btn.attr("onmouseout", "UnlikeBtnMouseOut('" + btnid + "');")
+}
+
+function UnlikeBtnMouseOver(btnid) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-danger like-btn");
+    btn.text("Unlike");
+}
+
+function UnlikeBtnMouseOut(btnid) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-success like-btn");
+    btn.text("Liked");
+}
+
+function SetLikeBtn(btnid, topicid, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Like");
+    btn.attr("class", "btn btn-primary like-btn");
+    if (enabled) {
+        btn.attr("onclick", "Like('" + btnid + "', '" + topicid + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
+}
+
+function Like(btnid, topicid) {
+    SetUnlikeBtn(btnid, topicid, false);
+    $.ajax({
+        type: "GET",
+        url: "/api/topic/addfavouritetopic",
+        data: "topicID=" + encodeURIComponent(topicid),
+        success: function (data) {
+            var code = data.ActionResultCode;
+            var msg = data.Message;
+            if (code == "0") {
+                LoadMyFavoriteTopics();
+                SetUnlikeBtn(btnid, topicid, true);
+            }
+            else {
+                ShowError(msg);
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+function Unlike(btnid, topicid) {
+    SetLikeBtn(btnid, topicid, false);
+    $.ajax({
+        type: "GET",
+        url: "/api/topic/removefavouritetopic",
+        data: "topicID=" + encodeURIComponent(topicid),
+        success: function (data) {
+            var code = data.ActionResultCode;
+            var msg = data.Message;
+            if (code == "0") {
+                LoadMyFavoriteTopics();
+                SetLikeBtn(btnid, topicid, true);
+            }
+            else {
+                ShowError(msg);
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowError(textStatus + ": " + errorThrown);
+        }
+    });
+}
+
+function CreateTopic(topicid, topicname, topicdesp, topiccount) {
+    var output = "";
+
+    output += "<li class='list-group-item'>";
+    output += "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "'>&nbsp;</a>";
+    output += "  <span class='badge'>" + topiccount + "</span>";
+    output += "  <a class='fullname' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
+    output += "  <span class='username' >" + (isNullOrEmpty(topicdesp) ? "" : topicdesp) + "</span>&nbsp;";
+    output += "</li>";
+
+    return output;
 }
 
 
