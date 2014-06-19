@@ -235,6 +235,7 @@ namespace MSGorilla.WebApi
             public string[] TopicName { get; set; }
             public string[] Owner { get; set; }
             public string[] AtUser { get; set; }
+            public string RichMessage { get; set; }
         };
 
         [HttpPost]
@@ -252,7 +253,7 @@ namespace MSGorilla.WebApi
             {
                 msg.EventID = "none";
             }
-            return PostMessage(msg.Message, msg.SchemaID, msg.EventID, msg.Owner, msg.AtUser, msg.TopicName);
+            return PostMessage(msg.Message, msg.SchemaID, msg.EventID, msg.Owner, msg.AtUser, msg.TopicName, msg.RichMessage);
             //return new ActionResult();
         }
     }
