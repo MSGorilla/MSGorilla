@@ -55,10 +55,6 @@ namespace MSGorilla.WebApi
             string me = whoami();
             Attachment attachment = _attachmentManager.GetAttachmentInfo(attachmentID);
 
-
-            var path = @"D:\FederationMetadata.xml";
-            var stream = new FileStream(path, FileMode.Open);
-
             HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
             result.Content = new StreamContent(_attachmentManager.GetAttachment(attachment));
             result.Content.Headers.ContentType =
