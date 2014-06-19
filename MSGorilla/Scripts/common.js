@@ -401,7 +401,7 @@ function PostMessage() {
     $.ajax({
         type: "POST",
         url: "/api/message/postmessage",
-        data: "message=" + message,
+        data: "message=" + message, // +"&richMessage=" + message,
         dataType: "json",
         success: function (data) {
             $("#postmessage").val("");

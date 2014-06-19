@@ -252,8 +252,7 @@
     <Compile Include="WebAPI\TopicController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\ms-bootstrap.css" />
-    <Content Include="Content\ms-bootstrap.min.css" />
+    <Content Include="Content\ms.gorilla.css" />
     <Content Include="Content\css.css" />
     <Content Include="Content\Images\default_avatar.jpg" />
     <Content Include="Content\Images\default_bg.png" />
