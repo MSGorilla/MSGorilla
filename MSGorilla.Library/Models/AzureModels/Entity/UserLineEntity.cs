@@ -10,6 +10,7 @@ namespace MSGorilla.Library.Models.AzureModels
     public class UserLineEntity : TableEntity
     {
         public string Content { get; set; }
+        public string RichMessage { get; set; }
 
         //public int RetweetCount { get; set; }
 
@@ -21,8 +22,10 @@ namespace MSGorilla.Library.Models.AzureModels
                 Utils.ToAzureStorageDayBasedString(msg.PostTime.ToUniversalTime()));    //Partition key
             this.RowKey = msg.ID;
             Content = msg.ToJsonString();
+            RichMessage = msg.RichMessage;
             //RetweetCount = retweetCount;
             ReplyCount = replyCount;
+
         }
 
         //public UserLineEntity(string userid, string tweetID)

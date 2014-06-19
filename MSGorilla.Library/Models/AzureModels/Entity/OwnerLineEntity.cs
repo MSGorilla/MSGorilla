@@ -10,6 +10,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
     class OwnerLineEntity : TableEntity
     {
         public string Content { get; set; }
+        public string RichMessage { get; set; }
 
         public OwnerLineEntity()
         {
@@ -23,6 +24,8 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             this.RowKey = msg.ID;
 
             Content = msg.ToJsonString();
+            RichMessage = msg.RichMessage;
+
         }
     }
 }
