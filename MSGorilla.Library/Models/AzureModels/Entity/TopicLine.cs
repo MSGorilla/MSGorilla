@@ -11,6 +11,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
     class TopicLine : TableEntity
     {
         public string Content { get; set; }
+        public string RichMessage { get; set; }
 
         public TopicLine()
         {
@@ -24,6 +25,8 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             this.RowKey = msg.ID;
 
             Content = msg.ToJsonString();
+            RichMessage = msg.RichMessage;
+
         }
     }
 }
