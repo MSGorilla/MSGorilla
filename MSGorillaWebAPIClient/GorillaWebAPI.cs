@@ -132,7 +132,7 @@ namespace MSGorilla.WebAPI.Client
                     return sb.ToString();
                 }
             }
-            return longStr;
+            return Uri.EscapeDataString(longStr);
         }
 
         public List<Message> HomeLine(DateTime start, DateTime end)
