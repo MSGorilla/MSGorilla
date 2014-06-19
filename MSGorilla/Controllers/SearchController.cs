@@ -9,7 +9,6 @@ using MSGorilla.Library.Models.SqlModels;
 
 namespace MSGorilla.Views
 {
-    [CryptographicExceptionHandlerAttribute]
     public class SearchController : Controller
     {
         AccountManager _accManager = new AccountManager();

@@ -10,7 +10,6 @@ using MSGorilla.Library.Models.SqlModels;
 
 namespace MSGorilla.Controllers
 {
-    [CryptographicExceptionHandlerAttribute]
     public class ProfileController : Controller
     {
         AccountManager _accManager = new AccountManager();
