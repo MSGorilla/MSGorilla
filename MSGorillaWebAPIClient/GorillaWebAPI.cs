@@ -99,6 +99,12 @@ namespace MSGorilla.WebAPI.Client
                 if (richMessage != null)
                 {
                     richMessageStr = "&richMessage=" + EscapeString(richMessage);
+                    
+                    // Currently azure table field only supports max 64K
+                    if (richMessageStr.Length > 60000)
+                    {
+                        richMessageStr = null;
+                    }
                 }
 
                 writer.Write(string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}{6}", Uri.EscapeDataString(message), schemaID, eventID, topicNameStr, ownerStr, atUserStr, richMessageStr));
