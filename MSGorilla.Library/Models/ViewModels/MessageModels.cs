@@ -22,10 +22,11 @@ namespace MSGorilla.Library.Models.ViewModels
             continuationToken = msg.continuationToken;
             var msglist = msg.message;
             AccountManager accManager = new AccountManager();
+            AttachmentManager attManager = new AttachmentManager();
             message = new List<DisplayMessage>();
             foreach (var m in msglist)
             {
-                message.Add(new DisplayMessage(m, accManager));
+                message.Add(new DisplayMessage(m, accManager, attManager));
             }
         }
     }
@@ -41,9 +42,10 @@ namespace MSGorilla.Library.Models.ViewModels
         public string[] TopicName { get; set; }
         public string MessageContent { get; set; }
         public string RichMessage { get; set; }
+        public List<Attachment> Attachment { get; set; } 
         public DateTime PostTime { get; set; }
 
-        public DisplayMessage(Message msg, AccountManager accManager)
+        public DisplayMessage(Message msg, AccountManager accManager, AttachmentManager attManager)
         {
             //
             var userinfo = accManager.FindUser(msg.User);
@@ -59,6 +61,23 @@ namespace MSGorilla.Library.Models.ViewModels
             this.MessageContent = msg.MessageContent;
             this.RichMessage = msg.RichMessage;
             this.PostTime = msg.PostTime;
+
+            if (msg.AttachmentID == null || msg.AttachmentID.Length == 0)
+            {
+                this.Attachment = null;
+            }
+            else
+            {
+                this.Attachment = new List<Attachment>();
+                foreach (string attid in msg.AttachmentID)
+                {
+                    Attachment att = attManager.GetAttachmentInfo(attid);
+                    if (att != null)
+                    {
+                        this.Attachment.Add(att);
+                    }
+                }
+            }
         }
     }
 }

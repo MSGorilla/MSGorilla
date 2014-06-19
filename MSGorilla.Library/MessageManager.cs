@@ -36,6 +36,7 @@ namespace MSGorilla.Library
         private CloudQueue _queue;
 
         private AccountManager _accManager;
+        private AttachmentManager _attManager;
         private SchemaManager _schemaManager;
         private NotifManager _notifManager;
         private TopicManager _topicManager;
@@ -54,6 +55,7 @@ namespace MSGorilla.Library
             _queue = AzureFactory.GetQueue();
 
             _accManager = new AccountManager();
+            _attManager = new AttachmentManager();
             _schemaManager = new SchemaManager();
             _notifManager = new NotifManager();
             _topicManager = new TopicManager();
@@ -394,7 +396,7 @@ namespace MSGorilla.Library
             {
                 return null;
             }
-            return new DisplayMessage(msg, _accManager);
+            return new DisplayMessage(msg, _accManager, _attManager);
         }
 
         public Message PostMessage(string userid, 
@@ -405,6 +407,7 @@ namespace MSGorilla.Library
                                     string[] topicName, 
                                     string message, 
                                     string richMessage,
+                                    string[] attachmentID,
                                     DateTime timestamp)
         {
             if (message.Length > 2048)
@@ -453,7 +456,7 @@ namespace MSGorilla.Library
             }
 
             // create message
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray(), richMessage);
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray(), richMessage, attachmentID);
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);

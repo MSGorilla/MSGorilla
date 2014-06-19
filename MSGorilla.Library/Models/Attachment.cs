@@ -8,7 +8,7 @@ namespace MSGorilla.Library.Models
 {
     public class Attachment
     {
-        public string AttachmentId { get; set; }          //{pk};{guid}
+        public string AttachmentID { get; set; }          //{pk};{guid}
         public string FileID { get; set; }
         public string Uploader { get; set; }
         public DateTime UploadTimestamp { get; set; }

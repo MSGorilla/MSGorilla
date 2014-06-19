@@ -24,7 +24,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
                 Utils.ToAzureStorageSecondBasedString(attachment.UploadTimestamp),
                 attachment.FileID);
 
-            attachment.AttachmentId = string.Format("{0};{1}", this.PartitionKey, this.RowKey);
+            attachment.AttachmentID = string.Format("{0};{1}", this.PartitionKey, this.RowKey);
             this.Content = JsonConvert.SerializeObject(attachment);
         }
     }

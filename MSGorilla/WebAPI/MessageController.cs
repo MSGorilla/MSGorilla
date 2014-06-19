@@ -144,9 +144,10 @@ namespace MSGorilla.WebApi
             var msglist = _messageManager.EventLine(eventID);
             var msg = new List<DisplayMessage>();
             AccountManager accManager = new AccountManager();
+            AttachmentManager attManage = new AttachmentManager();
             foreach (var m in msglist)
             {
-                msg.Add(new DisplayMessage(m, accManager));
+                msg.Add(new DisplayMessage(m, accManager, attManage));
             }
 
             return msg;
@@ -221,9 +222,10 @@ namespace MSGorilla.WebApi
                                     [FromUri]string[] owner = null,
                                     [FromUri]string[] atUser = null,
                                     [FromUri]string[] topicName = null,
-                                    string richMessage = null)
+                                    string richMessage = null,
+                                    [FromUri]string[] attachmentID = null)
         {
-            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, topicName, message, richMessage, DateTime.UtcNow), new AccountManager());
+            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, topicName, message, richMessage, attachmentID, DateTime.UtcNow), new AccountManager(), new AttachmentManager());
             //return new ActionResult();
         }
 
@@ -236,6 +238,7 @@ namespace MSGorilla.WebApi
             public string[] Owner { get; set; }
             public string[] AtUser { get; set; }
             public string RichMessage { get; set; }
+            public string[] AttachmentID { get; set; }
         };
 
         [HttpPost]
@@ -253,7 +256,7 @@ namespace MSGorilla.WebApi
             {
                 msg.EventID = "none";
             }
-            return PostMessage(msg.Message, msg.SchemaID, msg.EventID, msg.Owner, msg.AtUser, msg.TopicName, msg.RichMessage);
+            return PostMessage(msg.Message, msg.SchemaID, msg.EventID, msg.Owner, msg.AtUser, msg.TopicName, msg.RichMessage, msg.AttachmentID);
             //return new ActionResult();
         }
     }
