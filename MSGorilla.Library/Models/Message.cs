@@ -7,6 +7,10 @@ using Newtonsoft.Json;
 using Microsoft.WindowsAzure.Storage.Queue;
 
 using MSGorilla.Library.Exceptions;
+using System.Runtime.Serialization.Json;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Web.Script.Serialization;
 
 namespace MSGorilla.Library.Models
 {
@@ -16,20 +20,26 @@ namespace MSGorilla.Library.Models
         public string ID { get; set; }
         public string EventID { get; set; }
         public string SchemaID { get; set; }
-        public string[] Owner { get; set; }        
+        public string[] Owner { get; set; }
         public string[] AtUser { get; set; }
         public string[] TopicName { get; set; }
-        public string MessageContent { get; set; } 
+        public string MessageContent { get; set; }
         public DateTime PostTime { get; set; }
+        [ScriptIgnore]
+        public string RichMessage { get; set; }
+        public string[] AttachmentID { get; set; }
 
-        public Message(string userid, 
-            string message, 
-            DateTime timestamp, 
-            string eventID, 
-            string schemaID, 
+        public Message(string userid,
+            string message,
+            DateTime timestamp,
+            string eventID,
+            string schemaID,
             string[] owner,
             string[] atUser,
-            string[] topicName)
+            string[] topicName,
+            string richMessage,
+            string[] attachmentID
+                )
         {
             User = userid;
             MessageContent = message;
@@ -38,7 +48,9 @@ namespace MSGorilla.Library.Models
             Owner = owner;
             AtUser = atUser;
             TopicName = topicName;
+            RichMessage = richMessage;
             PostTime = timestamp.ToUniversalTime();
+            AttachmentID = attachmentID;
             ID = string.Format("{0}_{1}",
                                 Utils.ToAzureStorageSecondBasedString(PostTime),
                                 Guid.NewGuid().ToString());
@@ -46,7 +58,10 @@ namespace MSGorilla.Library.Models
 
         public string ToJsonString()
         {
-            return JsonConvert.SerializeObject(this);
+            JavaScriptSerializer serialize = new JavaScriptSerializer();
+            return serialize.Serialize(this);
+
+            //return JsonConvert.SerializeObject(this);
         }
 
         public static string ToMessagePK(string userid, string messageID)

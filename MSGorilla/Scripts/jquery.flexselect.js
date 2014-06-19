@@ -57,7 +57,8 @@
             });
 
             //apiurl = "/api/topic/getalltopic"
-            apiurl = "/api/topic/hottopics?count=25"
+            //apiurl = "/api/topic/hottopics?count=25"
+            apiurl = "/api/topic/getmyfavouritetopic";
             $.ajax({
                 type: "GET",
                 url: apiurl,
@@ -201,7 +202,10 @@
         },
 
         filterResults: function () {
-            var abbreviation = this.getWordAtCursor();
+            var abbreviation = this.getUserAtCursor();  // try to find user
+            if (isNullOrEmpty(abbreviation)) {
+                abbreviation = this.getTopicAtCursor(); // try to find topic
+            }
 
             // hide dropdown
             if (isNullOrEmpty(abbreviation)) {
@@ -368,7 +372,19 @@
         pickSelected: function () {
             var selected = this.results[this.selectedIndex];
             if (selected) {
-                this.replaceWordAtCursor(selected.value);
+                var type = selected.value.substr(0, 1);
+
+                switch(type){
+                    case "@":
+                        this.replacUserAtCursor(selected.value);
+                        break;
+                    case "#":
+                        this.replaceTopicAtCursor(selected.value);
+                        break;
+                    default:
+                        break;
+                }
+
                 //this.hidden.val(selected.name);
                 this.picked = true;
             } else if (this.settings.allowMismatch) {
@@ -384,7 +400,7 @@
             this.lastAbbreviation = null;
         },
 
-        getWordAtCursor: function () {
+        getUserAtCursor: function () {
             var str = this.input.val();
             var pos = this.input.getSelectionStart();
             var ret = "";
@@ -392,16 +408,16 @@
             var i = pos - 1;
             var j = pos;
             while (i >= 0) {
-                if (isValidForKey(str[i])) {
+                if (isValidForUserid(str[i])) {
                     i--;
                     continue;
                 }
                 break;
             }
 
-            if (i < pos - 1 && (str[i] == '@' || str[i] == '#')) { // found sth.
+            if (i < pos - 1 && (str[i] == '@')) { // found sth.
                 while (j < str.length) {
-                    if (isValidForKey(str[j])) {
+                    if (isValidForUserid(str[j])) {
                         j++;
                         continue;
                     }
@@ -413,23 +429,87 @@
             return ret;
         },
 
-        replaceWordAtCursor: function (newWord) {
+        getTopicAtCursor: function () {
             var str = this.input.val();
             var pos = this.input.getSelectionStart();
+            var ret = "";
 
             var i = pos - 1;
             var j = pos;
             while (i >= 0) {
-                if (isValidForKey(str[i])) {
+                if (isValidForTopic(str[i])) {
                     i--;
                     continue;
                 }
                 break;
             }
 
-            if (i < pos - 1 && (str[i] == '@' || str[i] == '#')) { // found sth.
+            if (i < pos - 1 && (str[i] == '#')) { // found sth.
                 while (j < str.length) {
-                    if (isValidForKey(str[j])) {
+                    if (isValidForTopic(str[j])) {
+                        j++;
+                        continue;
+                    }
+                    break;
+                }
+                ret = str.substring(i, j);
+            }
+
+            return ret;
+        },
+
+        replacUserAtCursor: function (newWord) {
+            var str = this.input.val();
+            var pos = this.input.getSelectionStart();
+
+            var i = pos - 1;
+            var j = pos;
+            while (i >= 0) {
+                if (isValidForUserid(str[i])) {
+                    i--;
+                    continue;
+                }
+                break;
+            }
+
+            if (i < pos - 1 && (str[i] == '@')) { // found sth.
+                while (j < str.length) {
+                    if (isValidForUserid(str[j])) {
+                        j++;
+                        continue;
+                    }
+                    break;
+                }
+                var len = newWord.length + 1;
+                if (str[j] != ' ') newWord += " ";
+                if (i > 0 && (str[i - 1] != ' ' && str[i - 1] != '\n')) {
+                    newWord = " " + newWord;
+                    len++;
+                }
+                this.input.val(str.substring(0, i) + newWord + str.substring(j));
+                this.input.moveCursor(i + len);
+            }
+
+            return;
+        },
+
+        replaceTopicAtCursor: function (newWord) {
+            var str = this.input.val();
+            var pos = this.input.getSelectionStart();
+
+            var i = pos - 1;
+            var j = pos;
+            while (i >= 0) {
+                if (isValidForTopic(str[i])) {
+                    i--;
+                    continue;
+                }
+                break;
+            }
+
+            if (i < pos - 1 && (str[i] == '#')) { // found sth.
+                while (j < str.length) {
+                    if (isValidForTopic(str[j])) {
                         j++;
                         continue;
                     }

@@ -227,6 +227,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\SquareController.cs" />
     <Compile Include="Controllers\TopicController.cs" />
     <Compile Include="Filters\BasicAuthAttribute.cs" />
@@ -242,6 +243,7 @@
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Utility\TokenCacheUtils.cs" />
     <Compile Include="WebAPI\AccountController.cs" />
+    <Compile Include="WebAPI\AttachmentController.cs" />
     <Compile Include="WebAPI\BaseController.cs" />
     <Compile Include="WebAPI\MessageController.cs">
       <SubType>Code</SubType>
@@ -251,12 +253,12 @@
     <Compile Include="WebAPI\TopicController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\ms.gorilla.css" />
     <Content Include="Content\css.css" />
     <Content Include="Content\Images\default_avatar.jpg" />
     <Content Include="Content\Images\default_bg.png" />
     <Content Include="Content\Images\link_line.png" />
+    <Content Include="Content\Images\MSFTE_photo.jpg" />
     <Content Include="Content\Images\new_flag.png" />
     <Content Include="Content\Images\small_spinner.gif" />
     <Content Include="favicon.ico" />
@@ -323,9 +325,12 @@
     <Content Include="Views\Shared\_MessageModalPartial.cshtml" />
     <Content Include="Views\Profile\Favorites.cshtml" />
     <Content Include="Views\Profile\Owned.cshtml" />
+    <Content Include="Views\Error\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Attachment\" />
+    <Folder Include="Views\HandleCustomError\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -360,7 +365,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>14061</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44301/</IISUrl>
+          <IISUrl>http://localhost:14061/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

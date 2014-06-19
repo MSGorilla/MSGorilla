@@ -160,7 +160,7 @@ namespace MSGorilla.Library
                 return AtUser;
             }
          
-            Regex r = new Regex(@"@([0-9a-z\-]+)(\s|$)", RegexOptions.IgnoreCase);
+            Regex r = new Regex(@"(\s|^)@([0-9a-z\-]+)", RegexOptions.IgnoreCase);
             MatchCollection matches = r.Matches(message);
 
             foreach (Match m in matches)
@@ -180,7 +180,7 @@ namespace MSGorilla.Library
                 return topicNames;
             }
 
-            Regex r = new Regex(@"#(([\w \-]+(#{2,})?)*[\w \-]+)#(\s|$)", RegexOptions.IgnoreCase);
+            Regex r = new Regex(@"(\s|^)#([\w][\w \-.,:&\*\+]*)?[\w]#", RegexOptions.IgnoreCase);
             //Regex r = new Regex(@"#(([\w \-]+(#{2})?)*[\w \-]+)#(\s|$)", RegexOptions.IgnoreCase);
             MatchCollection matches = r.Matches(message);
 

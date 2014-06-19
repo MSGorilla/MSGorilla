@@ -32,7 +32,7 @@ namespace MSGorilla
                       "~/Scripts/respond.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/Content/bootstrap.css",
+                      "~/Content/ms.gorilla.css",
                       "~/Content/site.css"));
         }
     }

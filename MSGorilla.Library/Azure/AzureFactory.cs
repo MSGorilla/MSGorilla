@@ -8,6 +8,7 @@ using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Microsoft.WindowsAzure.Storage.Queue;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 using System.Configuration;
 
@@ -25,9 +26,11 @@ namespace MSGorilla.Library.Azure
             AtLine,
             Reply,
             ReplyNotification,
-            ReplyArchive
+            ReplyArchive,
+            Attachment
         }
 
+        public const string AttachmentContainer = "attachment";
         public const string QueueName = "messagequeue";
 
         private static CloudStorageAccount _storageAccount;
@@ -52,6 +55,7 @@ namespace MSGorilla.Library.Azure
             _dict.Add(MSGorillaTable.Reply, "Reply");
             _dict.Add(MSGorillaTable.ReplyNotification, "ReplyNotification");
             _dict.Add(MSGorillaTable.ReplyArchive, "ReplyArchive");
+            _dict.Add(MSGorillaTable.Attachment, "Attachment");
         }
 
         public static CloudTable GetTable(MSGorillaTable table)
@@ -68,6 +72,19 @@ namespace MSGorilla.Library.Azure
             var azqueue = client.GetQueueReference(QueueName);
             azqueue.CreateIfNotExists();
             return azqueue;
+        }
+
+        public static CloudBlobContainer GetBlobContainer()
+        {
+            var client = _storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer container = client.GetContainerReference(AttachmentContainer);
+            container.CreateIfNotExists();
+            //container.SetPermissions(new BlobContainerPermissions
+            //{
+            //    PublicAccess = BlobContainerPublicAccessType.Blob
+            //});
+
+            return container;
         }
     }
 }

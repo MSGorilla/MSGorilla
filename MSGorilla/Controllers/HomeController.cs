@@ -26,12 +26,12 @@ namespace MSGorilla.Controllers
             ViewBag.Me = me;
 
             ViewBag.FeedCategory = "homeline";
-
             return View();
         }
 
         public ActionResult About()
         {
+            throw new System.Security.Cryptography.CryptographicException();
             return View();
         }
 

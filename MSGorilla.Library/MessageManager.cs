@@ -36,6 +36,7 @@ namespace MSGorilla.Library
         private CloudQueue _queue;
 
         private AccountManager _accManager;
+        private AttachmentManager _attManager;
         private SchemaManager _schemaManager;
         private NotifManager _notifManager;
         private TopicManager _topicManager;
@@ -54,6 +55,7 @@ namespace MSGorilla.Library
             _queue = AzureFactory.GetQueue();
 
             _accManager = new AccountManager();
+            _attManager = new AttachmentManager();
             _schemaManager = new SchemaManager();
             _notifManager = new NotifManager();
             _topicManager = new TopicManager();
@@ -140,7 +142,9 @@ namespace MSGorilla.Library
             List<Message> msgs = new List<Message>();
             foreach (UserLineEntity entity in _userline.ExecuteQuery(rangeQuery))
             {
-                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msg.RichMessage = entity.RichMessage;
+                msgs.Add(msg);
             }
             return msgs;
         }
@@ -157,7 +161,9 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (UserLineEntity entity in queryResult)
             {
-                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msg.RichMessage = entity.RichMessage;
+                ret.message.Add(msg);
             }
             return ret;
         }
@@ -172,7 +178,9 @@ namespace MSGorilla.Library
             List<Message> msgs = new List<Message>();
             foreach (UserLineEntity entity in _ownerline.ExecuteQuery(rangeQuery))
             {
-                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msg.RichMessage = entity.RichMessage;
+                msgs.Add(msg);
             }
             return msgs;
         }
@@ -188,7 +196,9 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (OwnerLineEntity entity in queryResult)
             {
-                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msg.RichMessage = entity.RichMessage;
+                ret.message.Add(msg);
             }
             return ret;
         }
@@ -204,7 +214,9 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (AtLineEntity entity in queryResult)
             {
-                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msg.RichMessage = entity.RichMessage;
+                ret.message.Add(msg);
             }
 
             return ret;
@@ -220,7 +232,9 @@ namespace MSGorilla.Library
             List<Message> msgs = new List<Message>();
             foreach (HomeLineEntity entity in _homeline.ExecuteQuery(rangeQuery))
             {
-                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msg.RichMessage = entity.RichMessage;
+                msgs.Add(msg);
             }
             return msgs;
         }
@@ -237,7 +251,9 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (HomeLineEntity entity in queryResult)
             {
-                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msg.RichMessage = entity.RichMessage;
+                ret.message.Add(msg);
             }
             return ret;
         }
@@ -254,7 +270,9 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (TopicLine entity in queryResult)
             {
-                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msg.RichMessage = entity.RichMessage;
+                ret.message.Add(msg);
             }
             return ret;
         }
@@ -268,7 +286,9 @@ namespace MSGorilla.Library
             List<Message> msgs = new List<Message>();
             foreach (EventLineEntity entity in _eventline.ExecuteQuery(rangeQuery))
             {
-                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msg.RichMessage = entity.RichMessage;
+                msgs.Add(msg);
             }
             return msgs;
         }
@@ -285,7 +305,9 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (PublicSquareLineEntity entity in queryResult)
             {
-                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msg.RichMessage = entity.RichMessage;
+                ret.message.Add(msg);
             }
             return ret;
         } 
@@ -338,7 +360,9 @@ namespace MSGorilla.Library
             List<Message> msgs = new List<Message>();
             foreach (PublicSquareLineEntity entity in  _publicSquareLine.ExecuteQuery(rangeQuery))
             {
-                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msg.RichMessage = entity.RichMessage;
+                msgs.Add(msg);
             }
             return msgs;
         }
@@ -348,17 +372,19 @@ namespace MSGorilla.Library
             string pk = Message.ToMessagePK(userid, messageID);
             TableOperation retrieveOperation = TableOperation.Retrieve<UserLineEntity>(pk, messageID);
 
-            MessageDetail msg = null;
+            MessageDetail msgd = null;
             TableResult retrievedResult = _userline.Execute(retrieveOperation);
             if (retrievedResult.Result != null)
             {
                 UserLineEntity entity = (UserLineEntity)retrievedResult.Result;
-                msg = new MessageDetail(JsonConvert.DeserializeObject<Message>(entity.Content));
-                msg.ReplyCount = entity.ReplyCount;
+                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msg.RichMessage = entity.RichMessage;
+                msgd = new MessageDetail(msg);
+                msgd.ReplyCount = entity.ReplyCount;
                 //tweet.RetweetCount = entity.RetweetCount;
-                msg.Replies = GetAllReplies(entity.RowKey);
+                msgd.Replies = GetAllReplies(entity.RowKey);
             }
-            return msg;
+            return msgd;
         }
 
         public List<Reply> GetAllReplies(string msgID)
@@ -384,7 +410,9 @@ namespace MSGorilla.Library
             {
                 return null;
             }
-            return JsonConvert.DeserializeObject<Message>(entity.Content);
+            var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+            msg.RichMessage = entity.RichMessage;
+            return msg;
         }
 
         public DisplayMessage GetDisplayMessage(string msgUser, string msgID)
@@ -394,7 +422,7 @@ namespace MSGorilla.Library
             {
                 return null;
             }
-            return new DisplayMessage(msg, _accManager);
+            return new DisplayMessage(msg, _accManager, _attManager);
         }
 
         public Message PostMessage(string userid, 
@@ -404,9 +432,15 @@ namespace MSGorilla.Library
                                     string[] atUser,
                                     string[] topicName, 
                                     string message, 
+                                    string richMessage,
+                                    string[] attachmentID,
                                     DateTime timestamp)
         {
             if (message.Length > 2048)
+            {
+                throw new MessageTooLongException();
+            }
+            if (richMessage != null && richMessage.Length > 64*1024)
             {
                 throw new MessageTooLongException();
             }
@@ -452,7 +486,7 @@ namespace MSGorilla.Library
             }
 
             // create message
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray());
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray(), richMessage, attachmentID);
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);
@@ -553,5 +587,6 @@ namespace MSGorilla.Library
                 _notifManager.incrementHomelineNotifCount(user.Userid);
             }
         }
+
     }
 }

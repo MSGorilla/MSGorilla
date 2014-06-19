@@ -216,6 +216,10 @@ input[type="checkbox"].input-validation-error {
     margin-bottom: 10px;
 }
 
+.ma-btm-20 {
+    margin-bottom: 20px;
+}
+
 .bold {
     font-weight: bold;
 }
@@ -486,4 +490,6 @@ input[type="checkbox"].input-validation-error {
     min-width: 50px;
 }
 
-
+.hidden {
+    display: none;
+}

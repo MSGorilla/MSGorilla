@@ -1,9 +1,27 @@
 ﻿/* common function */
-function isValidForKey(c) {
+function isValidForUserid(c) {
     if ((c >= 'a' && c <= 'z')
         || (c >= '0' && c <= '9')
         || (c >= 'A' && c <= 'Z')
         || c == '-'
+        )
+        return true;
+    else
+        return false;
+}
+
+function isValidForTopic(c) {
+    if ((c >= 'a' && c <= 'z')
+        || (c >= '0' && c <= '9')
+        || (c >= 'A' && c <= 'Z')
+        //|| c == ' '
+        || c == '-'
+        || c == '.'
+        || c == ','
+        || c == ':'
+        || c == '&'
+        || c == '*'
+        || c == '+'
         )
         return true;
     else
@@ -19,8 +37,8 @@ function encodeEmail(code) {
 function ScrollTo(itemname) {
     var scroll_offset = $("#" + itemname).offset();
     $("body,html").animate({
-        scrollTop: scroll_offset.top
-    }, 0.5);
+        scrollTop: scroll_offset.top - 50
+    }, "slow");
 }
 
 function Txt2Html(code) {
@@ -49,7 +67,6 @@ function Html2Txt(code) {
 }
 
 function encodeHtml(code, atusers, topics) {
-    var txtcode = code;
     var code = Txt2Html(code);
 
     // autolink http[s]
@@ -384,7 +401,7 @@ function PostMessage() {
     $.ajax({
         type: "POST",
         url: "/api/message/postmessage",
-        data: "message=" + message,
+        data: "message=" + message, // +"&richMessage=" + message,
         dataType: "json",
         success: function (data) {
             $("#postmessage").val("");
@@ -573,6 +590,7 @@ function CreateFeed(postData, isNew) {
     var sid = postData.SchemaID;
     var eid = postData.EventID;
     var msg = postData.MessageContent;
+    var richmsg = postData.RichMessage;
     var posttime = postData.PostTime;
     var user = postData.User.Userid;
     var username = postData.User.DisplayName;
@@ -581,10 +599,8 @@ function CreateFeed(postData, isNew) {
     var owners = postData.Owner;
     var atusers = postData.AtUser;
     var topics = postData.TopicName;
+    var attach = postData.Attachment;
     var showevents = false;
-
-    //alert(user);
-    //alert(username);
 
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";
@@ -596,21 +612,24 @@ function CreateFeed(postData, isNew) {
 
     //output += "<ul class='list-group'>";
     if (isNew == true) {
-        output += "  <li class='list-group-item new-notification'>";
+        output += "  <li id='feed_" + mid + "' class='list-group-item new-notification'>";
     }
     else {
-        output += "  <li class='list-group-item'>";
+        output += "  <li id='feed_" + mid + "' class='list-group-item'>";
     }
+
     output += "    <div>"
     output += "      <div class='feed-pic'>";
     output += "        <img class='img-rounded' id='user_pic_" + mid + "' src='" + picurl + "' width='100' height='100' />";
     output += "      </div>";
+
     output += "      <div class='feed-content'>";
     output += "        <div class='newpost-header'>";
     output += "          <a id='username_" + mid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>&nbsp;";
     output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
     output += "        </div>";
 
+    // owners
     if (!isNullOrEmpty(owners)) {
         output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
         for (var key in owners) {
@@ -619,25 +638,101 @@ function CreateFeed(postData, isNew) {
         output += "    </div>";
     }
 
+    // message
     output += "        <div class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
-    output += "        <div class='newpost-footer'>";
 
-    if (showevents) {
-        // event button
-        //output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
+    // fordebug
+    //richmsg = " <img src='/Content/Images/MSFTE_photo.jpg' />";
+    // richmsg
+    if (!isNullOrEmpty(richmsg)) {
+        output += "    <div id='rich_message_" + mid + "' class='newpost-input' style='display:none;'>" + richmsg + "</div>";
     }
 
-    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Expand</button>";
+    // attachment
+    if (!isNullOrEmpty(attach)) {
+        output += "    <div class='newpost-input'><span class=''>Attachment: </span>";
+        for (var key in attach) {
+            output += "  <a class='btn btn-link btn-xs' onclick='ShowAttach(\"" + attach[key].AttachmentID + "\", \"" + attach[key].Filetype + "\", \"" + mid + "\");' >" + attach[key].Filename + " (" + Filesize + ")</a>&nbsp;";
+        }
+        output += "    </div>";
+        output += "    <div id='attachment_" + mid + "' class='newpost-input' style='display:none;'></div>";
+    }
+
+    // footer btns
+    output += "        <div class='newpost-footer'>";
+
+    // event button
+    //if (showevents) {
+    //    output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
+    //}
+
+    // btns
+    if (!isNullOrEmpty(richmsg)) {
+        output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowRichMsg(\"" + user + "\", \"" + mid + "\");'>More</button>";
+    }
+    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Replies</button>";
     output += "        </div>";
     output += "      </div>";
     output += "    </div>";
-    output += "    <div id='reply_" + mid + "'></div>";
-    output += "    <input type='hidden' id='isshowreplies_" + mid + "' value='false'/>";
+
+    // reply
+    output += "    <div style='display:none;' id='reply_" + mid + "'>";
+    // add reply box
+    output += "      <div class='replies-container well'>";
+    output += "        <div class='input-group'>";
+    //output += "         <span class='input-group-addon'>Comment</span>";
+    output += "          <input class='form-control' type='text' id='replymessage_" + mid + "' replyto='" + user + "' placeholder='Reply to @" + user + "'>";
+    output += "          <span class='input-group-btn'>";
+    output += "            <button class='btn btn-primary' type='button' id='btn_reply_" + mid + "' data-loading-text='Replying...' onclick='PostReply(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
+    output += "          </span>";
+    output += "        </div>";
+    output += "      </div>";
+    // add replies
+    output += "      <div class='replies-feeds'>";
+    output += "        <ul id='replylist_" + mid + "' class='list-group'></ul>";
+    output += "      </div>";
+    output += "    </div>";
+
     output += "  </li>";
 
     //output += "</ul>";
 
     return output;
+}
+
+function ShowAttach(aid, type, mid) {
+    var attadiv = $("#attachment_" + mid);
+    var apiurl = "/api/attachment/download?attachmentid=" + aid;
+
+    attadiv.empty();
+    switch (type) {
+        default:
+            window.open(apiurl);
+            break;
+    }
+}
+
+function ShowRichMsg(user, mid) {
+    var showbtn = $("#btn_showrichmsg_" +mid);
+    var show = showbtn.attr("isshow");
+    var richmsgdiv = $("#rich_message_" + mid);
+
+    if (show == "false") {
+        // show replies
+        showbtn.attr("isshow", "true");
+        showbtn.text("Less");
+
+        richmsgdiv.show();
+    }
+    else {
+        // clear replies
+        showbtn.attr("isshow", "false");
+        showbtn.text("More");
+
+        richmsgdiv.hide();
+    }
+
+    ScrollTo("feed_" +mid);
 }
 
 
@@ -652,23 +747,7 @@ function ShowReplies(user, mid) {
         showbtn.attr("isshow", "true");
         showbtn.text("Collapse");
 
-        var html = "";
-        html = "<div class='replies-container well'>";
-        // add reply box
-        html += "  <div class='input-group'>";
-        //html += "     <span class='input-group-addon'>Comment</span>";
-        html += "     <input class='form-control' type='text' id='replymessage_" + mid + "' replyto='" + user + "' placeholder='Reply to @" + user + "'>";
-        html += "     <span class='input-group-btn'>";
-        html += "       <button class='btn btn-primary' type='button' id='btn_reply_" + mid + "' data-loading-text='Replying...' onclick='PostReply(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
-        html += "     </span>";
-        html += "  </div>";
-        // add replies
-        html += "  <div class='replies-feeds'>";
-        html += "    <ul id='replylist_" + mid + "' class='list-group'></ul>";
-        html += "  </div>";
-        html += "</div>";
-
-        replydiv.html(html);
+        replydiv.show();
 
         // show reply
         LoadReplies(mid);
@@ -676,9 +755,9 @@ function ShowReplies(user, mid) {
     else {
         // clear replies
         showbtn.attr("isshow", "false");
-        showbtn.text("Expand");
+        showbtn.text("Replies");
 
-        replydiv.html("");
+        replydiv.hide();
     }
 }
 
@@ -820,6 +899,7 @@ function CreateEvent(postData, isHeighlight) {
     var sid = postData.SchemaID;
     var eid = postData.EventID;
     var msg = postData.MessageContent;
+    var richmsg = postData.RichMessage;
     var posttime = postData.PostTime;
     var user = postData.User.Userid;
     var username = postData.User.DisplayName;
@@ -843,8 +923,10 @@ function CreateEvent(postData, isHeighlight) {
     output += "        <img class='img-rounded' id='event_user_pic_" + eid + "' src='" + picurl + "' width='100' height='100' />";
     output += "      </div>";
     output += "      <div class='feed-content'>";
-    output += "        <div class='newpost-header'><a id='event_username_" + eid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>";
-    output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span></div>";
+    output += "        <div class='newpost-header'>";
+    output += "          <a id='event_username_" + eid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>&nbsp;";
+    output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
+    output += "        </div>";
 
     if (!isNullOrEmpty(owners)) {
         output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
@@ -855,13 +937,13 @@ function CreateEvent(postData, isHeighlight) {
     }
 
     output += "        <div class='newpost-input'>" + encodeHtml(msg) + "</div>";
-    //output += "        <div class='newpost-footer'>";
-    //output += "          <button id='btn_reply' class='btn btn-link' type='button' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Comments</button>";
-    //output += "        </div>";
+
+    if (!isNullOrEmpty(richmsg)) {
+        output += "        <div class='newpost-input'>" + richmsg + "</div>";
+    }
+
     output += "      </div>";
     output += "    </div>";
-    //output += "    <div id='reply_" + mid + "'></div>";
-    //output += "    <input type='hidden' id='isshowreplies_" + mid + "' value='false'/>";
     output += "  </li>";
 
     return output;
