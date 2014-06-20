@@ -429,10 +429,6 @@ namespace MSGorilla.Library
             {
                 throw new MessageTooLongException();
             }
-            if (richMessage != null && richMessage.Length > 64*1024)
-            {
-                throw new RichMessageTooLongException();
-            }
             UserProfile user = _accManager.FindUser(userid);
             if (user == null)
             {
@@ -478,8 +474,7 @@ namespace MSGorilla.Library
             string richMessageID = null;
             if (!string.IsNullOrEmpty(richMessage))
             {
-                RichMessageEntity richMsgEntity = _richMsgManager.PostRichMessage(userid, timestamp, richMessage);
-                richMessageID = richMsgEntity.RichMsgID;
+                richMessageID = _richMsgManager.PostRichMessage(userid, timestamp, richMessage);
             }            
 
             // create message
