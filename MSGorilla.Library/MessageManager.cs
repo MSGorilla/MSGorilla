@@ -475,10 +475,15 @@ namespace MSGorilla.Library
             }
 
             //Insert Rich Message
-            RichMessageEntity richMsgEntity = _richMsgManager.PostRichMessage(userid, timestamp, richMessage);
+            string richMessageID = null;
+            if (!string.IsNullOrEmpty(richMessage))
+            {
+                RichMessageEntity richMsgEntity = _richMsgManager.PostRichMessage(userid, timestamp, richMessage);
+                richMessageID = richMsgEntity.RichMsgID;
+            }            
 
             // create message
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray(), richMsgEntity.RichMsgID, attachmentID);
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray(), richMessageID, attachmentID);
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);
