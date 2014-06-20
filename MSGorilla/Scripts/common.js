@@ -602,7 +602,7 @@ function CreateFeed(postData, isNew) {
     var sid = postData.SchemaID;
     var eid = postData.EventID;
     var msg = postData.MessageContent;
-    var richmsg = postData.RichMessage;
+    var richmsgid = postData.RichMessageID;
     var posttime = postData.PostTime;
     var user = postData.User.Userid;
     var username = postData.User.DisplayName;
@@ -656,8 +656,8 @@ function CreateFeed(postData, isNew) {
     // fordebug
     //richmsg = " <img src='/Content/Images/MSFTE_photo.jpg' />";
     // richmsg
-    if (!isNullOrEmpty(richmsg)) {
-        output += "    <div id='rich_message_" + mid + "' class='newpost-input' style='display:none;'>" + richmsg + "</div>";
+    if (!isNullOrEmpty(richmsgid)) {
+        output += "    <div id='rich_message_" + mid + "' class='newpost-input' style='display:none;'></div>";
     }
 
     // attachment
@@ -679,8 +679,8 @@ function CreateFeed(postData, isNew) {
     //}
 
     // btns
-    if (!isNullOrEmpty(richmsg)) {
-        output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowRichMsg(\"" + user + "\", \"" + mid + "\");'>More</button>";
+    if (!isNullOrEmpty(richmsgid)) {
+        output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
     }
     output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Replies</button>";
     output += "        </div>";
@@ -724,23 +724,44 @@ function ShowAttach(aid, type, mid) {
     }
 }
 
-function ShowRichMsg(user, mid) {
+function ShowRichMsg(rmid, mid) {
     var showbtn = $("#btn_showrichmsg_" + mid);
     var show = showbtn.attr("isshow");
     var richmsgdiv = $("#rich_message_" + mid);
 
     if (show == "false") {
-        // show replies
-        showbtn.attr("isshow", "true");
-        showbtn.text("Less");
+        if (isNullOrEmpty(richmsgdiv.html())) {
+            // load rich once
+            $.ajax({
+                type: "GET",
+                url: "/api/message/getrichmessage",
+                data: "richMsgID=" + encodeURIComponent(rmid),
+                success: function (data) {
+                    richmsgdiv.empty();
+                    // create rich message
+                    richmsgdiv.append(data);
 
-        richmsgdiv.show();
+                    // show rich
+                    showbtn.attr("isshow", "true");
+                    showbtn.text("Less");
+                    richmsgdiv.show();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+                }
+            });
+        }
+        else {
+            // show rich
+            showbtn.attr("isshow", "true");
+            showbtn.text("Less");
+            richmsgdiv.show();
+        }
     }
     else {
-        // clear replies
+        // clear rich
         showbtn.attr("isshow", "false");
         showbtn.text("More");
-
         richmsgdiv.hide();
     }
 
