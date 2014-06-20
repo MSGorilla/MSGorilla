@@ -690,7 +690,7 @@ function CreateFeed(postData, isNew) {
     // reply
     output += "    <div style='display:none;' id='reply_" + mid + "'>";
     // add reply box
-    output += "      <div class='replies-container well'>";
+    output += "      <div class='replies-container'>";
     output += "        <div class='input-group'>";
     //output += "         <span class='input-group-addon'>Comment</span>";
     output += "          <input class='form-control' type='text' id='replymessage_" + mid + "' replyto='" + user + "' placeholder='Reply to @" + user + "'>";
@@ -698,10 +698,10 @@ function CreateFeed(postData, isNew) {
     output += "            <button class='btn btn-primary' type='button' id='btn_reply_" + mid + "' data-loading-text='Replying...' onclick='PostReply(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
     output += "          </span>";
     output += "        </div>";
-    output += "      </div>";
     // add replies
-    output += "      <div class='replies-feeds'>";
-    output += "        <ul id='replylist_" + mid + "' class='list-group'></ul>";
+    output += "        <div class='replies-feeds'>";
+    output += "          <ul id='replylist_" + mid + "' class='list-group'></ul>";
+    output += "        </div>";
     output += "      </div>";
     output += "    </div>";
 
@@ -731,6 +731,8 @@ function ShowRichMsg(rmid, mid) {
 
     if (show == "false") {
         if (isNullOrEmpty(richmsgdiv.html())) {
+            richmsgdiv.append("<div class='txtaln-c'><span class='spinner-loading'></span> Loading...</div>");
+            richmsgdiv.show();
             // load rich once
             $.ajax({
                 type: "GET",
@@ -747,6 +749,8 @@ function ShowRichMsg(rmid, mid) {
                     richmsgdiv.show();
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    richmsgdiv.empty();
+                    richmsgdiv.hide();
                     ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
                 }
             });
@@ -795,18 +799,22 @@ function ShowReplies(user, mid) {
 }
 
 function LoadReplies(mid) {
+    var replydiv = $("#replylist_" + mid);
+
+    replydiv.append("<li class='center-block txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
     $.ajax({
         type: "GET",
         url: "/api/message/getmessagereply",
         data: "msgID=" + encodeURIComponent(mid),
         success: function (data) {
             // create reply list
-            $("#replylist_" + mid).empty();
+            replydiv.empty();
             $.each(data, function (index, item) {
-                $("#replylist_" + mid).append(CreateReply(item, false));
+                replydiv.append(CreateReply(item, false));
             })
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
+            replydiv.empty();
             ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
@@ -1201,12 +1209,20 @@ function UpdateNotificationCount() {
             var userid = data.Userid;
             var notificationCount = ownerlineCount + replyCount + atlineCount;
 
+            // shortcut panel count
             $("#shortcut_homeline_count").html(homelineCount);
             $("#shortcut_reply_count").html(replyCount);
             $("#shortcut_atline_count").html(atlineCount);
             $("#shortcut_ownerline_count").html(ownerlineCount);
             $("#shortcut_notification_count").html(notificationCount);
 
+            // homepage count
+            $("#home_reply_count").html(replyCount);
+            $("#home_atline_count").html(atlineCount);
+            $("#home_ownerline_count").html(ownerlineCount);
+
+
+            // nav bar count
             if (homelineCount > 0)
                 $("#nav_home_count").html(homelineCount);
             else
@@ -1314,11 +1330,23 @@ function LoadMyFavoriteTopics() {
                 var topicdesp = item.topicDescription;
                 var topiccount = item.topicMsgCount;
 
+                // shortcut panel
                 output += "<li class='sub-list-group-item'>";
                 output += "  <span class='badge'>" + unreadcount + "</span>";
                 output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
                 output += "</li>";
                 $("#favorite_collapse").append(output);
+
+                // homepage 
+                var navlist = $("#home_nav_list");
+                if (unreadcount > 0 && navlist.length > 0) {
+                    output = "";
+                    output += "<li>";
+                    output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a>";
+                    output += "</li>";
+
+                    $("#home_nav_list").append(output);
+                }
             })
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
