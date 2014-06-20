@@ -1197,6 +1197,7 @@ function GetNotificationCount(category) {
 
 function UpdateNotificationCount() {
     var apiurl = "/api/account/getnotificationcount";
+
     $.ajax({
         type: "GET",
         url: apiurl,
@@ -1221,7 +1222,6 @@ function UpdateNotificationCount() {
             $("#home_atline_count").html(atlineCount);
             $("#home_ownerline_count").html(ownerlineCount);
 
-
             // nav bar count
             if (homelineCount > 0)
                 $("#nav_home_count").html(homelineCount);
@@ -1232,6 +1232,9 @@ function UpdateNotificationCount() {
                 $("#nav_notification_count").html(notificationCount);
             else
                 $("#nav_notification_count").html("");
+
+            // chrome desktop notification
+            notify(homelineCount, atlineCount, ownerlineCount, replyCount);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             // ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
@@ -1504,3 +1507,40 @@ function CreateTopic(topicid, topicname, topicdesp, topiccount) {
 }
 
 
+function notify(homelineCount, atlineCount, ownerlineCount, replyCount) {
+    var opt = {
+        type: "list",
+        title: "Notifications",
+        message: "You have new unread messages.",
+        iconUrl: "/Content/Images/default_avatar.jpg",
+        items: [{ title: "Mentions: ", message: atlineCount },
+                { title: "Owned : ", message: ownerlineCount },
+                { title: "Replies : ", message: replyCount }]
+    }
+
+    chrome.notifications.create('chrome_notification', opt, function (id) {
+    });
+}
+
+//function notify() {
+//    alert(window.webkitNotifications);
+//    if (window.webkitNotifications) {
+//        if (window.webkitNotifications.checkPermission() == 0) {
+//            var notification_test = window.webkitNotifications.createNotification("http://images.cnblogs.com/cnblogs_com/flyingzl/268702/r_1.jpg", '标题', '内容' + new Date().getTime());
+//            notification_test.display = function () { }
+//            notification_test.onerror = function () { }
+//            notification_test.onclose = function () { }
+//            notification_test.onclick = function () { this.cancel(); }
+
+//            notification_test.replaceId = 'Meteoric';
+
+//            notification_test.show();
+
+//            var tempPopup = window.webkitNotifications.createHTMLNotification(["http://www.baidu.com/", "http://www.soso.com"][Math.random() >= 0.5 ? 0 : 1]);
+//            tempPopup.replaceId = "Meteoric_cry";
+//            tempPopup.show();
+//        } else {
+//            window.webkitNotifications.requestPermission(notify);
+//        }
+//    }
+//}
