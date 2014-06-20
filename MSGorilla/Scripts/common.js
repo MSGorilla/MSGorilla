@@ -664,7 +664,7 @@ function CreateFeed(postData, isNew) {
     if (!isNullOrEmpty(attach)) {
         output += "    <div class='newpost-input'><span class=''>Attachment: </span>";
         for (var key in attach) {
-            output += "  <a class='btn btn-link btn-xs' onclick='ShowAttach(\"" + attach[key].AttachmentID + "\", \"" + attach[key].Filetype + "\", \"" + mid + "\");' >" + attach[key].Filename + " (" + Filesize + ")</a>&nbsp;";
+            output += "  <a class='btn btn-link btn-xs' onclick='ShowAttach(\"" + attach[key].AttachmentID + "\", \"" + attach[key].Filetype + "\", \"" + mid + "\");' >" + attach[key].Filename + " (" + attach[key].Filesize + ")</a>&nbsp;";
         }
         output += "    </div>";
         output += "    <div id='attachment_" + mid + "' class='newpost-input' style='display:none;'></div>";
