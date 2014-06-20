@@ -9,6 +9,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
+using MSGorilla.Library.Models.ViewModels;
+
 namespace MSGorilla.WebAPI.Client
 {
     public class GorillaWebAPI
@@ -135,12 +137,12 @@ namespace MSGorilla.WebAPI.Client
             return longStr;
         }
 
-        public List<Message> HomeLine(DateTime start, DateTime end)
+        public DisplayMessagePagination HomeLine(string userid, int count = 25, string token = "")
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriHomeLine, start, end));
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriHomeLine, userid, count, token));
             request.Headers["Authorization"] = _authHeader;
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-            return JsonConvert.DeserializeObject<List<Message>>(_readResponseContent(response));            
+            return JsonConvert.DeserializeObject<DisplayMessagePagination>(_readResponseContent(response));            
         }
 
         public List<Message> EventLine(string eventID)

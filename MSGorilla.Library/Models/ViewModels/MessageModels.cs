@@ -30,6 +30,8 @@ namespace MSGorilla.Library.Models.ViewModels
                 message.Add(new DisplayMessage(m, accManager, attManager, richMsgManager));
             }
         }
+
+        public DisplayMessagePagination() { }
     }
 
     public class DisplayMessage
@@ -42,9 +44,12 @@ namespace MSGorilla.Library.Models.ViewModels
         public string[] AtUser { get; set; }
         public string[] TopicName { get; set; }
         public string MessageContent { get; set; }
+        public string RichMessageID { get; set; }
         public string RichMessage { get; set; }
         public List<Attachment> Attachment { get; set; } 
         public DateTime PostTime { get; set; }
+
+        public DisplayMessage() { }
 
         public DisplayMessage(Message msg, AccountManager accManager, AttachmentManager attManager, RichMsgManager richMsgManager)
         {
@@ -60,6 +65,7 @@ namespace MSGorilla.Library.Models.ViewModels
             this.AtUser = msg.AtUser;
             this.TopicName = msg.TopicName;
             this.MessageContent = msg.MessageContent;
+            this.RichMessageID = msg.RichMessageID;
             this.RichMessage = richMsgManager.GetRichMessage(msg.RichMessageID);
             this.PostTime = msg.PostTime;
 
