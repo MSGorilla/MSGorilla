@@ -690,7 +690,7 @@ function CreateFeed(postData, isNew) {
     // reply
     output += "    <div style='display:none;' id='reply_" + mid + "'>";
     // add reply box
-    output += "      <div class='replies-container well'>";
+    output += "      <div class='replies-container'>";
     output += "        <div class='input-group'>";
     //output += "         <span class='input-group-addon'>Comment</span>";
     output += "          <input class='form-control' type='text' id='replymessage_" + mid + "' replyto='" + user + "' placeholder='Reply to @" + user + "'>";
@@ -698,10 +698,10 @@ function CreateFeed(postData, isNew) {
     output += "            <button class='btn btn-primary' type='button' id='btn_reply_" + mid + "' data-loading-text='Replying...' onclick='PostReply(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
     output += "          </span>";
     output += "        </div>";
-    output += "      </div>";
     // add replies
-    output += "      <div class='replies-feeds'>";
-    output += "        <ul id='replylist_" + mid + "' class='list-group'></ul>";
+    output += "        <div class='replies-feeds'>";
+    output += "          <ul id='replylist_" + mid + "' class='list-group'></ul>";
+    output += "        </div>";
     output += "      </div>";
     output += "    </div>";
 
@@ -731,6 +731,8 @@ function ShowRichMsg(rmid, mid) {
 
     if (show == "false") {
         if (isNullOrEmpty(richmsgdiv.html())) {
+            richmsgdiv.append("<div class='txtaln-c'><span class='spinner-loading'></span> Loading...</div>");
+            richmsgdiv.show();
             // load rich once
             $.ajax({
                 type: "GET",
@@ -747,6 +749,8 @@ function ShowRichMsg(rmid, mid) {
                     richmsgdiv.show();
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    richmsgdiv.empty();
+                    richmsgdiv.hide();
                     ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
                 }
             });
@@ -795,18 +799,22 @@ function ShowReplies(user, mid) {
 }
 
 function LoadReplies(mid) {
+    var replydiv = $("#replylist_" + mid);
+
+    replydiv.append("<li class='center-block txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
     $.ajax({
         type: "GET",
         url: "/api/message/getmessagereply",
         data: "msgID=" + encodeURIComponent(mid),
         success: function (data) {
             // create reply list
-            $("#replylist_" + mid).empty();
+            replydiv.empty();
             $.each(data, function (index, item) {
-                $("#replylist_" + mid).append(CreateReply(item, false));
+                replydiv.append(CreateReply(item, false));
             })
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
+            replydiv.empty();
             ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
@@ -1189,6 +1197,7 @@ function GetNotificationCount(category) {
 
 function UpdateNotificationCount() {
     var apiurl = "/api/account/getnotificationcount";
+
     $.ajax({
         type: "GET",
         url: apiurl,
@@ -1201,12 +1210,19 @@ function UpdateNotificationCount() {
             var userid = data.Userid;
             var notificationCount = ownerlineCount + replyCount + atlineCount;
 
+            // shortcut panel count
             $("#shortcut_homeline_count").html(homelineCount);
             $("#shortcut_reply_count").html(replyCount);
             $("#shortcut_atline_count").html(atlineCount);
             $("#shortcut_ownerline_count").html(ownerlineCount);
             $("#shortcut_notification_count").html(notificationCount);
 
+            // homepage count
+            $("#home_reply_count").html(replyCount);
+            $("#home_atline_count").html(atlineCount);
+            $("#home_ownerline_count").html(ownerlineCount);
+
+            // nav bar count
             if (homelineCount > 0)
                 $("#nav_home_count").html(homelineCount);
             else
@@ -1216,6 +1232,9 @@ function UpdateNotificationCount() {
                 $("#nav_notification_count").html(notificationCount);
             else
                 $("#nav_notification_count").html("");
+
+            // chrome desktop notification
+            notify(homelineCount, atlineCount, ownerlineCount, replyCount);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             // ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
@@ -1249,7 +1268,7 @@ function LoadHotTopics() {
                 var topiccount = item.MsgCount;
 
                 output += "<li class='sub-list-group-item'>";
-                output += "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "'>&nbsp;</a>";
+                output += "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>";
                 //output += "  <span class='badge'>" + topiccount + "</span>";
                 output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
                 output += "</li>";
@@ -1314,11 +1333,23 @@ function LoadMyFavoriteTopics() {
                 var topicdesp = item.topicDescription;
                 var topiccount = item.topicMsgCount;
 
+                // shortcut panel
                 output += "<li class='sub-list-group-item'>";
                 output += "  <span class='badge'>" + unreadcount + "</span>";
                 output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
                 output += "</li>";
                 $("#favorite_collapse").append(output);
+
+                // homepage 
+                var navlist = $("#home_nav_list");
+                if (unreadcount > 0 && navlist.length > 0) {
+                    output = "";
+                    output += "<li>";
+                    output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a>";
+                    output += "</li>";
+
+                    $("#home_nav_list").append(output);
+                }
             })
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -1345,9 +1376,11 @@ function LoadTopicLikeBtn(btnid, topicid) {
             if (data == true) {
                 SetUnlikeBtn(btnid, topicid, true);
             }
-            else {
+            else if (data == false) {
                 SetLikeBtn(btnid, topicid, true);
-
+            }
+            else {
+                // do nothing.
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -1372,6 +1405,7 @@ function SetUnlikeBtn(btnid, topicid, enabled) {
     }
     btn.attr("onmouseover", "UnlikeBtnMouseOver('" + btnid + "');")
     btn.attr("onmouseout", "UnlikeBtnMouseOut('" + btnid + "');")
+    btn.show();
 }
 
 function UnlikeBtnMouseOver(btnid) {
@@ -1410,6 +1444,7 @@ function SetLikeBtn(btnid, topicid, enabled) {
     }
     btn.attr("onmouseover", "")
     btn.attr("onmouseout", "")
+    btn.show();
 }
 
 function Like(btnid, topicid) {
@@ -1462,7 +1497,7 @@ function CreateTopic(topicid, topicname, topicdesp, topiccount) {
     var output = "";
 
     output += "<li class='list-group-item'>";
-    output += "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "'>&nbsp;</a>";
+    output += "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>";
     output += "  <span class='badge'>" + topiccount + "</span>";
     output += "  <a class='fullname' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
     output += "  <span class='username' >" + (isNullOrEmpty(topicdesp) ? "" : topicdesp) + "</span>&nbsp;";
@@ -1472,3 +1507,40 @@ function CreateTopic(topicid, topicname, topicdesp, topiccount) {
 }
 
 
+function notify(homelineCount, atlineCount, ownerlineCount, replyCount) {
+    var opt = {
+        type: "list",
+        title: "Notifications",
+        message: "You have new unread messages.",
+        iconUrl: "/Content/Images/default_avatar.jpg",
+        items: [{ title: "Mentions: ", message: atlineCount },
+                { title: "Owned : ", message: ownerlineCount },
+                { title: "Replies : ", message: replyCount }]
+    }
+
+    chrome.notifications.create('chrome_notification', opt, function (id) {
+    });
+}
+
+//function notify() {
+//    alert(window.webkitNotifications);
+//    if (window.webkitNotifications) {
+//        if (window.webkitNotifications.checkPermission() == 0) {
+//            var notification_test = window.webkitNotifications.createNotification("http://images.cnblogs.com/cnblogs_com/flyingzl/268702/r_1.jpg", '标题', '内容' + new Date().getTime());
+//            notification_test.display = function () { }
+//            notification_test.onerror = function () { }
+//            notification_test.onclose = function () { }
+//            notification_test.onclick = function () { this.cancel(); }
+
+//            notification_test.replaceId = 'Meteoric';
+
+//            notification_test.show();
+
+//            var tempPopup = window.webkitNotifications.createHTMLNotification(["http://www.baidu.com/", "http://www.soso.com"][Math.random() >= 0.5 ? 0 : 1]);
+//            tempPopup.replaceId = "Meteoric_cry";
+//            tempPopup.show();
+//        } else {
+//            window.webkitNotifications.requestPermission(notify);
+//        }
+//    }
+//}

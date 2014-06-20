@@ -7,21 +7,6 @@
     @Html.Partial("_EventModalPartial")
 
     <div class="contents-container">
-        <div class="posts-newpost">
-            <div class="well">
-                <div class="newpost-header">
-                    <span class="help-block">What's on your mind?</span>
-                </div>
-                <div class="newpost-input">
-                    <textarea class="form-control" id="postmessage" rows="3" maxlength="140"></textarea>
-                </div>
-                <div class="newpost-footer">
-                    <span id="postmessage_counter" class="post-counter">140</span>
-                    <button id="btn_post" onclick="PostMessage();" class="btn btn-primary post-btn" type="button" data-loading-text="Posting...">Post</button>
-                </div>
-            </div>
-        </div>
-
         <div id="notifications" class="posts-notification">
             @*<div class="alert alert-dismissable alert-warning">
                     <button class="close" type="button" data-dismiss="alert">×</button>
@@ -31,6 +16,14 @@
 
         <div class="title-container">
             <h4>@ViewBag.Title</h4>
+        </div>
+
+        <div class="nav-container">
+            <ul id="home_nav_list" class="nav nav-pills">
+                <li><a href="/Notification/index?category=atline">Mentions <span id="home_atline_count" class="badge"></span></a></li>
+                <li><a href="/Notification/index?category=ownerline">My owns<span id="home_ownerline_count" class="badge"></span></a></li>
+                <li><a href="/Notification/index?category=replyline">Replies<span id="home_reply_count" class="badge"></span></a></li>
+            </ul>
         </div>
 
         <div class="posts-feeds">
@@ -59,13 +52,11 @@
 
     <script>
         $(LoadFeeds("@ViewBag.FeedCategory"));
-        $(document).ready(function () {
-            $("#postmessage").flexselect();
-        });
     </script>
 
     <div class="tools-container">
         @Html.Partial("_MePartial")
+        @Html.Partial("_PostPartial")
         @Html.Partial("_ShortcutPartial")
     </div>
 
