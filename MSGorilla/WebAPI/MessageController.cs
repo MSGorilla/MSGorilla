@@ -146,10 +146,9 @@ namespace MSGorilla.WebApi
             var msg = new List<DisplayMessage>();
             AccountManager accManager = new AccountManager();
             AttachmentManager attManage = new AttachmentManager();
-            RichMsgManager richMsgManager = new RichMsgManager();
             foreach (var m in msglist)
             {
-                msg.Add(new DisplayMessage(m, accManager, attManage, richMsgManager));
+                msg.Add(new DisplayMessage(m, accManager, attManage));
             }
 
             return msg;
@@ -233,7 +232,7 @@ namespace MSGorilla.WebApi
                                     string richMessage = null,
                                     [FromUri]string[] attachmentID = null)
         {
-            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, topicName, message, richMessage, attachmentID, DateTime.UtcNow), new AccountManager(), new AttachmentManager(), new RichMsgManager());
+            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, topicName, message, richMessage, attachmentID, DateTime.UtcNow), new AccountManager(), new AttachmentManager());
             //return new ActionResult();
         }
 

@@ -411,7 +411,7 @@ namespace MSGorilla.Library
             {
                 return null;
             }
-            return new DisplayMessage(msg, _accManager, _attManager, _richMsgManager);
+            return new DisplayMessage(msg, _accManager, _attManager);
         }
 
         public Message PostMessage(string userid, 
