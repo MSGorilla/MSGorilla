@@ -128,7 +128,6 @@ function encodeTxt(code) {
     return code;
 }
 
-
 function isNullOrEmpty(strVal) {
     if (strVal == null || strVal == undefined || strVal == '') {
         return true;
@@ -181,11 +180,20 @@ function Time2Now(datestring) {
 function ShowError(msg, boxno) {
     var msghtml = "<div class='alert alert-dismissable alert-warning'><button class='close' type='button' data-dismiss='alert'>×</button><p>" + msg + "</p></div>";
     $("#notifications").append(msghtml);
+
     if (isNullOrEmpty(boxno)) {
         $("#loading_message").html(msg);
     } else {
         $("#loading_message_" + boxno).html(msg);
     }
+}
+
+function ShowAjaxError(status, error, code, msg, boxno) {
+    if (code == 2004) // access denied. need login again.
+        location.href = "/Error/?message=" + encodeURIComponent(msg) + "&returnUrl=" + encodeURIComponent("/Account/Logoff");
+
+    var errormsg = "[" + status + "]" + " " + error + ": " + code + " " + msg;
+    ShowError(errormsg, boxno);
 }
 
 
@@ -216,23 +224,26 @@ function LoadMyInfo() {
             $("#my_followers").html(followerscount);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
 
 function LoadUserInfo(user) {
     var apiurl = "";
+    var apidata = "";
     if (isNullOrEmpty(user)) {
         apiurl = "/api/account/me";
     }
     else {
-        apiurl = "/api/account/user?userid=" + encodeURIComponent(user);
+        apiurl = "/api/account/user";
+        apidata = "userid=" + encodeURIComponent(user);
     }
 
     $.ajax({
         type: "GET",
         url: apiurl,
+        data: apidata,
         success: function (data) {
             var userid = data.Userid;
             var username = data.DisplayName;
@@ -257,7 +268,7 @@ function LoadUserInfo(user) {
             LoadUserFollowBtn(user, isFollowimg);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -362,7 +373,7 @@ function Follow(user) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -385,7 +396,7 @@ function Unfollow(user) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -401,7 +412,7 @@ function PostMessage() {
     $.ajax({
         type: "POST",
         url: "/api/message/postmessage",
-        data: "message=" + message, // +"&richMessage=" + message,
+        data: "message=" + message, // + "&richMessage=" + message,
         dataType: "json",
         success: function (data) {
             $("#postmessage").val("");
@@ -409,7 +420,7 @@ function PostMessage() {
             $("#feedlist").prepend(CreateFeed(data));
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     }).always(function () {
         $("#btn_post").button('reset');
@@ -433,14 +444,14 @@ function PostReply(user, mid) {
     $.ajax({
         type: "POST",
         url: "/api/reply/postreply",
-        data: "to=" + touser + "&message=" + message + "&messageUser=" + user + "&messageID=" + mid,
+        data: "to=" + encodeURIComponent(touser) + "&message=" + message + "&messageUser=" + encodeURIComponent(user) + "&messageID=" + encodeURIComponent(mid),
         dataType: "json",
         success: function (data) {
             $("#replymessage_" + mid).val("");
             $("#replylist_" + mid).prepend(CreateReply(data));
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     }).always(function () {
         $("#btn_reply_" + mid).button('reset');
@@ -465,7 +476,7 @@ function LoadFeeds(category, id) {
 
     var apiurl = "";
     var apidata = "";
-    var count = $("#hd_newcount").val();
+    var count = 0;
     if (isNullOrEmpty(category))
         apiurl = "/api/message/userline";
     else if (category == "homeline") {
@@ -513,6 +524,7 @@ function LoadFeeds(category, id) {
         count = GetNotificationCount(category);
         $("#hd_newcount").val(count);
     } else {    // load more
+        count = $("#hd_newcount").val();
         if (isNullOrEmpty(apidata)) {
             apidata = "token=" + token;
         }
@@ -576,7 +588,7 @@ function LoadFeeds(category, id) {
             isLoadFeeds = false;
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
             $("#lbl_seemore").html("");
             $("#hd_token").val("nomore");
             isLoadFeeds = false;
@@ -713,7 +725,7 @@ function ShowAttach(aid, type, mid) {
 }
 
 function ShowRichMsg(user, mid) {
-    var showbtn = $("#btn_showrichmsg_" +mid);
+    var showbtn = $("#btn_showrichmsg_" + mid);
     var show = showbtn.attr("isshow");
     var richmsgdiv = $("#rich_message_" + mid);
 
@@ -732,7 +744,7 @@ function ShowRichMsg(user, mid) {
         richmsgdiv.hide();
     }
 
-    ScrollTo("feed_" +mid);
+    ScrollTo("feed_" + mid);
 }
 
 
@@ -765,7 +777,7 @@ function LoadReplies(mid) {
     $.ajax({
         type: "GET",
         url: "/api/message/getmessagereply",
-        data: "msgID=" + mid,
+        data: "msgID=" + encodeURIComponent(mid),
         success: function (data) {
             // create reply list
             $("#replylist_" + mid).empty();
@@ -774,7 +786,7 @@ function LoadReplies(mid) {
             })
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -858,7 +870,7 @@ function ShowMessage(mid, user) {
             $("#MessageModal").modal();
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -888,7 +900,7 @@ function ShowEvents(mid, eid) {
             $("#EventsModal").modal();
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -984,7 +996,7 @@ function SearchTopic(keyword) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -1015,11 +1027,10 @@ function SearchUser(keyword) {
                     $("#userlist").append(CreateUserCard(item));
                     LoadUserFollowBtn(item.Userid, item.IsFollowing);
                 })
-
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown, "1");
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message, "1");
         }
     });
 }
@@ -1061,7 +1072,7 @@ function LoadUsers(category, user) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -1147,6 +1158,9 @@ function GetNotificationCount(category) {
                     break;
             }
         },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            // ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
     });
 
     return count;
@@ -1182,9 +1196,9 @@ function UpdateNotificationCount() {
             else
                 $("#nav_notification_count").html("");
         },
-        //error: function (XMLHttpRequest, textStatus, errorThrown) {
-        //    ShowError(textStatus + ": " + errorThrown);
-        //}
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            // ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
     });
 }
 
@@ -1222,15 +1236,15 @@ function LoadHotTopics() {
                 LoadTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid);
             })
         },
-        //error: function (XMLHttpRequest, textStatus, errorThrown) {
-        //    ShowError(textStatus + ": " + errorThrown);
-        //}
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            // ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
     });
 }
 
 function LoadUserFavoriteTopics(user) {
     var apiurl = "/api/topic/getuserfavouritetopic";
-    var apidata = "userid=" + user;
+    var apidata = "userid=" + encodeURIComponent(user);
 
     $.ajax({
         type: "GET",
@@ -1255,7 +1269,7 @@ function LoadUserFavoriteTopics(user) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -1286,9 +1300,9 @@ function LoadMyFavoriteTopics() {
                 $("#favorite_collapse").append(output);
             })
         },
-        //error: function (XMLHttpRequest, textStatus, errorThrown) {
-        //    ShowError(textStatus + ": " + errorThrown);
-        //}
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            //ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
     });
 }
 
@@ -1315,9 +1329,9 @@ function LoadTopicLikeBtn(btnid, topicid) {
 
             }
         },
-        //error: function (XMLHttpRequest, textStatus, errorThrown) {
-        //    ShowError(textStatus + ": " + errorThrown);
-        //}
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            //ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
     });
 }
 
@@ -1395,7 +1409,7 @@ function Like(btnid, topicid) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -1418,7 +1432,7 @@ function Unlike(btnid, topicid) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }

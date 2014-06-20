@@ -85,7 +85,7 @@ namespace MSGorilla.Library.Exceptions
     {
         public MessageTooLongException()
         {
-            Description = "Message is too long. Should be less than 256 byte";
+            Description = "Message is too long.";
             Code = 3001;
         }
     }
@@ -114,6 +114,15 @@ namespace MSGorilla.Library.Exceptions
         {
             Description = "Invalid Message ID";
             Code = 3004;
+        }
+    }
+
+    public class RichMessageTooLongException : MSGorillaBaseException
+    {
+        public RichMessageTooLongException()
+        {
+            Description = "Rich message is too long.";
+            Code = 3005;
         }
     }
 
