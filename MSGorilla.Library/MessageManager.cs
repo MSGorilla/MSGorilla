@@ -40,6 +40,7 @@ namespace MSGorilla.Library
         private SchemaManager _schemaManager;
         private NotifManager _notifManager;
         private TopicManager _topicManager;
+        private RichMsgManager _richMsgManager;
 
         public MessageManager()
         {
@@ -59,6 +60,7 @@ namespace MSGorilla.Library
             _schemaManager = new SchemaManager();
             _notifManager = new NotifManager();
             _topicManager = new TopicManager();
+            _richMsgManager = new RichMsgManager();
         }
 
         static string GenerateTimestampConditionQuery(string userid, DateTime start, DateTime end)
@@ -143,7 +145,6 @@ namespace MSGorilla.Library
             foreach (UserLineEntity entity in _userline.ExecuteQuery(rangeQuery))
             {
                 var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msg.RichMessage = entity.RichMessage;
                 msgs.Add(msg);
             }
             return msgs;
@@ -162,7 +163,6 @@ namespace MSGorilla.Library
             foreach (UserLineEntity entity in queryResult)
             {
                 var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msg.RichMessage = entity.RichMessage;
                 ret.message.Add(msg);
             }
             return ret;
@@ -179,7 +179,6 @@ namespace MSGorilla.Library
             foreach (UserLineEntity entity in _ownerline.ExecuteQuery(rangeQuery))
             {
                 var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msg.RichMessage = entity.RichMessage;
                 msgs.Add(msg);
             }
             return msgs;
@@ -197,7 +196,6 @@ namespace MSGorilla.Library
             foreach (OwnerLineEntity entity in queryResult)
             {
                 var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msg.RichMessage = entity.RichMessage;
                 ret.message.Add(msg);
             }
             return ret;
@@ -215,7 +213,6 @@ namespace MSGorilla.Library
             foreach (AtLineEntity entity in queryResult)
             {
                 var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msg.RichMessage = entity.RichMessage;
                 ret.message.Add(msg);
             }
 
@@ -233,7 +230,6 @@ namespace MSGorilla.Library
             foreach (HomeLineEntity entity in _homeline.ExecuteQuery(rangeQuery))
             {
                 var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msg.RichMessage = entity.RichMessage;
                 msgs.Add(msg);
             }
             return msgs;
@@ -252,7 +248,6 @@ namespace MSGorilla.Library
             foreach (HomeLineEntity entity in queryResult)
             {
                 var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msg.RichMessage = entity.RichMessage;
                 ret.message.Add(msg);
             }
             return ret;
@@ -271,7 +266,6 @@ namespace MSGorilla.Library
             foreach (TopicLine entity in queryResult)
             {
                 var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msg.RichMessage = entity.RichMessage;
                 ret.message.Add(msg);
             }
             return ret;
@@ -287,7 +281,6 @@ namespace MSGorilla.Library
             foreach (EventLineEntity entity in _eventline.ExecuteQuery(rangeQuery))
             {
                 var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msg.RichMessage = entity.RichMessage;
                 msgs.Add(msg);
             }
             return msgs;
@@ -306,7 +299,6 @@ namespace MSGorilla.Library
             foreach (PublicSquareLineEntity entity in queryResult)
             {
                 var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msg.RichMessage = entity.RichMessage;
                 ret.message.Add(msg);
             }
             return ret;
@@ -361,7 +353,6 @@ namespace MSGorilla.Library
             foreach (PublicSquareLineEntity entity in  _publicSquareLine.ExecuteQuery(rangeQuery))
             {
                 var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msg.RichMessage = entity.RichMessage;
                 msgs.Add(msg);
             }
             return msgs;
@@ -378,7 +369,6 @@ namespace MSGorilla.Library
             {
                 UserLineEntity entity = (UserLineEntity)retrievedResult.Result;
                 var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msg.RichMessage = entity.RichMessage;
                 msgd = new MessageDetail(msg);
                 msgd.ReplyCount = entity.ReplyCount;
                 //tweet.RetweetCount = entity.RetweetCount;
@@ -411,7 +401,6 @@ namespace MSGorilla.Library
                 return null;
             }
             var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-            msg.RichMessage = entity.RichMessage;
             return msg;
         }
 
@@ -422,7 +411,7 @@ namespace MSGorilla.Library
             {
                 return null;
             }
-            return new DisplayMessage(msg, _accManager, _attManager);
+            return new DisplayMessage(msg, _accManager, _attManager, _richMsgManager);
         }
 
         public Message PostMessage(string userid, 
@@ -485,8 +474,11 @@ namespace MSGorilla.Library
                 topic.UnionWith(topicName);
             }
 
+            //Insert Rich Message
+            RichMessageEntity richMsgEntity = _richMsgManager.PostRichMessage(userid, timestamp, richMessage);
+
             // create message
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray(), richMessage, attachmentID);
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray(), richMsgEntity.RichMsgID, attachmentID);
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);

@@ -23,10 +23,11 @@ namespace MSGorilla.Library.Models.ViewModels
             var msglist = msg.message;
             AccountManager accManager = new AccountManager();
             AttachmentManager attManager = new AttachmentManager();
+            RichMsgManager richMsgManager = new RichMsgManager();
             message = new List<DisplayMessage>();
             foreach (var m in msglist)
             {
-                message.Add(new DisplayMessage(m, accManager, attManager));
+                message.Add(new DisplayMessage(m, accManager, attManager, richMsgManager));
             }
         }
     }
@@ -45,7 +46,7 @@ namespace MSGorilla.Library.Models.ViewModels
         public List<Attachment> Attachment { get; set; } 
         public DateTime PostTime { get; set; }
 
-        public DisplayMessage(Message msg, AccountManager accManager, AttachmentManager attManager)
+        public DisplayMessage(Message msg, AccountManager accManager, AttachmentManager attManager, RichMsgManager richMsgManager)
         {
             //
             var userinfo = accManager.FindUser(msg.User);
@@ -59,7 +60,7 @@ namespace MSGorilla.Library.Models.ViewModels
             this.AtUser = msg.AtUser;
             this.TopicName = msg.TopicName;
             this.MessageContent = msg.MessageContent;
-            this.RichMessage = msg.RichMessage;
+            this.RichMessage = richMsgManager.GetRichMessage(msg.RichMessageID);
             this.PostTime = msg.PostTime;
 
             if (msg.AttachmentID == null || msg.AttachmentID.Length == 0)

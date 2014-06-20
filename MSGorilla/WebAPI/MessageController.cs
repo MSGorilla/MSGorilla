@@ -22,6 +22,7 @@ namespace MSGorilla.WebApi
         MessageManager _messageManager = new MessageManager();
         NotifManager _notifManager = new NotifManager();
         TopicManager _topicManager = new TopicManager();
+        RichMsgManager _richMsgManager = new RichMsgManager();
 
         [HttpGet]
         public DisplayMessagePagination UserLine(int count = 25, string token = null)
@@ -145,9 +146,10 @@ namespace MSGorilla.WebApi
             var msg = new List<DisplayMessage>();
             AccountManager accManager = new AccountManager();
             AttachmentManager attManage = new AttachmentManager();
+            RichMsgManager richMsgManager = new RichMsgManager();
             foreach (var m in msglist)
             {
-                msg.Add(new DisplayMessage(m, accManager, attManage));
+                msg.Add(new DisplayMessage(m, accManager, attManage, richMsgManager));
             }
 
             return msg;
@@ -215,6 +217,12 @@ namespace MSGorilla.WebApi
             return reply;
         }
 
+        [HttpGet]
+        public string GetRichMessage(string richMsgID)
+        {
+            return _richMsgManager.GetRichMessage(richMsgID);
+        }
+
         [HttpGet, HttpPost]
         public DisplayMessage PostMessage(string message,
                                     string schemaID = "none", 
@@ -225,7 +233,7 @@ namespace MSGorilla.WebApi
                                     string richMessage = null,
                                     [FromUri]string[] attachmentID = null)
         {
-            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, topicName, message, richMessage, attachmentID, DateTime.UtcNow), new AccountManager(), new AttachmentManager());
+            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, topicName, message, richMessage, attachmentID, DateTime.UtcNow), new AccountManager(), new AttachmentManager(), new RichMsgManager());
             //return new ActionResult();
         }
 

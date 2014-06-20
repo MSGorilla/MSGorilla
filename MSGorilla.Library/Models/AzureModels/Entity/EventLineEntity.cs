@@ -10,7 +10,6 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
     public class EventLineEntity : TableEntity
     {
         public string Content { get; set; }
-        public string RichMessage { get; set; }
         
         public EventLineEntity()
         {
@@ -24,8 +23,6 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             this.RowKey = msg.ID;
 
             Content = msg.ToJsonString();
-            RichMessage = msg.RichMessage;
-
         }
     }
 }

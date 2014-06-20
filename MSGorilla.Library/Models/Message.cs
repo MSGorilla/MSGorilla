@@ -25,8 +25,7 @@ namespace MSGorilla.Library.Models
         public string[] TopicName { get; set; }
         public string MessageContent { get; set; }
         public DateTime PostTime { get; set; }
-        [ScriptIgnore]
-        public string RichMessage { get; set; }
+        public string RichMessageID { get; set; }
         public string[] AttachmentID { get; set; }
 
         public Message(string userid,
@@ -37,7 +36,7 @@ namespace MSGorilla.Library.Models
             string[] owner,
             string[] atUser,
             string[] topicName,
-            string richMessage,
+            string richMessageID,
             string[] attachmentID
                 )
         {
@@ -48,7 +47,7 @@ namespace MSGorilla.Library.Models
             Owner = owner;
             AtUser = atUser;
             TopicName = topicName;
-            RichMessage = richMessage;
+            RichMessageID = richMessageID;
             PostTime = timestamp.ToUniversalTime();
             AttachmentID = attachmentID;
             ID = string.Format("{0}_{1}",
@@ -58,10 +57,9 @@ namespace MSGorilla.Library.Models
 
         public string ToJsonString()
         {
-            JavaScriptSerializer serialize = new JavaScriptSerializer();
-            return serialize.Serialize(this);
-
-            //return JsonConvert.SerializeObject(this);
+            //JavaScriptSerializer serialize = new JavaScriptSerializer();
+            //return serialize.Serialize(this);
+            return JsonConvert.SerializeObject(this);
         }
 
         public static string ToMessagePK(string userid, string messageID)
