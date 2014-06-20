@@ -431,7 +431,7 @@ namespace MSGorilla.Library
             }
             if (richMessage != null && richMessage.Length > 64*1024)
             {
-                throw new MessageTooLongException();
+                throw new RichMessageTooLongException();
             }
             UserProfile user = _accManager.FindUser(userid);
             if (user == null)
