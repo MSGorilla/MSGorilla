@@ -68,7 +68,7 @@
                     var windowHeight = $(window).height();
                     var documentHeight = $(document).height();
                     if (documentTop >= (documentHeight - windowHeight)) {
-                        LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.UserId');
+                        LoadUserFavoriteTopics('@ViewBag.UserId');
                     }
                 })
             </script>
