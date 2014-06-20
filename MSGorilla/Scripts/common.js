@@ -1265,7 +1265,7 @@ function LoadHotTopics() {
                 var topiccount = item.MsgCount;
 
                 output += "<li class='sub-list-group-item'>";
-                output += "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "'>&nbsp;</a>";
+                output += "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>";
                 //output += "  <span class='badge'>" + topiccount + "</span>";
                 output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
                 output += "</li>";
@@ -1373,9 +1373,11 @@ function LoadTopicLikeBtn(btnid, topicid) {
             if (data == true) {
                 SetUnlikeBtn(btnid, topicid, true);
             }
-            else {
+            else if (data == false) {
                 SetLikeBtn(btnid, topicid, true);
-
+            }
+            else {
+                // do nothing.
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -1400,6 +1402,7 @@ function SetUnlikeBtn(btnid, topicid, enabled) {
     }
     btn.attr("onmouseover", "UnlikeBtnMouseOver('" + btnid + "');")
     btn.attr("onmouseout", "UnlikeBtnMouseOut('" + btnid + "');")
+    btn.show();
 }
 
 function UnlikeBtnMouseOver(btnid) {
@@ -1438,6 +1441,7 @@ function SetLikeBtn(btnid, topicid, enabled) {
     }
     btn.attr("onmouseover", "")
     btn.attr("onmouseout", "")
+    btn.show();
 }
 
 function Like(btnid, topicid) {
@@ -1490,7 +1494,7 @@ function CreateTopic(topicid, topicname, topicdesp, topiccount) {
     var output = "";
 
     output += "<li class='list-group-item'>";
-    output += "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "'>&nbsp;</a>";
+    output += "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>";
     output += "  <span class='badge'>" + topiccount + "</span>";
     output += "  <a class='fullname' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
     output += "  <span class='username' >" + (isNullOrEmpty(topicdesp) ? "" : topicdesp) + "</span>&nbsp;";

@@ -507,6 +507,10 @@ input[type="checkbox"].input-validation-error {
     float: right;
 }
 
+    .like-btn :empty {
+        display:none;
+    }
+
 .list-group-item > .like-btn, .sub-list-group-item > .like-btn {
     font-size: 11px;
     padding: 1px 5px;
