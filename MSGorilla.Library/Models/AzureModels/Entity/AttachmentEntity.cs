@@ -25,8 +25,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 
         public AttachmentEntity(Attachment attachment)
         {
-            this.PartitionKey = string.Format("{0}_{1}", attachment.Uploader,
-                                                Utils.ToAzureStorageDayBasedString(attachment.UploadTimestamp));
+            this.PartitionKey = Utils.ToAzureStorageDayBasedString(attachment.UploadTimestamp);
             this.RowKey = string.Format("{0}_{1}",
                 Utils.ToAzureStorageSecondBasedString(attachment.UploadTimestamp),
                 attachment.FileID);

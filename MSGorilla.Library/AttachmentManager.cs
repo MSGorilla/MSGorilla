@@ -75,6 +75,7 @@ namespace MSGorilla.Library
             CloudBlockBlob blockBlob = _blobcontainer.GetBlockBlobReference(attachment.FileID);
             blockBlob.UploadFromStream(filestream);
 
+            blockBlob.Properties.ContentType = filetype;
             return attachment;
         }
 
