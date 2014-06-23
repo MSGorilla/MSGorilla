@@ -19,6 +19,11 @@ namespace MSGorilla.WebApi
         ReplyManager _replyManager = new ReplyManager();
         NotifManager _notifManager = new NotifManager();
 
+        /// <summary>
+        /// Return current user's all replies in a  list.
+        /// Deprecated.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public List<DisplayReply> Replies()
         {
@@ -32,6 +37,12 @@ namespace MSGorilla.WebApi
             return reply;
         }
 
+        /// <summary>
+        /// Return current user's reply list.
+        /// </summary>
+        /// <param name="count">count of replies in the list </param>
+        /// <param name="token">continuous token</param>
+        /// <returns></returns>
         [HttpGet]
         public DisplayReplyPagination GetMyReply(int count = 25, string token = null)
         {
@@ -42,6 +53,14 @@ namespace MSGorilla.WebApi
             return new DisplayReplyPagination(_replyManager.GetReply(me, count, Utils.String2Token(token)));
         }
 
+        /// <summary>
+        /// Post a reply to somebody
+        /// </summary>
+        /// <param name="to">to user id</param>
+        /// <param name="message">reply message content</param>
+        /// <param name="messageUser">user id of whom posted the message</param>
+        /// <param name="messageID">message id</param>
+        /// <returns></returns>
         [HttpGet, HttpPost]
         public DisplayReply PostReply(string to, string message, string messageUser, string messageID)
         {
@@ -56,6 +75,11 @@ namespace MSGorilla.WebApi
             public string MessageID { get; set; }
         }
 
+        /// <summary>
+        /// Post a reply to somebody. Same as the Get API
+        /// </summary>
+        /// <param name="reply"></param>
+        /// <returns></returns>
         [HttpPost]
         public DisplayReply PostReply(ReplyModel reply)
         {

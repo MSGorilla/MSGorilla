@@ -40,6 +40,10 @@ namespace MSGorilla.WebApi
         private string graphUserUrl = "https://graph.windows.net/{0}/me?api-version=" + ConfigurationManager.AppSettings["ida:GraphApiVersion"];
         private const string TenantIdClaimType = "http://schemas.microsoft.com/identity/claims/tenantid";
 
+        /// <summary>
+        /// Return the current authenticated user id
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public string whoami()
         {
@@ -91,7 +95,8 @@ namespace MSGorilla.WebApi
                 UserProfile profile = _accountManager.FindUser(userid);
                 if (profile == null)
                 {
-                    CreateNewAADUser(userid, GetDisplayName(claims));
+                    UserProfile newUser = Utils.CreateNewUser(userid, GetDisplayName(claims));
+                    _accountManager.AddUser(newUser);
                 }
                 else if (profile.Password != null)
                 {
@@ -126,12 +131,6 @@ namespace MSGorilla.WebApi
             claim = claims.FirstOrDefault(c => c.ClaimType.Contains("LastName"));
             displayname += claim.Value;
             return displayname;
-        }
-
-        public void CreateNewAADUser(string userid, string displayName = null)
-        {
-            UserProfile newUser = Utils.CreateNewUser(userid, displayName);
-            _accountManager.AddUser(newUser);
         }
     }
 }

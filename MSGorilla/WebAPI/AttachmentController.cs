@@ -17,6 +17,10 @@ namespace MSGorilla.WebApi
     {
         AttachmentManager _attachmentManager = new AttachmentManager();
 
+        /// <summary>
+        /// Upload attachments. Return attachment detail list.
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         public List<Attachment> Upload()
         {
@@ -49,6 +53,11 @@ namespace MSGorilla.WebApi
             return uploadedAttachments;
         }
 
+        /// <summary>
+        /// Download Attachment. Redirect to an azure blob
+        /// </summary>
+        /// <param name="attachmentID">attachment id</param>
+        /// <returns></returns>
         [HttpGet]
         public HttpResponseMessage Download(string attachmentID)
         {

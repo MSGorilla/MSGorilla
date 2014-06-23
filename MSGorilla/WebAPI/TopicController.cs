@@ -18,18 +18,35 @@ namespace MSGorilla.WebApi
     {
         TopicManager _topicManager = new TopicManager();
 
+        /// <summary>
+        /// Return the specification of a topic.
+        /// </summary>
+        /// <param name="topicid">id of the topic</param>
+        /// <returns></returns>
         [HttpGet]
         public Topic FindTopic(int topicid)
         {
             return _topicManager.FindTopic(topicid);
         }
 
+        /// <summary>
+        /// Return a list a topics the topic name of which contain keyword
+        /// </summary>
+        /// <param name="keyword">key word</param>
+        /// <returns></returns>
         [HttpGet]
         public List<Topic> SearchTopic(string keyword)
         {
             return _topicManager.SearchTopic(keyword);
         }
 
+        /// <summary>
+        /// Add a new topic.
+        /// Return the topic created.
+        /// </summary>
+        /// <param name="Name">name of the topic</param>
+        /// <param name="Description">description of the topic</param>
+        /// <returns></returns>
         [HttpGet]
         public Topic AddTopic(string Name, string Description)
         {
@@ -41,18 +58,32 @@ namespace MSGorilla.WebApi
             return _topicManager.AddTopic(topic);
         }
 
+        /// <summary>
+        /// Return the list of all the topics.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public List<Topic> GetAllTopic()
         {
             return _topicManager.GetAllTopics();
         }
 
+        /// <summary>
+        /// Return a topics list which contains the most messages order by message count desc
+        /// </summary>
+        /// <param name="count">count of topic in the list</param>
+        /// <returns></returns>
         [HttpGet]
         public List<Topic> HotTopics(int count = 5)
         {
             return _topicManager.GetHotTopics(count);
         }
 
+        /// <summary>
+        /// Add the topic into current user's favourite topic list 
+        /// </summary>
+        /// <param name="topicID">id of the topic</param>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult AddFavouriteTopic(int topicID)
         {
@@ -60,6 +91,11 @@ namespace MSGorilla.WebApi
             return new ActionResult();
         }
 
+        /// <summary>
+        /// Remove the topic from the favourite topic list of current User
+        /// </summary>
+        /// <param name="topicID">id of the topic</param>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult RemoveFavouriteTopic(int topicID)
         {
@@ -67,24 +103,43 @@ namespace MSGorilla.WebApi
             return new ActionResult();
         }
 
+        /// <summary>
+        /// Return the favourite topic list of the current user
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public List<DisplayFavouriteTopic> GetMyFavouriteTopic()
         {
             return _topicManager.GetFavouriteTopic(whoami());
         }
 
+        /// <summary>
+        /// Return the favourite topic list of a user
+        /// </summary>
+        /// <param name="userid">id of a user</param>
+        /// <returns></returns>
         [HttpGet]
         public List<DisplayFavouriteTopic> GetUserFavouriteTopic(string userid)
         {
             return _topicManager.GetFavouriteTopic(userid);
         }
 
+        /// <summary>
+        /// Return whether the topic is current user's favourite topic or not
+        /// </summary>
+        /// <param name="topicID">id of the topic</param>
+        /// <returns></returns>
         [HttpGet]
         public bool IsFavouriteTopic(int topicID)
         {
             return _topicManager.IsFavouriteTopic(whoami(), topicID);
         }
 
+        /// <summary>
+        /// Return whether the topic is current user's favourite topic or not
+        /// </summary>
+        /// <param name="topic">name of the topic, case insensitive</param>
+        /// <returns></returns>
         [HttpGet]
         public bool IsFavouriteTopic(string topic)
         {

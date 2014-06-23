@@ -7,6 +7,8 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Runtime.Serialization;
 using System.Web;
+//using System.Web.Mvc;
+
 
 using MSGorilla.Library;
 using MSGorilla.Filters;
@@ -46,6 +48,10 @@ namespace MSGorilla.WebApi
     {
         private NotifManager _notifManager = new NotifManager();
 
+        /// <summary>
+        /// Return a list of all users in the system. 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public List<DisplayUserProfile> User()
         {
@@ -60,6 +66,11 @@ namespace MSGorilla.WebApi
             return dispusers;
         }
 
+        /// <summary>
+        /// Return profile of a user 
+        /// </summary>
+        /// <param name="userid">user id</param>
+        /// <returns></returns>
         [HttpGet]
         public DisplayUserProfile User(string userid)
         {
@@ -74,6 +85,10 @@ namespace MSGorilla.WebApi
             }
         }
 
+        /// <summary>
+        /// Return profile of the current user
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public DisplayUserProfile Me()
         {
@@ -89,7 +104,16 @@ namespace MSGorilla.WebApi
             }
         }
 
-        [HttpGet]
+        /// <summary>
+        /// Register a local account. Return the profile of the registered user.
+        /// User https tunnel for security reason.
+        /// </summary>
+        /// <param name="Username">user id</param>
+        /// <param name="DisplayName">user display name</param>
+        /// <param name="Password">password of the user</param>
+        /// <param name="Description">description of the user</param>
+        /// <returns></returns>
+        [HttpGet, System.Web.Mvc.RequireHttps]
         public UserProfile Register(string Username, string DisplayName, string Password, string Description)
         {
             UserProfile user = new UserProfile();
@@ -103,6 +127,13 @@ namespace MSGorilla.WebApi
             return createdUser;
         }
 
+        /// <summary>
+        /// Update user profile. Return the profile after updated.
+        /// </summary>
+        /// <param name="DisplayName">user display name</param>
+        /// <param name="Description">description of the user</param>
+        /// <param name="portraitUrl">portrait url of the user</param>
+        /// <returns></returns>
         [HttpGet]
         public UserProfile Update(string DisplayName, string Description, string portraitUrl)
         {
@@ -113,10 +144,14 @@ namespace MSGorilla.WebApi
             user.PortraitUrl = portraitUrl;
             _accountManager.UpdateUser(user);
             return user;
-
         }
 
-        [HttpGet]
+        /// <summary>
+        /// Update user password
+        /// </summary>
+        /// <param name="password">password of the user</param>
+        /// <returns></returns>
+        [HttpGet, System.Web.Mvc.RequireHttps]
         public ActionResult UpdatePassword(string password)
         {
             UserProfile user = _accountManager.FindUser(whoami());
@@ -126,19 +161,24 @@ namespace MSGorilla.WebApi
 
         }
 
-        public class RegisterModel
-        {
-            public string Username { get; set; }
-            public string DisplayName { get; set; }
-            public string Password { get; set; }
-            public string Description { get; set; }
-        }
-        [HttpPost]
-        public UserProfile Register(RegisterModel registerModel)
-        {
-            return Register(registerModel.Username, registerModel.DisplayName, registerModel.Password, registerModel.Description);
-        }
+        //public class RegisterModel
+        //{
+        //    public string Username { get; set; }
+        //    public string DisplayName { get; set; }
+        //    public string Password { get; set; }
+        //    public string Description { get; set; }
+        //}
+        //[HttpPost]
+        //public UserProfile Register(RegisterModel registerModel)
+        //{
+        //    return Register(registerModel.Username, registerModel.DisplayName, registerModel.Password, registerModel.Description);
+        //}
 
+        /// <summary>
+        /// Set current user following another user
+        /// </summary>
+        /// <param name="userid">another user id</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult> Follow(string userid)
         {
@@ -158,6 +198,11 @@ namespace MSGorilla.WebApi
             return new MSGorillaBaseException().toActionResult();
         }
 
+        /// <summary>
+        /// Set current user unfollowing of another user
+        /// </summary>
+        /// <param name="userid">another user id</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult> UnFollow(string userid)
         {
@@ -177,6 +222,10 @@ namespace MSGorilla.WebApi
             return new MSGorillaBaseException().toActionResult();
         }
 
+        /// <summary>
+        /// Return following user list of the current user.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public List<DisplayUserProfile> Followings()
         {
@@ -192,6 +241,11 @@ namespace MSGorilla.WebApi
             return dispusers;
         }
 
+        /// <summary>
+        /// Return following user list of a user
+        /// </summary>
+        /// <param name="userid">user id</param>
+        /// <returns></returns>
         [HttpGet]
         public List<DisplayUserProfile> Followings(string userid)
         {
@@ -206,12 +260,21 @@ namespace MSGorilla.WebApi
             return dispusers;
         }
 
+        /// <summary>
+        /// Return follower user list of the current user
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public List<DisplayUserProfile> Followers()
         {
             return Followers(whoami());
         }
 
+        /// <summary>
+        /// Return follower user list of a user
+        /// </summary>
+        /// <param name="userid">user id</param>
+        /// <returns></returns>
         [HttpGet]
         public List<DisplayUserProfile> Followers(string userid)
         {
@@ -226,12 +289,25 @@ namespace MSGorilla.WebApi
             return dispusers;
         }
 
+        /// <summary>
+        /// Return whether current is following another user.
+        /// 0 for false , 1 for true and -1 for users are the same.
+        /// </summary>
+        /// <param name="followingUserID">another user id</param>
+        /// <returns></returns>
         [HttpGet]
         public int IsFollowing(string followingUserID)
         {
             return IsFollowing(whoami(), followingUserID);
         }
 
+        /// <summary>
+        /// Return whether a user is following another user.
+        /// 0 for false , 1 for true and -1 for users are the same.
+        /// </summary>
+        /// <param name="userid">user id</param>
+        /// <param name="followingUserID">another user id</param>
+        /// <returns></returns>
         [HttpGet]
         public int IsFollowing(string userid, string followingUserID)
         {
@@ -244,6 +320,10 @@ namespace MSGorilla.WebApi
             return _accountManager.IsFollowing(userid, followingUserID) ? 1 : 0;
         }
 
+        /// <summary>
+        /// Return count of new messages of the current user
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public NotificationCount GetNotificationCount()
         {
@@ -251,6 +331,11 @@ namespace MSGorilla.WebApi
             return _notifManager.FindUserNotif(me);
         }
 
+        /// <summary>
+        /// Return a user list the userid of which contains key word
+        /// </summary>
+        /// <param name="keyword">key word</param>
+        /// <returns></returns>
         [HttpGet]
         public List<DisplayUserProfile> SearchUser(string keyword)
         {
