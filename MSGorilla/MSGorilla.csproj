@@ -29,6 +29,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\MSGorilla.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -222,6 +223,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\DocumentController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
@@ -240,6 +242,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Utility\TokenCacheUtils.cs" />
+    <Compile Include="Utility\XmlCommentDocumentationProvider.cs" />
     <Compile Include="WebAPI\AccountController.cs" />
     <Compile Include="WebAPI\AttachmentController.cs" />
     <Compile Include="WebAPI\BaseController.cs" />

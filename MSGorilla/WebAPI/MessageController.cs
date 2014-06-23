@@ -153,8 +153,8 @@ namespace MSGorilla.WebApi
         /// <summary>
         /// Return the messages in the current user's ownerline in a list
         /// </summary>
-        /// <param name="count"></param>
-        /// <param name="token"></param>
+        /// <param name="count">count of messages int the list</param>
+        /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
         public DisplayMessagePagination OwnerLine(int count = 25, string token = null)
@@ -165,9 +165,9 @@ namespace MSGorilla.WebApi
         /// <summary>
         /// Return the messages in a user's ownerline in a list
         /// </summary>
-        /// <param name="userid"></param>
-        /// <param name="count"></param>
-        /// <param name="token"></param>
+        /// <param name="userid">user id</param>
+        /// <param name="count">count of messages int the list</param>
+        /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
         public DisplayMessagePagination OwnerLine(string userid, int count = 25, string token = null)
@@ -189,9 +189,9 @@ namespace MSGorilla.WebApi
         /// <summary>
         /// Deprecated. Return the messages in a user's owner in a list
         /// </summary>
-        /// <param name="userid"></param>
-        /// <param name="end"></param>
-        /// <param name="start"></param>
+        /// <param name="userid">user id</param>
+        /// <param name="end">end time</param>
+        /// <param name="start">start time</param>
         /// <returns></returns>
         [HttpGet]
         public List<Message> OwnerLine(string userid, DateTime end, DateTime start)
@@ -203,8 +203,8 @@ namespace MSGorilla.WebApi
         /// <summary>
         /// Return the messages in the current user's atline in a list
         /// </summary>
-        /// <param name="count"></param>
-        /// <param name="token"></param>
+        /// <param name="count">count of messages int the list</param>
+        /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
         public DisplayMessagePagination AtLine(int count = 25, string token = null)
@@ -215,9 +215,9 @@ namespace MSGorilla.WebApi
         /// <summary>
         /// Return the messages in a user's atline in a list
         /// </summary>
-        /// <param name="userid"></param>
-        /// <param name="count"></param>
-        /// <param name="token"></param>
+        /// <param name="userid">user id</param>
+        /// <param name="count">count of messages int the list</param>
+        /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
         public DisplayMessagePagination AtLine(string userid, int count = 25, string token = null)
