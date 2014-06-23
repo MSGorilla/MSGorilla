@@ -55,12 +55,18 @@ namespace MSGorilla.WebApi
             string me = whoami();
             Attachment attachment = _attachmentManager.GetAttachmentInfo(attachmentID);
 
-            HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
-            result.Content = new StreamContent(_attachmentManager.GetAttachment(attachment));
-            result.Content.Headers.ContentType =
-                new System.Net.Http.Headers.MediaTypeHeaderValue(attachment.Filetype);
-            result.Content.Headers.Add("Content-Disposition", "attachment; filename=" + attachment.Filename);
-            return result;
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Redirect); // tried MOVED too
+            response.Headers.Location = new Uri(_attachmentManager.GetDownloadLink(attachment));
+            return response;
+
+
+            //HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+
+            //response.Content = new StreamContent(_attachmentManager.GetAttachment(attachment));
+            //response.Content.Headers.ContentType =
+            //    new System.Net.Http.Headers.MediaTypeHeaderValue(attachment.Filetype);
+            //response.Content.Headers.Add("Content-Disposition", "attachment; filename=" + attachment.Filename);
+            //return response;
         }
 	}
 }

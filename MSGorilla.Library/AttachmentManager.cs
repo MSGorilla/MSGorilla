@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
 
-using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -17,7 +17,7 @@ using MSGorilla.Library.Models.SqlModels;
 using MSGorilla.Library.Models.AzureModels;
 using MSGorilla.Library.Models.ViewModels;
 using MSGorilla.Library.Models.AzureModels.Entity;
-
+using Microsoft.WindowsAzure;
 
 namespace MSGorilla.Library
 {
@@ -25,7 +25,7 @@ namespace MSGorilla.Library
     {
         private CloudTable _attachment;
         private CloudBlobContainer _blobcontainer;
-        private string _sasToken;
+        private static string _policyName = "MySASPolicy";
 
         public AttachmentManager()
         {
@@ -34,7 +34,7 @@ namespace MSGorilla.Library
 
             BlobContainerPermissions blobPermissions = new BlobContainerPermissions();
 
-            blobPermissions.SharedAccessPolicies.Add("mypolicy", new SharedAccessBlobPolicy()
+            blobPermissions.SharedAccessPolicies.Add(_policyName, new SharedAccessBlobPolicy()
             {
                 // To ensure SAS is valid immediately, don’t set start time.
                 // This way, you can avoid failures caused by small clock differences.
@@ -50,8 +50,7 @@ namespace MSGorilla.Library
             _blobcontainer.SetPermissions(blobPermissions);
 
             // Get the shared access signature to share with users.
-            _sasToken =
-               _blobcontainer.GetSharedAccessSignature(new SharedAccessBlobPolicy(), "mypolicy");
+            
         }
 
         public Attachment Upload(string filename, 
@@ -118,6 +117,20 @@ namespace MSGorilla.Library
             }
 
             return blockBlob.OpenRead();
+        }
+
+        public string GetDownloadLink(Attachment attachment)
+        {
+            if (attachment == null)
+            {
+                throw new AttachmentNotFoundException();
+            }
+            CloudBlockBlob blockBlob = _blobcontainer.GetBlockBlobReference(attachment.FileID);
+
+            string _sasToken =
+               _blobcontainer.GetSharedAccessSignature(new SharedAccessBlobPolicy(), _policyName);
+
+            return blockBlob.Uri.ToString() + _sasToken;
         }
 
         //public static string GenerateAttachmentID(string uploader, string guid, DateTime timestamp)
