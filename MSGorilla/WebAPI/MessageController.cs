@@ -96,7 +96,6 @@ namespace MSGorilla.WebApi
                 case "all":
                 default:
                     return HomeLine(whoami(), count, token);
-                    break;
             }
 
             return HomeLine(whoami(), start, end, count, token);
