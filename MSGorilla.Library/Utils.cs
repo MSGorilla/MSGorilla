@@ -88,7 +88,8 @@ namespace MSGorilla.Library
                 return false;
             }
 
-            if (id.Contains('\\') || 
+            if (id.Contains('\\') ||
+                id.Contains('|') || 
                 id.Contains(' ') || 
                 id.Contains('?') || 
                 id.Contains('/') || 
