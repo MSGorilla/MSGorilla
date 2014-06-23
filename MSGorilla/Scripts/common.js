@@ -1514,30 +1514,37 @@ function notify(homelineCount, atlineCount, ownerlineCount, replyCount) {
             return;
         }
 
-        var notifitems = [];
+        //chrome.notification.getPermissionLevel(function (level) {
+        //    if (level == "granted") {
+                var notifitems = [];
 
-        if (atlineCount > 0) {
-            notifitems.push({ title: "Mentions: ", message: atlineCount });
-        }
-        if (ownerlineCount > 0) {
-            notifitems.push({ title: "Owned : ", message: ownerlineCount });
-        }
-        if (replyCount > 0) {
-            notifitems.push({ title: "Replies : ", message: replyCount });
-        }
+                if (atlineCount > 0) {
+                    notifitems.push({ title: "Mentions: ", message: atlineCount });
+                }
+                if (ownerlineCount > 0) {
+                    notifitems.push({ title: "Owned : ", message: ownerlineCount });
+                }
+                if (replyCount > 0) {
+                    notifitems.push({ title: "Replies : ", message: replyCount });
+                }
 
-        var opt = {
-            type: "list",
-            title: "Notifications",
-            message: "You have new unread messages.",
-            iconUrl: "/Content/Images/default_avatar.jpg",
-            items: notifitems
-        };
+                var opt = {
+                    type: "list",
+                    title: "Notifications",
+                    message: "You have new unread messages.",
+                    iconUrl: "/Content/Images/default_avatar.jpg",
+                    items: notifitems
+                };
 
-        if (notifitems.length > 0) {
-            chrome.notifications.create('chrome_notification', opt, function (id) {
-            });
-        }
+                if (notifitems.length > 0) {
+                    chrome.notifications.create('chrome_notification', opt, function (id) {
+                    });
+                }
+        //    }
+        //    else if (level == "denied") {
+        //        return;
+        //    }
+        //});
     }
     catch (e) { }
 }
