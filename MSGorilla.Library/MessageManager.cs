@@ -144,8 +144,8 @@ namespace MSGorilla.Library
             List<Message> msgs = new List<Message>();
             foreach (UserLineEntity entity in _userline.ExecuteQuery(rangeQuery))
             {
-                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msgs.Add(msg);
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msgs.Add(entity.toMessage());
             }
             return msgs;
         }
@@ -162,8 +162,8 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (UserLineEntity entity in queryResult)
             {
-                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                ret.message.Add(msg);
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
             return ret;
         }
@@ -178,8 +178,8 @@ namespace MSGorilla.Library
             List<Message> msgs = new List<Message>();
             foreach (UserLineEntity entity in _ownerline.ExecuteQuery(rangeQuery))
             {
-                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msgs.Add(msg);
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msgs.Add(entity.toMessage());
             }
             return msgs;
         }
@@ -195,8 +195,8 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (OwnerLineEntity entity in queryResult)
             {
-                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                ret.message.Add(msg);
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
             return ret;
         }
@@ -212,8 +212,8 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (AtLineEntity entity in queryResult)
             {
-                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                ret.message.Add(msg);
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
 
             return ret;
@@ -229,8 +229,8 @@ namespace MSGorilla.Library
             List<Message> msgs = new List<Message>();
             foreach (HomeLineEntity entity in _homeline.ExecuteQuery(rangeQuery))
             {
-                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msgs.Add(msg);
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msgs.Add(entity.toMessage());
             }
             return msgs;
         }
@@ -247,8 +247,8 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (HomeLineEntity entity in queryResult)
             {
-                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                ret.message.Add(msg);
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
             return ret;
         }
@@ -265,8 +265,8 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (TopicLine entity in queryResult)
             {
-                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                ret.message.Add(msg);
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
             return ret;
         }
@@ -280,8 +280,8 @@ namespace MSGorilla.Library
             List<Message> msgs = new List<Message>();
             foreach (EventLineEntity entity in _eventline.ExecuteQuery(rangeQuery))
             {
-                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msgs.Add(msg);
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msgs.Add(entity.toMessage());
             }
             return msgs;
         }
@@ -298,8 +298,8 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (PublicSquareLineEntity entity in queryResult)
             {
-                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                ret.message.Add(msg);
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
             return ret;
         } 
@@ -352,8 +352,8 @@ namespace MSGorilla.Library
             List<Message> msgs = new List<Message>();
             foreach (PublicSquareLineEntity entity in  _publicSquareLine.ExecuteQuery(rangeQuery))
             {
-                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msgs.Add(msg);
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msgs.Add(entity.toMessage());
             }
             return msgs;
         }
@@ -368,7 +368,8 @@ namespace MSGorilla.Library
             if (retrievedResult.Result != null)
             {
                 UserLineEntity entity = (UserLineEntity)retrievedResult.Result;
-                var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                var msg = entity.toMessage();
                 msgd = new MessageDetail(msg);
                 msgd.ReplyCount = entity.ReplyCount;
                 //tweet.RetweetCount = entity.RetweetCount;
@@ -400,8 +401,8 @@ namespace MSGorilla.Library
             {
                 return null;
             }
-            var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-            return msg;
+            //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+            return entity.toMessage();
         }
 
         public DisplayMessage GetDisplayMessage(string msgUser, string msgID)

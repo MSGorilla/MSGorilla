@@ -10,7 +10,14 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 {
     public class AttachmentEntity : TableEntity
     {
-        public string Content { get; set; }
+        public string AttachmentID { get; set; }          //{pk};{guid}
+        public string FileID { get; set; }
+        public string Uploader { get; set; }
+        public DateTime UploadTimestamp { get; set; }
+        public string Filename { get; set; }
+        public string Filetype { get; set; }
+        public int Filesize { get; set; }
+
         public AttachmentEntity()
         {
             ;
@@ -25,7 +32,26 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
                 attachment.FileID);
 
             attachment.AttachmentID = string.Format("{0};{1}", this.PartitionKey, this.RowKey);
-            this.Content = JsonConvert.SerializeObject(attachment);
+            this.AttachmentID = string.Format("{0};{1}", this.PartitionKey, this.RowKey);
+            this.FileID = attachment.FileID;
+            this.Uploader = attachment.Uploader;
+            this.UploadTimestamp = attachment.UploadTimestamp;
+            this.Filename = attachment.Filename;
+            this.Filetype = attachment.Filetype;
+            this.Filesize = attachment.Filesize;
+        }
+
+        public Attachment toAttachment()
+        {
+            Attachment attachment = new Attachment();
+            attachment.AttachmentID = this.AttachmentID;
+            attachment.FileID = this.FileID;
+            attachment.Uploader = this.Uploader;
+            attachment.UploadTimestamp = this.UploadTimestamp;
+            attachment.Filename = this.Filename;
+            attachment.Filetype = this.Filetype;
+            attachment.Filesize = this.Filesize;
+            return attachment;
         }
     }
 }

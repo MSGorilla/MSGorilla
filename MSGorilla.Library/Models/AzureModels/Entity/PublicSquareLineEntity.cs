@@ -7,21 +7,17 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace MSGorilla.Library.Models.AzureModels.Entity
 {
-    public class PublicSquareLineEntity : TableEntity
+    public class PublicSquareLineEntity : BaseMessageEntity
     {
-        public string Content { get; set; }
-
         public PublicSquareLineEntity()
         {
             ;
         }
 
-        public PublicSquareLineEntity(Message msg)
+        public PublicSquareLineEntity(Message msg) : base(msg)
         {
             this.PartitionKey = Utils.ToAzureStorageDayBasedString(msg.PostTime.ToUniversalTime());
             this.RowKey = msg.ID;
-
-            Content = msg.ToJsonString();
         }
     }
 }

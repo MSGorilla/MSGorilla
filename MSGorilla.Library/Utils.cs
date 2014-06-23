@@ -192,5 +192,32 @@ namespace MSGorilla.Library
 
             return topicNames;
         }
+
+        public static string StringArray2String(string[] array)
+        {
+            if (array == null || array.Length == 0)
+            {
+                return null;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < (array.Length - 1); i++)
+            {
+                sb.Append(array[i]);
+                sb.Append(";");
+            }
+            sb.Append(array[array.Length - 1]);
+            return sb.ToString();
+        }
+
+        public static string[] String2StringArray(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return null;
+            }
+
+            return str.Split(';');
+        }
     }
 }

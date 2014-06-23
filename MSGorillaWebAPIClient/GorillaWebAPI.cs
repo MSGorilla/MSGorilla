@@ -176,5 +176,20 @@ namespace MSGorilla.WebAPI.Client
             return _readResponseContent(response);
         }
 
+        public List<Attachment> UploadAttachment(string filePath)
+        {
+            string url = _rootUri + Constant.UriUploadAttachment;
+
+            WebClient myWebClient = new WebClient();
+            myWebClient.Headers.Add("Authorization:"+_authHeader);
+            Console.WriteLine("Uploading {0} to {1} ...", filePath, url);
+
+            // Upload the file to the URI. 
+            // The 'UploadFile(uriString,fileName)' method implicitly uses HTTP POST method. 
+            byte[] responseArray = myWebClient.UploadFile(url, filePath);
+            string ret = System.Text.Encoding.ASCII.GetString(responseArray);
+
+            return JsonConvert.DeserializeObject<List<Attachment>>(ret);
+        }
     }
 }
