@@ -28,7 +28,8 @@ namespace MSGorilla.Library.Azure
             ReplyNotification,
             ReplyArchive,
             Attachment,
-            RichMessage
+            RichMessage,
+            Statistics
         }
 
         public const string AttachmentContainer = "attachment";
@@ -58,6 +59,7 @@ namespace MSGorilla.Library.Azure
             _dict.Add(MSGorillaTable.ReplyArchive, "ReplyArchive");
             _dict.Add(MSGorillaTable.Attachment, "Attachment");
             _dict.Add(MSGorillaTable.RichMessage, "RichMessage");
+            _dict.Add(MSGorillaTable.Statistics, "Statistics");
         }
 
         public static CloudTable GetTable(MSGorillaTable table)

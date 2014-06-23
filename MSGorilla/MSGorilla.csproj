@@ -327,6 +327,7 @@
     <Content Include="Views\Profile\Owned.cshtml" />
     <Content Include="Views\Error\Index.cshtml" />
     <Content Include="Views\Shared\_PostPartial.cshtml" />
+    <Content Include="Views\Shared\_FeedFilterPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

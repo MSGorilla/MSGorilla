@@ -29,6 +29,7 @@ namespace MSGorilla.Controllers
             {
                 ViewBag.FeedCategory = category.ToLower();
             }
+            ViewBag.FeedId = "";
 
             return View();
         }

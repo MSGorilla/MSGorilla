@@ -1,0 +1,16 @@
+﻿<div class="shortcut-container ">
+    <ul class="list-group" id="feedfilter_accordion">
+        <li class="list-group-item top-radius-10">
+            <a href="#" onclick="LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'all');">All feeds</a>
+        </li>
+        <li class="list-group-item">
+            <a href="#" onclick="LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'latest24hours');">Latest 24 hours</a>
+        </li>
+        <li class="list-group-item">
+            <a href="#" onclick="LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'latest7days');">Latest 7 days</a>
+        </li>
+        <li class="list-group-item">
+            <a href="#" onclick="LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'latest1month');">Latest 1 month</a>
+        </li>
+    </ul>
+</div>
