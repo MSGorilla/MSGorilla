@@ -7,22 +7,18 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace MSGorilla.Library.Models.AzureModels.Entity
 {
-    public class EventLineEntity : TableEntity
-    {
-        public string Content { get; set; }
-        
+    public class EventLineEntity : BaseMessageEntity
+    {        
         public EventLineEntity()
         {
             ;
         }
 
-        public EventLineEntity(Message msg)
+        public EventLineEntity(Message msg) : base(msg)
         {
             this.PartitionKey = string.Format("{0}_{1}", msg.EventID, 
                 Utils.ToAzureStorageDayBasedString(msg.PostTime.ToUniversalTime()));
             this.RowKey = msg.ID;
-
-            Content = msg.ToJsonString();
         }
     }
 }

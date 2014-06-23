@@ -16,7 +16,6 @@ using MSGorilla.Library.Models;
 using MSGorilla.Library.Models.SqlModels;
 using MSGorilla.Library.Models.AzureModels;
 using MSGorilla.Library.Models.ViewModels;
-using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.AzureModels.Entity;
 
 
@@ -26,11 +25,33 @@ namespace MSGorilla.Library
     {
         private CloudTable _attachment;
         private CloudBlobContainer _blobcontainer;
+        private string _sasToken;
 
         public AttachmentManager()
         {
             _attachment = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Attachment);
             _blobcontainer = AzureFactory.GetBlobContainer();
+
+            BlobContainerPermissions blobPermissions = new BlobContainerPermissions();
+
+            blobPermissions.SharedAccessPolicies.Add("mypolicy", new SharedAccessBlobPolicy()
+            {
+                // To ensure SAS is valid immediately, don’t set start time.
+                // This way, you can avoid failures caused by small clock differences.
+                SharedAccessExpiryTime = DateTime.UtcNow.AddHours(1),
+                Permissions = SharedAccessBlobPermissions.Read
+            });
+
+            // The public access setting explicitly specifies that 
+            // the container is private, so that it can't be accessed anonymously.
+            blobPermissions.PublicAccess = BlobContainerPublicAccessType.Off;
+
+            // Set the permission policy on the container.
+            _blobcontainer.SetPermissions(blobPermissions);
+
+            // Get the shared access signature to share with users.
+            _sasToken =
+               _blobcontainer.GetSharedAccessSignature(new SharedAccessBlobPolicy(), "mypolicy");
         }
 
         public Attachment Upload(string filename, 
@@ -45,7 +66,7 @@ namespace MSGorilla.Library
             attachment.Filetype = filetype;
             attachment.Filesize = filesize;
             attachment.Uploader = uploader;
-            attachment.FileID = Guid.NewGuid().ToString();
+            attachment.FileID = Guid.NewGuid().ToString() + Path.GetExtension(filename);
             //attachment.AttachmentId = GenerateAttachmentID(attachment.Uploader, attachment.FileID, attachment.UploadTimestamp);
 
             AttachmentEntity attachmentEntity = new AttachmentEntity(attachment);
@@ -81,7 +102,7 @@ namespace MSGorilla.Library
                 return null;
             }
             AttachmentEntity entity = (AttachmentEntity)retrievedResult.Result;
-            return JsonConvert.DeserializeObject<Attachment>(entity.Content);
+            return entity.toAttachment();
         }
 
         public Stream GetAttachment(Attachment attachment)
