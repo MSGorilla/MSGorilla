@@ -204,7 +204,7 @@ namespace MSGorilla.Library
             for (int i = 0; i < (array.Length - 1); i++)
             {
                 sb.Append(array[i]);
-                sb.Append(";");
+                sb.Append("|");
             }
             sb.Append(array[array.Length - 1]);
             return sb.ToString();
@@ -217,7 +217,7 @@ namespace MSGorilla.Library
                 return null;
             }
 
-            return str.Split(';');
+            return str.Split('|');
         }
     }
 }
