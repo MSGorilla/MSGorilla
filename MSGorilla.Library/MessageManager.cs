@@ -219,20 +219,23 @@ namespace MSGorilla.Library
             return ret;
         }
 
-        public List<Message> HomeLine(string userid, DateTime start, DateTime end)
+        public MessagePagination HomeLine(string userid, DateTime start, DateTime end, int count = 25, TableContinuationToken continuationToken = null)
         {
             TableQuery<HomeLineEntity> rangeQuery =
                 new TableQuery<HomeLineEntity>().Where(
                     GenerateTimestampConditionQuery(userid, start, end)
-                );
+                ).Take(count); ;
+            TableQuerySegment<HomeLineEntity> queryResult = _homeline.ExecuteQuerySegmented(rangeQuery, continuationToken);
 
-            List<Message> msgs = new List<Message>();
-            foreach (HomeLineEntity entity in _homeline.ExecuteQuery(rangeQuery))
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
+            ret.message = new List<Message>();
+            foreach (HomeLineEntity entity in queryResult)
             {
                 //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                msgs.Add(entity.toMessage());
+                ret.message.Add(entity.toMessage());
             }
-            return msgs;
+            return ret;
         }
 
         public MessagePagination HomeLine(string userid, int count = 25, TableContinuationToken continuationToken = null)

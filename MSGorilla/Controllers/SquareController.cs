@@ -22,6 +22,7 @@ namespace MSGorilla.Controllers
             ViewBag.Me = me;
 
             ViewBag.FeedCategory = "publicsquareline";
+            ViewBag.FeedId = "";
 
             return View();
         }

@@ -26,6 +26,7 @@ namespace MSGorilla.Controllers
             ViewBag.Me = me;
 
             ViewBag.FeedCategory = "homeline";
+            ViewBag.FeedId = "";
             return View();
         }
 

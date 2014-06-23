@@ -76,9 +76,30 @@ namespace MSGorilla.WebApi
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination HomeLine(int count = 25, string token = null)
+        public DisplayMessagePagination HomeLine(int count = 25, string token = null, string filter = "")
         {
-            return HomeLine(whoami(), count, token);
+            DateTime start, end;
+            end = DateTime.UtcNow;
+
+            switch (filter)
+            {
+                case "latest24hours":
+                    start = end.AddDays(-1);
+                    break;
+                case "latest7days":
+                    start = end.AddDays(-7);
+                    break;
+                case "latest1month":
+                    start = end.AddMonths(-1);
+                    break;
+                case "":
+                case "all":
+                default:
+                    return HomeLine(whoami(), count, token);
+                    break;
+            }
+
+            return HomeLine(whoami(), start, end, count, token);
         }
 
         /// <summary>
@@ -113,10 +134,20 @@ namespace MSGorilla.WebApi
         /// <param name="start">start timestamp</param>
         /// <returns></returns>
         [HttpGet]
-        public List<Message> HomeLine(string userid, DateTime end, DateTime start)
+        public DisplayMessagePagination HomeLine(string userid, DateTime start, DateTime end, int count = 25, string token = null)
         {
-            whoami();
-            return _messageManager.HomeLine(userid, start, end);
+            string me = whoami();
+            if (string.IsNullOrEmpty(userid))
+            {
+                userid = me;
+            }
+            TableContinuationToken tok = Utils.String2Token(token);
+
+            if (me.Equals(userid))
+            {
+                _notifManager.clearHomelineNotifCount(me);
+            }
+            return new DisplayMessagePagination(_messageManager.HomeLine(userid, start, end, count, tok));
         }
 
         /// <summary>
@@ -277,7 +308,7 @@ namespace MSGorilla.WebApi
         public DisplayMessagePagination TopicLine(string topic, int count = 25, string token = null)
         {
             string me = whoami();
-            var t  = _topicManager.FindTopicByName(topic);
+            var t = _topicManager.FindTopicByName(topic);
             if (t == null)
             {
                 return null;
@@ -362,7 +393,7 @@ namespace MSGorilla.WebApi
         /// <returns></returns>
         [HttpGet, HttpPost]
         public DisplayMessage PostMessage(string message,
-                                    string schemaID = "none", 
+                                    string schemaID = "none",
                                     string eventID = "none",
                                     [FromUri]string[] owner = null,
                                     [FromUri]string[] atUser = null,

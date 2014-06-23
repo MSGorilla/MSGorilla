@@ -461,22 +461,15 @@ function PostReply(user, mid) {
 
 // feed function
 var isLoadFeeds = false;
-function LoadFeeds(category, id) {
-    if (isLoadFeeds) return;
+function LoadFeeds(category, id, filter) {
+    if (isLoadFeeds) return;    // if it is loading, skip this time.
     isLoadFeeds = true;
-
-    var token = $("#hd_token").val();
-    if (!isNullOrEmpty(token)) {
-        if (token == "nomore") {
-            // already no more feeds, don't load any more
-            isLoadFeeds = false;
-            return;
-        }
-    }
 
     var apiurl = "";
     var apidata = "";
+    var token = "";
     var count = 0;
+
     if (isNullOrEmpty(category))
         apiurl = "/api/message/userline";
     else if (category == "homeline") {
@@ -520,10 +513,38 @@ function LoadFeeds(category, id) {
         return;
     }
 
-    if (isNullOrEmpty(token)) { // first time load
+    
+    if (isNullOrEmpty(filter)) { // page load or load more
+        token = $("#hd_token").val();
+        filter = $("#hd_filter").val();
+    }
+    else {  // click on filter btn, clear current feeds and add loading gif
+        $("#feedlist").empty();
+        $("#feedlist").append("<li id='loading_message' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
+
+        $("#hd_token").val(token);
+        $("#hd_filter").val(filter);
+    }
+
+    if (!isNullOrEmpty(filter)) {   // set filter value
+        if (isNullOrEmpty(apidata)) {
+            apidata = "filter=" + filter;
+        }
+        else {
+            apidata += "&filter=" + filter;
+        }
+    }
+
+    if (isNullOrEmpty(token)) { // first time load, not load more
         count = GetNotificationCount(category);
         $("#hd_newcount").val(count);
     } else {    // load more
+        if (token == "nomore") {
+            // already no more feeds, don't load any more
+            isLoadFeeds = false;
+            return;
+        }
+
         count = $("#hd_newcount").val();
         if (isNullOrEmpty(apidata)) {
             apidata = "token=" + token;
@@ -1516,30 +1537,30 @@ function notify(homelineCount, atlineCount, ownerlineCount, replyCount) {
 
         //chrome.notification.getPermissionLevel(function (level) {
         //    if (level == "granted") {
-                var notifitems = [];
+        var notifitems = [];
 
-                if (atlineCount > 0) {
-                    notifitems.push({ title: "Mentions: ", message: atlineCount });
-                }
-                if (ownerlineCount > 0) {
-                    notifitems.push({ title: "Owned : ", message: ownerlineCount });
-                }
-                if (replyCount > 0) {
-                    notifitems.push({ title: "Replies : ", message: replyCount });
-                }
+        if (atlineCount > 0) {
+            notifitems.push({ title: "Mentions: ", message: atlineCount });
+        }
+        if (ownerlineCount > 0) {
+            notifitems.push({ title: "Owned : ", message: ownerlineCount });
+        }
+        if (replyCount > 0) {
+            notifitems.push({ title: "Replies : ", message: replyCount });
+        }
 
-                var opt = {
-                    type: "list",
-                    title: "Notifications",
-                    message: "You have new unread messages.",
-                    iconUrl: "/Content/Images/default_avatar.jpg",
-                    items: notifitems
-                };
+        var opt = {
+            type: "list",
+            title: "Notifications",
+            message: "You have new unread messages.",
+            iconUrl: "/Content/Images/default_avatar.jpg",
+            items: notifitems
+        };
 
-                if (notifitems.length > 0) {
-                    chrome.notifications.create('chrome_notification', opt, function (id) {
-                    });
-                }
+        if (notifitems.length > 0) {
+            chrome.notifications.create('chrome_notification', opt, function (id) {
+            });
+        }
         //    }
         //    else if (level == "denied") {
         //        return;
