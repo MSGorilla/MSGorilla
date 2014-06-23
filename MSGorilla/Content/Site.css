@@ -244,6 +244,15 @@ input[type="checkbox"].input-validation-error {
     margin-bottom: 20px;
 }
 
+.ma-lt-15 {
+    margin-left:15px;
+}
+
+.pd-10 {
+    padding-left:10px;
+    padding-right:10px;
+}
+
 .bold {
     font-weight: bold;
 }

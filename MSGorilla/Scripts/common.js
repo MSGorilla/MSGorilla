@@ -1324,6 +1324,8 @@ function LoadMyFavoriteTopics() {
         success: function (data) {
             // create hot topic
             $("#favorite_collapse").empty();
+            var navlist = $("#home_nav_list");
+            navlist.empty();
             $.each(data, function (index, item) {
                 var output = "";
                 var userid = item.userid;
@@ -1341,14 +1343,13 @@ function LoadMyFavoriteTopics() {
                 $("#favorite_collapse").append(output);
 
                 // homepage 
-                var navlist = $("#home_nav_list");
                 if (unreadcount > 0 && navlist.length > 0) {
                     output = "";
-                    output += "<li>";
-                    output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a>";
-                    output += "</li>";
+                    //output += "<li>";
+                    output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a> ";
+                    //output += "</li>";
 
-                    $("#home_nav_list").append(output);
+                    navlist.append(output);
                 }
             })
         },
@@ -1516,13 +1517,13 @@ function notify(homelineCount, atlineCount, ownerlineCount, replyCount) {
         var notifitems = [];
 
         if (atlineCount > 0) {
-            notifitems.push({ title: "Mentions: ", message: atlineCount })
+            notifitems.push({ title: "Mentions: ", message: atlineCount });
         }
         if (ownerlineCount > 0) {
-            notifitems.push({ title: "Owned : ", message: ownerlineCount })
+            notifitems.push({ title: "Owned : ", message: ownerlineCount });
         }
         if (replyCount > 0) {
-            notifitems.push({ title: "Replies : ", message: replyCount })
+            notifitems.push({ title: "Replies : ", message: replyCount });
         }
 
         var opt = {
@@ -1531,7 +1532,7 @@ function notify(homelineCount, atlineCount, ownerlineCount, replyCount) {
             message: "You have new unread messages.",
             iconUrl: "/Content/Images/default_avatar.jpg",
             items: notifitems
-        }
+        };
 
         if (notifitems.length > 0) {
             chrome.notifications.create('chrome_notification', opt, function (id) {
