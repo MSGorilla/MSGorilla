@@ -19,6 +19,12 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return schema.
+        /// 
+        /// Example output:
+        /// {
+        ///     "SchemaID": "schema1",
+        ///     "SchemaContent": "<timestamp><eventid><schemaid>"
+        /// }
         /// </summary>
         /// <param name="schemaID">ID of the schema</param>
         /// <returns></returns>
@@ -30,6 +36,22 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return list of all schemas.
+        /// 
+        /// Example output:
+        /// [
+        ///     {
+        ///         "SchemaID": "123",
+        ///         "SchemaContent": "1234"
+        ///     },
+        ///     {
+        ///         "SchemaID": "none",
+        ///         "SchemaContent": ""
+        ///     },
+        ///     {
+        ///         "SchemaID": "schema1",
+        ///         "SchemaContent": "<timestamp><eventid><schemaid>"
+        ///     }
+        /// ]
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -40,6 +62,12 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Post a new schema
+        /// 
+        /// Example output:
+        /// {
+        ///     "SchemaID": "schema1",
+        ///     "SchemaContent": "<timestamp><eventid><schemaid>"
+        /// }
         /// </summary>
         /// <param name="schemaID">ID of the schema</param>
         /// <param name="schemaContent">content of a schema</param>

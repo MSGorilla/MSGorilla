@@ -25,7 +25,7 @@ namespace MSGorilla.Controllers
 
 
             //return View(apiExplorer);
-            return View(FindControllerApi("api/base"));
+            return View(FindControllerApi("api"));
         }
 
         public ActionResult Base()

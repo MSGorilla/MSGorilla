@@ -90,7 +90,8 @@ namespace MSGorilla.Library
 
             if (id.Contains('\\') ||
                 id.Contains('|') || 
-                id.Contains(' ') || 
+                id.Contains(' ') ||
+                id.Contains('@') || 
                 id.Contains('?') || 
                 id.Contains('/') || 
                 id.Contains('#') ||
