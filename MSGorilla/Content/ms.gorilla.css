@@ -895,6 +895,12 @@ pre {
     }
 }
 
+@media (min-width: 1600px) {
+    .container {
+        width: 1570px;
+    }
+}
+
 .container-fluid {
     margin-right: auto;
     margin-left: auto;

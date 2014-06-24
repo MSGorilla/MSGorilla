@@ -83,6 +83,12 @@ input[type="checkbox"].input-validation-error {
     }
 }
 
+@media (min-width: 1600px) {
+    .contents-container {
+        width: 1220px;
+    }
+}
+
 .tools-container {
     float: right;
     overflow: hidden;
@@ -432,6 +438,10 @@ input[type="checkbox"].input-validation-error {
     cursor: pointer;
 }
 
+    .clickable:hover {
+        background-color: aliceblue;
+    }
+
 .fullname {
     font-weight: 700;
     color: #292f33;
@@ -530,3 +540,5 @@ input[type="checkbox"].input-validation-error {
 .hidden {
     display: none;
 }
+
+

@@ -71,13 +71,23 @@ namespace MSGorilla.WebApi
         ///     ]
         /// }
         /// </summary>
+        /// <param name="userid">user id</param>
         /// <param name="count">count of message in the list</param>
         /// <param name="token">continuous token</param>
+        /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination UserLine(int count = 25, string token = null)
+        public DisplayMessagePagination UserLine(string filter, string userid, int count = 25, string token = null)
         {
-            return UserLine(whoami(), count, token);
+            DateTime start, end;
+            if (GetFilterDateTime(filter, out start, out end))
+            {
+                return UserLine(userid, start, end, count, token);
+        }
+            else
+            {
+                return UserLine(userid, count, token);
+            }
         }
 
         /// <summary>
@@ -181,13 +191,19 @@ namespace MSGorilla.WebApi
         /// </summary>
         /// <param name="userid">user id</param>
         /// <param name="start">start timestamp</param>
-        /// <param name="end">end timestamp</param>
+        /// <param name="count">count of messages in the list</param>
+        /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public List<Message> UserLine(string userid, DateTime start, DateTime end)
+        public DisplayMessagePagination UserLine(string userid, DateTime start, DateTime end, int count = 25, string token = null)
         {
             string me = whoami();
-            return _messageManager.UserLine(userid, start, end);
+            if (string.IsNullOrEmpty(userid))
+            {
+                userid = me;
+        }
+            TableContinuationToken tok = Utils.String2Token(token);
+            return new DisplayMessagePagination(_messageManager.UserLine(userid, start, end, count, tok));
         }
 
         /// <summary>
@@ -226,34 +242,23 @@ namespace MSGorilla.WebApi
         ///		......
         /// ]
         /// </summary>
+        /// <param name="userid">user id</param>
         /// <param name="count">count of messages in the list</param>
         /// <param name="token">continuous token</param>
         /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination HomeLine(int count = 25, string token = null, string filter = "")
+        public DisplayMessagePagination HomeLine(string filter, string userid, int count = 25, string token = null)
         {
             DateTime start, end;
-            end = DateTime.UtcNow;
-
-            switch (filter)
+            if (GetFilterDateTime(filter, out start, out end))
             {
-                case "latest24hours":
-                    start = end.AddDays(-1);
-                    break;
-                case "latest7days":
-                    start = end.AddDays(-7);
-                    break;
-                case "latest1month":
-                    start = end.AddMonths(-1);
-                    break;
-                case "":
-                case "all":
-                default:
-                    return HomeLine(whoami(), count, token);
+                return HomeLine(userid, start, end, count, token);
             }
-
-            return HomeLine(whoami(), start, end, count, token);
+            else
+            {
+                return HomeLine(userid, count, token);
+        }
         }
 
         /// <summary>
@@ -350,8 +355,10 @@ namespace MSGorilla.WebApi
         /// ]
         /// </summary>
         /// <param name="userid">user id</param>
-        /// <param name="end">end timestamp</param>
         /// <param name="start">start timestamp</param>
+        /// <param name="end">end timestamp</param>
+        /// <param name="count">count of messages in the list</param>
+        /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
         public DisplayMessagePagination HomeLine(string userid, DateTime start, DateTime end, int count = 25, string token = null)
@@ -425,13 +432,23 @@ namespace MSGorilla.WebApi
         ///     ]
         /// }
         /// </summary>
+        /// <param name="userid">user id</param>
         /// <param name="count">count of messages int the list</param>
         /// <param name="token">continuous token</param>
+        /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination OwnerLine(int count = 25, string token = null)
+        public DisplayMessagePagination OwnerLine(string filter, string userid, int count = 25, string token = null)
         {
-            return OwnerLine(whoami(), count, token);
+            DateTime start, end;
+            if (GetFilterDateTime(filter, out start, out end))
+            {
+                return OwnerLine(userid, start, end, count, token);
+            }
+            else
+        {
+                return OwnerLine(userid, count, token);
+            }
         }
 
         /// <summary>
@@ -566,14 +583,26 @@ namespace MSGorilla.WebApi
         /// }
         /// </summary>
         /// <param name="userid">user id</param>
-        /// <param name="end">end time</param>
         /// <param name="start">start time</param>
+        /// <param name="end">end time</param>
+        /// <param name="count">count of messages int the list</param>
+        /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public List<Message> OwnerLine(string userid, DateTime end, DateTime start)
+        public DisplayMessagePagination OwnerLine(string userid, DateTime start, DateTime end, int count = 25, string token = null)
         {
-            whoami();
-            return _messageManager.OwnerLine(whoami(), start, end);
+            string me = whoami();
+            if (string.IsNullOrEmpty(userid))
+            {
+                userid = me;
+            }
+            TableContinuationToken tok = Utils.String2Token(token);
+
+            if (me.Equals(userid) && token == null)
+        {
+                _notifManager.clearOwnerlineNotifCount(me);
+            }
+            return new DisplayMessagePagination(_messageManager.OwnerLine(userid, start, end, count, tok));
         }
 
         /// <summary>
@@ -631,13 +660,23 @@ namespace MSGorilla.WebApi
         ///     ]
         /// }
         /// </summary>
+        /// <param name="userid">user id</param>
         /// <param name="count">count of messages int the list</param>
         /// <param name="token">continuous token</param>
+        /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination AtLine(int count = 25, string token = null)
+        public DisplayMessagePagination AtLine(string filter, string userid, int count = 25, string token = null)
         {
-            return AtLine(whoami(), count, token);
+            DateTime start, end;
+            if (GetFilterDateTime(filter, out start, out end))
+            {
+                return AtLine(userid, start, end, count, token);
+            }
+            else
+        {
+                return AtLine(userid, count, token);
+            }
         }
 
         /// <summary>
@@ -719,6 +758,34 @@ namespace MSGorilla.WebApi
         }
 
         /// <summary>
+        /// Return the messages in a user's atline in a list
+        /// </summary>
+        /// <param name="userid">user id</param>
+        /// <param name="start">start time</param>
+        /// <param name="end">end time</param>
+        /// <param name="count">count of messages int the list</param>
+        /// <param name="token">continuous token</param>
+        /// <returns></returns>
+        [HttpGet]
+        public DisplayMessagePagination AtLine(string userid, DateTime start, DateTime end, int count = 25, string token = null)
+        {
+            string me = whoami();
+            if (string.IsNullOrEmpty(userid))
+            {
+                userid = whoami();
+            }
+
+            TableContinuationToken tok = Utils.String2Token(token);
+
+            if (me.Equals(userid) && token == null)
+            {
+                _notifManager.clearAtlineNotifCount(me);
+            }
+
+            return new DisplayMessagePagination(_messageManager.AtLine(userid, start, end, count, tok));
+        }
+
+        /// <summary>
         /// Deprecated. Return all messages do not have a eventid in a list.
         /// </summary>
         /// <returns></returns>
@@ -748,6 +815,27 @@ namespace MSGorilla.WebApi
             }
 
             return msg;
+        }
+
+        /// <summary>
+        /// Return a messages list order by post time desc
+        /// </summary>
+        /// <param name="count">count of messages in the list</param>
+        /// <param name="token">continuous token</param>
+        /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
+        /// <returns></returns>
+        [HttpGet]
+        public DisplayMessagePagination PublicSquareLine(string filter, int count = 25, string token = null)
+        {
+            DateTime start, end;
+            if (GetFilterDateTime(filter, out start, out end))
+            {
+                return PublicSquareLine(start, end, count, token);
+            }
+            else
+            {
+                return PublicSquareLine(count, token);
+            }
         }
 
         /// <summary>
@@ -794,12 +882,15 @@ namespace MSGorilla.WebApi
         /// </summary>
         /// <param name="start">start time</param>
         /// <param name="end">end time</param>
+        /// <param name="count">count of messages in the list</param>
+        /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public List<Message> PublicSquareLine(DateTime start, DateTime end)
+        public DisplayMessagePagination PublicSquareLine(DateTime start, DateTime end, int count = 25, string token = null)
         {
             whoami();
-            return _messageManager.PublicSquareLine(start, end);
+            TableContinuationToken tok = Utils.String2Token(token);
+            return new DisplayMessagePagination(_messageManager.PublicSquareLine(start, end, count, tok));
         }
 
         /// <summary>
@@ -867,6 +958,28 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return a list of messages having the same topic
+        /// </summary>
+        /// <param name="topic">topic name</param>
+        /// <param name="count">count of messages in the list</param>
+        /// <param name="token">continuous token</param>
+        /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
+        /// <returns></returns>
+        [HttpGet]
+        public DisplayMessagePagination TopicLine(string filter, string topic, int count = 25, string token = null)
+        {
+            DateTime start, end;
+            if (GetFilterDateTime(filter, out start, out end))
+            {
+                return TopicLine(topic, start, end, count, token);
+            }
+            else
+            {
+                return TopicLine(topic, count, token);
+            }
+        }
+
+        /// <summary>
+        /// Return a list of messages having the same topic
         /// 
         /// Example output:
         /// {
@@ -916,6 +1029,33 @@ namespace MSGorilla.WebApi
                 _topicManager.clearUnreadMsgCountOfFavouriteTopic(me, t.Id);
             }
             return new DisplayMessagePagination(_messageManager.TopicLine(t.Id.ToString(), count, tok));
+        }
+
+        /// <summary>
+        /// Return a list of messages having the same topic
+        /// </summary>
+        /// <param name="topic">topic name</param>
+        /// <param name="start">start timestamp</param>
+        /// <param name="end">end timestamp</param>
+        /// <param name="count">count of messages in the list</param>
+        /// <param name="token">continuous token</param>
+        /// <returns></returns>
+        [HttpGet]
+        public DisplayMessagePagination TopicLine(string topic, DateTime start, DateTime end, int count = 25, string token = null)
+        {
+            string me = whoami();
+            var t = _topicManager.FindTopicByName(topic);
+            if (t == null)
+            {
+                return null;
+            }
+
+            TableContinuationToken tok = Utils.String2Token(token);
+            if (tok == null)
+            {
+                _topicManager.clearUnreadMsgCountOfFavouriteTopic(me, t.Id);
+            }
+            return new DisplayMessagePagination(_messageManager.TopicLine(t.Id.ToString(), start, end, count, tok));
         }
 
         /// <summary>
@@ -1171,6 +1311,31 @@ namespace MSGorilla.WebApi
             }
             return PostMessage(msg.Message, msg.SchemaID, msg.EventID, msg.Owner, msg.AtUser, msg.TopicName, msg.RichMessage, msg.AttachmentID);
             //return new ActionResult();
+        }
+
+        private bool GetFilterDateTime(string filter, out DateTime start, out DateTime end)
+        {
+            start = end = DateTime.UtcNow;
+
+            switch (filter)
+            {
+                case "latest24hours":
+                    start = end.AddDays(-1);
+                    break;
+                case "latest7days":
+                    start = end.AddDays(-7);
+                    break;
+                case "latest1month":
+                    start = end.AddMonths(-1);
+                    break;
+                case null:
+                case "":
+                case "all":
+                default:
+                    return false;
+            }
+
+            return true;
         }
     }
 }
