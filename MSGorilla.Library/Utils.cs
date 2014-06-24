@@ -90,7 +90,8 @@ namespace MSGorilla.Library
 
             if (id.Contains('\\') ||
                 id.Contains('|') || 
-                id.Contains(' ') || 
+                id.Contains(' ') ||
+                id.Contains('@') || 
                 id.Contains('?') || 
                 id.Contains('/') || 
                 id.Contains('#') ||
@@ -219,6 +220,23 @@ namespace MSGorilla.Library
             }
 
             return str.Split('|');
+        }
+
+        public static string Txt2Html(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return "";
+            }
+
+            text = text.Replace("&", "&#38;");
+            text = text.Replace("<", "&#60;");
+            text = text.Replace(">", "&#62;");
+            text = text.Replace("\"", "&#34;");
+            text = text.Replace(" ", "&nbsp;");
+            text = text.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+            text = text.Replace("\r\n", "<br/>");
+            return text;
         }
     }
 }

@@ -42,6 +42,9 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the current authenticated user id
+        /// 
+        /// Example output:
+        /// "user1"
         /// </summary>
         /// <returns></returns>
         [HttpGet]

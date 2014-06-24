@@ -19,7 +19,15 @@ namespace MSGorilla.WebApi
         TopicManager _topicManager = new TopicManager();
 
         /// <summary>
-        /// Return the specification of a topic.
+        /// Return the specification of a topic or null.
+        /// 
+        /// Example out:
+        /// {
+        ///     "Id": 1007,
+        ///     "Name": "worldcup",
+        ///     "Description": null,
+        ///     "MsgCount": 19
+        /// }
         /// </summary>
         /// <param name="topicid">id of the topic</param>
         /// <returns></returns>
@@ -31,6 +39,22 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return a list a topics the topic name of which contain keyword
+        /// 
+        /// Example output:
+        /// [
+        ///     {
+        ///         "Id": 1007,
+        ///         "Name": "worldcup",
+        ///         "Description": null,
+        ///         "MsgCount": 19
+        ///     },
+        ///     {
+        ///         "Id": 2256,
+        ///         "Name": "worldcupfinal",
+        ///         "Description": "join the discusstion",
+        ///         "MsgCount": 0
+        ///     }
+        /// ]
         /// </summary>
         /// <param name="keyword">key word</param>
         /// <returns></returns>
@@ -41,8 +65,15 @@ namespace MSGorilla.WebApi
         }
 
         /// <summary>
-        /// Add a new topic.
-        /// Return the topic created.
+        /// Add a new topic and return the topic created.
+        /// 
+        /// Example output:
+        /// {
+        ///     "Id": 2256,
+        ///     "Name": "worldcupfinal",
+        ///     "Description": "join the discusstion",
+        ///     "MsgCount": 0
+        /// }
         /// </summary>
         /// <param name="Name">name of the topic</param>
         /// <param name="Description">description of the topic</param>
@@ -60,6 +91,24 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the list of all the topics.
+        /// 
+        /// Example output
+        /// [
+        ///     {
+        ///         "Id": 1035,
+        ///         "Name": "PCV Build",
+        ///         "Description": null,
+        ///         "MsgCount": 12
+        ///     },
+        ///     ......,
+        ///     ......,
+        ///     {
+        ///         "Id": 2256,
+        ///         "Name": "worldcupfinal",
+        ///         "Description": "join the discusstion",
+        ///         "MsgCount": 0
+        ///     }
+        /// ]
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -69,7 +118,29 @@ namespace MSGorilla.WebApi
         }
 
         /// <summary>
-        /// Return a topics list which contains the most messages order by message count desc
+        /// Return a topics list which contains the most messages order by message count desc.
+        /// 
+        /// Example output:
+        /// [
+        ///     {
+        ///         "Id": 1015,
+        ///         "Name": "WOSS WAES Job",
+        ///         "Description": null,
+        ///         "MsgCount": 327
+        ///     },
+        ///     {
+        ///         "Id": 1062,
+        ///         "Name": "WOSS TFS",
+        ///         "Description": null,
+        ///         "MsgCount": 181
+        ///     },
+        ///     {
+        ///         "Id": 1066,
+        ///         "Name": "WOSS TFS Changed",
+        ///         "Description": null,
+        ///         "MsgCount": 120
+        ///     }
+        /// ]
         /// </summary>
         /// <param name="count">count of topic in the list</param>
         /// <returns></returns>
@@ -81,6 +152,12 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Add the topic into current user's favourite topic list 
+        /// 
+        /// Example output:
+        /// {
+        ///     "ActionResultCode": 0,
+        ///     "Message": "success"
+        /// }
         /// </summary>
         /// <param name="topicID">id of the topic</param>
         /// <returns></returns>
@@ -93,6 +170,12 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Remove the topic from the favourite topic list of current User
+        /// 
+        /// Example output:
+        /// {
+        ///     "ActionResultCode": 0,
+        ///     "Message": "success"
+        /// }
         /// </summary>
         /// <param name="topicID">id of the topic</param>
         /// <returns></returns>
@@ -105,6 +188,27 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the favourite topic list of the current user
+        /// 
+        /// Example output:
+        /// [
+        ///     {
+        ///         "userid": "user1",
+        ///         "topicID": 1038,
+        ///         "UnreadMsgCount": 0,
+        ///         "topicName": "WOSS Bug 294144",
+        ///         "topicDescription": null,
+        ///         "topicMsgCount": 9
+        ///     },
+        ///     {
+        ///         "userid": "user1",
+        ///         "topicID": 1039,
+        ///         "UnreadMsgCount": 0,
+        ///         "topicName": "WOSS Bugs",
+        ///         "topicDescription": null,
+        ///         "topicMsgCount": 61
+        ///     },
+        ///     ......
+        /// ]
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -115,6 +219,26 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the favourite topic list of a user
+        /// 
+        /// Example output:
+        /// [
+        ///     {
+        ///         "userid": "user2",
+        ///         "topicID": 2,
+        ///         "UnreadMsgCount": 0,
+        ///         "topicName": "test2",
+        ///         "topicDescription": "test22",
+        ///         "topicMsgCount": 3
+        ///     },
+        ///     {
+        ///         "userid": "user2",
+        ///         "topicID": 3,
+        ///         "UnreadMsgCount": 2,
+        ///         "topicName": "top3",
+        ///         "topicDescription": "333",
+        ///         "topicMsgCount": 5
+        ///     }
+        /// ]
         /// </summary>
         /// <param name="userid">id of a user</param>
         /// <returns></returns>
@@ -126,6 +250,9 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return whether the topic is current user's favourite topic or not
+        /// 
+        /// Example output:
+        /// false
         /// </summary>
         /// <param name="topicID">id of the topic</param>
         /// <returns></returns>
@@ -137,6 +264,9 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return whether the topic is current user's favourite topic or not
+        /// 
+        /// Example output:
+        /// true
         /// </summary>
         /// <param name="topic">name of the topic, case insensitive</param>
         /// <returns></returns>

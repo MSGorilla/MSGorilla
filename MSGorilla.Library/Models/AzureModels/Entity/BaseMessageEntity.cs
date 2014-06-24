@@ -59,7 +59,8 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
                     Utils.String2StringArray(this.AtUser),
                     Utils.String2StringArray(this.TopicName),
                     this.RichMessageID,
-                    Utils.String2StringArray(this.AttachmentID)                
+                    Utils.String2StringArray(this.AttachmentID),
+                    this.ID
                 );
             return message;
         }

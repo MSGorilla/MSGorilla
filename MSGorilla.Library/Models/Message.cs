@@ -37,7 +37,8 @@ namespace MSGorilla.Library.Models
             string[] atUser,
             string[] topicName,
             string richMessageID,
-            string[] attachmentID
+            string[] attachmentID,
+            string msgID = null
                 )
         {
             User = userid;
@@ -50,9 +51,17 @@ namespace MSGorilla.Library.Models
             RichMessageID = richMessageID;
             PostTime = timestamp.ToUniversalTime();
             AttachmentID = attachmentID;
-            ID = string.Format("{0}_{1}",
+
+            if (string.IsNullOrEmpty(msgID))
+            {
+                ID = string.Format("{0}_{1}",
                                 Utils.ToAzureStorageSecondBasedString(PostTime),
                                 Guid.NewGuid().ToString());
+            }
+            else
+            {
+                ID = msgID;
+            }
         }
 
         public string ToJsonString()
