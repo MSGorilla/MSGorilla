@@ -83,7 +83,7 @@ namespace MSGorilla.WebApi
             if (GetFilterDateTime(filter, out start, out end))
             {
                 return UserLine(userid, start, end, count, token);
-        }
+            }
             else
             {
                 return UserLine(userid, count, token);
@@ -201,7 +201,7 @@ namespace MSGorilla.WebApi
             if (string.IsNullOrEmpty(userid))
             {
                 userid = me;
-        }
+            }
             TableContinuationToken tok = Utils.String2Token(token);
             return new DisplayMessagePagination(_messageManager.UserLine(userid, start, end, count, tok));
         }
@@ -258,7 +258,7 @@ namespace MSGorilla.WebApi
             else
             {
                 return HomeLine(userid, count, token);
-        }
+            }
         }
 
         /// <summary>
@@ -446,7 +446,7 @@ namespace MSGorilla.WebApi
                 return OwnerLine(userid, start, end, count, token);
             }
             else
-        {
+            {
                 return OwnerLine(userid, count, token);
             }
         }
@@ -599,7 +599,7 @@ namespace MSGorilla.WebApi
             TableContinuationToken tok = Utils.String2Token(token);
 
             if (me.Equals(userid) && token == null)
-        {
+            {
                 _notifManager.clearOwnerlineNotifCount(me);
             }
             return new DisplayMessagePagination(_messageManager.OwnerLine(userid, start, end, count, tok));
@@ -674,7 +674,7 @@ namespace MSGorilla.WebApi
                 return AtLine(userid, start, end, count, token);
             }
             else
-        {
+            {
                 return AtLine(userid, count, token);
             }
         }
@@ -759,6 +759,58 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the messages in a user's atline in a list
+        /// 
+        /// Example output:
+        /// {
+        ///     "continuationToken": "1!20!dXNlcjJfMjkxNjY2Mg--;1!72!MjUxOTk5Njc3ODE5NTk0XzEyMTI3ODViLWEyZWUtNDMyMi05ZDA1LWYyNWQ1MDIyZmI4Zg--;;Primary;",
+        ///     "message": [
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "251999326132390_8b076705-aa69-4522-b389-3d184cfdcfdd",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": null,
+        ///             "AtUser": [
+        ///                 "user2"
+        ///             ],
+        ///             "TopicName": [],
+        ///             "MessageContent": "test@user2",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-17T03:11:07.6098089Z"
+        ///         },
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "251999677173707_aac7d956-076e-461a-bb0e-54c61e0e3876",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": [
+        ///                 "user1"
+        ///             ],
+        ///             "AtUser": [
+        ///                 "user2"
+        ///             ],
+        ///             "TopicName": [
+        ///                 "111",
+        ///                 "test2"
+        ///             ],
+        ///             "MessageContent": "Multi topic test",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-13T01:40:26.2923506Z"
+        ///         }
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="userid">user id</param>
         /// <param name="start">start time</param>
