@@ -145,6 +145,39 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Deprecated. Return the messages in a user's userline in a list
+        /// 
+        /// Example output:
+        /// [
+        ///     {
+        ///         "User": "user1",
+        ///         "ID": "251998797027974_478a39bc-6671-4381-8648-b70143eba83d",
+        ///         "EventID": "none",
+        ///         "SchemaID": "none",
+        ///         "Owner": null,
+        ///         "AtUser": null,
+        ///         "TopicName": null,
+        ///         "MessageContent": "smoke test",
+        ///         "PostTime": "2014-06-23T06:09:32.0256428Z",
+        ///         "RichMessageID": null,
+        ///         "AttachmentID": null
+        ///     },
+        ///     {
+        ///         "User": "user1",
+        ///         "ID": "251998806386312_4a37b9f0-a123-4c38-af0f-e6e69fae4e19",
+        ///         "EventID": "none",
+        ///         "SchemaID": "none",
+        ///         "Owner": null,
+        ///         "AtUser": [
+        ///             "user1"
+        ///         ],
+        ///         "TopicName": [],
+        ///         "MessageContent": "@user1",
+        ///         "PostTime": "2014-06-23T03:33:33.6874261Z",
+        ///         "RichMessageID": null,
+        ///         "AttachmentID": null
+        ///     },
+        ///		......
+        /// ]
         /// </summary>
         /// <param name="userid">user id</param>
         /// <param name="start">start timestamp</param>
@@ -159,6 +192,39 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the messages in the current user's homeline in a list
+        /// 
+        /// Example output:
+        /// [
+        ///     {
+        ///         "User": "user1",
+        ///         "ID": "251998797027974_478a39bc-6671-4381-8648-b70143eba83d",
+        ///         "EventID": "none",
+        ///         "SchemaID": "none",
+        ///         "Owner": null,
+        ///         "AtUser": null,
+        ///         "TopicName": null,
+        ///         "MessageContent": "smoke test",
+        ///         "PostTime": "2014-06-23T06:09:32.0256428Z",
+        ///         "RichMessageID": null,
+        ///         "AttachmentID": null
+        ///     },
+        ///     {
+        ///         "User": "user1",
+        ///         "ID": "251998806386312_4a37b9f0-a123-4c38-af0f-e6e69fae4e19",
+        ///         "EventID": "none",
+        ///         "SchemaID": "none",
+        ///         "Owner": null,
+        ///         "AtUser": [
+        ///             "user1"
+        ///         ],
+        ///         "TopicName": [],
+        ///         "MessageContent": "@user1",
+        ///         "PostTime": "2014-06-23T03:33:33.6874261Z",
+        ///         "RichMessageID": null,
+        ///         "AttachmentID": null
+        ///     },
+        ///		......
+        /// ]
         /// </summary>
         /// <param name="count">count of messages in the list</param>
         /// <param name="token">continuous token</param>
@@ -192,6 +258,39 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the messages in a user's userline in a list
+        /// 
+        /// Example output:
+        /// [
+        ///     {
+        ///         "User": "user1",
+        ///         "ID": "251998797027974_478a39bc-6671-4381-8648-b70143eba83d",
+        ///         "EventID": "none",
+        ///         "SchemaID": "none",
+        ///         "Owner": null,
+        ///         "AtUser": null,
+        ///         "TopicName": null,
+        ///         "MessageContent": "smoke test",
+        ///         "PostTime": "2014-06-23T06:09:32.0256428Z",
+        ///         "RichMessageID": null,
+        ///         "AttachmentID": null
+        ///     },
+        ///     {
+        ///         "User": "user1",
+        ///         "ID": "251998806386312_4a37b9f0-a123-4c38-af0f-e6e69fae4e19",
+        ///         "EventID": "none",
+        ///         "SchemaID": "none",
+        ///         "Owner": null,
+        ///         "AtUser": [
+        ///             "user1"
+        ///         ],
+        ///         "TopicName": [],
+        ///         "MessageContent": "@user1",
+        ///         "PostTime": "2014-06-23T03:33:33.6874261Z",
+        ///         "RichMessageID": null,
+        ///         "AttachmentID": null
+        ///     },
+        ///		......
+        /// ]
         /// </summary>
         /// <param name="userid">user id</param>
         /// <param name="count">count of messages in the list</param>
@@ -216,6 +315,39 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Deprecated. Return the messages in a user's homeline in a list
+        /// 
+        /// Example output:
+        /// [
+        ///     {
+        ///         "User": "user1",
+        ///         "ID": "251998797027974_478a39bc-6671-4381-8648-b70143eba83d",
+        ///         "EventID": "none",
+        ///         "SchemaID": "none",
+        ///         "Owner": null,
+        ///         "AtUser": null,
+        ///         "TopicName": null,
+        ///         "MessageContent": "smoke test",
+        ///         "PostTime": "2014-06-23T06:09:32.0256428Z",
+        ///         "RichMessageID": null,
+        ///         "AttachmentID": null
+        ///     },
+        ///     {
+        ///         "User": "user1",
+        ///         "ID": "251998806386312_4a37b9f0-a123-4c38-af0f-e6e69fae4e19",
+        ///         "EventID": "none",
+        ///         "SchemaID": "none",
+        ///         "Owner": null,
+        ///         "AtUser": [
+        ///             "user1"
+        ///         ],
+        ///         "TopicName": [],
+        ///         "MessageContent": "@user1",
+        ///         "PostTime": "2014-06-23T03:33:33.6874261Z",
+        ///         "RichMessageID": null,
+        ///         "AttachmentID": null
+        ///     },
+        ///		......
+        /// ]
         /// </summary>
         /// <param name="userid">user id</param>
         /// <param name="end">end timestamp</param>
@@ -240,6 +372,58 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the messages in the current user's ownerline in a list
+        /// 
+        /// Example output:
+        /// {
+        ///     "continuationToken": "1!20!dXNlcjJfMjkxNjY3MA--;1!72!MjUyMDAwMzY2OTk3NjQzXzViNGVkNzNjLTJiMTMtNDE1Ni04ODBhLTgwZmNhZTk0MzEzMA--;;Primary;",
+        ///     "message": [
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "251999678181833_c8864f48-5238-4cd6-bc46-82d20c6da044",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": [
+        ///                 "user2"
+        ///             ],
+        ///             "AtUser": [
+        ///                 "user3"
+        ///             ],
+        ///             "TopicName": [
+        ///                 "world"
+        ///             ],
+        ///             "MessageContent": "#worldcup# Brazil won the first match @user3",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-13T01:23:38.1661805Z"
+        ///         },
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "252000366997643_5b4ed73c-2b13-4156-880a-80fcae943130",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": [
+        ///                 "user2"
+        ///             ],
+        ///             "AtUser": [],
+        ///             "TopicName": null,
+        ///             "MessageContent": "something owned by user2",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-05T02:03:22.3562092Z"
+        ///         },
+        ///         ......
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="count">count of messages int the list</param>
         /// <param name="token">continuous token</param>
@@ -252,6 +436,58 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the messages in a user's ownerline in a list
+        /// 
+        /// Example output:
+        /// {
+        ///     "continuationToken": "1!20!dXNlcjJfMjkxNjY3MA--;1!72!MjUyMDAwMzY2OTk3NjQzXzViNGVkNzNjLTJiMTMtNDE1Ni04ODBhLTgwZmNhZTk0MzEzMA--;;Primary;",
+        ///     "message": [
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "251999678181833_c8864f48-5238-4cd6-bc46-82d20c6da044",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": [
+        ///                 "user2"
+        ///             ],
+        ///             "AtUser": [
+        ///                 "user3"
+        ///             ],
+        ///             "TopicName": [
+        ///                 "world"
+        ///             ],
+        ///             "MessageContent": "#worldcup# Brazil won the first match @user3",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-13T01:23:38.1661805Z"
+        ///         },
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "252000366997643_5b4ed73c-2b13-4156-880a-80fcae943130",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": [
+        ///                 "user2"
+        ///             ],
+        ///             "AtUser": [],
+        ///             "TopicName": null,
+        ///             "MessageContent": "something owned by user2",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-05T02:03:22.3562092Z"
+        ///         },
+        ///         ......
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="userid">user id</param>
         /// <param name="count">count of messages int the list</param>
@@ -276,6 +512,58 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Deprecated. Return the messages in a user's owner in a list
+        /// 
+        /// Example output:
+        /// {
+        ///     "continuationToken": "1!20!dXNlcjJfMjkxNjY3MA--;1!72!MjUyMDAwMzY2OTk3NjQzXzViNGVkNzNjLTJiMTMtNDE1Ni04ODBhLTgwZmNhZTk0MzEzMA--;;Primary;",
+        ///     "message": [
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "251999678181833_c8864f48-5238-4cd6-bc46-82d20c6da044",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": [
+        ///                 "user2"
+        ///             ],
+        ///             "AtUser": [
+        ///                 "user3"
+        ///             ],
+        ///             "TopicName": [
+        ///                 "world"
+        ///             ],
+        ///             "MessageContent": "#worldcup# Brazil won the first match @user3",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-13T01:23:38.1661805Z"
+        ///         },
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "252000366997643_5b4ed73c-2b13-4156-880a-80fcae943130",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": [
+        ///                 "user2"
+        ///             ],
+        ///             "AtUser": [],
+        ///             "TopicName": null,
+        ///             "MessageContent": "something owned by user2",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-05T02:03:22.3562092Z"
+        ///         },
+        ///         ......
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="userid">user id</param>
         /// <param name="end">end time</param>
@@ -290,6 +578,58 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the messages in the current user's atline in a list
+        /// 
+        /// Example output:
+        /// {
+        ///     "continuationToken": "1!20!dXNlcjJfMjkxNjY2Mg--;1!72!MjUxOTk5Njc3ODE5NTk0XzEyMTI3ODViLWEyZWUtNDMyMi05ZDA1LWYyNWQ1MDIyZmI4Zg--;;Primary;",
+        ///     "message": [
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "251999326132390_8b076705-aa69-4522-b389-3d184cfdcfdd",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": null,
+        ///             "AtUser": [
+        ///                 "user2"
+        ///             ],
+        ///             "TopicName": [],
+        ///             "MessageContent": "test@user2",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-17T03:11:07.6098089Z"
+        ///         },
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "251999677173707_aac7d956-076e-461a-bb0e-54c61e0e3876",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": [
+        ///                 "user1"
+        ///             ],
+        ///             "AtUser": [
+        ///                 "user2"
+        ///             ],
+        ///             "TopicName": [
+        ///                 "111",
+        ///                 "test2"
+        ///             ],
+        ///             "MessageContent": "Multi topic test",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-13T01:40:26.2923506Z"
+        ///         }
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="count">count of messages int the list</param>
         /// <param name="token">continuous token</param>
@@ -302,6 +642,58 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the messages in a user's atline in a list
+        /// 
+        /// Example output:
+        /// {
+        ///     "continuationToken": "1!20!dXNlcjJfMjkxNjY2Mg--;1!72!MjUxOTk5Njc3ODE5NTk0XzEyMTI3ODViLWEyZWUtNDMyMi05ZDA1LWYyNWQ1MDIyZmI4Zg--;;Primary;",
+        ///     "message": [
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "251999326132390_8b076705-aa69-4522-b389-3d184cfdcfdd",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": null,
+        ///             "AtUser": [
+        ///                 "user2"
+        ///             ],
+        ///             "TopicName": [],
+        ///             "MessageContent": "test@user2",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-17T03:11:07.6098089Z"
+        ///         },
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "251999677173707_aac7d956-076e-461a-bb0e-54c61e0e3876",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": [
+        ///                 "user1"
+        ///             ],
+        ///             "AtUser": [
+        ///                 "user2"
+        ///             ],
+        ///             "TopicName": [
+        ///                 "111",
+        ///                 "test2"
+        ///             ],
+        ///             "MessageContent": "Multi topic test",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-13T01:40:26.2923506Z"
+        ///         }
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="userid">user id</param>
         /// <param name="count">count of messages int the list</param>
@@ -327,7 +719,7 @@ namespace MSGorilla.WebApi
         }
 
         /// <summary>
-        /// Return all messages do not have a eventid in a list.
+        /// Deprecated. Return all messages do not have a eventid in a list.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -338,7 +730,7 @@ namespace MSGorilla.WebApi
         }
 
         /// <summary>
-        /// Return all messages have the same eventid in a list
+        /// Deprecated. Return all messages have the same eventid in a list
         /// </summary>
         /// <param name="eventID">event id</param>
         /// <returns></returns>
@@ -360,6 +752,45 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Deprecated. Return all messages posted in a certain time
+        /// 
+        /// Example output:
+        /// [
+        ///     {
+        ///         "User": "user2",
+        ///         "ID": "251998713203119_c6db3598-d234-45b8-9bc9-c29f805f6be7",
+        ///         "EventID": "none",
+        ///         "SchemaID": "none",
+        ///         "Owner": null,
+        ///         "AtUser": null,
+        ///         "TopicName": null,
+        ///         "MessageContent": "Is every thing good?",
+        ///         "PostTime": "2014-06-24T05:26:36.8802633Z",
+        ///         "RichMessageID": null,
+        ///         "AttachmentID": null
+        ///     },
+        ///     {
+        ///         "User": "WossWAESMonitor",
+        ///         "ID": "251998713939135_355a132e-0594-4fb2-ab27-b09e6f1a09f7",
+        ///         "EventID": "1-955a4ba5-56db-40f8-9863-3b17896aed42-jusjin",
+        ///         "SchemaID": "none",
+        ///         "Owner": [
+        ///             "jusjin"
+        ///         ],
+        ///         "AtUser": [
+        ///             "jusjin"
+        ///         ],
+        ///         "TopicName": [
+        ///             "WAES Job 1-955a4ba5-56db-40f8-9863-3b17896aed42-jusjin",
+        ///             "WOSS Change 1170604",
+        ///             "WOSS WAES Job"
+        ///         ],
+        ///         "MessageContent": "PCV build complete \nsubmited by @jusjin \nbuild: Success \nCode Analysis: Not Run \nWAES /// Validation: 100.00% #WAES Job 1-955a4ba5-56db-40f8-9863-3b17896aed42-jusjin# \nchangeList #WOSS Change 1170604# \nchangeList Associated with: none \n",
+        ///         "PostTime": "2014-06-24T05:14:20.8641009Z",
+        ///         "RichMessageID": "WossWAESMonitor_2916651;081a7930-bb0d-479b-b958-2ee652294eb0",
+        ///         "AttachmentID": null
+        ///     },
+        ///     ......
+        /// ]
         /// </summary>
         /// <param name="start">start time</param>
         /// <param name="end">end time</param>
@@ -373,6 +804,55 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return a messages list order by post time desc
+        /// 
+        /// Example output:
+        /// {
+        ///     "continuationToken": "1!12!MjkxNjY1MQ--;1!72!MjUxOTk4NzA4Njc4Mjg1XzdiMzFhYTM3LWFhMDUtNGU4OS05ZTdmLTI5MDA3Y2M3MDczMQ--;;Primary;",
+        ///     "message": [
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "WossWAESMonitor",
+        ///                 "DisplayName": "WossWAESMonitor",
+        ///                 "PortraitUrl": "/Content/Images/default_avatar.jpg",
+        ///                 "Description": "WossWAESMonitor"
+        ///             },
+        ///             "ID": "251998707929673_79d10a16-e68d-495f-8980-4a718721ec44",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": [
+        ///                 "lazhang"
+        ///             ],
+        ///             "AtUser": null,
+        ///             "TopicName": [
+        ///                 "WOSS Change 1170731",
+        ///                 "WOSS WAES Job"
+        ///             ],
+        ///             "MessageContent": "PCV build complete \nsubmited by @lazhang \nbuild: Fail \nCode Analysis: PASS \nWAES Validation: Build Failed \nchangeList #WOSS Change 1170731# \nchangeList Associated with: none \n",
+        ///             "RichMessageID": "WossWAESMonitor_2916651;2486a037-df4d-43e3-ba29-2097bc6df45f",
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-24T06:54:30.3262394Z"
+        ///         },
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": null,
+        ///             "AtUser": null,
+        ///             "TopicName": null,
+        ///             "MessageContent": "a new cloud message",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-24T06:47:51.0325756Z"
+        ///         },
+        /// 		......
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="count">count of messages in the list</param>
         /// <param name="token">continuous token</param>
@@ -387,6 +867,34 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return a list of messages having the same topic
+        /// 
+        /// Example output:
+        /// {
+        ///     "continuationToken": null,
+        ///     "message": [
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user1",
+        ///                 "DisplayName": "User1",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user for test"
+        ///             },
+        ///             "ID": "251999057446274_93dc9472-7321-48d0-901d-7ec7443009d9",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": null,
+        ///             "AtUser": [],
+        ///             "TopicName": [
+        ///                 "WAES Job 1-bbcf06e2-adb8-4b36-af9b-7f0d54e0467a-bvt"
+        ///             ],
+        ///             "MessageContent": "#WAES Job 1-bbcf06e2-adb8-4b36-af9b-7f0d54e0467a-bvt#",
+        ///             "RichMessageID": "user1_2916655;75383ec9-1fb3-4b7f-bc8f-4a947ce26aec",
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-20T05:49:13.7251136Z"
+        ///         },
+        ///         ......
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="topic">topic name</param>
         /// <param name="count">count of messages in the list</param>
@@ -412,6 +920,49 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Deprecated. Return the detail of a Message
+        /// 
+        /// Example output:
+        /// {
+        ///     "ReplyCount": 3,
+        ///     "Replies": [
+        ///         {
+        ///             "FromUser": "user2",
+        ///             "ToUser": "user1",
+        ///             "Message": "test cloud reply",
+        ///             "PostTime": "2014-06-24T06:51:02.9789122Z",
+        ///             "MessageUser": "user1",
+        ///             "MessageID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
+        ///             "ReplyID": "251998708137021_431cab73-f6d7-4484-8872-797ec183ec68"
+        ///         },
+        ///         {
+        ///             "FromUser": "user2",
+        ///             "ToUser": "user1",
+        ///             "Message": "greate",
+        ///             "PostTime": "2014-06-24T06:48:26.5283644Z",
+        ///             "MessageUser": "user1",
+        ///             "MessageID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
+        ///             "ReplyID": "251998708293471_0e283889-18e2-44d3-a681-c07c35824c19"
+        ///         },
+        ///         {
+        ///             "FromUser": "user2",
+        ///             "ToUser": "user1",
+        ///             "Message": "hello",
+        ///             "PostTime": "2014-06-24T06:48:08.9586062Z",
+        ///             "MessageUser": "user1",
+        ///             "MessageID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
+        ///             "ReplyID": "251998708311041_51bfb009-53a2-435f-8559-5bf8e222887b"
+        ///         }
+        ///     ],
+        ///     "User": "user1",
+        ///     "ID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
+        ///     "EventID": "none",
+        ///     "SchemaID": "none",
+        ///     "Owner": null,
+        ///     "AtUser": null,
+        ///     "TopicName": null,
+        ///     "MessageContent": "a new cloud message",
+        ///     "PostTime": "2014-06-24T06:47:51.0325756Z"
+        /// }
         /// </summary>
         /// <param name="userid">user id of whom posted the message</param>
         /// <param name="messageID">message id</param>
@@ -425,6 +976,26 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the details of a message
+        /// 
+        /// Example output:
+        /// {
+        ///     "User": {
+        ///         "Userid": "user1",
+        ///         "DisplayName": "User1",
+        ///         "PortraitUrl": null,
+        ///         "Description": "user for test"
+        ///     },
+        ///     "ID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
+        ///     "EventID": "none",
+        ///     "SchemaID": "none",
+        ///     "Owner": null,
+        ///     "AtUser": null,
+        ///     "TopicName": null,
+        ///     "MessageContent": "a new cloud message",
+        ///     "RichMessageID": null,
+        ///     "Attachment": null,
+        ///     "PostTime": "2014-06-24T06:47:51.0325756Z"
+        /// }
         /// </summary>
         /// <param name="msgUser">user id of whom posted the message</param>
         /// <param name="msgID">message id</param>
@@ -438,6 +1009,35 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return all replies within the message in a list
+        /// 
+        /// Example output:
+        /// [
+        ///     {
+        ///         "FromUser": {
+        ///             "Userid": "user2",
+        ///             "DisplayName": "User22",
+        ///             "PortraitUrl": null,
+        ///             "Description": "user22"
+        ///         },
+        ///         "ToUser": {
+        ///             "Userid": "user1",
+        ///             "DisplayName": "User1",
+        ///             "PortraitUrl": null,
+        ///             "Description": "user for test"
+        ///         },
+        ///         "Message": "test cloud reply",
+        ///         "PostTime": "2014-06-24T06:51:02.9789122Z",
+        ///         "MessageUser": {
+        ///             "Userid": "user1",
+        ///             "DisplayName": "User1",
+        ///             "PortraitUrl": null,
+        ///             "Description": "user for test"
+        ///         },
+        ///         "MessageID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
+        ///         "ReplyID": "251998708137021_431cab73-f6d7-4484-8872-797ec183ec68"
+        ///     },
+        ///     ......
+        /// ]
         /// </summary>
         /// <param name="msgID">message id</param>
         /// <returns></returns>
@@ -458,6 +1058,9 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the rich messsage.
+        /// 
+        /// Example output:
+        /// "A rich message"
         /// </summary>
         /// <param name="richMsgID">rich message id</param>
         /// <returns></returns>
