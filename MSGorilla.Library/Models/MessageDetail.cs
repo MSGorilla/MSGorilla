@@ -17,6 +17,8 @@ namespace MSGorilla.Library.Models
         public string[] TopicName { get; set; }
         public string MessageContent { get; set; }
         public DateTime PostTime { get; set; }
+        public string RichMessageID { get; set; }
+        public string[] AttachmentID { get; set; }
 
         public int ReplyCount;
         public List<Reply> Replies;
@@ -32,6 +34,8 @@ namespace MSGorilla.Library.Models
             this.TopicName = msg.TopicName;
             this.MessageContent = msg.MessageContent;
             this.PostTime = msg.PostTime;
+            this.RichMessageID = msg.RichMessageID;
+            this.AttachmentID = msg.AttachmentID;
         }
     }
 }

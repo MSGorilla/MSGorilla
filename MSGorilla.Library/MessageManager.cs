@@ -503,9 +503,14 @@ namespace MSGorilla.Library
 
         public void SpreadMessage(Message message)
         {
+            TableOperation insertOperation;
+
             //insert into Eventline
-            TableOperation insertOperation = TableOperation.InsertOrReplace(new EventLineEntity(message));
-            _eventline.Execute(insertOperation);
+            if (!string.IsNullOrEmpty(message.EventID) && !"none".Equals(message.EventID))
+            {
+                insertOperation = TableOperation.InsertOrReplace(new EventLineEntity(message));
+                _eventline.Execute(insertOperation);
+            }            
 
             //insert into PublicSquareLine
             insertOperation = TableOperation.InsertOrReplace(new PublicSquareLineEntity(message));

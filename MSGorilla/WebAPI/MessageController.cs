@@ -961,7 +961,9 @@ namespace MSGorilla.WebApi
         ///     "AtUser": null,
         ///     "TopicName": null,
         ///     "MessageContent": "a new cloud message",
-        ///     "PostTime": "2014-06-24T06:47:51.0325756Z"
+        ///     "PostTime": "2014-06-24T06:47:51.0325756Z",
+        ///     "RichMessageID" : null,
+        ///     "AttachmentID" : null,
         /// }
         /// </summary>
         /// <param name="userid">user id of whom posted the message</param>
@@ -1072,8 +1074,49 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Post a new message
+        /// 
+        /// Example output:
+        /// {
+        ///     "User": {
+        ///         "Userid": "user2",
+        ///         "DisplayName": "User22",
+        ///         "PortraitUrl": null,
+        ///         "Description": "user22"
+        ///     },
+        ///     "ID": "251998703315809_64a6332e-7809-46cc-89c1-5d0624db7111",
+        ///     "EventID": "none",
+        ///     "SchemaID": "none",
+        ///     "Owner": [
+        ///         "user1"
+        ///     ],
+        ///     "AtUser": [
+        ///         "user2",
+        ///         "user4",
+        ///         "user3"
+        ///     ],
+        ///     "TopicName": [
+        ///         "test topic"
+        ///     ],
+        ///     "MessageContent": "@user2 a new posted message",
+        ///     "RichMessageID": "user2_2916651;e18437bd-2fe7-427f-94be-fcd4c1c69fd8",
+        ///     "Attachment": [
+        ///         {
+        ///             "AttachmentID": "2916651;251998720140928_7b7b2ad2-dd71-424d-a918-279c832b0440.xml",
+        ///             "FileID": "7b7b2ad2-dd71-424d-a918-279c832b0440.xml",
+        ///             "Uploader": "user1",
+        ///             "UploadTimestamp": "2014-06-24T03:30:59.0715892Z",
+        ///             "Filename": "FederationMetadata.xml",
+        ///             "Filetype": "text/xml",
+        ///             "Filesize": 46403
+        ///         }
+        ///     ],
+        ///     "PostTime": "2014-06-24T08:11:24.1907127Z"
+        /// }
         /// </summary>
-        /// <param name="message">message content</param>
+        /// <param name="message">message content. If a single word of content starts with @ and the suffix is a valid
+        /// userid, such as @user1, the userid will be added into atUser list. If a single word starts with and ends with #,
+        /// such as #world cup#, it will be recognized as a topic name and be added into topicName list.
+        /// </param>
         /// <param name="schemaID">schema id</param>
         /// <param name="eventID">event id</param>
         /// <param name="owner">user id of the owner. Can be a list.</param>
@@ -1130,5 +1173,4 @@ namespace MSGorilla.WebApi
             //return new ActionResult();
         }
     }
-
 }
