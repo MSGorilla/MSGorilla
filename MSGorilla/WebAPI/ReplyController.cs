@@ -166,7 +166,30 @@ namespace MSGorilla.WebApi
         /// Post a reply to somebody
         /// 
         /// Example output:
-        /// 
+        /// {
+        ///     "FromUser": {
+        ///         "Userid": "user2",
+        ///         "DisplayName": "User22",
+        ///         "PortraitUrl": null,
+        ///         "Description": "user22"
+        ///     },
+        ///     "ToUser": {
+        ///         "Userid": "user1",
+        ///         "DisplayName": "User1",
+        ///         "PortraitUrl": null,
+        ///         "Description": "user for test"
+        ///     },
+        ///     "Message": "a new reply",
+        ///     "PostTime": "2014-06-24T06:02:38.5769194Z",
+        ///     "MessageUser": {
+        ///         "Userid": "user1",
+        ///         "DisplayName": "User1",
+        ///         "PortraitUrl": null,
+        ///         "Description": "user for test"
+        ///     },
+        ///     "MessageID": "251998712005492_f4a6056b-0ac5-4b46-9d69-c8d5aa1a355c",
+        ///     "ReplyID": "251998711041423_42b1f6b8-8861-4924-be0f-bd82f1d776da"
+        /// }
         /// </summary>
         /// <param name="to">to user id</param>
         /// <param name="message">reply content</param>
@@ -189,6 +212,7 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Post a reply to somebody. Same as the Get API
+        /// Same as the Get API
         /// </summary>
         /// <param name="reply"></param>
         /// <returns></returns>
