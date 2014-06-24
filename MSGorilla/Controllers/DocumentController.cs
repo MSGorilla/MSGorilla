@@ -21,7 +21,30 @@ namespace MSGorilla.Controllers
             //{
             //    //api.
             //}
-            return View(apiExplorer);
+
+
+
+            //return View(apiExplorer);
+            return View(FindControllerApi("api/base"));
+        }
+
+        public ActionResult Base()
+        {
+            return View(FindControllerApi("api/base"));
+        }
+
+        private List<ApiDescription> FindControllerApi(string routeStart)
+        {
+            IApiExplorer apiExplorer = GlobalConfiguration.Configuration.Services.GetApiExplorer();
+            List<ApiDescription> list = new List<ApiDescription>();
+            foreach(var api in apiExplorer.ApiDescriptions)
+            {
+                if (api.RelativePath.StartsWith(routeStart, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    list.Add(api);
+                }
+            }
+            return list;
         }
 	}
 }
