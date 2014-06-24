@@ -26,6 +26,50 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the messages in the current user's userline in a list
+        /// 
+        /// Example output:
+        /// {
+        ///     "continuationToken": "1!20!dXNlcjJfMjkxNjY3Ng--;1!72!MjUyMDAwODg2ODUxNjg4XzhjN2Y5ZmVjLTgyMTEtNGIzYi1iZTI5LTAyNjRiMTNmYjUxOQ--;;Primary;",
+        ///     "message": [
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user2",
+        ///                 "DisplayName": "User22",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user22"
+        ///             },
+        ///             "ID": "251998713203119_c6db3598-d234-45b8-9bc9-c29f805f6be7",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": null,
+        ///             "AtUser": null,
+        ///             "TopicName": null,
+        ///             "MessageContent": "Is every thing good?",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-24T05:26:36.8802633Z"
+        ///         },
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user2",
+        ///                 "DisplayName": "User22",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user22"
+        ///             },
+        ///             "ID": "251999741397833_43f40cf4-3509-46a5-8f31-8f96ef1305d4",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": null,
+        ///             "AtUser": null,
+        ///             "TopicName": null,
+        ///             "MessageContent": "@user10 welcome",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-12T07:50:02.1662774Z"
+        ///         },
+        ///			......
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="count">count of message in the list</param>
         /// <param name="token">continuous token</param>
@@ -38,6 +82,50 @@ namespace MSGorilla.WebApi
 
         /// <summary>
         /// Return the messages in a user's userline in a list
+        /// 
+        /// Example output:
+        /// {
+        ///     "continuationToken": "1!20!dXNlcjJfMjkxNjY3Ng--;1!72!MjUyMDAwODg2ODUxNjg4XzhjN2Y5ZmVjLTgyMTEtNGIzYi1iZTI5LTAyNjRiMTNmYjUxOQ--;;Primary;",
+        ///     "message": [
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user2",
+        ///                 "DisplayName": "User22",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user22"
+        ///             },
+        ///             "ID": "251998713203119_c6db3598-d234-45b8-9bc9-c29f805f6be7",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": null,
+        ///             "AtUser": null,
+        ///             "TopicName": null,
+        ///             "MessageContent": "Is every thing good?",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-24T05:26:36.8802633Z"
+        ///         },
+        ///         {
+        ///             "User": {
+        ///                 "Userid": "user2",
+        ///                 "DisplayName": "User22",
+        ///                 "PortraitUrl": null,
+        ///                 "Description": "user22"
+        ///             },
+        ///             "ID": "251999741397833_43f40cf4-3509-46a5-8f31-8f96ef1305d4",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": null,
+        ///             "AtUser": null,
+        ///             "TopicName": null,
+        ///             "MessageContent": "@user10 welcome",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-06-12T07:50:02.1662774Z"
+        ///         },
+        ///			......
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="userid">user id</param>
         /// <param name="count">count of messages in the list</param>
@@ -59,14 +147,14 @@ namespace MSGorilla.WebApi
         /// Deprecated. Return the messages in a user's userline in a list
         /// </summary>
         /// <param name="userid">user id</param>
-        /// <param name="end">end timestamp</param>
         /// <param name="start">start timestamp</param>
+        /// <param name="end">end timestamp</param>
         /// <returns></returns>
         [HttpGet]
-        public List<Message> UserLine(string userid, DateTime end, DateTime start)
+        public List<Message> UserLine(string userid, DateTime start, DateTime end)
         {
             string me = whoami();
-            return _messageManager.UserLine(userid, end, start);
+            return _messageManager.UserLine(userid, start, end);
         }
 
         /// <summary>
