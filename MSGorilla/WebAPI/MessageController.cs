@@ -74,7 +74,7 @@ namespace MSGorilla.WebApi
         /// </summary>
         /// <param name="count">count of messages in the list</param>
         /// <param name="token">continuous token</param>
-        /// <param name="filter">filter</param>
+        /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
         /// <returns></returns>
         [HttpGet]
         public DisplayMessagePagination HomeLine(int count = 25, string token = null, string filter = "")

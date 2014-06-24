@@ -12,7 +12,7 @@
     <AzureHostedServiceLabel>MSGorilla</AzureHostedServiceLabel>
     <AzureHostedServiceName>msgorilla</AzureHostedServiceName>
     <AzureEnableIntelliTrace>False</AzureEnableIntelliTrace>
-    <AzureEnableProfiling>True</AzureEnableProfiling>
+    <AzureEnableProfiling>False</AzureEnableProfiling>
     <AzureServiceConfiguration>Cloud</AzureServiceConfiguration>
     <AzureSolutionConfiguration>Release</AzureSolutionConfiguration>
     <AzureStorageAccountLabel>msgorilla</AzureStorageAccountLabel>
