@@ -75,11 +75,8 @@ namespace MSGorilla.WebApi
         /// Content-Length:0
         /// Date:Tue, 24 Jun 2014 03:32:24 GMT
         /// Expires:-1
-        /// Location:https://msgorilla.blob.core.windows.net/attachment/7b7b2ad2-dd71-424d-a918-279c832b0440.xml?sv=2013-08-15&sr=c&si=[some_policy]&sig=[some_signature]
-        /// Pragma:no-cache
-        /// Server:Microsoft-IIS/8.5
-        /// X-AspNet-Version:4.0.30319
-        /// X-Powered-By:ASP.NET
+        /// Location:https://msgorilla.blob.core.windows.net/attachment/......
+        /// ......
         /// </summary>
         /// <param name="attachmentID">attachment id</param>
         /// <returns></returns>

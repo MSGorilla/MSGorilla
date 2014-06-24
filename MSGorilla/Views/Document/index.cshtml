@@ -20,34 +20,54 @@
             </div>
 
         </section>
-        <section class="content-wrapper main-content clear-fix">
-            <h3>APIs</h3>
-            <ul>
 
-                @foreach (var api in Model)
-                {
-                    <li>
-                        <h5>@api.HttpMethod @api.RelativePath</h5>
-                        <blockquote>
-                            <div>@Html.Raw(Utils.Txt2Html(api.Documentation))</div>
-                            <br />
-                            @if (api.ParameterDescriptions.Count > 0)
+        <div class="container">
+            <div class="row">
+                <div class="col-md-9" role="main">
+
+                    <section class="content-wrapper main-content clear-fix">
+                        <h3>APIs</h3>
+                        <ul>
+                            <h1 id="topic" class="page-header">TopicController</h1>
+                            @foreach (var api in Model)
                             {
-                                <h6>Parameters</h6>
-                                <ul>
-                                    @foreach (var parameter in api.ParameterDescriptions)
-                                    {
-                                        <li>@parameter.Name: @parameter.Documentation (@parameter.Source)</li>
-                                    }
-                                </ul>
+                                <li>
+                                    <h5>@api.HttpMethod @api.RelativePath</h5>
+                                    <blockquote>
+                                        <div>@Html.Raw(Utils.Txt2Html(api.Documentation))</div>
+                                        <br />
+                                        @if (api.ParameterDescriptions.Count > 0)
+                                        {
+                                            <h6>Parameters</h6>
+                                            <ul>
+                                                @foreach (var parameter in api.ParameterDescriptions)
+                                                {
+                                                    <li>@parameter.Name: @parameter.Documentation (@parameter.Source)</li>
+                                                }
+                                            </ul>
+                                        }
+                                    </blockquote>
+                                </li>
                             }
-                        </blockquote>
-                    </li>
-                }
 
-            </ul>
+                        </ul>
 
-        </section>
+                    </section>
+                </div>
+                    
+                <div class="col-md-3">
+                    <div class="bs-docs-sidebar hidden-print affix" role="complementary">
+                        <ul class="nav bs-docs-sidenav">
+                            <li class>
+                                <a href="#topic">Topic</a>
+                            </li>
+                        </ul>
+                        <a class="back-to-top" href="#top">Back to top</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
     </div>
 
