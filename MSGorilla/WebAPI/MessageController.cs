@@ -242,6 +242,7 @@ namespace MSGorilla.WebApi
         ///		......
         /// ]
         /// </summary>
+        /// <param name="userid">user id</param>
         /// <param name="count">count of messages in the list</param>
         /// <param name="token">continuous token</param>
         /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
@@ -785,7 +786,7 @@ namespace MSGorilla.WebApi
         }
 
         /// <summary>
-        /// Return all messages do not have a eventid in a list.
+        /// Deprecated. Return all messages do not have a eventid in a list.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
