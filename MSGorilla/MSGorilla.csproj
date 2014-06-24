@@ -254,6 +254,7 @@
     <Compile Include="WebAPI\TopicController.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Images\default_avatar_bk.jpg" />
     <Content Include="Content\ms.gorilla.css" />
     <Content Include="Content\css.css" />
     <Content Include="Content\Images\default_avatar.jpg" />
@@ -332,6 +333,7 @@
     <Content Include="Views\Shared\_PostPartial.cshtml" />
     <Content Include="Views\Shared\_FeedFilterPartial.cshtml" />
     <Content Include="Views\Document\Index.cshtml" />
+    <Content Include="Views\Notification\Replies.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

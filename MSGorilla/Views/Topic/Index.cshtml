@@ -17,12 +17,38 @@
         <div class="title-container">
             <h4>
                 @ViewBag.Title for "#<span class="bold">@ViewBag.Topic</span>#"
+                <div class="btn-group">
+                    <button class="btn btn-link btn-sm dropdown-toggle" type="button" data-toggle="dropdown"><span id="feedfilter_title">All feeds</span>&nbsp;<span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="#" onclick="FilterFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'all');">All feeds</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="FilterFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'latest24hours');">Latest 24 hours</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="FilterFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'latest7days');">Latest 7 days</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="FilterFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'latest1month');">Latest 1 month</a>
+                        </li>
+                    </ul>
+                </div>
                 @if (@ViewBag.TopicId >= 0)
                 {
                     <a class='btn btn-default like-btn' id='btn_topic_like' style='display:none'>&nbsp;</a>
                 }
             </h4>
             <span class="help-block"> See topics you’re interested in.</span>
+        </div>
+
+        <div class="nav-container">
+            <div id="home_nav_list" class="pd-10"></div>
+            <ul class="nav nav-pills">
+                <li><a href="/Notification/index?category=atline">Mentions <span id="home_atline_count" class="badge"></span></a></li>
+                <li><a href="/Notification/index?category=ownerline">My owns <span id="home_ownerline_count" class="badge"></span></a></li>
+                <li><a href="/Notification/index?category=replyline">Replies <span id="home_reply_count" class="badge"></span></a></li>
+            </ul>
         </div>
 
         <div class="posts-feeds">
@@ -58,6 +84,7 @@
 
     <div class="tools-container">
         @Html.Partial("_MePartial")
+        @Html.Partial("_FeedFilterPartial")
         @Html.Partial("_ShortcutPartial")
     </div>
 

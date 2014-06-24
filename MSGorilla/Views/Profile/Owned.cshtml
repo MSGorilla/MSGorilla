@@ -32,7 +32,7 @@
             <div class="user-postinfo">
                 <div class="btn-group btn-group-justified">
                     <a class="btn btn-default" href="/Profile/Index?user=@ViewBag.UserId">POSTS &nbsp;<span id="user_posts" class="badge">0</span></a>
-                    <a class="btn btn-default disabled" >OWNED &nbsp;<span id="user_owned" class="badge"></span></a>
+                    <a class="btn btn-default disabled">OWNS &nbsp;<span id="user_owned" class="badge"></span></a>
                     <a class="btn btn-default" href="/Profile/Following?user=@ViewBag.UserId">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
                     <a class="btn btn-default" href="/Profile/Followers?user=@ViewBag.UserId">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
                     <a class="btn btn-default" href="/Profile/Favorites?user=@ViewBag.UserId">FAVORITES &nbsp;<span id="user_favorites" class="badge"></span></a>
@@ -49,7 +49,26 @@
         </div>
 
         <div class="title-container">
-            <h4>Owned threads</h4>
+            <h4>
+                My owns
+                <div class="btn-group">
+                    <button class="btn btn-link btn-sm dropdown-toggle" type="button" data-toggle="dropdown"><span id="feedfilter_title">All feeds</span>&nbsp;<span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="#" onclick="FilterFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'all');">All feeds</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="FilterFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'latest24hours');">Latest 24 hours</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="FilterFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'latest7days');">Latest 7 days</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="FilterFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'latest1month');">Latest 1 month</a>
+                        </li>
+                    </ul>
+                </div>
+            </h4>
         </div>
 
         <div class="posts-feeds">
@@ -89,6 +108,7 @@
         {
             @Html.Partial("_MePartial")
         }
+        @Html.Partial("_FeedFilterPartial")
         @Html.Partial("_ShortcutPartial")
     </div>
 
