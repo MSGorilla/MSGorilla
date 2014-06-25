@@ -660,20 +660,20 @@ function CreateFeed(postData, isNew) {
 
     //output += "<ul class='list-group'>";
     if (isNew == true) {
-        if (!isNullOrEmpty(richmsgid)) {
-            output += "  <li id='feed_" + mid + "' class='list-group-item new-notification clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
-        }
-        else {
+        //if (!isNullOrEmpty(richmsgid)) {
+        //    output += "  <li id='feed_" + mid + "' class='list-group-item new-notification clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
+        //}
+        //else {
             output += "  <li id='feed_" + mid + "' class='list-group-item new-notification'>";
-        }
+        //}
     }
     else {
-        if (!isNullOrEmpty(richmsgid)) {
-            output += "  <li id='feed_" + mid + "' class='list-group-item clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
-        }
-        else {
+        //if (!isNullOrEmpty(richmsgid)) {
+        //    output += "  <li id='feed_" + mid + "' class='list-group-item clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
+        //}
+        //else {
             output += "  <li id='feed_" + mid + "' class='list-group-item'>";
-        }
+        //}
     }
 
     output += "    <div>"
@@ -699,11 +699,12 @@ function CreateFeed(postData, isNew) {
     // message
     output += "        <div class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
 
-    // fordebug
-    //richmsg = " <img src='/Content/Images/MSFTE_photo.jpg' />";
     // richmsg
     if (!isNullOrEmpty(richmsgid)) {
-        output += "    <div id='rich_message_" + mid + "' class='newpost-input' style='display:none;'></div>";
+        //output += "        <div class='newpost-footer'>";
+        //output += "          <button id='btn_up_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
+        //output += "        </div>";
+        output += "    <div id='rich_message_" + mid + "' class='newpost-input panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" +mid + "' href='#rich_message_" +mid + "' onclick='ShowRichMsg(\"" +richmsgid + "\", \"" +mid + "\");'></div>";
     }
 
     // attachment
@@ -726,15 +727,16 @@ function CreateFeed(postData, isNew) {
 
     // btns
     if (!isNullOrEmpty(richmsgid)) {
-        output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
+        output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
     }
-    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Replies</button>";
+    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#reply_" + mid + "' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Replies</button>";
+
     output += "        </div>";
     output += "      </div>";
     output += "    </div>";
 
     // reply
-    output += "    <div style='display:none;' id='reply_" + mid + "'>";
+    output += "    <div id='reply_" + mid + "' class='panel-collapse collapse out '>";
     // add reply box
     output += "      <div class='replies-container'>";
     output += "        <div class='input-group'>";
@@ -770,32 +772,14 @@ function ShowAttach(aid, type, mid) {
     }
 }
 
-function ShowRichMsg(evt, rmid, mid) {
-    var sender = null;
-    if (window.event) {
-        sender = window.event.target;
-        event.cancelBubble = true;
-    } else if (evt) {
-        sender = evt.target;
-        evt.stopPropagation();
-    }
-    if (!isNullOrEmpty(sender.href)) {  // link clicked
-        return;
-    }
-    if (sender.id != "btn_showrichmsg_" + mid
-        && sender.id != "feed_" + mid
-        && !isNullOrEmpty(sender.id)) {
-        return;
-    }
-
+function ShowRichMsg(rmid, mid) {
     var showbtn = $("#btn_showrichmsg_" + mid);
-    var show = showbtn.attr("isshow");
     var richmsgdiv = $("#rich_message_" + mid);
+    var show = richmsgdiv.hasClass("in");
 
-    if (show == "false") {
+    if (show == false) {
         if (isNullOrEmpty(richmsgdiv.html())) {
             richmsgdiv.append("<div class='txtaln-c'><span class='spinner-loading'></span> Loading...</div>");
-            richmsgdiv.show();
             // load rich once
             $.ajax({
                 type: "GET",
@@ -807,29 +791,22 @@ function ShowRichMsg(evt, rmid, mid) {
                     richmsgdiv.append(data);
 
                     // show rich
-                    showbtn.attr("isshow", "true");
                     showbtn.text("Less");
-                    richmsgdiv.show();
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     richmsgdiv.empty();
-                    richmsgdiv.hide();
                     ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
                 }
             });
         }
         else {
             // show rich
-            showbtn.attr("isshow", "true");
             showbtn.text("Less");
-            richmsgdiv.show();
         }
     }
     else {
         // clear rich
-        showbtn.attr("isshow", "false");
         showbtn.text("More");
-        richmsgdiv.hide();
     }
 
     ScrollTo("feed_" + mid);
@@ -839,31 +816,26 @@ function ShowRichMsg(evt, rmid, mid) {
 // reply function
 function ShowReplies(user, mid) {
     var showbtn = $("#btn_showreply_" + mid);
-    var show = showbtn.attr("isshow");
     var replydiv = $("#reply_" + mid);
+    var show = replydiv.hasClass("in");
 
-    if (show == "false") {
+    if (show == false) {
         // show replies
-        showbtn.attr("isshow", "true");
         showbtn.text("Collapse");
-
-        replydiv.show();
 
         // show reply
         LoadReplies(mid);
     }
     else {
         // clear replies
-        showbtn.attr("isshow", "false");
         showbtn.text("Replies");
-
-        replydiv.hide();
     }
 }
 
 function LoadReplies(mid) {
     var replydiv = $("#replylist_" + mid);
 
+    replydiv.empty();
     replydiv.append("<li class='center-block txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
     $.ajax({
         type: "GET",
