@@ -1,15 +1,15 @@
 ﻿
 @{
-    ViewBag.Title = "API Doc";
+    ViewBag.Title = "MSGorilla Rest API Document";
 }
 
 <h2>@ViewBag.Title</h2>
 
 @using MSGorilla.Library;
 @using System.Web.Http.Description;
-@model System.Collections.Generic.List<ApiDescription>
+@model Dictionary<string, List<ApiDescription>>
     <div id="body">
-        <section class="featured">
+        @*<section class="featured">
             <div class="content-wrapper">
                 <hgroup class="title">
 
@@ -19,7 +19,7 @@
 
             </div>
 
-        </section>
+        </section>*@
 
         <div class="container">
             <div class="row">
@@ -27,30 +27,33 @@
 
                     <section class="content-wrapper main-content clear-fix">
                         <h3>APIs</h3>
-                        <ul>
-                            <h1 id="topic" class="page-header">TopicController</h1>
-                            @foreach (var api in Model)
-                            {
-                                <li>
-                                    <h5>@api.HttpMethod @api.RelativePath</h5>
-                                    <blockquote>
-                                        <div>@Html.Raw(Utils.Txt2Html(api.Documentation))</div>
-                                        <br />
-                                        @if (api.ParameterDescriptions.Count > 0)
-                                        {
-                                            <h6>Parameters</h6>
-                                            <ul>
-                                                @foreach (var parameter in api.ParameterDescriptions)
-                                                {
-                                                    <li>@parameter.Name: @parameter.Documentation (@parameter.Source)</li>
-                                                }
-                                            </ul>
-                                        }
-                                    </blockquote>
-                                </li>
-                            }
+                        @foreach (string key in Model.Keys)
+                        {
+                            <ul>
+                                <h1 id="@key" class="page-header">@key</h1>
+                                @foreach (var api in Model[key])
+                                {
+                                    <li>
+                                        <h5>@api.HttpMethod @api.RelativePath</h5>
+                                        <blockquote>
+                                            <div>@Html.Raw(Utils.Txt2Html(api.Documentation))</div>
+                                            <br />
+                                            @if (api.ParameterDescriptions.Count > 0)
+                                            {
+                                                <h6>Parameters</h6>
+                                                <ul>
+                                                    @foreach (var parameter in api.ParameterDescriptions)
+                                                    {
+                                                        <li>@parameter.Name: @parameter.Documentation (@parameter.Source)</li>
+                                                    }
+                                                </ul>
+                                            }
+                                        </blockquote>
+                                    </li>
+                                }
 
-                        </ul>
+                            </ul>
+                        }                        
 
                     </section>
                 </div>
@@ -59,7 +62,11 @@
                     <div class="bs-docs-sidebar hidden-print affix" role="complementary">
                         <ul class="nav bs-docs-sidenav">
                             <li class>
-                                <a href="#topic">Topic</a>
+                                @foreach (string key in Model.Keys)
+                                {
+                                    <a href="#@key">@key</a>
+                                }
+                                
                             </li>
                         </ul>
                         <a class="back-to-top" href="#top">Back to top</a>

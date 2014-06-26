@@ -23,7 +23,7 @@ namespace MSGorilla.WebApi
         /// Example output:
         /// {
         ///     "SchemaID": "schema1",
-        ///     "SchemaContent": "<timestamp><eventid><schemaid>"
+        ///     "SchemaContent": "some_content"
         /// }
         /// </summary>
         /// <param name="schemaID">ID of the schema</param>
@@ -45,11 +45,11 @@ namespace MSGorilla.WebApi
         ///     },
         ///     {
         ///         "SchemaID": "none",
-        ///         "SchemaContent": ""
+        ///         "SchemaContent": "......"
         ///     },
         ///     {
         ///         "SchemaID": "schema1",
-        ///         "SchemaContent": "<timestamp><eventid><schemaid>"
+        ///         "SchemaContent": "some_content"
         ///     }
         /// ]
         /// </summary>
@@ -66,7 +66,7 @@ namespace MSGorilla.WebApi
         /// Example output:
         /// {
         ///     "SchemaID": "schema1",
-        ///     "SchemaContent": "<timestamp><eventid><schemaid>"
+        ///     "SchemaContent": "posted_content"
         /// }
         /// </summary>
         /// <param name="schemaID">ID of the schema</param>
