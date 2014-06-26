@@ -7,12 +7,15 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using System.Collections.ObjectModel;
 
+using MSGorilla.Filters;
+
 namespace MSGorilla.Controllers
 {
     public class DocumentController : Controller
     {
         //
         // GET: /Document/
+        [TokenAuthAttribute]
         public ActionResult Index()
         {
             IApiExplorer apiExplorer = GlobalConfiguration.Configuration.Services.GetApiExplorer();
