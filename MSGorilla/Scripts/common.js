@@ -620,6 +620,7 @@ function LoadFeeds(category, id, filter) {
             }
 
             UpdateNotificationCount();
+            LoadMyFavoriteTopics();
             isLoadFeeds = false;
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -659,20 +660,20 @@ function CreateFeed(postData, isNew) {
 
     //output += "<ul class='list-group'>";
     if (isNew == true) {
-        if (!isNullOrEmpty(richmsgid)) {
-            output += "  <li id='feed_" + mid + "' class='list-group-item new-notification clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
-        }
-        else {
+        //if (!isNullOrEmpty(richmsgid)) {
+        //    output += "  <li id='feed_" + mid + "' class='list-group-item new-notification clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
+        //}
+        //else {
             output += "  <li id='feed_" + mid + "' class='list-group-item new-notification'>";
-        }
+        //}
     }
     else {
-        if (!isNullOrEmpty(richmsgid)) {
-            output += "  <li id='feed_" + mid + "' class='list-group-item clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
-        }
-        else {
+        //if (!isNullOrEmpty(richmsgid)) {
+        //    output += "  <li id='feed_" + mid + "' class='list-group-item clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
+        //}
+        //else {
             output += "  <li id='feed_" + mid + "' class='list-group-item'>";
-        }
+        //}
     }
 
     output += "    <div>"
@@ -698,11 +699,12 @@ function CreateFeed(postData, isNew) {
     // message
     output += "        <div class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
 
-    // fordebug
-    //richmsg = " <img src='/Content/Images/MSFTE_photo.jpg' />";
     // richmsg
     if (!isNullOrEmpty(richmsgid)) {
-        output += "    <div id='rich_message_" + mid + "' class='newpost-input' style='display:none;'></div>";
+        //output += "        <div class='newpost-footer'>";
+        //output += "          <button id='btn_up_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
+        //output += "        </div>";
+        output += "    <div id='rich_message_" + mid + "' class='newpost-input panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" +mid + "' href='#rich_message_" +mid + "' onclick='ShowRichMsg(\"" +richmsgid + "\", \"" +mid + "\");'></div>";
     }
 
     // attachment
@@ -725,15 +727,16 @@ function CreateFeed(postData, isNew) {
 
     // btns
     if (!isNullOrEmpty(richmsgid)) {
-        output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
+        output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
     }
-    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Replies</button>";
+    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#reply_" + mid + "' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Replies</button>";
+
     output += "        </div>";
     output += "      </div>";
     output += "    </div>";
 
     // reply
-    output += "    <div style='display:none;' id='reply_" + mid + "'>";
+    output += "    <div id='reply_" + mid + "' class='panel-collapse collapse out '>";
     // add reply box
     output += "      <div class='replies-container'>";
     output += "        <div class='input-group'>";
@@ -769,32 +772,14 @@ function ShowAttach(aid, type, mid) {
     }
 }
 
-function ShowRichMsg(evt, rmid, mid) {
-    var sender = null;
-    if (window.event) {
-        sender = window.event.target;
-        event.cancelBubble = true;
-    } else if (evt) {
-        sender = evt.target;
-        evt.stopPropagation();
-    }
-    if (!isNullOrEmpty(sender.href)) {  // link clicked
-        return;
-    }
-    if (sender.id != "btn_showrichmsg_" + mid
-        && sender.id != "feed_" + mid
-        && !isNullOrEmpty(sender.id)) {
-        return;
-    }
-
+function ShowRichMsg(rmid, mid) {
     var showbtn = $("#btn_showrichmsg_" + mid);
-    var show = showbtn.attr("isshow");
     var richmsgdiv = $("#rich_message_" + mid);
+    var show = richmsgdiv.hasClass("in");
 
-    if (show == "false") {
+    if (show == false) {
         if (isNullOrEmpty(richmsgdiv.html())) {
             richmsgdiv.append("<div class='txtaln-c'><span class='spinner-loading'></span> Loading...</div>");
-            richmsgdiv.show();
             // load rich once
             $.ajax({
                 type: "GET",
@@ -806,29 +791,22 @@ function ShowRichMsg(evt, rmid, mid) {
                     richmsgdiv.append(data);
 
                     // show rich
-                    showbtn.attr("isshow", "true");
                     showbtn.text("Less");
-                    richmsgdiv.show();
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     richmsgdiv.empty();
-                    richmsgdiv.hide();
                     ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
                 }
             });
         }
         else {
             // show rich
-            showbtn.attr("isshow", "true");
             showbtn.text("Less");
-            richmsgdiv.show();
         }
     }
     else {
         // clear rich
-        showbtn.attr("isshow", "false");
         showbtn.text("More");
-        richmsgdiv.hide();
     }
 
     ScrollTo("feed_" + mid);
@@ -838,31 +816,26 @@ function ShowRichMsg(evt, rmid, mid) {
 // reply function
 function ShowReplies(user, mid) {
     var showbtn = $("#btn_showreply_" + mid);
-    var show = showbtn.attr("isshow");
     var replydiv = $("#reply_" + mid);
+    var show = replydiv.hasClass("in");
 
-    if (show == "false") {
+    if (show == false) {
         // show replies
-        showbtn.attr("isshow", "true");
         showbtn.text("Collapse");
-
-        replydiv.show();
 
         // show reply
         LoadReplies(mid);
     }
     else {
         // clear replies
-        showbtn.attr("isshow", "false");
         showbtn.text("Replies");
-
-        replydiv.hide();
     }
 }
 
 function LoadReplies(mid) {
     var replydiv = $("#replylist_" + mid);
 
+    replydiv.empty();
     replydiv.append("<li class='center-block txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
     $.ajax({
         type: "GET",
@@ -974,51 +947,51 @@ function ShowMessage(evt, mid, user) {
     }
 
     $.ajax({
-                type: "GET",
-                url: "/api/message/getdisplaymessage",
-                data: "msgUser=" + encodeURIComponent(user) + "&msgID=" + encodeURIComponent(mid),
-                success: function (data) {
+        type: "GET",
+        url: "/api/message/getdisplaymessage",
+        data: "msgUser=" + encodeURIComponent(user) + "&msgID=" + encodeURIComponent(mid),
+        success: function (data) {
             message_div.empty();
-                    // create message
-    message_div.append(CreateFeed(data));
+            // create message
+            message_div.append(CreateFeed(data));
 
-    $("#MessageModal").modal();
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
+            $("#MessageModal").modal();
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-                }
-            });
+        }
+    });
 }
 
 
 // event function
-        function ShowEvents(mid, eid) {
-            var events_div = $("#events_div");
-            if (events_div.length == 0) {
-                return;
-            }
+function ShowEvents(mid, eid) {
+    var events_div = $("#events_div");
+    if (events_div.length == 0) {
+        return;
+    }
 
     $.ajax({
-                        type: "GET",
-                        url: "/api/message/eventline",
-                        data: "eventID=" + encodeURIComponent(eid),
-                        success: function (data) {
-                                    events_div.empty();
-                            // create events list
-                            $.each(data, function (index, item) {
-                                if(item.ID == mid)
-                                    events_div.append(CreateEvent(item, true));
-                                else
-                                    events_div.append(CreateEvent(item, false));
-                            })
+        type: "GET",
+        url: "/api/message/eventline",
+        data: "eventID=" + encodeURIComponent(eid),
+        success: function (data) {
+            events_div.empty();
+            // create events list
+            $.each(data, function (index, item) {
+                if (item.ID == mid)
+                    events_div.append(CreateEvent(item, true));
+                else
+                    events_div.append(CreateEvent(item, false));
+            })
 
-                            $("#EventsModal").modal();
-                        },
-                        error: function (XMLHttpRequest, textStatus, errorThrown) {
-        ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-                        }
-                    });
+            $("#EventsModal").modal();
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
+    });
+}
 
 function CreateEvent(postData, isHeighlight) {
     var output = "";
@@ -1030,11 +1003,11 @@ function CreateEvent(postData, isHeighlight) {
     var posttime = postData.PostTime;
     var user = postData.User.Userid;
     var username = postData.User.DisplayName;
-                        var picurl = postData.User.PortraitUrl;
-                        var userdesp = postData.User.Description;
-                        var owners = postData.Owner;
-                        var atusers = postData.AtUser;
-                        var topics = postData.TopicName;
+    var picurl = postData.User.PortraitUrl;
+    var userdesp = postData.User.Description;
+    var owners = postData.Owner;
+    var atusers = postData.AtUser;
+    var topics = postData.TopicName;
 
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";
@@ -1058,7 +1031,7 @@ function CreateEvent(postData, isHeighlight) {
     if (!isNullOrEmpty(owners)) {
         output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
         for (var key in owners) {
-            output += "  <a href='/profile/index?user=" + encodeURIComponent(owners[key]) + "'>@" + owners[key]+ "</a>&nbsp;";
+            output += "  <a href='/profile/index?user=" + encodeURIComponent(owners[key]) + "'>@" + owners[key] + "</a>&nbsp;";
         }
         output += "    </div>";
     }
@@ -1078,45 +1051,45 @@ function CreateEvent(postData, isHeighlight) {
 
 
 // search function
-        function SearchTopic(keyword) {
-            var apiurl = "";
-            var apidata = "";
-            if (isNullOrEmpty(keyword))
-                apiurl = "/api/topic/getalltopic";
-            else {
-                apiurl = "/api/topic/searchtopic";
-                apidata = "keyword=" + encodeURIComponent(keyword);
-            }
+function SearchTopic(keyword) {
+    var apiurl = "";
+    var apidata = "";
+    if (isNullOrEmpty(keyword))
+        apiurl = "/api/topic/getalltopic";
+    else {
+        apiurl = "/api/topic/searchtopic";
+        apidata = "keyword=" + encodeURIComponent(keyword);
+    }
 
-            $.ajax({
-                            type: "GET",
-                            url: apiurl,
-                            data: apidata,
-                            dataType: "json",
-                            success: function (data) {
-                            if(data.length == 0) {
-                                ShowError("No content.");
-                            }
-                            else {
-                                $("#topiclist").empty();
-                                $.each(data, function (index, item) {
-                                    var topicid = item.Id;
-                                    var topicname = item.Name;
-                            var topicdesp = item.Description;
-                            var topiccount = item.MsgCount;
+    $.ajax({
+        type: "GET",
+        url: apiurl,
+        data: apidata,
+        dataType: "json",
+        success: function (data) {
+            if (data.length == 0) {
+                ShowError("No content.");
+            }
+            else {
+                $("#topiclist").empty();
+                $.each(data, function (index, item) {
+                    var topicid = item.Id;
+                    var topicname = item.Name;
+                    var topicdesp = item.Description;
+                    var topiccount = item.MsgCount;
 
                     $("#topiclist").append(CreateTopic(topicid, topicname, topicdesp, topiccount));
-                            LoadTopicLikeBtn("btn_topic_like_" + topicid, topicid);
-                                })
-                            }
-                            },
-                            error: function (XMLHttpRequest, textStatus, errorThrown) {
-        ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-                            }
-                        });
+                    LoadTopicLikeBtn("btn_topic_like_" + topicid, topicid);
+                })
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
+    });
+}
 
-    function SearchUser(keyword) {
+function SearchUser(keyword) {
     var apiurl = "";
     var apidata = "";
     if (isNullOrEmpty(keyword))
@@ -1127,69 +1100,69 @@ function CreateEvent(postData, isHeighlight) {
     }
 
     $.ajax({
-                    type: "GET",
-                    url: apiurl,
-                    data: apidata,
-                    dataType: "json",
-                    success: function (data) {
-                        if(data.length == 0) {
+        type: "GET",
+        url: apiurl,
+        data: apidata,
+        dataType: "json",
+        success: function (data) {
+            if (data.length == 0) {
                 ShowError("No content.", "1");
-                        }
-                        else {
-                            // create user list
-        $("#userlist").empty();
-        $.each(data, function(index, item) {
-            $("#userlist").append(CreateUserCard(item));
+            }
+            else {
+                // create user list
+                $("#userlist").empty();
+                $.each(data, function (index, item) {
+                    $("#userlist").append(CreateUserCard(item));
                     LoadUserFollowBtn(item.Userid, item.IsFollowing);
-        })
-                        }
-                    },
-                    error: function (XMLHttpRequest, textStatus, errorThrown) {
-                        ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message, "1");
-                    }
-                });
-    }
+                })
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message, "1");
+        }
+    });
+}
 
 function LoadUsers(category, user) {
-                                    var apiurl = "";
-                                    var apidata = "";
+    var apiurl = "";
+    var apidata = "";
     if (isNullOrEmpty(category))
         apiurl = "/api/account/user";
     else if (category == "following")
-    apiurl = "/api/account/followings";
+        apiurl = "/api/account/followings";
     else if (category == "followers")
-    apiurl = "/api/account/followers";
+        apiurl = "/api/account/followers";
     else {
-    ShowError("Illegal operation.");
-    return;
+        ShowError("Illegal operation.");
+        return;
     }
 
-        if(!isNullOrEmpty(user)) {
+    if (!isNullOrEmpty(user)) {
         apidata = "userid=" + encodeURIComponent(user);
-        }
+    }
 
     $.ajax({
-                    type: "GET",
-                    url: apiurl,
-                    data: apidata,
-                    dataType: "json",
-                    success: function(data) {
-                    if(data.length == 0) {
-                        ShowError("No content.");
-                    }
-                    else {
-                        // create user list
+        type: "GET",
+        url: apiurl,
+        data: apidata,
+        dataType: "json",
+        success: function (data) {
+            if (data.length == 0) {
+                ShowError("No content.");
+            }
+            else {
+                // create user list
                 $("#userlist").empty();
-                $.each(data, function(index, item) {
+                $.each(data, function (index, item) {
                     $("#userlist").append(CreateUserCard(item));
-                        LoadUserFollowBtn(item.Userid, item.IsFollowing);
+                    LoadUserFollowBtn(item.Userid, item.IsFollowing);
                 })
-                    }
-                    },
-                    error: function (XMLHttpRequest, textStatus, errorThrown) {
-        ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-                    }
-                });
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
+    });
 }
 
 function CreateUserCard(data) {
@@ -1244,93 +1217,93 @@ function GetNotificationCount(category) {
 
     var apiurl = "/api/account/getnotificationcount";
     $.ajax({
-                type: "GET",
-                url: apiurl,
-                dataType: "json",
-                async: false,
-                success: function (data) {
-                    var homelineCount = data.UnreadHomelineMsgCount;
-                var ownerlineCount = data.UnreadOwnerlineMsgCount;
-                var atlineCount = data.UnreadAtlineMsgCount;
-                var replyCount = data.UnreadReplyCount;
-                var userid = data.Userid;
-                var notificationCount = ownerlineCount + replyCount + atlineCount;
+        type: "GET",
+        url: apiurl,
+        dataType: "json",
+        async: false,
+        success: function (data) {
+            var homelineCount = data.UnreadHomelineMsgCount;
+            var ownerlineCount = data.UnreadOwnerlineMsgCount;
+            var atlineCount = data.UnreadAtlineMsgCount;
+            var replyCount = data.UnreadReplyCount;
+            var userid = data.Userid;
+            var notificationCount = ownerlineCount + replyCount + atlineCount;
 
-                switch (category) {
-                    case "atline":
-                        count = atlineCount;
-                        break;
-                    case "ownerline":
-                        count = ownerlineCount;
-                        break;
-                    case "replyline":
-                        count = replyCount;
-                        break;
-                    case "homeline":
-                        count = homelineCount;
-                        break;
-                    default:
-                        break;
-                    }
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    // ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-                }
-            });
+            switch (category) {
+                case "atline":
+                    count = atlineCount;
+                    break;
+                case "ownerline":
+                    count = ownerlineCount;
+                    break;
+                case "replyline":
+                    count = replyCount;
+                    break;
+                case "homeline":
+                    count = homelineCount;
+                    break;
+                default:
+                    break;
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            // ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
+    });
 
-        return count;
+    return count;
 }
 
-    function UpdateNotificationCount() {
-        var apiurl = "/api/account/getnotificationcount";
+function UpdateNotificationCount() {
+    var apiurl = "/api/account/getnotificationcount";
 
-        $.ajax({
-                            type: "GET",
-                            url: apiurl,
-                            dataType: "json",
-                            success: function (data) {
-                                var homelineCount = data.UnreadHomelineMsgCount;
-                        var ownerlineCount = data.UnreadOwnerlineMsgCount;
-                        var atlineCount = data.UnreadAtlineMsgCount;
-                        var replyCount = data.UnreadReplyCount;
-                        var userid = data.Userid;
-                            var notificationCount = ownerlineCount + replyCount + atlineCount;
+    $.ajax({
+        type: "GET",
+        url: apiurl,
+        dataType: "json",
+        success: function (data) {
+            var homelineCount = data.UnreadHomelineMsgCount;
+            var ownerlineCount = data.UnreadOwnerlineMsgCount;
+            var atlineCount = data.UnreadAtlineMsgCount;
+            var replyCount = data.UnreadReplyCount;
+            var userid = data.Userid;
+            var notificationCount = ownerlineCount + replyCount + atlineCount;
 
-                                // shortcut panel count
-                            $("#shortcut_homeline_count").html(homelineCount);
-                    $("#shortcut_reply_count").html(replyCount);
-                    $("#shortcut_atline_count").html(atlineCount);
-                    $("#shortcut_ownerline_count").html(ownerlineCount);
-                        $("#shortcut_notification_count").html(notificationCount);
+            // shortcut panel count
+            $("#shortcut_homeline_count").html(homelineCount);
+            $("#shortcut_reply_count").html(replyCount);
+            $("#shortcut_atline_count").html(atlineCount);
+            $("#shortcut_ownerline_count").html(ownerlineCount);
+            $("#shortcut_notification_count").html(notificationCount);
 
-                                // homepage count
-                        $("#home_reply_count").html(replyCount);
-                        $("#home_atline_count").html(atlineCount);
-                            $("#home_ownerline_count").html(ownerlineCount);
+            // homepage count
+            $("#home_reply_count").html(replyCount);
+            $("#home_atline_count").html(atlineCount);
+            $("#home_ownerline_count").html(ownerlineCount);
 
-                                // nav bar count
-                    if (homelineCount > 0)
-                            $("#nav_home_count").html(homelineCount);
-                    else
-                        $("#nav_home_count").html("");
+            // nav bar count
+            if (homelineCount > 0)
+                $("#nav_home_count").html(homelineCount);
+            else
+                $("#nav_home_count").html("");
 
-                        if (notificationCount > 0)
-                            $("#nav_notification_count").html(notificationCount);
-                        else
-                            $("#nav_notification_count").html("");
+            if (notificationCount > 0)
+                $("#nav_notification_count").html(notificationCount);
+            else
+                $("#nav_notification_count").html("");
 
-                                // chrome desktop notification
-                    notify(homelineCount, atlineCount, ownerlineCount, replyCount);
-                            },
-                            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                                // ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-                            }
-                            });
+            // chrome desktop notification
+            notify(homelineCount, atlineCount, ownerlineCount, replyCount);
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            // ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
+    });
+}
 
 function SetNotificationCount() {
-UpdateNotificationCount();
-var timer = $.timer(UpdateNotificationCount, 30000, true);
+    UpdateNotificationCount();
+    var timer = $.timer(UpdateNotificationCount, 30000, true);
 }
 
 
@@ -1356,10 +1329,10 @@ function LoadHotTopics() {
                 output += "<li class='sub-list-group-item'>";
                 output += "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>";
                 //output += "  <span class='badge'>" + topiccount + "</span>";
-    output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
-    output += "</li>";
-    $("#topic_collapse").append(output);
-    LoadTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid);
+                output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
+                output += "</li>";
+                $("#topic_collapse").append(output);
+                LoadTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid);
             })
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -1373,17 +1346,17 @@ function LoadUserFavoriteTopics(user) {
     var apidata = "userid=" + encodeURIComponent(user);
 
     $.ajax({
-            type: "GET",
-            url: apiurl,
-            data: apidata,
-            dataType: "json",
-            success: function (data) {
-            if(data.length == 0) {
+        type: "GET",
+        url: apiurl,
+        data: apidata,
+        dataType: "json",
+        success: function (data) {
+            if (data.length == 0) {
                 ShowError("No content.");
             }
             else {
                 $("#topiclist").empty();
-                $.each(data, function(index, item) {
+                $.each(data, function (index, item) {
                     var topicid = item.topicID;
                     var topicname = item.topicName;
                     var topicdesp = item.topicDescription;
@@ -1393,94 +1366,94 @@ function LoadUserFavoriteTopics(user) {
                     LoadTopicLikeBtn("btn_topic_like_" + topicid, topicid);
                 })
             }
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-            }
-        });
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
+    });
 }
 
-                            function LoadMyFavoriteTopics() {
-                var apiurl = "/api/topic/getmyfavouritetopic";
+function LoadMyFavoriteTopics() {
+    var apiurl = "/api/topic/getmyfavouritetopic";
 
-                $.ajax({
-                        type: "GET",
-                        url: apiurl,
-                        dataType: "json",
-                        success: function (data) {
-                            // create hot topic
-                    $("#favorite_collapse").empty();
-                        var navlist = $("#home_nav_list");
-                        navlist.empty();
-                        $.each(data, function (index, item) {
-                            var output = "";
-                            var userid = item.userid;
+    $.ajax({
+        type: "GET",
+        url: apiurl,
+        dataType: "json",
+        success: function (data) {
+            // create hot topic
+            $("#favorite_collapse").empty();
+            var navlist = $("#home_nav_list");
+            navlist.empty();
+            $.each(data, function (index, item) {
+                var output = "";
+                var userid = item.userid;
                 var topicid = item.topicID;
-                            var unreadcount = item.UnreadMsgCount;
-                            var topicname = item.topicName;
+                var unreadcount = item.UnreadMsgCount;
+                var topicname = item.topicName;
                 var topicdesp = item.topicDescription;
                 var topiccount = item.topicMsgCount;
 
-                            // shortcut panel
-                    output += "<li class='sub-list-group-item'>";
-                            output += "  <span class='badge'>" + unreadcount + "</span>";
-                            output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
-                            output += "</li>";
-                            $("#favorite_collapse").append(output);
+                // shortcut panel
+                output += "<li class='sub-list-group-item'>";
+                output += "  <span class='badge'>" + unreadcount + "</span>";
+                output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
+                output += "</li>";
+                $("#favorite_collapse").append(output);
 
-                            // homepage 
-                            if (unreadcount > 0 && navlist.length > 0) {
-                                output = "";
-                                //output += "<li>";
-                                output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a> ";
-                                //output += "</li>";
+                // homepage 
+                if (unreadcount > 0 && navlist.length > 0) {
+                    output = "";
+                    //output += "<li>";
+                    output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a> ";
+                    //output += "</li>";
 
                     navlist.append(output);
-                            }
-                        })
-                        },
-                        error: function (XMLHttpRequest, textStatus, errorThrown) {
-                            //ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-                        }
-                    });
-                            }
-
-            function LoadTopicLikeBtn(btnid, topicid) {
-                var btn = $("#" + btnid);
-                if(btn.length == 0) {
-                    return;
                 }
+            })
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            //ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
+    });
+}
 
-                var apiurl = "/api/topic/isfavouritetopic";
-                var apidata = "topicID=" + encodeURIComponent(topicid);
+function LoadTopicLikeBtn(btnid, topicid) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    var apiurl = "/api/topic/isfavouritetopic";
+    var apidata = "topicID=" + encodeURIComponent(topicid);
 
     $.ajax({
-                            type: "GET",
-                            url: apiurl,
-                            data: apidata,
-                            dataType: "json",
-                            success: function (data) {
-                                if(data == true) {
-                                    SetUnlikeBtn(btnid, topicid, true);
-                                }
-                                else if (data == false) {
-                                        SetLikeBtn(btnid, topicid, true);
-                                }
-                                else {
-                                    // do nothing.
-                                }
-                            },
-                            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                                //ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-                            }
-                        });
+        type: "GET",
+        url: apiurl,
+        data: apidata,
+        dataType: "json",
+        success: function (data) {
+            if (data == true) {
+                SetUnlikeBtn(btnid, topicid, true);
             }
-
-    function SetUnlikeBtn(btnid, topicid, enabled) {
-        var btn = $("#" + btnid);
-        if (btn.length == 0) {
-            return;
+            else if (data == false) {
+                SetLikeBtn(btnid, topicid, true);
+            }
+            else {
+                // do nothing.
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            //ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
+    });
+}
+
+function SetUnlikeBtn(btnid, topicid, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
 
     btn.text("Liked");
     btn.attr("class", "btn btn-success like-btn");
@@ -1493,7 +1466,7 @@ function LoadUserFavoriteTopics(user) {
     btn.attr("onmouseover", "UnlikeBtnMouseOver('" + btnid + "');")
     btn.attr("onmouseout", "UnlikeBtnMouseOut('" + btnid + "');")
     btn.show();
-    }
+}
 
 function UnlikeBtnMouseOver(btnid) {
     var btn = $("#" + btnid);
@@ -1537,48 +1510,48 @@ function SetLikeBtn(btnid, topicid, enabled) {
 function Like(btnid, topicid) {
     SetUnlikeBtn(btnid, topicid, false);
     $.ajax({
-                type: "GET",
-                url: "/api/topic/addfavouritetopic",
-                data: "topicID=" + encodeURIComponent(topicid),
-                success: function (data) {
-                    var code = data.ActionResultCode;
-                    var msg = data.Message;
-                    if(code == "0") {
-                        LoadMyFavoriteTopics();
-                        SetUnlikeBtn(btnid, topicid, true);
-                    }
-                    else {
-                        ShowError(msg);
-                    }
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-                }
-            });
+        type: "GET",
+        url: "/api/topic/addfavouritetopic",
+        data: "topicID=" + encodeURIComponent(topicid),
+        success: function (data) {
+            var code = data.ActionResultCode;
+            var msg = data.Message;
+            if (code == "0") {
+                LoadMyFavoriteTopics();
+                SetUnlikeBtn(btnid, topicid, true);
+            }
+            else {
+                ShowError(msg);
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
+    });
 }
 
-        function Unlike(btnid, topicid) {
-            SetLikeBtn(btnid, topicid, false);
-            $.ajax({
-                        type: "GET",
-                        url: "/api/topic/removefavouritetopic",
-                        data: "topicID=" + encodeURIComponent(topicid),
-                        success: function (data) {
-                    var code = data.ActionResultCode;
-                    var msg = data.Message;
-                    if(code == "0") {
-                        LoadMyFavoriteTopics();
-                        SetLikeBtn(btnid, topicid, true);
-                    }
-                    else {
-                        ShowError(msg);
-                    }
-                        },
-                        error: function (XMLHttpRequest, textStatus, errorThrown) {
-                ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-                        }
-                    });
+function Unlike(btnid, topicid) {
+    SetLikeBtn(btnid, topicid, false);
+    $.ajax({
+        type: "GET",
+        url: "/api/topic/removefavouritetopic",
+        data: "topicID=" + encodeURIComponent(topicid),
+        success: function (data) {
+            var code = data.ActionResultCode;
+            var msg = data.Message;
+            if (code == "0") {
+                LoadMyFavoriteTopics();
+                SetLikeBtn(btnid, topicid, true);
+            }
+            else {
+                ShowError(msg);
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
+    });
+}
 
 function CreateTopic(topicid, topicname, topicdesp, topiccount) {
     var output = "";
@@ -1587,7 +1560,7 @@ function CreateTopic(topicid, topicname, topicdesp, topiccount) {
     output += "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>";
     output += "  <span class='badge'>" + topiccount + "</span>";
     output += "  <a class='fullname' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
-    output += "  <span class='username' >" +(isNullOrEmpty(topicdesp) ? "" : topicdesp) + "</span>&nbsp;";
+    output += "  <span class='username' >" + (isNullOrEmpty(topicdesp) ? "" : topicdesp) + "</span>&nbsp;";
     output += "</li>";
 
     return output;
@@ -1610,7 +1583,8 @@ function notify(homelineCount, atlineCount, ownerlineCount, replyCount) {
             });
         }
         if (ownerlineCount > 0) {
-            notifitems.push({ title: "Owned : ", message: ownerlineCount
+            notifitems.push({
+                title: "Owned : ", message: ownerlineCount
             });
         }
         if (replyCount > 0) {
@@ -1620,17 +1594,17 @@ function notify(homelineCount, atlineCount, ownerlineCount, replyCount) {
         }
 
         var opt = {
-                type: "list",
-                title: "Notifications",
-                message: "You have new unread messages.",
-                iconUrl: "/Content/Images/default_avatar.jpg",
-                items: notifitems
-            };
+            type: "list",
+            title: "Notifications",
+            message: "You have new unread messages.",
+            iconUrl: "/Content/Images/default_avatar.jpg",
+            items: notifitems
+        };
 
         if (notifitems.length > 0) {
             chrome.notifications.create('chrome_notification', opt, function (id) {
             });
-            }
+        }
         //    }
         //    else if (level == "denied") {
         //        return;
@@ -1639,7 +1613,7 @@ function notify(homelineCount, atlineCount, ownerlineCount, replyCount) {
     }
     catch (e) {
     }
-    }
+}
 
 //function notify() {
 //    alert(window.webkitNotifications);
