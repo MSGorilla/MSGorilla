@@ -334,6 +334,7 @@
     <Content Include="Views\Shared\_FeedFilterPartial.cshtml" />
     <Content Include="Views\Document\Index.cshtml" />
     <Content Include="Views\Notification\Replies.cshtml" />
+    <Content Include="Views\Shared\_FeedFilterDropdownPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
