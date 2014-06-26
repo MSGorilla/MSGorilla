@@ -466,6 +466,7 @@ function FilterFeeds(category, id, filter) {
     var filters = [
         "all",
         "latest24hours",
+        "latest3days",
         "latest7days",
         "latest1month"
     ];

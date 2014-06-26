@@ -51,23 +51,7 @@
         <div class="title-container">
             <h4>
                 My owns
-                <div class="btn-group">
-                    <button class="btn btn-link btn-sm dropdown-toggle" type="button" data-toggle="dropdown"><span id="feedfilter_title">All feeds</span>&nbsp;<span class="caret"></span></button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="#" onclick="FilterFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'all');">All feeds</a>
-                        </li>
-                        <li>
-                            <a href="#" onclick="FilterFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'latest24hours');">Latest 24 hours</a>
-                        </li>
-                        <li>
-                            <a href="#" onclick="FilterFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'latest7days');">Latest 7 days</a>
-                        </li>
-                        <li>
-                            <a href="#" onclick="FilterFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId', 'latest1month');">Latest 1 month</a>
-                        </li>
-                    </ul>
-                </div>
+                @Html.Partial("_FeedFilterDropdownPartial")
             </h4>
         </div>
 

@@ -1368,17 +1368,24 @@ namespace MSGorilla.WebApi
         private bool GetFilterDateTime(string filter, out DateTime start, out DateTime end)
         {
             start = end = DateTime.UtcNow;
+            DateTime daysago = DateTime.UtcNow;
 
             switch (filter)
             {
                 case "latest24hours":
                     start = end.AddDays(-1);
                     break;
+                case "latest3days":
+                    daysago = end.AddDays(-3);
+                    start = new DateTime(daysago.Year, daysago.Month, daysago.Day);
+                    break;
                 case "latest7days":
-                    start = end.AddDays(-7);
+                    daysago = end.AddDays(-7);
+                    start = new DateTime(daysago.Year, daysago.Month, daysago.Day);
                     break;
                 case "latest1month":
-                    start = end.AddMonths(-1);
+                    daysago = end.AddMonths(-1);
+                    start = new DateTime(daysago.Year, daysago.Month, daysago.Day);
                     break;
                 case null:
                 case "":
