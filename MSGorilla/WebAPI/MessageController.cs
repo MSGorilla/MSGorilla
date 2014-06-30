@@ -1325,9 +1325,10 @@ namespace MSGorilla.WebApi
                                     [FromUri]string[] atUser = null,
                                     [FromUri]string[] topicName = null,
                                     string richMessage = null,
-                                    [FromUri]string[] attachmentID = null)
+                                    [FromUri]string[] attachmentID = null,
+                                    [FromUri]int importance = 2)
         {
-            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, topicName, message, richMessage, attachmentID, DateTime.UtcNow), new AccountManager(), new AttachmentManager());
+            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, topicName, message, richMessage, attachmentID, importance, DateTime.UtcNow), new AccountManager(), new AttachmentManager());
             //return new ActionResult();
         }
 
@@ -1344,6 +1345,7 @@ namespace MSGorilla.WebApi
             public string[] AtUser { get; set; }
             public string RichMessage { get; set; }
             public string[] AttachmentID { get; set; }
+            public int Importance { get; set; }
         };
 
         [HttpPost]
@@ -1361,7 +1363,7 @@ namespace MSGorilla.WebApi
             {
                 msg.EventID = "none";
             }
-            return PostMessage(msg.Message, msg.SchemaID, msg.EventID, msg.Owner, msg.AtUser, msg.TopicName, msg.RichMessage, msg.AttachmentID);
+            return PostMessage(msg.Message, msg.SchemaID, msg.EventID, msg.Owner, msg.AtUser, msg.TopicName, msg.RichMessage, msg.AttachmentID, msg.Importance);
             //return new ActionResult();
         }
 

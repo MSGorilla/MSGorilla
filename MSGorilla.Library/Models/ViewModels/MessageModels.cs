@@ -46,6 +46,7 @@ namespace MSGorilla.Library.Models.ViewModels
         public string RichMessageID { get; set; }
         public List<Attachment> Attachment { get; set; } 
         public DateTime PostTime { get; set; }
+        public int Importance { get; set; }
 
         public DisplayMessage() { }
 
@@ -65,6 +66,7 @@ namespace MSGorilla.Library.Models.ViewModels
             this.MessageContent = msg.MessageContent;
             this.RichMessageID = msg.RichMessageID;
             this.PostTime = msg.PostTime;
+            this.Importance = msg.Importance;
 
             if (msg.AttachmentID == null || msg.AttachmentID.Length == 0)
             {
