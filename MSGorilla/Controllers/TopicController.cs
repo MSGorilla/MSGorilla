@@ -29,11 +29,13 @@ namespace MSGorilla.Controllers
             {
                 ViewBag.TopicId = -1;
                 ViewBag.Topic = "";
+                ViewBag.FeedId = "";
             }
             else
             {
                 ViewBag.TopicId = t.Id;
-                ViewBag.Topic = topic;
+                ViewBag.Topic = t.Name;
+                ViewBag.FeedId = t.Name;
             }
 
             return View();

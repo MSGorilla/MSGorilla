@@ -7,6 +7,10 @@ using Newtonsoft.Json;
 using Microsoft.WindowsAzure.Storage.Queue;
 
 using MSGorilla.Library.Exceptions;
+using System.Runtime.Serialization.Json;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Web.Script.Serialization;
 
 namespace MSGorilla.Library.Models
 {
@@ -16,22 +20,27 @@ namespace MSGorilla.Library.Models
         public string ID { get; set; }
         public string EventID { get; set; }
         public string SchemaID { get; set; }
-        public string[] Owner { get; set; }        
+        public string[] Owner { get; set; }
         public string[] AtUser { get; set; }
         public string[] TopicName { get; set; }
-        public string MessageContent { get; set; } 
+        public string MessageContent { get; set; }
         public DateTime PostTime { get; set; }
-        public string RichMessage { get; set; }
+        public string RichMessageID { get; set; }
+        public string[] AttachmentID { get; set; }
+        public int Importance { get; set; }
 
-        public Message(string userid, 
-            string message, 
-            DateTime timestamp, 
-            string eventID, 
-            string schemaID, 
-            string[] owner,
-            string[] atUser,
-            string[] topicName,
-            string richMessage
+        public Message(string userid,
+                        string message,
+                        DateTime timestamp,
+                        string eventID,
+                        string schemaID,
+                        string[] owner,
+                        string[] atUser,
+                        string[] topicName,
+                        string richMessageID,
+                        string[] attachmentID,
+                        int importance = 2,
+                        string msgID = null            
                 )
         {
             User = userid;
@@ -41,15 +50,35 @@ namespace MSGorilla.Library.Models
             Owner = owner;
             AtUser = atUser;
             TopicName = topicName;
-            RichMessage = richMessage;
+            RichMessageID = richMessageID;
             PostTime = timestamp.ToUniversalTime();
-            ID = string.Format("{0}_{1}",
+            AttachmentID = attachmentID;
+
+            if (string.IsNullOrEmpty(msgID))
+            {
+                ID = string.Format("{0}_{1}",
                                 Utils.ToAzureStorageSecondBasedString(PostTime),
                                 Guid.NewGuid().ToString());
+            }
+            else
+            {
+                ID = msgID;
+            }
+
+            if (importance < 0)
+            {
+                this.Importance = 0;
+            }
+            else
+            {
+                this.Importance = importance;
+            }
         }
 
         public string ToJsonString()
         {
+            //JavaScriptSerializer serialize = new JavaScriptSerializer();
+            //return serialize.Serialize(this);
             return JsonConvert.SerializeObject(this);
         }
 

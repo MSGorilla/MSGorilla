@@ -9,6 +9,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
+using MSGorilla.Library.Models.ViewModels;
+
 namespace MSGorilla.WebAPI.Client
 {
     public class GorillaWebAPI
@@ -71,7 +73,7 @@ namespace MSGorilla.WebAPI.Client
             return sb.ToString();
         }
 
-        public string PostMessage(string message, string schemaID = "none", string eventID = "none", string[] topicName = null, string[] owner = null, string[] atUser = null, string richMessage = null)
+        public string PostMessage(string message, string schemaID = "none", string eventID = "none", string[] topicName = null, string[] owner = null, string[] atUser = null, string richMessage = null, string[] attachmentID = null, int importance = 2)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + Constant.UriPostMessage);
             request.Method = "POST";
@@ -84,6 +86,7 @@ namespace MSGorilla.WebAPI.Client
                 var atUserStr = "";
                 var topicNameStr = "";
                 var richMessageStr = "";
+                var attachmentStr = "";
                 if (owner != null)
                 {
                     ownerStr = "&owner=" + string.Join("&owner=", owner); 
@@ -106,8 +109,13 @@ namespace MSGorilla.WebAPI.Client
                         richMessageStr = null;
                     }
                 }
+                if (attachmentID != null)
+                {
+                    attachmentStr = "&attachmentID=" + string.Join("&attachmentID=", attachmentID);
+                }
 
-                writer.Write(string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}{6}", Uri.EscapeDataString(message), schemaID, eventID, topicNameStr, ownerStr, atUserStr, richMessageStr));
+                string msg = string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}{6}{7}&importance={8}", Uri.EscapeDataString(message), schemaID, eventID, topicNameStr, ownerStr, atUserStr, richMessageStr, attachmentStr, importance);
+                writer.Write(msg);
             }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return _readResponseContent(response);
@@ -141,12 +149,12 @@ namespace MSGorilla.WebAPI.Client
             return Uri.EscapeDataString(longStr);
         }
 
-        public List<Message> HomeLine(DateTime start, DateTime end)
+        public DisplayMessagePagination HomeLine(string userid, int count = 25, string token = "")
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriHomeLine, start, end));
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriHomeLine, userid, count, token));
             request.Headers["Authorization"] = _authHeader;
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-            return JsonConvert.DeserializeObject<List<Message>>(_readResponseContent(response));            
+            return JsonConvert.DeserializeObject<DisplayMessagePagination>(_readResponseContent(response));            
         }
 
         public List<Message> EventLine(string eventID)
@@ -180,5 +188,20 @@ namespace MSGorilla.WebAPI.Client
             return _readResponseContent(response);
         }
 
+        public List<Attachment> UploadAttachment(string filePath)
+        {
+            string url = _rootUri + Constant.UriUploadAttachment;
+
+            WebClient myWebClient = new WebClient();
+            myWebClient.Headers.Add("Authorization:"+_authHeader);
+            Console.WriteLine("Uploading {0} to {1} ...", filePath, url);
+
+            // Upload the file to the URI. 
+            // The 'UploadFile(uriString,fileName)' method implicitly uses HTTP POST method. 
+            byte[] responseArray = myWebClient.UploadFile(url, filePath);
+            string ret = System.Text.Encoding.ASCII.GetString(responseArray);
+
+            return JsonConvert.DeserializeObject<List<Attachment>>(ret);
+        }
     }
 }

@@ -17,18 +17,61 @@ namespace MSGorilla.WebApi
     {
         SchemaManager _schemaManager = new SchemaManager();
 
+        /// <summary>
+        /// Return schema.
+        /// 
+        /// Example output:
+        /// {
+        ///     "SchemaID": "schema1",
+        ///     "SchemaContent": "some_content"
+        /// }
+        /// </summary>
+        /// <param name="schemaID">ID of the schema</param>
+        /// <returns></returns>
         [HttpGet]
         public Schema GetSchema(string schemaID)
         {
             return _schemaManager.GetSchema(schemaID);
         }
 
+        /// <summary>
+        /// Return list of all schemas.
+        /// 
+        /// Example output:
+        /// [
+        ///     {
+        ///         "SchemaID": "123",
+        ///         "SchemaContent": "1234"
+        ///     },
+        ///     {
+        ///         "SchemaID": "none",
+        ///         "SchemaContent": "......"
+        ///     },
+        ///     {
+        ///         "SchemaID": "schema1",
+        ///         "SchemaContent": "some_content"
+        ///     }
+        /// ]
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public List<Schema> GetSchema()
         {
             return _schemaManager.GetSchema();
         }
 
+        /// <summary>
+        /// Post a new schema
+        /// 
+        /// Example output:
+        /// {
+        ///     "SchemaID": "schema1",
+        ///     "SchemaContent": "posted_content"
+        /// }
+        /// </summary>
+        /// <param name="schemaID">ID of the schema</param>
+        /// <param name="schemaContent">content of a schema</param>
+        /// <returns></returns>
         [HttpGet,HttpPost]
         public Schema PostSchema(string schemaID, string schemaContent)
         {

@@ -29,8 +29,24 @@ namespace MSGorilla.Controllers
             {
                 ViewBag.FeedCategory = category.ToLower();
             }
+            ViewBag.FeedId = me.Userid;
 
             return View();
         }
+
+        [TokenAuthAttribute]
+        public ActionResult Replies()
+        {
+            string myid = this.Session["userid"].ToString();
+            UserProfile me = _accManager.FindUser(myid);
+            ViewBag.Myid = me.Userid;
+            ViewBag.Me = me;
+
+            ViewBag.FeedCategory = "replyline";
+            ViewBag.FeedId = "";
+
+            return View();
+        }
+
     }
 }

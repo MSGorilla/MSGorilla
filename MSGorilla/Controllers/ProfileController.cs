@@ -34,6 +34,7 @@ namespace MSGorilla.Controllers
             ViewBag.UserId = user;
 
             ViewBag.FeedCategory = "userline";
+            ViewBag.FeedId = user;
 
             return View();
         }
@@ -134,6 +135,7 @@ namespace MSGorilla.Controllers
             ViewBag.UserId = user;
 
             ViewBag.FeedCategory = "ownerline";
+            ViewBag.FeedId = user;
 
             return View();
         }

@@ -37,7 +37,7 @@ function encodeEmail(code) {
 function ScrollTo(itemname) {
     var scroll_offset = $("#" + itemname).offset();
     $("body,html").animate({
-        scrollTop: scroll_offset.top - 50
+        scrollTop: scroll_offset.top - 60
     }, "slow");
 }
 
@@ -128,7 +128,6 @@ function encodeTxt(code) {
     return code;
 }
 
-
 function isNullOrEmpty(strVal) {
     if (strVal == null || strVal == undefined || strVal == '') {
         return true;
@@ -181,11 +180,20 @@ function Time2Now(datestring) {
 function ShowError(msg, boxno) {
     var msghtml = "<div class='alert alert-dismissable alert-warning'><button class='close' type='button' data-dismiss='alert'>×</button><p>" + msg + "</p></div>";
     $("#notifications").append(msghtml);
+
     if (isNullOrEmpty(boxno)) {
         $("#loading_message").html(msg);
     } else {
         $("#loading_message_" + boxno).html(msg);
     }
+}
+
+function ShowAjaxError(status, error, code, msg, boxno) {
+    if (code == 2004) // access denied. need login again.
+        location.href = "/Error/?message=" + encodeURIComponent(msg) + "&returnUrl=" + encodeURIComponent("/Account/Logoff");
+
+    var errormsg = "[" + status + "]" + " " + error + ": " + (isNullOrEmpty(code) ? "" : code) + " " + msg;
+    ShowError(errormsg, boxno);
 }
 
 
@@ -216,23 +224,26 @@ function LoadMyInfo() {
             $("#my_followers").html(followerscount);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
 
 function LoadUserInfo(user) {
     var apiurl = "";
+    var apidata = "";
     if (isNullOrEmpty(user)) {
         apiurl = "/api/account/me";
     }
     else {
-        apiurl = "/api/account/user?userid=" + encodeURIComponent(user);
+        apiurl = "/api/account/user";
+        apidata = "userid=" + encodeURIComponent(user);
     }
 
     $.ajax({
         type: "GET",
         url: apiurl,
+        data: apidata,
         success: function (data) {
             var userid = data.Userid;
             var username = data.DisplayName;
@@ -257,7 +268,7 @@ function LoadUserInfo(user) {
             LoadUserFollowBtn(user, isFollowimg);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -362,7 +373,7 @@ function Follow(user) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -385,7 +396,7 @@ function Unfollow(user) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -401,7 +412,7 @@ function PostMessage() {
     $.ajax({
         type: "POST",
         url: "/api/message/postmessage",
-        data: "message=" + message,
+        data: "message=" + message, // + "&richMessage=" + message,
         dataType: "json",
         success: function (data) {
             $("#postmessage").val("");
@@ -409,7 +420,7 @@ function PostMessage() {
             $("#feedlist").prepend(CreateFeed(data));
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     }).always(function () {
         $("#btn_post").button('reset');
@@ -433,14 +444,14 @@ function PostReply(user, mid) {
     $.ajax({
         type: "POST",
         url: "/api/reply/postreply",
-        data: "to=" + touser + "&message=" + message + "&messageUser=" + user + "&messageID=" + mid,
+        data: "to=" + encodeURIComponent(touser) + "&message=" + message + "&messageUser=" + encodeURIComponent(user) + "&messageID=" + encodeURIComponent(mid),
         dataType: "json",
         success: function (data) {
             $("#replymessage_" + mid).val("");
             $("#replylist_" + mid).prepend(CreateReply(data));
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     }).always(function () {
         $("#btn_reply_" + mid).button('reset');
@@ -449,36 +460,83 @@ function PostReply(user, mid) {
 
 
 // feed function
-var isLoadFeeds = false;
-function LoadFeeds(category, id) {
-    if (isLoadFeeds) return;
-    isLoadFeeds = true;
+function LoadMessage(user, msgId) {
+    var apiurl = "";
+    var apidata = "";
 
-    var token = $("#hd_token").val();
-    if (!isNullOrEmpty(token)) {
-        if (token == "nomore") {
-            // already no more feeds, don't load any more
-            isLoadFeeds = false;
-            return;
+    if (isNullOrEmpty(user) || isNullOrEmpty(msgId)) {
+        ShowError("Illegal operation.");
+        return;
+    }
+
+    apiurl = "/api/message/getdisplaymessage";
+    apidata = "msgUser=" + encodeURIComponent(user) + "&msgID=" + encodeURIComponent(msgId);
+
+    $.ajax({
+        type: "GET",
+        url: apiurl,
+        dataType: "json",
+        data: apidata,
+        success: function (data) {
+            if (isNullOrEmpty(data)) {
+                ShowError("No content.");
+            }
+            else {
+                $("#feedlist").empty();
+                // create feed 
+                $("#feedlist").append(CreateFeed(data, false));
+            }
+
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
+    });
+}
+
+function FilterFeeds(category, id, filter) {
+    if (isLoadFeeds) return;    // if it is loading, skip this time.
+
+    var filters = [
+        "all",
+        "latest24hours",
+        "latest3days",
+        "latest7days",
+        "latest1month"
+    ];
+
+    for (var f in filters) {
+        if (filters[f] == filter) {
+            $("#feedfilter_" + filter).addClass("active");
+            $("#feedfilter_title").text($("#feedfilter_" + filter).text());
+            LoadFeeds(category, id, filter);
+        } else {
+            $("#feedfilter_" + filters[f]).removeClass("active");
         }
     }
+}
+
+var isLoadFeeds = false;
+function LoadFeeds(category, id, filter) {
+    if (isLoadFeeds) return;    // if it is loading, skip this time.
+    isLoadFeeds = true;
 
     var apiurl = "";
     var apidata = "";
-    var count = $("#hd_newcount").val();
-    if (isNullOrEmpty(category))
-        apiurl = "/api/message/userline";
-    else if (category == "homeline") {
+    var token = "";
+    var count = 0;
+
+    if (category == "homeline") {
         apiurl = "/api/message/homeline";
+        apidata = "userid=" + encodeURIComponent(id);
     }
     else if (category == "atline") {
         apiurl = "/api/message/atline";
+        apidata = "userid=" + encodeURIComponent(id);
     }
     else if (category == "ownerline") {
         apiurl = "/api/message/ownerline";
-        if (!isNullOrEmpty(id)) {
-            apidata = "userid=" + encodeURIComponent(id);
-        }
+        apidata = "userid=" + encodeURIComponent(id);
     }
     else if (category == "replyline") {
         apiurl = "/api/reply/getmyreply";
@@ -487,14 +545,18 @@ function LoadFeeds(category, id) {
         apiurl = "/api/message/publicsquareline";
     else if (category == "userline") {
         apiurl = "/api/message/userline";
+        apidata = "userid=" + encodeURIComponent(id);
+    }
+    else if (category == "topicline") {
+        apiurl = "/api/message/topicline";
         if (isNullOrEmpty(id)) {
             ShowError("Illegal operation.");
             isLoadFeeds = false;
             return;
         }
-        apidata = "userid=" + encodeURIComponent(id);
+        apidata = "topic=" + encodeURIComponent(id);
     }
-    else if (category == "topicline") {
+    else if (category == "message") {
         apiurl = "/api/message/topicline";
         if (isNullOrEmpty(id)) {
             ShowError("Illegal operation.");
@@ -509,10 +571,39 @@ function LoadFeeds(category, id) {
         return;
     }
 
-    if (isNullOrEmpty(token)) { // first time load
+
+    if (isNullOrEmpty(filter)) { // page load or load more
+        token = $("#hd_token").val();
+        filter = $("#hd_filter").val();
+    }
+    else {  // click on filter btn, clear current feeds and add loading gif
+        $("#feedlist").empty();
+        $("#feedlist").append("<li id='loading_message' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
+
+        $("#hd_token").val(token);
+        $("#hd_filter").val(filter);
+    }
+
+    if (!isNullOrEmpty(filter)) {   // set filter value
+        if (isNullOrEmpty(apidata)) {
+            apidata = "filter=" + filter;
+        }
+        else {
+            apidata += "&filter=" + filter;
+        }
+    }
+
+    if (isNullOrEmpty(token)) { // first time load, not load more
         count = GetNotificationCount(category);
         $("#hd_newcount").val(count);
     } else {    // load more
+        if (token == "nomore") {
+            // already no more feeds, don't load any more
+            isLoadFeeds = false;
+            return;
+        }
+
+        count = $("#hd_newcount").val();
         if (isNullOrEmpty(apidata)) {
             apidata = "token=" + token;
         }
@@ -573,10 +664,11 @@ function LoadFeeds(category, id) {
             }
 
             UpdateNotificationCount();
+            LoadMyFavoriteTopics();
             isLoadFeeds = false;
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
             $("#lbl_seemore").html("");
             $("#hd_token").val("nomore");
             isLoadFeeds = false;
@@ -590,7 +682,7 @@ function CreateFeed(postData, isNew) {
     var sid = postData.SchemaID;
     var eid = postData.EventID;
     var msg = postData.MessageContent;
-    var richmsg = postData.RichMessage;
+    var richmsgid = postData.RichMessageID;
     var posttime = postData.PostTime;
     var user = postData.User.Userid;
     var username = postData.User.DisplayName;
@@ -599,6 +691,7 @@ function CreateFeed(postData, isNew) {
     var owners = postData.Owner;
     var atusers = postData.AtUser;
     var topics = postData.TopicName;
+    var attach = postData.Attachment;
     var showevents = false;
 
     if (isNullOrEmpty(picurl)) {
@@ -611,21 +704,34 @@ function CreateFeed(postData, isNew) {
 
     //output += "<ul class='list-group'>";
     if (isNew == true) {
+        //if (!isNullOrEmpty(richmsgid)) {
+        //    output += "  <li id='feed_" + mid + "' class='list-group-item new-notification clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
+        //}
+        //else {
         output += "  <li id='feed_" + mid + "' class='list-group-item new-notification'>";
+        //}
     }
     else {
+        //if (!isNullOrEmpty(richmsgid)) {
+        //    output += "  <li id='feed_" + mid + "' class='list-group-item clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
+        //}
+        //else {
         output += "  <li id='feed_" + mid + "' class='list-group-item'>";
+        //}
     }
+
     output += "    <div>"
     output += "      <div class='feed-pic'>";
     output += "        <img class='img-rounded' id='user_pic_" + mid + "' src='" + picurl + "' width='100' height='100' />";
     output += "      </div>";
+
     output += "      <div class='feed-content'>";
     output += "        <div class='newpost-header'>";
     output += "          <a id='username_" + mid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>&nbsp;";
     output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
     output += "        </div>";
 
+    // owners
     if (!isNullOrEmpty(owners)) {
         output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
         for (var key in owners) {
@@ -634,15 +740,28 @@ function CreateFeed(postData, isNew) {
         output += "    </div>";
     }
 
+    // message
     output += "        <div class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
 
-    // fordebug
-    //richmsg = " <img src='/Content/Images/MSFTE_photo.jpg' />";
-    // richmsg div
-    if (!isNullOrEmpty(richmsg)) {
-        output += "        <div id='rich_message_" + mid + "' class='newpost-input' style='display:none;'>" + richmsg + "</div>";
+    // richmsg
+    if (!isNullOrEmpty(richmsgid)) {
+        //output += "        <div class='newpost-footer'>";
+        //output += "          <button id='btn_up_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
+        //output += "        </div>";
+        output += "    <div id='rich_message_" + mid + "' class='newpost-input panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'></div>";
     }
 
+    // attachment
+    if (!isNullOrEmpty(attach)) {
+        output += "    <div class='newpost-input'><span class=''>Attachments: </span>";
+        for (var key in attach) {
+            output += "  <a class='btn btn-link btn-xs' onclick='ShowAttach(\"" + attach[key].AttachmentID + "\", \"" + attach[key].Filetype + "\", \"" + mid + "\");' >" + attach[key].Filename + " (" + attach[key].Filesize + ")</a>&nbsp;";
+        }
+        output += "    </div>";
+        output += "    <div id='attachment_" + mid + "' class='newpost-input' style='display:none;'></div>";
+    }
+
+    // footer btns
     output += "        <div class='newpost-footer'>";
 
     // event button
@@ -650,17 +769,20 @@ function CreateFeed(postData, isNew) {
     //    output += "      <button id='btn_expandevent' class='btn btn-link btn-sm' type='button' onclick='ShowEvents(\"" + mid + "\", \"" + eid + "\");'>Related threads</button>";
     //}
 
-    // richmsg btn
-    if (!isNullOrEmpty(richmsg)) {
-        output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowRichMsg(\"" + user + "\", \"" + mid + "\");'>More</button>";
+    // btns
+    if (!isNullOrEmpty(richmsgid)) {
+        output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
     }
-    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' isshow='false' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Replies</button>";
+    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#reply_" + mid + "' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Replies</button>";
+
     output += "        </div>";
     output += "      </div>";
     output += "    </div>";
-    output += "    <div style='display:none;' id='reply_" + mid + "'>";
+
+    // reply
+    output += "    <div id='reply_" + mid + "' class='panel-collapse collapse out '>";
     // add reply box
-    output += "      <div class='replies-container well'>";
+    output += "      <div class='replies-container'>";
     output += "        <div class='input-group'>";
     //output += "         <span class='input-group-addon'>Comment</span>";
     output += "          <input class='form-control' type='text' id='replymessage_" + mid + "' replyto='" + user + "' placeholder='Reply to @" + user + "'>";
@@ -668,13 +790,13 @@ function CreateFeed(postData, isNew) {
     output += "            <button class='btn btn-primary' type='button' id='btn_reply_" + mid + "' data-loading-text='Replying...' onclick='PostReply(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
     output += "          </span>";
     output += "        </div>";
-    output += "      </div>";
     // add replies
-    output += "      <div class='replies-feeds'>";
-    output += "        <ul id='replylist_" + mid + "' class='list-group'></ul>";
+    output += "        <div class='replies-feeds'>";
+    output += "          <ul id='replylist_" + mid + "' class='list-group'></ul>";
+    output += "        </div>";
     output += "      </div>";
     output += "    </div>";
-    output += "    <input type='hidden' id='isshowreplies_" + mid + "' value='false'/>";
+
     output += "  </li>";
 
     //output += "</ul>";
@@ -682,69 +804,97 @@ function CreateFeed(postData, isNew) {
     return output;
 }
 
-function ShowRichMsg(user, mid) {
-    var showbtn = $("#btn_showrichmsg_" +mid);
-    var show = showbtn.attr("isshow");
+function ShowAttach(aid, type, mid) {
+    var attadiv = $("#attachment_" + mid);
+    var apiurl = "/api/attachment/download?attachmentid=" + aid;
+
+    attadiv.empty();
+    switch (type) {
+        default:
+            window.open(apiurl);
+            break;
+    }
+}
+
+function ShowRichMsg(rmid, mid) {
+    var showbtn = $("#btn_showrichmsg_" + mid);
     var richmsgdiv = $("#rich_message_" + mid);
+    var show = richmsgdiv.hasClass("in");
 
-    if (show == "false") {
-        // show replies
-        showbtn.attr("isshow", "true");
-        showbtn.text("Less");
+    if (show == false) {
+        if (isNullOrEmpty(richmsgdiv.html())) {
+            richmsgdiv.append("<div class='txtaln-c'><span class='spinner-loading'></span> Loading...</div>");
+            // load rich once
+            $.ajax({
+                type: "GET",
+                url: "/api/message/getrichmessage",
+                data: "richMsgID=" + encodeURIComponent(rmid),
+                success: function (data) {
+                    richmsgdiv.empty();
+                    // create rich message
+                    richmsgdiv.append(data);
 
-        richmsgdiv.show();
+                    // show rich
+                    showbtn.text("Less");
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    richmsgdiv.empty();
+                    ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+                }
+            });
+        }
+        else {
+            // show rich
+            showbtn.text("Less");
+        }
     }
     else {
-        // clear replies
-        showbtn.attr("isshow", "false");
+        // clear rich
         showbtn.text("More");
-
-        richmsgdiv.hide();
     }
 
-    ScrollTo("feed_" +mid);
+    ScrollTo("feed_" + mid);
 }
 
 
 // reply function
 function ShowReplies(user, mid) {
     var showbtn = $("#btn_showreply_" + mid);
-    var show = showbtn.attr("isshow");
     var replydiv = $("#reply_" + mid);
+    var show = replydiv.hasClass("in");
 
-    if (show == "false") {
+    if (show == false) {
         // show replies
-        showbtn.attr("isshow", "true");
         showbtn.text("Collapse");
-
-        replydiv.show();
 
         // show reply
         LoadReplies(mid);
     }
     else {
         // clear replies
-        showbtn.attr("isshow", "false");
         showbtn.text("Replies");
-
-        replydiv.hide();
     }
 }
 
 function LoadReplies(mid) {
+    var replydiv = $("#replylist_" + mid);
+
+    replydiv.empty();
+    replydiv.append("<li class='center-block txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
     $.ajax({
         type: "GET",
         url: "/api/message/getmessagereply",
-        data: "msgID=" + mid,
+        data: "msgID=" + encodeURIComponent(mid),
         success: function (data) {
             // create reply list
-            $("#replylist_" + mid).empty();
+            replydiv.empty();
             $.each(data, function (index, item) {
-                $("#replylist_" + mid).append(CreateReply(item, false));
+                replydiv.append(CreateReply(item, false));
             })
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            replydiv.empty();
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -770,13 +920,13 @@ function CreateReply(replyData, isReplyFeed, isNew) {
 
     if (isReplyFeed) {
         if (isNew == true) {
-            output += "<li class='list-group-item clickable new-notification' onclick='ShowMessage(\"" + mid + "\", \"" + msguser + "\");'>";
+            output += "<li class='list-group-item clickable new-notification' onclick='ShowMessage(event, \"" + mid + "\", \"" + msguser + "\");'>";
         }
         else {
-            output += "<li class='list-group-item clickable' onclick='ShowMessage(\"" + mid + "\", \"" + msguser + "\");'>";
+            output += "<li class='list-group-item clickable' onclick='ShowMessage(event, \"" + mid + "\", \"" + msguser + "\");'>";
         }
     } else {
-        output += "<li class='list-group-item clickable' onclick='SetReplyTo(\"" + mid + "\", \"" + user + "\");'>";
+        output += "<li class='list-group-item clickable' onclick='SetReplyTo(event, \"" + mid + "\", \"" + user + "\");'>";
     }
 
     output += "  <div>"
@@ -799,7 +949,19 @@ function CreateReply(replyData, isReplyFeed, isNew) {
     return output;
 }
 
-function SetReplyTo(mid, user) {
+function SetReplyTo(evt, mid, user) {
+    var sender = null;
+    if (window.event) {
+        sender = window.event.target;
+        event.cancelBubble = true;
+    } else if (evt) {
+        sender = evt.target;
+        evt.stopPropagation();
+    }
+    if (!isNullOrEmpty(sender.href)) {  // link clicked
+        return;
+    }
+
     var replybox = $("#replymessage_" + mid);
 
     if (replybox.length == 0) {
@@ -810,7 +972,19 @@ function SetReplyTo(mid, user) {
     replybox.attr("placeholder", "Reply to @" + user);
 }
 
-function ShowMessage(mid, user) {
+function ShowMessage(evt, mid, user) {
+    var sender = null;
+    if (window.event) {
+        sender = window.event.target;
+        event.cancelBubble = true;
+    } else if (evt) {
+        sender = evt.target;
+        evt.stopPropagation();
+    }
+    if (!isNullOrEmpty(sender.href)) {  // link clicked
+        return;
+    }
+
     var message_div = $("#message_div");
     if (message_div.length == 0) {
         return;
@@ -828,7 +1002,7 @@ function ShowMessage(mid, user) {
             $("#MessageModal").modal();
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -858,7 +1032,7 @@ function ShowEvents(mid, eid) {
             $("#EventsModal").modal();
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -954,7 +1128,7 @@ function SearchTopic(keyword) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -985,11 +1159,10 @@ function SearchUser(keyword) {
                     $("#userlist").append(CreateUserCard(item));
                     LoadUserFollowBtn(item.Userid, item.IsFollowing);
                 })
-
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown, "1");
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message, "1");
         }
     });
 }
@@ -1031,7 +1204,7 @@ function LoadUsers(category, user) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -1117,6 +1290,9 @@ function GetNotificationCount(category) {
                     break;
             }
         },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            // ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
     });
 
     return count;
@@ -1124,6 +1300,7 @@ function GetNotificationCount(category) {
 
 function UpdateNotificationCount() {
     var apiurl = "/api/account/getnotificationcount";
+
     $.ajax({
         type: "GET",
         url: apiurl,
@@ -1136,12 +1313,19 @@ function UpdateNotificationCount() {
             var userid = data.Userid;
             var notificationCount = ownerlineCount + replyCount + atlineCount;
 
+            // shortcut panel count
             $("#shortcut_homeline_count").html(homelineCount);
             $("#shortcut_reply_count").html(replyCount);
             $("#shortcut_atline_count").html(atlineCount);
             $("#shortcut_ownerline_count").html(ownerlineCount);
             $("#shortcut_notification_count").html(notificationCount);
 
+            // homepage count
+            $("#home_reply_count").html(replyCount);
+            $("#home_atline_count").html(atlineCount);
+            $("#home_ownerline_count").html(ownerlineCount);
+
+            // nav bar count
             if (homelineCount > 0)
                 $("#nav_home_count").html(homelineCount);
             else
@@ -1151,10 +1335,13 @@ function UpdateNotificationCount() {
                 $("#nav_notification_count").html(notificationCount);
             else
                 $("#nav_notification_count").html("");
+
+            // chrome desktop notification
+            notify(homelineCount, atlineCount, ownerlineCount, replyCount);
         },
-        //error: function (XMLHttpRequest, textStatus, errorThrown) {
-        //    ShowError(textStatus + ": " + errorThrown);
-        //}
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            // ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
     });
 }
 
@@ -1184,7 +1371,7 @@ function LoadHotTopics() {
                 var topiccount = item.MsgCount;
 
                 output += "<li class='sub-list-group-item'>";
-                output += "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "'>&nbsp;</a>";
+                output += "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>";
                 //output += "  <span class='badge'>" + topiccount + "</span>";
                 output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
                 output += "</li>";
@@ -1192,15 +1379,15 @@ function LoadHotTopics() {
                 LoadTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid);
             })
         },
-        //error: function (XMLHttpRequest, textStatus, errorThrown) {
-        //    ShowError(textStatus + ": " + errorThrown);
-        //}
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            // ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
     });
 }
 
 function LoadUserFavoriteTopics(user) {
     var apiurl = "/api/topic/getuserfavouritetopic";
-    var apidata = "userid=" + user;
+    var apidata = "userid=" + encodeURIComponent(user);
 
     $.ajax({
         type: "GET",
@@ -1225,7 +1412,7 @@ function LoadUserFavoriteTopics(user) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -1240,6 +1427,8 @@ function LoadMyFavoriteTopics() {
         success: function (data) {
             // create hot topic
             $("#favorite_collapse").empty();
+            var navlist = $("#home_nav_list");
+            navlist.empty();
             $.each(data, function (index, item) {
                 var output = "";
                 var userid = item.userid;
@@ -1249,16 +1438,27 @@ function LoadMyFavoriteTopics() {
                 var topicdesp = item.topicDescription;
                 var topiccount = item.topicMsgCount;
 
+                // shortcut panel
                 output += "<li class='sub-list-group-item'>";
                 output += "  <span class='badge'>" + unreadcount + "</span>";
                 output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
                 output += "</li>";
                 $("#favorite_collapse").append(output);
+
+                // homepage 
+                if (unreadcount > 0 && navlist.length > 0) {
+                    output = "";
+                    //output += "<li>";
+                    output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a> ";
+                    //output += "</li>";
+
+                    navlist.append(output);
+                }
             })
         },
-        //error: function (XMLHttpRequest, textStatus, errorThrown) {
-        //    ShowError(textStatus + ": " + errorThrown);
-        //}
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            //ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
     });
 }
 
@@ -1280,14 +1480,16 @@ function LoadTopicLikeBtn(btnid, topicid) {
             if (data == true) {
                 SetUnlikeBtn(btnid, topicid, true);
             }
-            else {
+            else if (data == false) {
                 SetLikeBtn(btnid, topicid, true);
-
+            }
+            else {
+                // do nothing.
             }
         },
-        //error: function (XMLHttpRequest, textStatus, errorThrown) {
-        //    ShowError(textStatus + ": " + errorThrown);
-        //}
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            //ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
     });
 }
 
@@ -1307,6 +1509,7 @@ function SetUnlikeBtn(btnid, topicid, enabled) {
     }
     btn.attr("onmouseover", "UnlikeBtnMouseOver('" + btnid + "');")
     btn.attr("onmouseout", "UnlikeBtnMouseOut('" + btnid + "');")
+    btn.show();
 }
 
 function UnlikeBtnMouseOver(btnid) {
@@ -1345,6 +1548,7 @@ function SetLikeBtn(btnid, topicid, enabled) {
     }
     btn.attr("onmouseover", "")
     btn.attr("onmouseout", "")
+    btn.show();
 }
 
 function Like(btnid, topicid) {
@@ -1365,7 +1569,7 @@ function Like(btnid, topicid) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -1388,7 +1592,7 @@ function Unlike(btnid, topicid) {
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            ShowError(textStatus + ": " + errorThrown);
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
     });
 }
@@ -1397,7 +1601,7 @@ function CreateTopic(topicid, topicname, topicdesp, topiccount) {
     var output = "";
 
     output += "<li class='list-group-item'>";
-    output += "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "'>&nbsp;</a>";
+    output += "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>";
     output += "  <span class='badge'>" + topiccount + "</span>";
     output += "  <a class='fullname' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
     output += "  <span class='username' >" + (isNullOrEmpty(topicdesp) ? "" : topicdesp) + "</span>&nbsp;";
@@ -1407,3 +1611,73 @@ function CreateTopic(topicid, topicname, topicdesp, topiccount) {
 }
 
 
+function notify(homelineCount, atlineCount, ownerlineCount, replyCount) {
+    try {
+        if (isNullOrEmpty(chrome)) {
+            return;
+        }
+
+        //chrome.notification.getPermissionLevel(function (level) {
+        //    if (level == "granted") {
+        var notifitems = [];
+
+        if (atlineCount > 0) {
+            notifitems.push({
+                title: "Mentions: ", message: atlineCount
+            });
+        }
+        if (ownerlineCount > 0) {
+            notifitems.push({
+                title: "Owned : ", message: ownerlineCount
+            });
+        }
+        if (replyCount > 0) {
+            notifitems.push({
+                title: "Replies : ", message: replyCount
+            });
+        }
+
+        var opt = {
+            type: "list",
+            title: "Notifications",
+            message: "You have new unread messages.",
+            iconUrl: "/Content/Images/default_avatar.jpg",
+            items: notifitems
+        };
+
+        if (notifitems.length > 0) {
+            chrome.notifications.create('chrome_notification', opt, function (id) {
+            });
+        }
+        //    }
+        //    else if (level == "denied") {
+        //        return;
+        //    }
+        //});
+    }
+    catch (e) {
+    }
+}
+
+//function notify() {
+//    alert(window.webkitNotifications);
+//    if (window.webkitNotifications) {
+//        if (window.webkitNotifications.checkPermission() == 0) {
+//            var notification_test = window.webkitNotifications.createNotification("http://images.cnblogs.com/cnblogs_com/flyingzl/268702/r_1.jpg", '标题', '内容' + new Date().getTime());
+//            notification_test.display = function () { }
+//            notification_test.onerror = function () { }
+//            notification_test.onclose = function () { }
+//            notification_test.onclick = function () { this.cancel(); }
+
+//            notification_test.replaceId = 'Meteoric';
+
+//            notification_test.show();
+
+//            var tempPopup = window.webkitNotifications.createHTMLNotification(["http://www.baidu.com/", "http://www.soso.com"][Math.random() >= 0.5 ? 0 : 1]);
+//            tempPopup.replaceId = "Meteoric_cry";
+//            tempPopup.show();
+//        } else {
+//            window.webkitNotifications.requestPermission(notify);
+//        }
+//    }
+//}

@@ -57,6 +57,14 @@
                     {
                         <li>@Html.ActionLink("Ω Me", "Index", "Profile")</li>
                     }
+                    @if (ViewBag.Title == "API Doc")
+                    {
+                        <li class="active">@Html.ActionLink("? API Doc", "Index", "Document")</li>
+                    }
+                    else
+                    {
+                        <li>@Html.ActionLink("? API Doc", "Index", "Document")</li>
+                    }
                 </ul>
                 @Html.Partial("_LoginPartial")
                 <form class="navbar-form navbar-right" method="get" action="/Search/index">

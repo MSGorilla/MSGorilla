@@ -22,12 +22,15 @@ namespace MSGorilla.Library.Models.ViewModels
             continuationToken = msg.continuationToken;
             var msglist = msg.message;
             AccountManager accManager = new AccountManager();
+            AttachmentManager attManager = new AttachmentManager();
             message = new List<DisplayMessage>();
             foreach (var m in msglist)
             {
-                message.Add(new DisplayMessage(m, accManager));
+                message.Add(new DisplayMessage(m, accManager, attManager));
             }
         }
+
+        public DisplayMessagePagination() { }
     }
 
     public class DisplayMessage
@@ -40,10 +43,14 @@ namespace MSGorilla.Library.Models.ViewModels
         public string[] AtUser { get; set; }
         public string[] TopicName { get; set; }
         public string MessageContent { get; set; }
-        public string RichMessage { get; set; }
+        public string RichMessageID { get; set; }
+        public List<Attachment> Attachment { get; set; } 
         public DateTime PostTime { get; set; }
+        public int Importance { get; set; }
 
-        public DisplayMessage(Message msg, AccountManager accManager)
+        public DisplayMessage() { }
+
+        public DisplayMessage(Message msg, AccountManager accManager, AttachmentManager attManager)
         {
             //
             var userinfo = accManager.FindUser(msg.User);
@@ -57,8 +64,26 @@ namespace MSGorilla.Library.Models.ViewModels
             this.AtUser = msg.AtUser;
             this.TopicName = msg.TopicName;
             this.MessageContent = msg.MessageContent;
-            this.RichMessage = msg.RichMessage;
+            this.RichMessageID = msg.RichMessageID;
             this.PostTime = msg.PostTime;
+            this.Importance = msg.Importance;
+
+            if (msg.AttachmentID == null || msg.AttachmentID.Length == 0)
+            {
+                this.Attachment = null;
+            }
+            else
+            {
+                this.Attachment = new List<Attachment>();
+                foreach (string attid in msg.AttachmentID)
+                {
+                    Attachment att = attManager.GetAttachmentInfo(attid);
+                    if (att != null)
+                    {
+                        this.Attachment.Add(att);
+                    }
+                }
+            }
         }
     }
 }

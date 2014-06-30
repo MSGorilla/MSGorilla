@@ -31,5 +31,7 @@ namespace MSGorilla.Library.Models.ViewModels
                 Description = userinfo.Description;
             }
         }
+
+        public SimpleUserProfile() { }
     }
 }

@@ -14,7 +14,7 @@
     @Html.Partial("_EventModalPartial")
 
     <div class="contents-container">
-        <div class="user-container ">
+        <div class="user-container">
             <div class="user-info ">
                 <div class="ma-btm-10">
                     <img class="img-rounded" id="user_pic" src="/Content/Images/default_avatar.jpg" width="200" height="200" />
@@ -32,7 +32,7 @@
             <div class="user-postinfo">
                 <div class="btn-group btn-group-justified">
                     <a class="btn btn-default disabled">POSTS &nbsp;<span id="user_posts" class="badge">0</span></a>
-                    <a class="btn btn-default" href="/Profile/Owned?user=@ViewBag.UserId">OWNED &nbsp;<span id="user_owned" class="badge"></span></a>
+                    <a class="btn btn-default" href="/Profile/Owned?user=@ViewBag.UserId">OWNS &nbsp;<span id="user_owned" class="badge"></span></a>
                     <a class="btn btn-default" href="/Profile/Following?user=@ViewBag.UserId">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
                     <a class="btn btn-default" href="/Profile/Followers?user=@ViewBag.UserId">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
                     <a class="btn btn-default" href="/Profile/Favorites?user=@ViewBag.UserId">FAVORITES &nbsp;<span id="user_favorites" class="badge"></span></a>
@@ -49,7 +49,10 @@
         </div>
 
         <div class="title-container">
-            <h4>Posts</h4>
+            <h4>
+                Posts
+                @Html.Partial("_FeedFilterDropdownPartial")
+            </h4>
         </div>
 
         <div class="posts-feeds">
@@ -61,7 +64,9 @@
 
         <div class="txtaln-c">
             <span id="lbl_seemore" class="help-block">Loading more...</span>
-            <input id="hd_token" type="hidden" value="" /><input id="hd_newcount" type="hidden" value="0" />
+            <input id="hd_token" type="hidden" value="" />
+            <input id="hd_filter" type="hidden" value="" />
+            <input id="hd_newcount" type="hidden" value="0" />
 
             <script type="text/javascript">
                 $(window).scroll(function () {
@@ -69,7 +74,7 @@
                     var windowHeight = $(window).height();
                     var documentHeight = $(document).height();
                     if (documentTop >= (documentHeight - windowHeight)) {
-                        LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.UserId');
+                        LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId');
                     }
                 })
             </script>
@@ -79,7 +84,7 @@
 
     <script>
         $(LoadUserInfo('@ViewBag.UserId'));
-        $(LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.UserId'));
+        $(LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId'));
     </script>
 
     <div class="tools-container">
@@ -87,6 +92,7 @@
         {
             @Html.Partial("_MePartial")
         }
+        @Html.Partial("_FeedFilterPartial")
         @Html.Partial("_ShortcutPartial")
     </div>
 

@@ -20,7 +20,12 @@ namespace MSGorilla.Filters
 
             Exception e = actionExecutedContext.Exception;
             ActionResult result;
-            if (e is MSGorillaBaseException)
+
+            if (e is AccessDenyException)
+            {
+                result = ((AccessDenyException)e).toActionResult();
+            }
+            else if (e is MSGorillaBaseException)
             {
                 result = ((MSGorillaBaseException)e).toActionResult();
             }

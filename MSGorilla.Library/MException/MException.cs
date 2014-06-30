@@ -85,7 +85,7 @@ namespace MSGorilla.Library.Exceptions
     {
         public MessageTooLongException()
         {
-            Description = "Message is too long. Should be less than 256 byte";
+            Description = "Message is too long.";
             Code = 3001;
         }
     }
@@ -117,6 +117,15 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
+    public class RichMessageTooLongException : MSGorillaBaseException
+    {
+        public RichMessageTooLongException()
+        {
+            Description = "Rich message is too long.";
+            Code = 3005;
+        }
+    }
+
 
     //public class RetweetARetweetException : TwitterBaseException
     //{
@@ -141,6 +150,15 @@ namespace MSGorilla.Library.Exceptions
         {
             Description = "The specified schema already exists. Change the schema ID";
             Code = 4002;
+        }
+    }
+
+    public class AttachmentNotFoundException : MSGorillaBaseException
+    {
+        public AttachmentNotFoundException()
+        {
+            Description = "Attachment Not Found.";
+            Code = 5001;
         }
     }
 }

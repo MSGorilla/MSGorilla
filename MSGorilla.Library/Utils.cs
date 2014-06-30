@@ -88,8 +88,10 @@ namespace MSGorilla.Library
                 return false;
             }
 
-            if (id.Contains('\\') || 
-                id.Contains(' ') || 
+            if (id.Contains('\\') ||
+                id.Contains('|') || 
+                id.Contains(' ') ||
+                id.Contains('@') || 
                 id.Contains('?') || 
                 id.Contains('/') || 
                 id.Contains('#') ||
@@ -135,7 +137,7 @@ namespace MSGorilla.Library
             return ret;
         }
 
-        public static UserProfile CreateNewUser(string userid, string displayName = null)
+        public static UserProfile CreateNewUser(string userid, string displayName = null, string description = null)
         {
             if (!IsValidID(userid))
             {
@@ -146,6 +148,10 @@ namespace MSGorilla.Library
             if (displayName != null)
             {
                 userprofile.DisplayName = displayName;
+            }
+            if (description != null)
+            {
+                userprofile.Description = description;
             }
             userprofile.Password = null;
             userprofile.FollowersCount = userprofile.FollowingsCount = 0;
@@ -191,6 +197,50 @@ namespace MSGorilla.Library
             }
 
             return topicNames;
+        }
+
+        public static string StringArray2String(string[] array)
+        {
+            if (array == null || array.Length == 0)
+            {
+                return null;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < (array.Length - 1); i++)
+            {
+                sb.Append(array[i]);
+                sb.Append("|");
+            }
+            sb.Append(array[array.Length - 1]);
+            return sb.ToString();
+        }
+
+        public static string[] String2StringArray(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return null;
+            }
+
+            return str.Split('|');
+        }
+
+        public static string Txt2Html(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return "";
+            }
+
+            text = text.Replace("&", "&#38;");
+            text = text.Replace("<", "&#60;");
+            text = text.Replace(">", "&#62;");
+            text = text.Replace("\"", "&#34;");
+            text = text.Replace(" ", "&nbsp;");
+            text = text.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+            text = text.Replace("\r\n", "<br/>");
+            return text;
         }
     }
 }

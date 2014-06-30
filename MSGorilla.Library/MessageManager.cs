@@ -36,9 +36,11 @@ namespace MSGorilla.Library
         private CloudQueue _queue;
 
         private AccountManager _accManager;
+        private AttachmentManager _attManager;
         private SchemaManager _schemaManager;
         private NotifManager _notifManager;
         private TopicManager _topicManager;
+        private RichMsgManager _richMsgManager;
 
         public MessageManager()
         {
@@ -54,9 +56,11 @@ namespace MSGorilla.Library
             _queue = AzureFactory.GetQueue();
 
             _accManager = new AccountManager();
+            _attManager = new AttachmentManager();
             _schemaManager = new SchemaManager();
             _notifManager = new NotifManager();
             _topicManager = new TopicManager();
+            _richMsgManager = new RichMsgManager();
         }
 
         static string GenerateTimestampConditionQuery(string userid, DateTime start, DateTime end)
@@ -130,19 +134,23 @@ namespace MSGorilla.Library
             return query;
         }
 
-        public List<Message> UserLine(string userid, DateTime start, DateTime end)
+        public MessagePagination UserLine(string userid, DateTime start, DateTime end, int count = 25, TableContinuationToken continuationToken = null)
         {
             TableQuery<UserLineEntity> rangeQuery =
                 new TableQuery<UserLineEntity>().Where(
                     GenerateTimestampConditionQuery(userid, start, end)
-                );
+                ).Take(count);
+            TableQuerySegment<UserLineEntity> queryResult = _userline.ExecuteQuerySegmented(rangeQuery, continuationToken);
 
-            List<Message> msgs = new List<Message>();
-            foreach (UserLineEntity entity in _userline.ExecuteQuery(rangeQuery))
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
+            ret.message = new List<Message>();
+            foreach (UserLineEntity entity in queryResult)
             {
-                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
-            return msgs;
+            return ret;
         }
 
         public MessagePagination UserLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
@@ -157,24 +165,29 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (UserLineEntity entity in queryResult)
             {
-                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
             return ret;
         }
 
-        public List<Message> OwnerLine(string userid, DateTime start, DateTime end)
+        public MessagePagination OwnerLine(string userid, DateTime start, DateTime end, int count = 25, TableContinuationToken continuationToken = null)
         {
-            TableQuery<UserLineEntity> rangeQuery =
-                new TableQuery<UserLineEntity>().Where(
+            TableQuery<OwnerLineEntity> rangeQuery =
+                new TableQuery<OwnerLineEntity>().Where(
                     GenerateTimestampConditionQuery(userid, start, end)
-                );
+                ).Take(count);
+            TableQuerySegment<OwnerLineEntity> queryResult = _ownerline.ExecuteQuerySegmented(rangeQuery, continuationToken);
 
-            List<Message> msgs = new List<Message>();
-            foreach (UserLineEntity entity in _ownerline.ExecuteQuery(rangeQuery))
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
+            ret.message = new List<Message>();
+            foreach (OwnerLineEntity entity in queryResult)
             {
-                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
-            return msgs;
+            return ret;
         }
 
         public MessagePagination OwnerLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
@@ -188,7 +201,27 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (OwnerLineEntity entity in queryResult)
             {
-                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
+            }
+            return ret;
+        }
+
+        public MessagePagination AtLine(string userid, DateTime start, DateTime end, int count = 25, TableContinuationToken continuationToken = null)
+        {
+            TableQuery<AtLineEntity> rangeQuery =
+                new TableQuery<AtLineEntity>().Where(
+                    GenerateTimestampConditionQuery(userid, start, end)
+                ).Take(count);
+            TableQuerySegment<AtLineEntity> queryResult = _atline.ExecuteQuerySegmented(rangeQuery, continuationToken);
+
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
+            ret.message = new List<Message>();
+            foreach (AtLineEntity entity in queryResult)
+            {
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
             return ret;
         }
@@ -204,25 +237,29 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (AtLineEntity entity in queryResult)
             {
-                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
-
             return ret;
         }
 
-        public List<Message> HomeLine(string userid, DateTime start, DateTime end)
+        public MessagePagination HomeLine(string userid, DateTime start, DateTime end, int count = 25, TableContinuationToken continuationToken = null)
         {
             TableQuery<HomeLineEntity> rangeQuery =
                 new TableQuery<HomeLineEntity>().Where(
                     GenerateTimestampConditionQuery(userid, start, end)
-                );
+                ).Take(count); ;
+            TableQuerySegment<HomeLineEntity> queryResult = _homeline.ExecuteQuerySegmented(rangeQuery, continuationToken);
 
-            List<Message> msgs = new List<Message>();
-            foreach (HomeLineEntity entity in _homeline.ExecuteQuery(rangeQuery))
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
+            ret.message = new List<Message>();
+            foreach (HomeLineEntity entity in queryResult)
             {
-                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
-            return msgs;
+            return ret;
         }
 
         public MessagePagination HomeLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
@@ -237,7 +274,27 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (HomeLineEntity entity in queryResult)
             {
-                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
+            }
+            return ret;
+        }
+
+        public MessagePagination TopicLine(string topicID, DateTime start, DateTime end, int count = 25, TableContinuationToken continuationToken = null)
+        {
+            TableQuery<TopicLine> rangeQuery =
+                new TableQuery<TopicLine>().Where(
+                    GenerateTimestampConditionQuery(topicID, start, end)
+                ).Take(count); ;
+            TableQuerySegment<TopicLine> queryResult = _topicline.ExecuteQuerySegmented(rangeQuery, continuationToken);
+
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
+            ret.message = new List<Message>();
+            foreach (TopicLine entity in queryResult)
+            {
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
             return ret;
         }
@@ -254,7 +311,8 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (TopicLine entity in queryResult)
             {
-                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
             return ret;
         }
@@ -268,7 +326,8 @@ namespace MSGorilla.Library
             List<Message> msgs = new List<Message>();
             foreach (EventLineEntity entity in _eventline.ExecuteQuery(rangeQuery))
             {
-                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                msgs.Add(entity.toMessage());
             }
             return msgs;
         }
@@ -285,12 +344,13 @@ namespace MSGorilla.Library
             ret.message = new List<Message>();
             foreach (PublicSquareLineEntity entity in queryResult)
             {
-                ret.message.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
             return ret;
-        } 
+        }
 
-        public List<Message> PublicSquareLine(DateTime start, DateTime end)
+        public MessagePagination PublicSquareLine(DateTime start, DateTime end, int count = 25, TableContinuationToken continuationToken = null)
         {
             if (end == null)
             {
@@ -333,14 +393,18 @@ namespace MSGorilla.Library
                     Utils.ToAzureStorageSecondBasedString(end))
             );
 
-            TableQuery<PublicSquareLineEntity> rangeQuery = new TableQuery<PublicSquareLineEntity>().Where(query);
+            TableQuery<PublicSquareLineEntity> rangeQuery = new TableQuery<PublicSquareLineEntity>().Where(query).Take(count); ;
+            TableQuerySegment<PublicSquareLineEntity> queryResult = _publicSquareLine.ExecuteQuerySegmented(rangeQuery, continuationToken);
 
-            List<Message> msgs = new List<Message>();
-            foreach (PublicSquareLineEntity entity in  _publicSquareLine.ExecuteQuery(rangeQuery))
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
+            ret.message = new List<Message>();
+            foreach (PublicSquareLineEntity entity in queryResult)
             {
-                msgs.Add(JsonConvert.DeserializeObject<Message>(entity.Content));
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                ret.message.Add(entity.toMessage());
             }
-            return msgs;
+            return ret;
         }
 
         public MessageDetail GetMessageDetail(string userid, string messageID)
@@ -348,17 +412,19 @@ namespace MSGorilla.Library
             string pk = Message.ToMessagePK(userid, messageID);
             TableOperation retrieveOperation = TableOperation.Retrieve<UserLineEntity>(pk, messageID);
 
-            MessageDetail msg = null;
+            MessageDetail msgd = null;
             TableResult retrievedResult = _userline.Execute(retrieveOperation);
             if (retrievedResult.Result != null)
             {
                 UserLineEntity entity = (UserLineEntity)retrievedResult.Result;
-                msg = new MessageDetail(JsonConvert.DeserializeObject<Message>(entity.Content));
-                msg.ReplyCount = entity.ReplyCount;
+                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+                var msg = entity.toMessage();
+                msgd = new MessageDetail(msg);
+                msgd.ReplyCount = entity.ReplyCount;
                 //tweet.RetweetCount = entity.RetweetCount;
-                msg.Replies = GetAllReplies(entity.RowKey);
+                msgd.Replies = GetAllReplies(entity.RowKey);
             }
-            return msg;
+            return msgd;
         }
 
         public List<Reply> GetAllReplies(string msgID)
@@ -384,7 +450,8 @@ namespace MSGorilla.Library
             {
                 return null;
             }
-            return JsonConvert.DeserializeObject<Message>(entity.Content);
+            //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
+            return entity.toMessage();
         }
 
         public DisplayMessage GetDisplayMessage(string msgUser, string msgID)
@@ -394,7 +461,7 @@ namespace MSGorilla.Library
             {
                 return null;
             }
-            return new DisplayMessage(msg, _accManager);
+            return new DisplayMessage(msg, _accManager, _attManager);
         }
 
         public Message PostMessage(string userid, 
@@ -405,6 +472,8 @@ namespace MSGorilla.Library
                                     string[] topicName, 
                                     string message, 
                                     string richMessage,
+                                    string[] attachmentID,
+                                    int importance,
                                     DateTime timestamp)
         {
             if (message.Length > 2048)
@@ -452,8 +521,15 @@ namespace MSGorilla.Library
                 topic.UnionWith(topicName);
             }
 
+            //Insert Rich Message
+            string richMessageID = null;
+            if (!string.IsNullOrEmpty(richMessage))
+            {
+                richMessageID = _richMsgManager.PostRichMessage(userid, timestamp, richMessage);
+            }            
+
             // create message
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray(), richMessage);
+            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray(), richMessageID, attachmentID, importance);
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);
@@ -474,9 +550,14 @@ namespace MSGorilla.Library
 
         public void SpreadMessage(Message message)
         {
+            TableOperation insertOperation;
+
             //insert into Eventline
-            TableOperation insertOperation = TableOperation.InsertOrReplace(new EventLineEntity(message));
-            _eventline.Execute(insertOperation);
+            if (!string.IsNullOrEmpty(message.EventID) && !"none".Equals(message.EventID))
+            {
+                insertOperation = TableOperation.InsertOrReplace(new EventLineEntity(message));
+                _eventline.Execute(insertOperation);
+            }            
 
             //insert into PublicSquareLine
             insertOperation = TableOperation.InsertOrReplace(new PublicSquareLineEntity(message));
@@ -554,5 +635,6 @@ namespace MSGorilla.Library
                 _notifManager.incrementHomelineNotifCount(user.Userid);
             }
         }
+
     }
 }

@@ -1,0 +1,100 @@
+﻿
+@{
+    ViewBag.Title = "MSGorilla Rest API Document";
+}
+
+<h2>@ViewBag.Title</h2>
+
+@using MSGorilla.Library;
+@using System.Web.Http.Description;
+@model Dictionary<string, List<ApiDescription>>
+    <div id="body">
+        @*<section class="featured">
+            <div class="content-wrapper">
+                <hgroup class="title">
+
+                    <h1>ASP.NET Web API Help Page</h1>
+
+                </hgroup>
+
+            </div>
+
+        </section>*@
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-9" role="main">
+
+                    <section class="content-wrapper main-content clear-fix">
+                        <h3>APIs</h3>
+                        <ul>
+                            <h1 id="authentication" class="page-header">Authentication</h1>
+                            <p>MSGorilla uses two kinds of authentication ways</p>
+                            <p>1. For corpnet user who has a valid microsoft account, you can go to <a href="https://corp.sts.microsoft.com/adfs/ls/?wa=wsignin1.0&wtrealm=https://msgorilla.cloudapp.net/&wctx=rm=1&id=passive&ru=%2f&wrefresh=0&whr=http://corp.sts.microsoft.com">https://corp.sts.microsoft.com/adfs/ls/?wa=wsignin1.0&wtrealm=https://msgorilla.cloudapp.net/&wctx=rm=1&id=passive&ru=%2f&wrefresh=0&whr=http://corp.sts.microsoft.com</a> to login and use the cookie returned to authenticate</p>
+                            <p>2. For robots, a local account should first be registered through web or use the rest api. 
+                                    Basic http authentication is used to check userid and password.</br></br>
+
+                                    The following is an example:</br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;Suppose userid = 'user1' and password = '123456',</br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;Hash = base64(userid:md5(password))</br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     = base64(user1:e10adc3949ba59abbe56e057f20f883e)</br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     = dXNlcjElM0FlMTBhZGMzOTQ5YmE1OWFiYmU1NmUwNTdmMjBmODgzZQ==</br>
+                                    
+                                    Then the Hash should be added into the http request header</br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;Authorization : basic dXNlcjElM0FlMTBhZGMzOTQ5YmE1OWFiYmU1NmUwNTdmMjBmODgzZQ==</br>
+                                <img src="/api/attachment/download?attachmentid=2916649;251998531529048_4bf9af6e-e39a-4e5a-88b9-703fdded3d63.png">
+                            </p>
+
+                        </ul>
+                        @foreach (string key in Model.Keys)
+                        {
+                            <ul>
+                                <h1 id="@key" class="page-header">@key</h1>
+                                @foreach (var api in Model[key])
+                                {
+                                    <li>
+                                        <h5>@api.HttpMethod @api.RelativePath</h5>
+                                        <blockquote>
+                                            <div>@Html.Raw(Utils.Txt2Html(api.Documentation))</div>
+                                            <br />
+                                            @if (api.ParameterDescriptions.Count > 0)
+                                            {
+                                                <h6>Parameters</h6>
+                                                <ul>
+                                                    @foreach (var parameter in api.ParameterDescriptions)
+                                                    {
+                                                        <li>@parameter.Name: @parameter.Documentation (@parameter.Source)</li>
+                                                    }
+                                                </ul>
+                                            }
+                                        </blockquote>
+                                    </li>
+                                }
+
+                            </ul>
+                        }                        
+
+                    </section>
+                </div>
+                    
+                <div class="col-md-3">
+                    <div class="bs-docs-sidebar hidden-print affix" role="complementary">
+                        <ul class="nav bs-docs-sidenav">
+                            <li class>
+                                <a href="#authentication">Authentication</a>
+                                @foreach (string key in Model.Keys)
+                                {
+                                    <a href="#@key">@key</a>
+                                }
+                                
+                            </li>
+                        </ul>
+                        <a class="back-to-top" href="#top">Back to top</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+

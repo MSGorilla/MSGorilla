@@ -5,23 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace MSGorilla.Library.Models.AzureModels
+namespace MSGorilla.Library.Models.AzureModels.Entity
 {
-    public class UserLineEntity : TableEntity
+    public class UserLineEntity : BaseMessageEntity
     {
-        public string Content { get; set; }
-
-        //public int RetweetCount { get; set; }
-
         public int ReplyCount { get; set; }
 
-        public UserLineEntity(Message msg, int replyCount = 0)
+        public UserLineEntity(Message msg, int replyCount = 0) : base(msg)
         {
             this.PartitionKey = string.Format("{0}_{1}", msg.User,
                 Utils.ToAzureStorageDayBasedString(msg.PostTime.ToUniversalTime()));    //Partition key
             this.RowKey = msg.ID;
-            Content = msg.ToJsonString();
-            //RetweetCount = retweetCount;
             ReplyCount = replyCount;
         }
 

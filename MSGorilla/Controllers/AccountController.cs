@@ -68,7 +68,7 @@ namespace MSGorilla.Controllers
 
                 try
                 {
-                    string userid = model.UserName.ToLower();
+                    string userid = model.UserName;
                     string password = model.Password;
                     if (_accManager.AuthenticateUser(userid, Utils.MD5Encoding(password)))
                     {
@@ -406,8 +406,8 @@ namespace MSGorilla.Controllers
         //
         // POST: /Account/LogOff
         
-        [HttpPost]
-        [TokenAuthAttribute]
+        //[HttpPost, HttpGet]
+        //[TokenAuthAttribute]
         public ActionResult LogOff()
         {
             //AuthenticationManager.SignOut();
@@ -421,12 +421,17 @@ namespace MSGorilla.Controllers
                     Response.Cookies.Add(myCookie);
                 }
 
-                //if (System.Web.HttpContext.Current.User.Identity.IsAuthenticated)
-                //{
-                //    TokenCacheUtils.RemoveAllFromCache();
-                //    HttpContext.GetOwinContext().Authentication.SignOut(
-                //        OpenIdConnectAuthenticationDefaults.AuthenticationType, CookieAuthenticationDefaults.AuthenticationType);
-                //}
+                HttpCookie cookie = new HttpCookie("ASP.NET_SessionId");
+                cookie.Expires = DateTime.Now.AddDays(-1d);
+                Response.Cookies.Add(cookie);
+
+                cookie = new HttpCookie("FedAuth");
+                cookie.Expires = DateTime.Now.AddDays(-1d);
+                Response.Cookies.Add(cookie);
+
+                cookie = new HttpCookie("FedAuth1");
+                cookie.Expires = DateTime.Now.AddDays(-1d);
+                Response.Cookies.Add(cookie);
             }
             catch {}
 
@@ -511,7 +516,7 @@ namespace MSGorilla.Controllers
             this.Session.Add("userid", userid);
 
             // remember me?
-            int days = 1;
+            int days = 7;
             if (isPersistent)
             {
                 days = 30;
