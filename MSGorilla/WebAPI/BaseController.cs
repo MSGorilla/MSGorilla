@@ -98,7 +98,7 @@ namespace MSGorilla.WebApi
                 UserProfile profile = _accountManager.FindUser(userid);
                 if (profile == null)
                 {
-                    UserProfile newUser = Utils.CreateNewUser(userid, GetDisplayName(claims));
+                    UserProfile newUser = Utils.CreateNewUser(userid, GetDisplayName(claims), GetUserTitle(claims));
                     _accountManager.AddUser(newUser);
                 }
                 else if (profile.Password != null)
@@ -134,6 +134,16 @@ namespace MSGorilla.WebApi
             claim = claims.FirstOrDefault(c => c.ClaimType.Contains("LastName"));
             displayname += claim.Value;
             return displayname;
+        }
+
+        public static string GetUserTitle(IEnumerable<Claim> claims)
+        {
+            Claim claim = claims.FirstOrDefault(c => c.ClaimType.Contains("Title"));
+            if (claim == null)
+            {
+                return null;
+            }
+            return claim.Value;
         }
     }
 }
