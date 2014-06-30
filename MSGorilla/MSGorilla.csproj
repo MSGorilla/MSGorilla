@@ -228,6 +228,7 @@
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
+    <Compile Include="Controllers\MessageController.cs" />
     <Compile Include="Controllers\SquareController.cs" />
     <Compile Include="Controllers\TopicController.cs" />
     <Compile Include="Filters\BasicAuthAttribute.cs" />
@@ -335,6 +336,8 @@
     <Content Include="Views\Document\Index.cshtml" />
     <Content Include="Views\Notification\Replies.cshtml" />
     <Content Include="Views\Shared\_FeedFilterDropdownPartial.cshtml" />
+    <Content Include="Views\Message\Index.cshtml" />
+    <Content Include="Views\Shared\_NotificationNavbarPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

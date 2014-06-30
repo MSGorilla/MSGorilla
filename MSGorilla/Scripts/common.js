@@ -37,7 +37,7 @@ function encodeEmail(code) {
 function ScrollTo(itemname) {
     var scroll_offset = $("#" + itemname).offset();
     $("body,html").animate({
-        scrollTop: scroll_offset.top - 50
+        scrollTop: scroll_offset.top - 60
     }, "slow");
 }
 
@@ -460,6 +460,40 @@ function PostReply(user, mid) {
 
 
 // feed function
+function LoadMessage(user, msgId) {
+    var apiurl = "";
+    var apidata = "";
+
+    if (isNullOrEmpty(user) || isNullOrEmpty(msgId)) {
+        ShowError("Illegal operation.");
+        return;
+    }
+
+    apiurl = "/api/message/getdisplaymessage";
+    apidata = "msgUser=" + encodeURIComponent(user) + "&msgID=" + encodeURIComponent(msgId);
+
+    $.ajax({
+        type: "GET",
+        url: apiurl,
+        dataType: "json",
+        data: apidata,
+        success: function (data) {
+            if (isNullOrEmpty(data)) {
+                ShowError("No content.");
+            }
+            else {
+                $("#feedlist").empty();
+                // create feed 
+                $("#feedlist").append(CreateFeed(data, false));
+            }
+
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        }
+    });
+}
+
 function FilterFeeds(category, id, filter) {
     if (isLoadFeeds) return;    // if it is loading, skip this time.
 
@@ -514,6 +548,15 @@ function LoadFeeds(category, id, filter) {
         apidata = "userid=" + encodeURIComponent(id);
     }
     else if (category == "topicline") {
+        apiurl = "/api/message/topicline";
+        if (isNullOrEmpty(id)) {
+            ShowError("Illegal operation.");
+            isLoadFeeds = false;
+            return;
+        }
+        apidata = "topic=" + encodeURIComponent(id);
+    }
+    else if (category == "message") {
         apiurl = "/api/message/topicline";
         if (isNullOrEmpty(id)) {
             ShowError("Illegal operation.");
@@ -665,7 +708,7 @@ function CreateFeed(postData, isNew) {
         //    output += "  <li id='feed_" + mid + "' class='list-group-item new-notification clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
         //}
         //else {
-            output += "  <li id='feed_" + mid + "' class='list-group-item new-notification'>";
+        output += "  <li id='feed_" + mid + "' class='list-group-item new-notification'>";
         //}
     }
     else {
@@ -673,7 +716,7 @@ function CreateFeed(postData, isNew) {
         //    output += "  <li id='feed_" + mid + "' class='list-group-item clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
         //}
         //else {
-            output += "  <li id='feed_" + mid + "' class='list-group-item'>";
+        output += "  <li id='feed_" + mid + "' class='list-group-item'>";
         //}
     }
 
@@ -705,7 +748,7 @@ function CreateFeed(postData, isNew) {
         //output += "        <div class='newpost-footer'>";
         //output += "          <button id='btn_up_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
         //output += "        </div>";
-        output += "    <div id='rich_message_" + mid + "' class='newpost-input panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" +mid + "' href='#rich_message_" +mid + "' onclick='ShowRichMsg(\"" +richmsgid + "\", \"" +mid + "\");'></div>";
+        output += "    <div id='rich_message_" + mid + "' class='newpost-input panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'></div>";
     }
 
     // attachment

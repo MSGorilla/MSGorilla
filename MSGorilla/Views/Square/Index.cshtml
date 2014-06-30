@@ -22,14 +22,7 @@
             <span class="help-block">What's happening now, tailored for you.</span>
         </div>
 
-        <div class="nav-container">
-            <div id="home_nav_list" class="pd-10"></div>
-            <ul class="nav nav-pills">
-                <li><a href="/Notification/index?category=atline">Mentions <span id="home_atline_count" class="badge"></span></a></li>
-                <li><a href="/Notification/index?category=ownerline">My owns <span id="home_ownerline_count" class="badge"></span></a></li>
-                <li><a href="/Notification/index?category=replyline">Replies <span id="home_reply_count" class="badge"></span></a></li>
-            </ul>
-        </div>
+        @Html.Partial("_NotificationNavbarPartial")
 
         <div class="posts-feeds">
             <ul id="feedlist" class='list-group'>
