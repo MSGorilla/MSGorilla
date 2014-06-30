@@ -27,18 +27,20 @@ namespace MSGorilla.Library.Models
         public DateTime PostTime { get; set; }
         public string RichMessageID { get; set; }
         public string[] AttachmentID { get; set; }
+        public int Importance { get; set; }
 
         public Message(string userid,
-            string message,
-            DateTime timestamp,
-            string eventID,
-            string schemaID,
-            string[] owner,
-            string[] atUser,
-            string[] topicName,
-            string richMessageID,
-            string[] attachmentID,
-            string msgID = null
+                        string message,
+                        DateTime timestamp,
+                        string eventID,
+                        string schemaID,
+                        string[] owner,
+                        string[] atUser,
+                        string[] topicName,
+                        string richMessageID,
+                        string[] attachmentID,
+                        int importance = 2,
+                        string msgID = null            
                 )
         {
             User = userid;
@@ -61,6 +63,15 @@ namespace MSGorilla.Library.Models
             else
             {
                 ID = msgID;
+            }
+
+            if (importance < 0)
+            {
+                this.Importance = 0;
+            }
+            else
+            {
+                this.Importance = importance;
             }
         }
 

@@ -23,6 +23,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
         public string RichMessageID { get; set; }
         public string AttachmentID { get; set; }
         public string Content { get; set; }
+        public int Importance { get; set; }
 
         public BaseMessageEntity() {}
 
@@ -39,6 +40,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             this.PostTime = message.PostTime;
             this.RichMessageID = message.RichMessageID;
             this.AttachmentID = Utils.StringArray2String(message.AttachmentID);
+            this.Importance = message.Importance;
         }
 
         public Message toMessage()
@@ -60,7 +62,8 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
                     Utils.String2StringArray(this.TopicName),
                     this.RichMessageID,
                     Utils.String2StringArray(this.AttachmentID),
-                    this.ID
+                    this.Importance,
+                    this.ID                    
                 );
             return message;
         }

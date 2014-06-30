@@ -73,7 +73,7 @@ namespace MSGorilla.WebAPI.Client
             return sb.ToString();
         }
 
-        public string PostMessage(string message, string schemaID = "none", string eventID = "none", string[] topicName = null, string[] owner = null, string[] atUser = null, string richMessage = null, string[] attachmentID = null)
+        public string PostMessage(string message, string schemaID = "none", string eventID = "none", string[] topicName = null, string[] owner = null, string[] atUser = null, string richMessage = null, string[] attachmentID = null, int importance = 2)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + Constant.UriPostMessage);
             request.Method = "POST";
@@ -108,7 +108,7 @@ namespace MSGorilla.WebAPI.Client
                     attachmentStr = "&attachmentID=" + string.Join("&attachmentID=", attachmentID);
                 }
 
-                string msg = string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}{6}{7}", Uri.EscapeDataString(message), schemaID, eventID, topicNameStr, ownerStr, atUserStr, richMessageStr, attachmentStr);
+                string msg = string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}{6}{7}&importance={8}", Uri.EscapeDataString(message), schemaID, eventID, topicNameStr, ownerStr, atUserStr, richMessageStr, attachmentStr, importance);
                 writer.Write(msg);
             }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
