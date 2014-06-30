@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using MSGorilla.WebAPI.Client;
 using System.Timers;
 
-namespace Test
+namespace TFSMonitor
 {
     class Program
     {

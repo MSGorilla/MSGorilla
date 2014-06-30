@@ -11,7 +11,7 @@ using System.Net;
 using System.Windows.Forms;
 using MSGorilla.WebAPI.Client;
 
-namespace Test
+namespace TFSMonitor
 {
     public class TfsHelper
     {
@@ -51,15 +51,16 @@ namespace Test
                         "Task Type",
                         "Triage",
                         "ID",
-                        "SD Changelist"
+                        "SD Changelist",
+                        "Repro Steps"
                         };
 
             string fieldChangeTemplate =
-                "<div style=\"display: block;\">" +
+                "<div class=\"tfs-collapsible-content\" style=\"display: block;\">" +
                     "<div class=\"container\">" +
-                        "<table class=\"detail-list\">" +
+                        "<table  class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 width=\"100%\" style='width:1000px;mso-cellspacing:0cm;border:solid green 1.5pt;mso-yfti-tbllook:1184;mso-padding-alt:0cm 0cm 0cm 0cm'>" +
                             "<tbody>" +
-                                "<tr><td>Field</td><td>New value</td><td>Old Value</td></tr>" +
+                                "<tr style=\"background-color: rgb(134, 202, 247); mso-yfti-irow: 0; mso-yfti-firstrow: yes; color: black; font-family: \"Verdana\",\"sans-serif\"; font-size: 9pt\"><td>Field</td><td>New value</td><td>Old Value</td></tr>" +
                                 "fieldChangeRows" +
                             "</tbody>" +
                         "</table>" +
@@ -67,11 +68,8 @@ namespace Test
                 "</div>";
             if (tpc == null)
             {
-                TeamProjectPicker tpp = new TeamProjectPicker(TeamProjectPickerMode.SingleProject, false);
-                if (tpp.ShowDialog() == DialogResult.OK)
-                {
-                    tpc = tpp.SelectedTeamProjectCollection;
-                }
+                tpc = new TfsTeamProjectCollection(new Uri("https://microsoft.visualstudio.com/defaultcollection"), new UICredentialsProvider());
+                tpc.EnsureAuthenticated();
             }
             if (tpc != null)
             {
@@ -138,7 +136,6 @@ namespace Test
                                 message = string.Format("#WOSS TFS Changed# #WOSS TFS {0}# changed by @{1} ({2})\n", wi.Id, changeBy, wi.ChangedBy);
                             }
 
-                            message += "\nField Changes:\n";
                             StringBuilder richMessage = new StringBuilder();
                             var revLatest = wi.Revisions[wi.Revision - 1];
                             foreach (var fieldName in monitoredFields)
@@ -157,7 +154,6 @@ namespace Test
 
                                     string oriValue = (string)revLatest.Fields[fieldName].OriginalValue;
                                     if (string.IsNullOrEmpty(oriValue)) oriValue = "(null)";
-                                    message += string.Format("  Field {0}: {1} --> {2} \n", revLatest.Fields[fieldName].Name, oriValue, revLatest.Fields[fieldName].Value);
                                     richMessage.Append(string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>", revLatest.Fields[fieldName].Name, revLatest.Fields[fieldName].Value, oriValue));
                                 }
                             }
@@ -169,8 +165,8 @@ namespace Test
                             // twitter message
                             try
                             {
-                                GorillaWebAPI webAPI = new GorillaWebAPI("User1", "111111");
-                                webAPI.PostMessage(message, "none", id.ToString(), new string[] { "WOSS TFS" }, new string[] { owner }, new string[] { assignTo, resolveBy, closeBy, changeBy });
+                                GorillaWebAPI webAPI = new GorillaWebAPI("WossTFSMonitor", "User@123");                                
+                                webAPI.PostMessage(message, "none", id.ToString(), new string[] { "WOSS TFS" }, new string[] { owner }, new string[] { assignTo, resolveBy, closeBy, changeBy }, fieldChangeTemplate.Replace("fieldChangeRows", richMessage.ToString()));
                             }
                             catch (Exception e)
                             {

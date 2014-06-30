@@ -7,8 +7,8 @@
     <ProjectGuid>{026E8141-737D-4CFE-9AAC-C0F9B62E6A29}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Test</RootNamespace>
-    <AssemblyName>Test</AssemblyName>
+    <RootNamespace>TFSMonitor</RootNamespace>
+    <AssemblyName>TFSMonitor</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
