@@ -242,5 +242,16 @@ namespace MSGorilla.Library
             text = text.Replace("\r\n", "<br/>");
             return text;
         }
+
+        public static string GetDownloadAttachmentUri(string attachmentID)
+        {
+            return string.Format("/api/attachment/download?attachmentID={0}", attachmentID);
+        }
+
+        public static byte[] Base64Decode(string base64EncodedData)
+        {
+            var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
+            return base64EncodedBytes;
+        }
     }
 }

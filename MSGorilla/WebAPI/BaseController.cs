@@ -20,6 +20,7 @@ using MSGorilla.Filters;
 using MSGorilla.Library;
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.SqlModels;
+using MSGorilla.Library.Models;
 
 
 //using Microsoft.AspNet.Identity;
@@ -100,6 +101,7 @@ namespace MSGorilla.WebApi
                 {
                     UserProfile newUser = Utils.CreateNewUser(userid, GetDisplayName(claims), GetUserTitle(claims));
                     _accountManager.AddUser(newUser);
+                    profile = newUser;
                 }
                 else if (profile.Password != null)
                 {
@@ -108,6 +110,25 @@ namespace MSGorilla.WebApi
                      + "Register a local account or contact MSGorilla Admin to solve this problem."
                      , profile.Userid);
                     throw new UserAlreadyExistException(profile.Userid, description);
+                }
+                else if (string.IsNullOrEmpty(profile.PortraitUrl))
+                {
+                    //Check Thumbnail photo
+                    try
+                    {
+                        byte[] photoBytes = GetThumbnailPhoto(claims);
+                        if (photoBytes != null)
+                        {
+                            Attachment thumbnail = UploadThumbnailPhoto(photoBytes, profile.Userid);
+                            profile.PortraitUrl = Utils.GetDownloadAttachmentUri(thumbnail.AttachmentID);
+                            _accountManager.UpdateUser(profile);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        
+                    }
+                    
                 }
                 return userid;
             }
@@ -144,6 +165,33 @@ namespace MSGorilla.WebApi
                 return null;
             }
             return claim.Value;
+        }
+
+        public static byte[] GetThumbnailPhoto(IEnumerable<Claim> claims)
+        {
+            Claim claim = claims.FirstOrDefault(c => c.ClaimType.Contains("ThumbnailPhoto"));
+            if (claim == null)
+            {
+                return null;
+            }
+
+            byte[] photoBytes = null;
+            try
+            {
+                photoBytes = Utils.Base64Decode(claim.Value);
+            }
+            catch
+            {
+
+            }
+            return photoBytes;
+        }
+
+        Attachment UploadThumbnailPhoto(byte[] photoBytes, string userid)
+        {
+            AttachmentManager attachmentManager = new AttachmentManager();
+            Attachment thumbnail = attachmentManager.Upload(string.Format("Thumbnail_{0}.jpg", userid), "image/jpeg", photoBytes, userid);
+            return thumbnail;
         }
     }
 }
