@@ -79,6 +79,20 @@ namespace MSGorilla.Library
             return attachment;
         }
 
+        public Attachment Upload(string filename,
+            string filetype,
+            byte[] filebytes,
+            string uploader)
+        {
+            if(filebytes == null)
+            {
+                return null;
+            }
+            MemoryStream stream = new MemoryStream(filebytes);
+            Attachment attachment = Upload(filename, filetype, filebytes.Length, stream, uploader);
+            return attachment;
+        }
+
         public Attachment GetAttachmentInfo(string attachmetID)
         {
             if (string.IsNullOrEmpty(attachmetID))
