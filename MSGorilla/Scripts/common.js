@@ -460,17 +460,17 @@ function PostReply(user, mid) {
 
 
 // feed function
-function LoadMessage(user, msgId) {
+function LoadMessage(user, mid) {
     var apiurl = "";
     var apidata = "";
 
-    if (isNullOrEmpty(user) || isNullOrEmpty(msgId)) {
+    if (isNullOrEmpty(user) || isNullOrEmpty(mid)) {
         ShowError("Illegal operation.");
         return;
     }
 
     apiurl = "/api/message/getdisplaymessage";
-    apidata = "msgUser=" + encodeURIComponent(user) + "&msgID=" + encodeURIComponent(msgId);
+    apidata = "msgUser=" + encodeURIComponent(user) + "&msgID=" + encodeURIComponent(mid);
 
     $.ajax({
         type: "GET",
@@ -484,7 +484,9 @@ function LoadMessage(user, msgId) {
             else {
                 $("#feedlist").empty();
                 // create feed 
-                $("#feedlist").append(CreateFeed(data, false));
+                $("#feedlist").append(CreateFeed(data));
+                $("#reply_" + mid).collapse('show');
+                ShowReplies(mid);
             }
 
         },
@@ -770,10 +772,11 @@ function CreateFeed(postData, isNew) {
     //}
 
     // btns
+    // output += "           <a id='btn_open_msg_" + mid + "' class='btn btn-link btn-sm' target='_blank' href='/Message/Index?user=" + encodeURIComponent(user) + "&msgID=" + encodeURIComponent(mid) + "'>Open</a>";
     if (!isNullOrEmpty(richmsgid)) {
         output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
     }
-    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#reply_" + mid + "' onclick='ShowReplies(\"" + user + "\", \"" + mid + "\");'>Replies</button>";
+    output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#reply_" + mid + "' onclick='ShowReplies(\"" + mid + "\");'>Replies</button>";
 
     output += "        </div>";
     output += "      </div>";
@@ -858,7 +861,7 @@ function ShowRichMsg(rmid, mid) {
 
 
 // reply function
-function ShowReplies(user, mid) {
+function ShowReplies(mid) {
     var showbtn = $("#btn_showreply_" + mid);
     var replydiv = $("#reply_" + mid);
     var show = replydiv.hasClass("in");
@@ -990,6 +993,10 @@ function ShowMessage(evt, mid, user) {
         return;
     }
 
+    $("#MessageModal").modal();
+    message_div.empty();
+    message_div.append("<li id='loading_message' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
+
     $.ajax({
         type: "GET",
         url: "/api/message/getdisplaymessage",
@@ -998,8 +1005,8 @@ function ShowMessage(evt, mid, user) {
             message_div.empty();
             // create message
             message_div.append(CreateFeed(data));
-
-            $("#MessageModal").modal();
+            $("#reply_" + mid).collapse('show');
+            ShowReplies(mid);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
