@@ -678,6 +678,16 @@ function LoadFeeds(category, id, filter) {
     });
 }
 
+var ImportenceTags = [
+    "", // 0
+    "<span class='label label-info'>Info</span>",
+    "<span class='label label-primary'>Primary</span>",
+    "<span class='label label-success'>Success</span>",
+    "<span class='label label-warning'>Warning</span>",
+    "<span class='label label-danger'>Danger</span>",
+    "<span class='label label-default'>Default</span>",
+];
+
 function CreateFeed(postData, isNew) {
     var output = "";
     var mid = postData.ID;
@@ -694,6 +704,7 @@ function CreateFeed(postData, isNew) {
     var atusers = postData.AtUser;
     var topics = postData.TopicName;
     var attach = postData.Attachment;
+    var importence = postData.Importance;
     var showevents = false;
 
     if (isNullOrEmpty(picurl)) {
@@ -706,20 +717,10 @@ function CreateFeed(postData, isNew) {
 
     //output += "<ul class='list-group'>";
     if (isNew == true) {
-        //if (!isNullOrEmpty(richmsgid)) {
-        //    output += "  <li id='feed_" + mid + "' class='list-group-item new-notification clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
-        //}
-        //else {
         output += "  <li id='feed_" + mid + "' class='list-group-item new-notification'>";
-        //}
     }
     else {
-        //if (!isNullOrEmpty(richmsgid)) {
-        //    output += "  <li id='feed_" + mid + "' class='list-group-item clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
-        //}
-        //else {
         output += "  <li id='feed_" + mid + "' class='list-group-item'>";
-        //}
     }
 
     output += "    <div>"
@@ -733,23 +734,26 @@ function CreateFeed(postData, isNew) {
     output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
     output += "        </div>";
 
+    output += "        <div class='newpost-input'>";
+    // importance
+    if (importence > 2) {
+        output += ImportenceTags[importence] + "&nbsp;";
+    }
+
     // owners
     if (!isNullOrEmpty(owners)) {
-        output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
+        output += "      <span class=''>Owned by: </span>";
         for (var key in owners) {
             output += "  <a href='/profile/index?user=" + encodeURIComponent(owners[key]) + "'>@" + owners[key] + "</a>&nbsp;";
         }
-        output += "    </div>";
     }
+    output += "        </div>";
 
     // message
     output += "        <div class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
 
     // richmsg
     if (!isNullOrEmpty(richmsgid)) {
-        //output += "        <div class='newpost-footer'>";
-        //output += "          <button id='btn_up_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
-        //output += "        </div>";
         output += "    <div id='rich_message_" + mid + "' class='newpost-input panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'></div>";
     }
 
@@ -772,9 +776,9 @@ function CreateFeed(postData, isNew) {
     //}
 
     // btns
-    // output += "           <a id='btn_open_msg_" + mid + "' class='btn btn-link btn-sm' target='_blank' href='/Message/Index?user=" + encodeURIComponent(user) + "&msgID=" + encodeURIComponent(mid) + "'>Open</a>";
+    // output += "       <a id='btn_open_msg_" + mid + "' class='btn btn-link btn-sm' target='_blank' href='/Message/Index?user=" + encodeURIComponent(user) + "&msgID=" + encodeURIComponent(mid) + "'>Open</a>";
     if (!isNullOrEmpty(richmsgid)) {
-        output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
+        output += "      <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
     }
     output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#reply_" + mid + "' onclick='ShowReplies(\"" + mid + "\");'>Replies</button>";
 
