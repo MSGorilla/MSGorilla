@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 
 namespace CodeFlowMonitor
 {
-    public class CodeFlowMonitorService: ServiceBase
+    public class CodeFlowMonitorService : ServiceBase
     {
         private static System.Timers.Timer serviceTimer = null;
         private static string _statusFileName = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "MonitorStatus.xml");
@@ -87,7 +87,7 @@ namespace CodeFlowMonitor
                 {
                     sw.Write(JsonConvert.SerializeObject(_MonitoredReviewDict));
 
-                }                
+                }
             }
         }
 
@@ -134,38 +134,83 @@ namespace CodeFlowMonitor
                             {
                                 isNew = true;
                             }
-
                             if (isNew)
                             {
                                 for (int i = _MonitoredReviewDict[username][r.Key]; i < r.codePackages.Length; i++)
                                 {
                                     CodePackage pkg = r.codePackages[i];
-                                    StringBuilder reviewers = new StringBuilder();
+
+                                    #region Generate review string
+                                    StringBuilder reviewers = new StringBuilder("<table><tr style=\"border: 1px solid; border-top: none; border-left: none;border-right: none;\"><td width=\"40%\"><b>Reviewer</b></td><td width=\"30%\"><b>Type</b></td><td width=\"30%\"><b>Status</b></td></tr>");
+                                    StringBuilder reviewerstr = new StringBuilder();
                                     foreach (var reviewer in r.reviewers)
-                                        reviewers.Append(string.Format(" @{0},", reviewer.Name.Substring(reviewer.Name.IndexOf('\\') + 1)));
+                                    {
+                                        reviewers.Append(string.Format("<tr><td><b>{3}</b>({0})</td><td>{1}</td><td>{2}</td></tr>",
+                                            reviewer.Name, reviewer.Required ? "<b>Required</b>" : "Optional",
+                                            reviewer.Status == ReviewerStatus.SignedOff ? "<font color=\"green\">SignedOff</font>" : reviewer.Status.ToString(),
+                                            reviewer.DisplayName));
+                                        reviewerstr.Append(string.Format(" @{0},", reviewer.Name.Substring(reviewer.Name.IndexOf('\\') + 1)));
+                                    }
+                                    reviewers.Append("</table>");
+                                    #endregion
+
+                                    #region Generate changed file
+                                    StringBuilder changedfiles = new StringBuilder("<table><tr style=\"border: 1px solid; border-top: none; border-left: none;border-right: none;\"><td width=\"50px\"><b>Change</b></td><td width=\"30%\"><b>Type</b></td><td><b>FilePath</b></td></tr>");
+                                    foreach (var file in pkg.FileChanges)
+                                    {
+                                        changedfiles.Append(string.Format("<tr><td><b>{0}</b></td><td>{1}</td></tr>", file.ChangeType, file.DepotFilePath));
+                                    }
+                                    changedfiles.Append("</table>");
 
                                     string description = pkg.Description;
                                     string newDescription = description;
                                     string pat = @"(\d{4,})";
+                                    #endregion
 
+                                    #region replace tfs number with topic
                                     // Instantiate the regular expression object.
                                     Regex reg = new Regex(pat, RegexOptions.IgnoreCase);
 
                                     // Match the regular expression pattern against a text string.
                                     Match m = reg.Match(description);
+                                    List<string> replacedValueList = new List<string>();
                                     while (m.Success)
                                     {
                                         //Console.WriteLine("Match" + (++matchCount));
-                                        newDescription = newDescription.Replace(m.Value, string.Format(" #WOSS TFS {0}# ", m.Value));
+                                        if (!replacedValueList.Contains(m.Value))
+                                        {
+                                            newDescription = newDescription.Replace(m.Value, string.Format(" #WOSS TFS {0}# ", m.Value));
+                                            replacedValueList.Add(m.Value);
+                                        }
                                         m = m.NextMatch();
                                     }
+                                    #endregion
 
-                                    string message = string.Format("#WOSS Codeflow# {0}\nIteration {2} {4}\nAuthor: {1}\nReviewer: {3}\n#WOSS Change {5}#\nReview: http://codeflow/Client/CodeFlow2010.application?server=http://codeflow/Services/DiscoveryService.svc&review={6}",
-                                        newDescription.Trim(), pkg.Author.Substring(pkg.Author.IndexOf('\\') + 1), pkg.Revision, reviewers.ToString().TrimEnd(new char[] { ',' }), 
-                                        pkg.IterationComment, pkg.SourceInfo.SourceName, codeReviewSummary.Key);
+                                    string title = string.Format("Code Review: ({0}){1}", pkg.Author.Substring(pkg.Author.IndexOf('\\') + 1), r.Name);
+
+                                    #region Iteration Title
+                                    string iteration = "";
+                                    if (i == 0)
+                                        iteration = "New review submitted";
+                                    else if (string.IsNullOrEmpty(r.CompletionMessage))
+                                        iteration = "Author started new iteration";
+                                    else
+                                        iteration = "Review completed";
+                                    #endregion
+
+                                    string link = "http://codeflow/Client/CodeFlow2010.application?server=http://codeflow/Services/DiscoveryService.svc&review=" + codeReviewSummary.Key;
+
+                                    string richMessage = string.Format("<h3>{0}</h3><br/><h4><b>{1}</b></h4><br/><b>Open in: [<a href=\"{2}\">CodeFlow</a>]</b><br/><b>Author: {3}</b><br/>{4}<br/><b>Description:</b><br/>{5}<br/><h4><b>Affected Files</b></h4>{6}",
+                                        title, iteration, link, pkg.Author, reviewers.ToString(),
+                                        pkg.Description.Trim(), changedfiles.ToString());
+
+                                    string message = string.Format("#WOSS Codeflow# {0}\nIteration {2} {4}\nAuthor: {1}\nReviewer: {3}\n#WOSS Change {5}#\nReview: {6}",
+                                        newDescription.Trim(), pkg.Author.Substring(pkg.Author.IndexOf('\\') + 1), pkg.Revision, reviewerstr.ToString().TrimEnd(new char[] { ',' }),
+                                        pkg.IterationComment, pkg.SourceInfo.SourceName, link);
                                     Logger.WriteInfo(message);
 
-                                    webapi.PostMessage(message, "none", r.Key, new string[]{"WOSS Codeflow"}, new string[]{pkg.Author.Substring(pkg.Author.IndexOf('\\') + 1)});
+                                    webapi.PostMessage(message, "none", r.Key, new string[] { "WOSS Codeflow" }, new string[] { pkg.Author.Substring(pkg.Author.IndexOf('\\') + 1) },
+                                        new string[] { }, richMessage);
                                 }
                                 _MonitoredReviewDict[username][r.Key] = r.codePackages.Length;
                             }
@@ -178,7 +223,7 @@ namespace CodeFlowMonitor
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.WriteInfo("Exception happened, try get the codeflow info in next run");
                 Logger.WriteInfo(e.Message);

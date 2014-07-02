@@ -32,9 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -59,6 +58,11 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\CodeFlowService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\DiscoveryServiceReference\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
@@ -91,17 +95,33 @@
     <None Include="Service References\CodeFlowService\CodeFlowMonitor.CodeFlowService.ReviewUpdateCode.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\CodeFlowService\ReviewService.wsdl" />
-    <None Include="Service References\CodeFlowService\ReviewService.xsd">
+    <None Include="Service References\CodeFlowService\ReviewService1.wsdl" />
+    <None Include="Service References\CodeFlowService\ReviewService4.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\CodeFlowService\ReviewService1.xsd">
+    <None Include="Service References\CodeFlowService\ReviewService41.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\CodeFlowService\ReviewService2.xsd">
+    <None Include="Service References\CodeFlowService\ReviewService42.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\CodeFlowService\ReviewService3.xsd">
+    <None Include="Service References\CodeFlowService\ReviewService43.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\DiscoveryServiceReference\CodeFlowMonitor.DiscoveryServiceReference.Discovery.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\DiscoveryServiceReference\DiscoveryService.wsdl" />
+    <None Include="Service References\DiscoveryServiceReference\DiscoveryService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\DiscoveryServiceReference\DiscoveryService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\DiscoveryServiceReference\DiscoveryService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\DiscoveryServiceReference\DiscoveryService3.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
@@ -120,9 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\CodeFlowService\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\CodeFlowService\ReviewService.disco" />
+    <WCFMetadataStorage Include="Service References\DiscoveryServiceReference\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Service References\CodeFlowService\configuration91.svcinfo" />
@@ -135,6 +153,24 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\DiscoveryServiceReference\DiscoveryService.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\DiscoveryServiceReference\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\DiscoveryServiceReference\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\DiscoveryServiceReference\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\CodeFlowService\ReviewService1.disco" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
