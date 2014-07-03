@@ -679,13 +679,13 @@ function LoadFeeds(category, id, filter) {
 }
 
 var ImportenceTags = [
-    "", // 0
-    "<span class='label label-info'>Info</span>",
-    "<span class='label label-primary'>Primary</span>",
-    "<span class='label label-success'>Success</span>",
-    "<span class='label label-warning'>Warning</span>",
-    "<span class='label label-danger'>Danger</span>",
-    "<span class='label label-default'>Default</span>",
+    "<span class='label label-danger feed-importence'>Important</span>", // 0
+    "<span class='label label-info feed-importence'>Info</span>",
+    "<span class='label label-primary feed-importence'>Primary</span>",
+    "<span class='label label-success feed-importence'>Success</span>",
+    "<span class='label label-warning feed-importence'>Warning</span>",
+    "<span class='label label-danger feed-importence'>Danger</span>",
+    "<span class='label label-default feed-importence'>Default</span>",
 ];
 
 function CreateFeed(postData, isNew) {
@@ -728,26 +728,26 @@ function CreateFeed(postData, isNew) {
     output += "        <img class='img-rounded' id='user_pic_" + mid + "' src='" + picurl + "' width='100' height='100' />";
     output += "      </div>";
 
+    // importance
+    if (importence == 0) {
+        output += ImportenceTags[importence] + "&nbsp;";
+    }
+
     output += "      <div class='feed-content'>";
     output += "        <div class='newpost-header'>";
     output += "          <a id='username_" + mid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>&nbsp;";
     output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
     output += "        </div>";
 
-    output += "        <div class='newpost-input'>";
-    // importance
-    if (importence > 2) {
-        output += ImportenceTags[importence] + "&nbsp;";
-    }
-
     // owners
     if (!isNullOrEmpty(owners)) {
+        output += "    <div class='newpost-input'>";
         output += "      <span class=''>Owned by: </span>";
         for (var key in owners) {
             output += "  <a href='/profile/index?user=" + encodeURIComponent(owners[key]) + "'>@" + owners[key] + "</a>&nbsp;";
         }
+        output += "    </div>";
     }
-    output += "        </div>";
 
     // message
     output += "        <div class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
