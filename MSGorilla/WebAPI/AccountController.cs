@@ -537,7 +537,7 @@ namespace MSGorilla.WebApi
         }
 
         /// <summary>
-        /// Return count of new messages of the a user
+        /// Return count of new messages of a user
         /// 
         /// Example output:
         /// {
@@ -558,7 +558,7 @@ namespace MSGorilla.WebApi
             {
                 userid = me;
             }
-            return _notifManager.FindUserNotif(me);
+            return _notifManager.FindUserNotif(userid);
         }
 
         /// <summary>
