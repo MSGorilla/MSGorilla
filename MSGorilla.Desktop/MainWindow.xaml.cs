@@ -113,6 +113,7 @@ namespace MSGorilla.Desktop
                     BtnAt.Content = string.Format("Mention({0})", notif.UnreadAtlineMsgCount);
                     BtnOwn.Content = string.Format("My Own({0})", notif.UnreadOwnerlineMsgCount);
                     BtnReply.Content = string.Format("Reply Me({0})", notif.UnreadReplyCount);
+                    BtnImportant.Content = string.Format("Important({0})", notif.UnreadImportantMsgCount);
 
                     TBStatus.Text = "Welcome to use MSGorilla, " + notif.Userid;
                 }));
