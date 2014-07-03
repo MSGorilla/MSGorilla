@@ -14,6 +14,8 @@ namespace CodeFlowMonitor
     {
         static void Main(string[] args)
         {
+            //DiscoveryServiceReference.DiscoveryServiceClient client = new DiscoveryServiceReference.DiscoveryServiceClient();
+            //var d = client.Discover();
             //CodeFlowMonitorService.OnTimedEvent(null, null);
             ServiceBase.Run(new CodeFlowMonitorService());
         }

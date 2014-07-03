@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla", "MSGorilla\MSGorilla.csproj", "{47634D5A-C567-4EDB-963E-A0F9B79F27E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.Library", "MSGorilla.Library\MSGorilla.Library.csproj", "{AD407F7A-F82C-4C44-98F9-C2145A5F4A50}"
@@ -115,5 +117,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{026E8141-737D-4CFE-9AAC-C0F9B62E6A29} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
+		{8B67E716-4250-479C-BD18-C2931556B0BC} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
 	EndGlobalSection
 EndGlobal

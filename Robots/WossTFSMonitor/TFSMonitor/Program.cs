@@ -12,8 +12,23 @@ namespace TFSMonitor
     {
         static void Main(string[] args)
         {
-            TfsHelper.GetWOSSTableBugsLatestUpdated(DateTime.Now.AddDays(-1.0f));
+            int minutesGap = 0;
 
+            if (args.Length > 0)
+            {
+                if (args[0].StartsWith("/minutes:"))
+                {
+                    string[] pair = args[0].Split(':');
+                    int.TryParse(pair[1], out minutesGap);
+                }
+                else
+                {
+                    Console.WriteLine("Usage: TFSMonitor.exe [/minutes:<minutesToInclude>]");
+                    return;
+                }
+            }
+
+            TfsHelper.GetWOSSTableBugsLatestUpdated(DateTime.Now.AddMinutes(-1.0f * minutesGap));
             System.Timers.Timer timer = new System.Timers.Timer(1000.0f * 60 * 10); // 10 minutes timer
             // Hook up the Elapsed event for the timer. 
             timer.Elapsed += OnTimedEvent;
