@@ -98,6 +98,10 @@
     <Compile Include="Migrations\201406160753225_AddFavourateTopic.Designer.cs">
       <DependentUpon>201406160753225_AddFavourateTopic.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201407030519350_add_important_msg_count.cs" />
+    <Compile Include="Migrations\201407030519350_add_important_msg_count.Designer.cs">
+      <DependentUpon>201407030519350_add_important_msg_count.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActionResult.cs" />
     <Compile Include="Models\Attachment.cs" />
@@ -161,6 +165,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201406160753225_AddFavourateTopic.resx">
       <DependentUpon>201406160753225_AddFavourateTopic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201407030519350_add_important_msg_count.resx">
+      <DependentUpon>201407030519350_add_important_msg_count.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
