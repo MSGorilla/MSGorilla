@@ -86,6 +86,16 @@ namespace MSGorilla.Library
             }            
         }
 
+        public void incrementImportantMsgCount(string userid)
+        {
+            using (var _gorillaCtx = new MSGorillaContext())
+            {
+                NotificationCount notif = FindUserNotif(userid, _gorillaCtx);
+                notif.UnreadImportantMsgCount++;
+                _gorillaCtx.SaveChanges();
+            }
+        }
+
         public void clearAtlineNotifCount(string userid)
         {
             using(var _gorillaCtx = new MSGorillaContext())
@@ -123,6 +133,16 @@ namespace MSGorilla.Library
                 notif.UnreadReplyCount = 0;
                 _gorillaCtx.SaveChanges();
             }            
+        }
+
+        public void clearImportantMsgCount(string userid)
+        {
+            using (var _gorillaCtx = new MSGorillaContext())
+            {
+                NotificationCount notif = FindUserNotif(userid, _gorillaCtx);
+                notif.UnreadImportantMsgCount = 0;
+                _gorillaCtx.SaveChanges();
+            }
         }
 
         public void clearAll(string userid)
