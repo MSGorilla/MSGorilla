@@ -71,21 +71,26 @@ namespace MSGorilla.Desktop
         private void BtnHome_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("https://msgorilla.cloudapp.net");
+            BtnHome.Content = "Home(0)";
+            BtnImportant.Content = "Important(0)";
         }
 
         private void BtnOwn_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("https://msgorilla.cloudapp.net/Notification/index?category=ownerline");
+            BtnOwn.Content = "My Own(0)";
         }
 
         private void BtnAt_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("https://msgorilla.cloudapp.net/Notification/index?category=atline");
+            BtnAt.Content = "Mention(0)";
         }
 
         private void BtnReply_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("https://msgorilla.cloudapp.net/Notification/Replies");
+            BtnReply.Content = "Reply Me(0)";
         }
 
         private void Update()

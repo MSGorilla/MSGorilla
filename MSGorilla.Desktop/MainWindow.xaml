@@ -33,7 +33,7 @@
                     </ControlTemplate>
                 </Button.Template>
             </Button>
-            <Button x:Name="BtnHome" Content="Home" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="75,0,0,0" Click="BtnHome_Click" MouseMove="Drag_MouseMove" Background="#FF00FF2E" Foreground="White" Opacity="0.8"/>
+            <Button x:Name="BtnHome" Content="Home" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="75,0,0,0" Click="BtnHome_Click" MouseMove="Drag_MouseMove" Background="#FF07EA07" Foreground="White" Opacity="0.8"/>
             <Button x:Name="BtnOwn" Content="My Own" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="150,0,0,0" Click="BtnOwn_Click" MouseMove="Drag_MouseMove" Background="Black" Foreground="White" Opacity="0.8"/>
             <Button x:Name="BtnAt" Content="Mention Me" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="225,0,0,0" Click="BtnAt_Click" MouseMove="Drag_MouseMove" Background="#FF008BFF" Foreground="White" Opacity="0.8"/>
             <Button x:Name="BtnReply" Content="Reply Me" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="300,0,0,0" Click="BtnReply_Click" MouseMove="Drag_MouseMove" Background="#FFA200FF" Foreground="White" Opacity="0.8">
