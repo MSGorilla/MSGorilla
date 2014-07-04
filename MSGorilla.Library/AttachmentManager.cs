@@ -27,6 +27,27 @@ namespace MSGorilla.Library
         private CloudBlobContainer _blobcontainer;
         private static string _policyName = "MySASPolicy";
 
+        private string _sasToken;
+        private DateTime _tokenGeneratedTimestamp;
+
+        private string SASToken
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_sasToken))
+                {
+                    _tokenGeneratedTimestamp = DateTime.UtcNow;
+                    _sasToken = _blobcontainer.GetSharedAccessSignature(new SharedAccessBlobPolicy(), _policyName);
+                }
+                else if (DateTime.UtcNow > _tokenGeneratedTimestamp.AddMinutes(30))
+                {
+                    _tokenGeneratedTimestamp = DateTime.UtcNow;
+                    _sasToken = _blobcontainer.GetSharedAccessSignature(new SharedAccessBlobPolicy(), _policyName);
+                }
+                return _sasToken;
+            }
+        }
+
         public AttachmentManager()
         {
             _attachment = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Attachment);
@@ -49,9 +70,10 @@ namespace MSGorilla.Library
             // Set the permission policy on the container.
             _blobcontainer.SetPermissions(blobPermissions);
 
-            // Get the shared access signature to share with users.
-            
+            // Get the shared access signature to share with users.            
         }
+
+        
 
         public Attachment Upload(string filename, 
                             string filetype, 
@@ -142,10 +164,7 @@ namespace MSGorilla.Library
             }
             CloudBlockBlob blockBlob = _blobcontainer.GetBlockBlobReference(attachment.FileID);
 
-            string _sasToken =
-               _blobcontainer.GetSharedAccessSignature(new SharedAccessBlobPolicy(), _policyName);
-
-            return blockBlob.Uri.ToString() + _sasToken;
+            return blockBlob.Uri.ToString() + this.SASToken;
         }
 
         //public static string GenerateAttachmentID(string uploader, string guid, DateTime timestamp)
