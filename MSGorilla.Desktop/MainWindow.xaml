@@ -4,7 +4,7 @@
         Title="MSGorilla" Height="75" Width="375" ResizeMode="NoResize" Topmost="True" WindowStyle="None" MouseMove="Drag_MouseMove" WindowStartupLocation="Manual" Top="50"
         Background="Transparent" AllowsTransparency="True">
     <Grid Margin="0,0,0,0">
-        <Border BorderThickness="1" BorderBrush="DarkGreen"  CornerRadius="10,10,10,10" Name="top">
+        <Border BorderThickness="1" BorderBrush="DarkGreen"  CornerRadius="10,10,10,10" Name="top" Opacity="0.8">
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#eee"/>
@@ -24,7 +24,7 @@
             </Grid.ContextMenu>
 
 
-            <Button x:Name="BtnImportant" Content="Important" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="0,0,0,0" Click="BtnHome_Click" MouseMove="Drag_MouseMove" Foreground="White">
+            <Button x:Name="BtnImportant" Content="Important" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="0,0,0,0" Click="BtnHome_Click" MouseMove="Drag_MouseMove" Foreground="White" Opacity="0.8">
                 <Button.Template>
                     <ControlTemplate TargetType="{x:Type Button}" >
                         <Border BorderBrush="{TemplateBinding Control.BorderBrush}" BorderThickness="0" CornerRadius="10,0,0,0" Background="#FFEA280A">
@@ -33,20 +33,20 @@
                     </ControlTemplate>
                 </Button.Template>
             </Button>
-            <Button x:Name="BtnHome" Content="Home" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="75,0,0,0" Click="BtnHome_Click" MouseMove="Drag_MouseMove" Background="#FF00FF2E" Foreground="White"/>
-            <Button x:Name="BtnOwn" Content="My Own" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="150,0,0,0" Click="BtnOwn_Click" MouseMove="Drag_MouseMove" Background="Black" Foreground="White"/>
-            <Button x:Name="BtnAt" Content="Mention Me" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="225,0,0,0" Click="BtnAt_Click" MouseMove="Drag_MouseMove" Background="#FF008BFF" Foreground="White"/>
-            <Button x:Name="BtnReply" Content="Reply Me" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="300,0,0,0" Click="BtnReply_Click" MouseMove="Drag_MouseMove" Background="#FFA200FF" Foreground="White">
+            <Button x:Name="BtnHome" Content="Home" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="75,0,0,0" Click="BtnHome_Click" MouseMove="Drag_MouseMove" Background="#FF00FF2E" Foreground="White" Opacity="0.8"/>
+            <Button x:Name="BtnOwn" Content="My Own" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="150,0,0,0" Click="BtnOwn_Click" MouseMove="Drag_MouseMove" Background="Black" Foreground="White" Opacity="0.8"/>
+            <Button x:Name="BtnAt" Content="Mention Me" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="225,0,0,0" Click="BtnAt_Click" MouseMove="Drag_MouseMove" Background="#FF008BFF" Foreground="White" Opacity="0.8"/>
+            <Button x:Name="BtnReply" Content="Reply Me" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="39" Margin="300,0,0,0" Click="BtnReply_Click" MouseMove="Drag_MouseMove" Background="#FFA200FF" Foreground="White" Opacity="0.8">
                 <Button.Template>
                     <ControlTemplate TargetType="{x:Type Button}" >
-                        <Border BorderBrush="{TemplateBinding Control.BorderBrush}" BorderThickness="0" CornerRadius="0,10,0,0" Background="#FFEA280A">
+                        <Border BorderBrush="{TemplateBinding Control.BorderBrush}" BorderThickness="0" CornerRadius="0,10,0,0" Background="#FFA200FF">
                             <ContentPresenter Content="{TemplateBinding ContentControl.Content}" HorizontalAlignment="Center" VerticalAlignment="Center" ></ContentPresenter>
                         </Border>
                     </ControlTemplate>
                 </Button.Template>
             </Button>
-            <Label Content="Status" HorizontalAlignment="Left" Margin="0,44,0,0" VerticalAlignment="Top" MouseMove="Drag_MouseMove"/>
-            <TextBox x:Name="TBStatus" HorizontalAlignment="Left" Height="23" Margin="47,47,0,0" TextWrapping="Wrap" Text="Unknown" VerticalAlignment="Top" Width="318" IsEnabled="False" MouseMove="Drag_MouseMove"/>
+            <Label Content="Status" HorizontalAlignment="Left" Margin="0,44,0,0" VerticalAlignment="Top" MouseMove="Drag_MouseMove" Opacity="0.8"/>
+            <TextBox x:Name="TBStatus" HorizontalAlignment="Left" Height="23" Margin="47,47,0,0" TextWrapping="Wrap" Text="Unknown" VerticalAlignment="Top" Width="318" IsEnabled="False" MouseMove="Drag_MouseMove" Opacity="0.8"/>
             
         </Grid>
     </Grid>
