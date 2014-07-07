@@ -51,6 +51,15 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public string whoami()
         {
+            if (HttpContext.Current.Session != null)
+            {
+                var session = HttpContext.Current.Session;
+                if (session["userid"] != null)
+                {
+                    return session["userid"].ToString();
+                }
+            }
+
             string authString = null;
             if(HttpContext.Current.Request.Cookies.Get("Authorization") !=null 
                 && !string.IsNullOrEmpty(HttpContext.Current.Request.Cookies.Get("Authorization").Value))

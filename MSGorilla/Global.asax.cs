@@ -7,6 +7,7 @@ using System.Web.Http.Description;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using System.Web.SessionState;
 
 using MSGorilla.Filters;
 
@@ -30,6 +31,11 @@ namespace MSGorilla
             var config = GlobalConfiguration.Configuration;
             config.Services.Replace(typeof(IDocumentationProvider), 
                 new XmlCommentDocumentationProvider(HttpContext.Current.Server.MapPath("~/bin/MSGorilla.XML")));
+        }
+
+        protected void Application_PostAuthorizeRequest()
+        {
+            HttpContext.Current.SetSessionStateBehavior(SessionStateBehavior.Required);
         }
 
         void Application_Error(object sender, EventArgs e)
