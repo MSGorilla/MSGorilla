@@ -37,18 +37,57 @@ namespace MSGorilla.Desktop
 
         GorillaStatusHelper _helper;
 
-        public MainWindow()
+        private void OnStartup()
         {
-            InitializeComponent();
-            this.Left = SystemParameters.PrimaryScreenWidth - this.Width;
+            // Get Reference to the current Process
+            Process thisProc = Process.GetCurrentProcess();
+            // Check how many total processes have the same name as the current one
+            if (Process.GetProcessesByName(thisProc.ProcessName).Length > 1)
+            {
+                // If ther is more than one, than it is already running.
+                MessageBox.Show("Application is already running.");
+                Application.Current.Shutdown();
+                return;
+            }
+
+            this.Left = SystemParameters.PrimaryScreenWidth - this.Width - 30;
 
             _helper = new GorillaStatusHelper(GetCurrentUserID());
             TBStatus.Text = "Welcome to use MSGorilla, " + _helper.Userid;
 
-            ThreadStart entry = new ThreadStart(Update);
-            Thread workThread = new Thread(entry);
+            Thread workThread = new Thread(new ThreadStart(Update));
             workThread.IsBackground = true;
             workThread.Start();
+
+            Thread magnetThread = new Thread(new ThreadStart(Magnet));
+            magnetThread.IsBackground = true;
+            magnetThread.Start();
+
+
+            Thread shinkMainWindowMonitor = new Thread(new ThreadStart(ShinkMainWindowMonitor));
+            shinkMainWindowMonitor.IsBackground = true;
+            shinkMainWindowMonitor.Start();
+        }
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            OnStartup();
+        }
+
+        private void Magnet()
+        {
+            while (true)
+            {
+                Thread.Sleep(1);                
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    if (this.Top < 20 && this.Top > 0)
+                    {
+                        this.Top = 0;
+                    }
+                }));
+            }            
         }
 
         private void Drag_MouseMove(object sender, MouseEventArgs e)
@@ -59,9 +98,67 @@ namespace MSGorilla.Desktop
                 {
                     this.DragMove();
                 }
+                if (e.LeftButton == MouseButtonState.Released)
+                {
+                    if (this.Top < 0)
+                    {
+                        ShowMainWindow();
+                    }
+                }
             }
             catch { }
         }
+
+        //////////////////////////////////////////UI Animation///////////////////////////////////////////////////////
+
+        private void ShinkMainWindowMonitor()
+        {
+            while (true)
+            {
+                Thread.Sleep(1);
+                ShinkMainWindowChecker();
+            }
+        }
+
+        private void ShinkMainWindowChecker()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                if (this.Top != 0)
+                {
+                    return;
+                }
+            }));
+
+            Thread.Sleep(3000);
+
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                if (this.Top == 0)
+                {
+                    ShinkMainWindow();
+                }
+            }));
+        }
+        private void ShinkMainWindow()
+        {
+            int height = (int)(0 - (this.Height - 5));            
+            for (int i = 0; i >= height; i--)
+            {
+                this.Top = i;
+                Thread.Sleep(1);
+            }
+        }
+
+        private void ShowMainWindow()
+        {
+            while (this.Top < 0)
+            {
+                this.Top++;
+                Thread.Sleep(1);
+            }
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////
 
         private void Close_Click(object sender, RoutedEventArgs e)
         {
@@ -121,6 +218,7 @@ namespace MSGorilla.Desktop
                     BtnImportant.Content = string.Format("Important({0})", notif.UnreadImportantMsgCount);
 
                     TBStatus.Text = "Welcome to use MSGorilla, " + notif.Userid;
+                    TBStatus.Foreground = Brushes.Black;
                 }));
             }
             catch (Exception e)
@@ -128,6 +226,9 @@ namespace MSGorilla.Desktop
                 this.Dispatcher.Invoke((Action)(() =>
                 {
                     TBStatus.Text = e.ToString();
+                    TBStatus.Foreground = Brushes.Red;
+
+                    MessageBoxResult result = MessageBox.Show(e.ToString(), "Confirmation", MessageBoxButton.OK, MessageBoxImage.Error);
                 }));
             }
         }
