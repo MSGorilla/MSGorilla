@@ -9,6 +9,12 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using System.Web.SessionState;
 
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Web;
+using Microsoft.IdentityModel.Web.Configuration;
+//using System.IdentityModel.Tokens;
+//using System.IdentityModel;
+
 using MSGorilla.Filters;
 
 namespace MSGorilla
@@ -31,6 +37,26 @@ namespace MSGorilla
             var config = GlobalConfiguration.Configuration;
             config.Services.Replace(typeof(IDocumentationProvider), 
                 new XmlCommentDocumentationProvider(HttpContext.Current.Server.MapPath("~/bin/MSGorilla.XML")));
+        }
+
+        private void OnServiceConfigurationCreated(object sender, ServiceConfigurationCreatedEventArgs e)
+        {
+            // Use the <serviceCertificate> to protect the cookies that 
+            // are sent to the client.
+            List<CookieTransform> sessionTransforms =
+                new List<CookieTransform>(
+                    new CookieTransform[] 
+            {
+                new DeflateCookieTransform(), 
+                new RsaEncryptionCookieTransform(
+                    e.ServiceConfiguration.ServiceCertificate),
+                new RsaSignatureCookieTransform(
+                    e.ServiceConfiguration.ServiceCertificate)  
+            });
+            SessionSecurityTokenHandler sessionHandler =
+                new SessionSecurityTokenHandler(sessionTransforms.AsReadOnly());
+
+            e.ServiceConfiguration.SecurityTokenHandlers.AddOrReplace(sessionHandler);
         }
 
         protected void Application_PostAuthorizeRequest()
