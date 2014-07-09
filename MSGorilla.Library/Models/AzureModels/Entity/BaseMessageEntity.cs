@@ -27,7 +27,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 
         public BaseMessageEntity() {}
 
-        public BaseMessageEntity(Message message)
+        public BaseMessageEntity(Message message, string pk = null, string rk = null)
         {
             this.User = message.User;
             this.ID = message.ID;
@@ -41,6 +41,15 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             this.RichMessageID = message.RichMessageID;
             this.AttachmentID = Utils.StringArray2String(message.AttachmentID);
             this.Importance = message.Importance;
+
+            if (!string.IsNullOrEmpty(pk))
+            {
+                this.PartitionKey = pk;
+            }
+            if (!string.IsNullOrEmpty(rk))
+            {
+                this.RowKey = rk;
+            }
         }
 
         public Message toMessage()

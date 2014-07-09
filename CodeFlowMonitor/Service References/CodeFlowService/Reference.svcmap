@@ -19,15 +19,15 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="http://codeflow/Services/ReviewService.svc" Protocol="http" SourceId="1" />
+    <MetadataSource Address="http://co1cdflweb03/Services/ReviewService.svc" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="ReviewService.disco" MetadataType="Disco" ID="917d149a-92b5-43d5-ba68-a3a8e6eb95a1" SourceId="1" SourceUrl="http://codeflow/Services/ReviewService.svc?disco" />
-    <MetadataFile FileName="ReviewService.wsdl" MetadataType="Wsdl" ID="4471e4cd-ee69-4bc6-b1b8-5df5e606a7ad" SourceId="1" SourceUrl="http://codeflow/Services/ReviewService.svc?wsdl" />
-    <MetadataFile FileName="ReviewService.xsd" MetadataType="Schema" ID="bd6b1000-6dba-48b4-bfde-6d52faf6b212" SourceId="1" SourceUrl="http://codeflow/Services/ReviewService.svc?xsd=xsd0" />
-    <MetadataFile FileName="ReviewService1.xsd" MetadataType="Schema" ID="5d7e34ac-1271-4e7d-92eb-600447ea160a" SourceId="1" SourceUrl="http://codeflow/Services/ReviewService.svc?xsd=xsd1" />
-    <MetadataFile FileName="ReviewService2.xsd" MetadataType="Schema" ID="9f2ab432-0a2c-4505-be54-b258b7d0bf0a" SourceId="1" SourceUrl="http://codeflow/Services/ReviewService.svc?xsd=xsd2" />
-    <MetadataFile FileName="ReviewService3.xsd" MetadataType="Schema" ID="7b55cd2b-6d0f-447d-a6b3-91035539d27b" SourceId="1" SourceUrl="http://codeflow/Services/ReviewService.svc?xsd=xsd3" />
+    <MetadataFile FileName="ReviewService1.disco" MetadataType="Disco" ID="c9117bad-10ec-4703-b4b0-0dd5c04f9251" SourceId="1" SourceUrl="http://co1cdflweb03/Services/ReviewService.svc?disco" />
+    <MetadataFile FileName="ReviewService4.xsd" MetadataType="Schema" ID="96fa3b44-4ba9-446f-a007-9269f82366e9" SourceId="1" SourceUrl="http://co1cdflweb03/Services/ReviewService.svc?xsd=xsd2" />
+    <MetadataFile FileName="ReviewService41.xsd" MetadataType="Schema" ID="8e5aa4d2-c6d2-4b06-8f0f-e471b91f9c5c" SourceId="1" SourceUrl="http://co1cdflweb03/Services/ReviewService.svc?xsd=xsd3" />
+    <MetadataFile FileName="ReviewService1.wsdl" MetadataType="Wsdl" ID="57a1cc46-3563-4494-862a-94e74c0be443" SourceId="1" SourceUrl="http://co1cdflweb03/Services/ReviewService.svc?wsdl" />
+    <MetadataFile FileName="ReviewService42.xsd" MetadataType="Schema" ID="e2928c03-3abc-4c2c-bfa7-d7b72ccc7eff" SourceId="1" SourceUrl="http://co1cdflweb03/Services/ReviewService.svc?xsd=xsd1" />
+    <MetadataFile FileName="ReviewService43.xsd" MetadataType="Schema" ID="a4c76b4b-c72c-4e77-92f8-f5f71291685e" SourceId="1" SourceUrl="http://co1cdflweb03/Services/ReviewService.svc?xsd=xsd0" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

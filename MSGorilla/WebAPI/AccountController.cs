@@ -537,6 +537,31 @@ namespace MSGorilla.WebApi
         }
 
         /// <summary>
+        /// Return count of new messages of a user
+        /// 
+        /// Example output:
+        /// {
+        ///    "Userid": "user1",
+        ///    "UnreadHomelineMsgCount": 8,
+        ///    "UnreadOwnerlineMsgCount": 0,
+        ///    "UnreadAtlineMsgCount": 0,
+        ///    "UnreadReplyCount": 0
+        /// }
+        /// </summary>
+        /// <param name="userid">user id</param>
+        /// <returns></returns>
+        [HttpGet]
+        public NotificationCount GetNotificationCount(string userid)
+        {
+            string me = whoami();
+            if (string.IsNullOrEmpty(userid))
+            {
+                userid = me;
+            }
+            return _notifManager.FindUserNotif(userid);
+        }
+
+        /// <summary>
         /// Return a user list the userid of which contains key word
         /// 
         /// Example output:

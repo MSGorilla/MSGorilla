@@ -66,8 +66,22 @@ function Html2Txt(code) {
     return code;
 }
 
+function enhanceMessage(schema, mid, msg) {
+    switch (schema) {
+        case "chart-free":
+            $("#message_" + mid).height(500);
+            var dom = document.getElementById('message_' + mid);
+            var chart = echarts.init(dom);
+            var json = eval("(" + msg + ")");
+            chart.setOption(json);
+            break;
+        default:
+            break;
+    }
+}
+
 function encodeHtml(code, atusers, topics) {
-    var code = Txt2Html(code);
+    code = Txt2Html(code);
 
     // autolink http[s]
     var strRegex = "http[s]?://(([0-9a-z]+(\\-)?)*[0-9a-z]+(\\.))*[0-9a-z]+(:[0-9]{1,5})?(/([\\w\\-/\\+\\?%#=\\.:{}]|(&#38;))*)?";
@@ -82,7 +96,7 @@ function encodeHtml(code, atusers, topics) {
         for (var key in atusers) {
             var user = atusers[key];
             var htmluser = Txt2Html(user);
-            code = code.replace("@" + htmluser, ('<a href="/profile/index?user=' + encodeURIComponent(user) + '">@' + htmluser + '</a>'));
+            code = code.replace("@" + htmluser, ('<a href="/profile/index?user=' + encodeTxt(user) + '">@' + htmluser + '</a>'));
         }
 
         //strRegex = "@([0-9a-z\\-]+)(\\s|$)";
@@ -90,7 +104,7 @@ function encodeHtml(code, atusers, topics) {
 
         //code = code.replace(atre, function (s1, s2, s3) {
         //    if ($.inArray(s2, atusers) >= 0) {
-        //        return encodeURIComponent('<a href="/profile/index?user=' + s2 + '">@' + s2 + '</a>') + s3;
+        //        return encodeTxt('<a href="/profile/index?user=' + s2 + '">@' + s2 + '</a>') + s3;
         //    }
         //    else {
         //        return s1;
@@ -104,7 +118,7 @@ function encodeHtml(code, atusers, topics) {
             var topic = topics[key];
             var htmltopic = Txt2Html(topic);
 
-            code = code.replace("#" + htmltopic + "#", ('<a href="/topic/index?topic=' + encodeURIComponent(topic) + '">#' + htmltopic + '#</a>'));
+            code = code.replace("#" + htmltopic + "#", ('<a href="/topic/index?topic=' + encodeTxt(topic) + '">#' + htmltopic + '#</a>'));
         }
 
         //strRegex = "#(([\\w \\-]+(#{2,})?)*[\\w \\-]+)#(\\s|$)";
@@ -112,7 +126,7 @@ function encodeHtml(code, atusers, topics) {
 
         //code = code.replace(topicre, function (s1, s2, s3, s4,s5,s6,s7) {
         //    if ($.inArray(s2, topics) >= 0) {
-        //        return encodeURIComponent('<a href="/topic/index?topic=' + s2 + '">#' + s2 + '#</a>') + s5;
+        //        return encodeTxt('<a href="/topic/index?topic=' + s2 + '">#' + s2 + '#</a>') + s5;
         //    }
         //    else {
         //        return s1;
@@ -190,7 +204,7 @@ function ShowError(msg, boxno) {
 
 function ShowAjaxError(status, error, code, msg, boxno) {
     if (code == 2004) // access denied. need login again.
-        location.href = "/Error/?message=" + encodeURIComponent(msg) + "&returnUrl=" + encodeURIComponent("/Account/Logoff");
+        location.href = "/Error/?message=" + encodeTxt(msg) + "&returnUrl=" + encodeTxt("/Account/Logoff");
 
     var errormsg = "[" + status + "]" + " " + error + ": " + (isNullOrEmpty(code) ? "" : code) + " " + msg;
     ShowError(errormsg, boxno);
@@ -237,7 +251,7 @@ function LoadUserInfo(user) {
     }
     else {
         apiurl = "/api/account/user";
-        apidata = "userid=" + encodeURIComponent(user);
+        apidata = "userid=" + encodeTxt(user);
     }
 
     $.ajax({
@@ -360,7 +374,7 @@ function Follow(user) {
     $.ajax({
         type: "GET",
         url: "/api/account/follow",
-        data: "userid=" + encodeURIComponent(user),
+        data: "userid=" + encodeTxt(user),
         success: function (data) {
             var code = data.ActionResultCode;
             var msg = data.Message;
@@ -383,7 +397,7 @@ function Unfollow(user) {
     $.ajax({
         type: "GET",
         url: "/api/account/unfollow",
-        data: "userid=" + encodeURIComponent(user),
+        data: "userid=" + encodeTxt(user),
         success: function (data) {
             var code = data.ActionResultCode;
             var msg = data.Message;
@@ -412,7 +426,7 @@ function PostMessage() {
     $.ajax({
         type: "POST",
         url: "/api/message/postmessage",
-        data: "message=" + message, // + "&richMessage=" + message,
+        data: "message=" + message + "&importance=2", // + "&schemaID=" + "chart-free",
         dataType: "json",
         success: function (data) {
             $("#postmessage").val("");
@@ -444,7 +458,7 @@ function PostReply(user, mid) {
     $.ajax({
         type: "POST",
         url: "/api/reply/postreply",
-        data: "to=" + encodeURIComponent(touser) + "&message=" + message + "&messageUser=" + encodeURIComponent(user) + "&messageID=" + encodeURIComponent(mid),
+        data: "to=" + encodeTxt(touser) + "&message=" + message + "&messageUser=" + encodeTxt(user) + "&messageID=" + encodeTxt(mid),
         dataType: "json",
         success: function (data) {
             $("#replymessage_" + mid).val("");
@@ -470,7 +484,7 @@ function LoadMessage(user, mid) {
     }
 
     apiurl = "/api/message/getdisplaymessage";
-    apidata = "msgUser=" + encodeURIComponent(user) + "&msgID=" + encodeURIComponent(mid);
+    apidata = "msgUser=" + encodeTxt(user) + "&msgID=" + encodeTxt(mid);
 
     $.ajax({
         type: "GET",
@@ -530,15 +544,15 @@ function LoadFeeds(category, id, filter) {
 
     if (category == "homeline") {
         apiurl = "/api/message/homeline";
-        apidata = "userid=" + encodeURIComponent(id);
+        apidata = "userid=" + encodeTxt(id);
     }
     else if (category == "atline") {
         apiurl = "/api/message/atline";
-        apidata = "userid=" + encodeURIComponent(id);
+        apidata = "userid=" + encodeTxt(id);
     }
     else if (category == "ownerline") {
         apiurl = "/api/message/ownerline";
-        apidata = "userid=" + encodeURIComponent(id);
+        apidata = "userid=" + encodeTxt(id);
     }
     else if (category == "replyline") {
         apiurl = "/api/reply/getmyreply";
@@ -547,7 +561,7 @@ function LoadFeeds(category, id, filter) {
         apiurl = "/api/message/publicsquareline";
     else if (category == "userline") {
         apiurl = "/api/message/userline";
-        apidata = "userid=" + encodeURIComponent(id);
+        apidata = "userid=" + encodeTxt(id);
     }
     else if (category == "topicline") {
         apiurl = "/api/message/topicline";
@@ -556,7 +570,7 @@ function LoadFeeds(category, id, filter) {
             isLoadFeeds = false;
             return;
         }
-        apidata = "topic=" + encodeURIComponent(id);
+        apidata = "topic=" + encodeTxt(id);
     }
     else if (category == "message") {
         apiurl = "/api/message/topicline";
@@ -565,7 +579,7 @@ function LoadFeeds(category, id, filter) {
             isLoadFeeds = false;
             return;
         }
-        apidata = "topic=" + encodeURIComponent(id);
+        apidata = "topic=" + encodeTxt(id);
     }
     else {
         ShowError("Illegal operation.");
@@ -648,8 +662,10 @@ function LoadFeeds(category, id, filter) {
                         }
                         if (category == "replyline")
                             $("#feedlist").append(CreateReply(item, true, isNew));
-                        else
+                        else {
                             $("#feedlist").append(CreateFeed(item, isNew));
+                            enhanceMessage(item.SchemaID, item.ID, item.MessageContent);
+                        }
                     })
                 }
             }
@@ -678,6 +694,16 @@ function LoadFeeds(category, id, filter) {
     });
 }
 
+var ImportenceTags = [
+    "<span class='label label-danger feed-importence'>Important</span>", // 0
+    "<span class='label label-info feed-importence'>Info</span>",
+    "<span class='label label-primary feed-importence'>Primary</span>",
+    "<span class='label label-success feed-importence'>Success</span>",
+    "<span class='label label-warning feed-importence'>Warning</span>",
+    "<span class='label label-danger feed-importence'>Danger</span>",
+    "<span class='label label-default feed-importence'>Default</span>",
+];
+
 function CreateFeed(postData, isNew) {
     var output = "";
     var mid = postData.ID;
@@ -694,6 +720,7 @@ function CreateFeed(postData, isNew) {
     var atusers = postData.AtUser;
     var topics = postData.TopicName;
     var attach = postData.Attachment;
+    var importence = postData.Importance;
     var showevents = false;
 
     if (isNullOrEmpty(picurl)) {
@@ -706,20 +733,10 @@ function CreateFeed(postData, isNew) {
 
     //output += "<ul class='list-group'>";
     if (isNew == true) {
-        //if (!isNullOrEmpty(richmsgid)) {
-        //    output += "  <li id='feed_" + mid + "' class='list-group-item new-notification clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
-        //}
-        //else {
         output += "  <li id='feed_" + mid + "' class='list-group-item new-notification'>";
-        //}
     }
     else {
-        //if (!isNullOrEmpty(richmsgid)) {
-        //    output += "  <li id='feed_" + mid + "' class='list-group-item clickable' onclick='ShowRichMsg(event, \"" + richmsgid + "\", \"" + mid + "\");'>";
-        //}
-        //else {
         output += "  <li id='feed_" + mid + "' class='list-group-item'>";
-        //}
     }
 
     output += "    <div>"
@@ -727,29 +744,32 @@ function CreateFeed(postData, isNew) {
     output += "        <img class='img-rounded' id='user_pic_" + mid + "' src='" + picurl + "' width='100' height='100' />";
     output += "      </div>";
 
+    // importance
+    if (importence == 0) {
+        output += ImportenceTags[importence] + "&nbsp;";
+    }
+
     output += "      <div class='feed-content'>";
     output += "        <div class='newpost-header'>";
-    output += "          <a id='username_" + mid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>&nbsp;";
+    output += "          <a id='username_" + mid + "' class='fullname' href='/profile/index?user=" + encodeTxt(user) + "'>" + username + "</a>&nbsp;";
     output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
     output += "        </div>";
 
     // owners
     if (!isNullOrEmpty(owners)) {
-        output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
+        output += "    <div class='newpost-input'>";
+        output += "      <span class=''>Owned by: </span>";
         for (var key in owners) {
-            output += "  <a href='/profile/index?user=" + encodeURIComponent(owners[key]) + "'>@" + owners[key] + "</a>&nbsp;";
+            output += "  <a href='/profile/index?user=" + encodeTxt(owners[key]) + "'>@" + owners[key] + "</a>&nbsp;";
         }
         output += "    </div>";
     }
 
     // message
-    output += "        <div class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
+    output += "        <div id='message_" + mid + "' class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
 
     // richmsg
     if (!isNullOrEmpty(richmsgid)) {
-        //output += "        <div class='newpost-footer'>";
-        //output += "          <button id='btn_up_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
-        //output += "        </div>";
         output += "    <div id='rich_message_" + mid + "' class='newpost-input panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'></div>";
     }
 
@@ -772,9 +792,9 @@ function CreateFeed(postData, isNew) {
     //}
 
     // btns
-    // output += "           <a id='btn_open_msg_" + mid + "' class='btn btn-link btn-sm' target='_blank' href='/Message/Index?user=" + encodeURIComponent(user) + "&msgID=" + encodeURIComponent(mid) + "'>Open</a>";
+    // output += "       <a id='btn_open_msg_" + mid + "' class='btn btn-link btn-sm' target='_blank' href='/Message/Index?user=" + encodeTxt(user) + "&msgID=" + encodeTxt(mid) + "'>Open</a>";
     if (!isNullOrEmpty(richmsgid)) {
-        output += "          <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
+        output += "      <button id='btn_showrichmsg_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'>More</button>";
     }
     output += "          <button id='btn_showreply_" + mid + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#reply_" + mid + "' onclick='ShowReplies(\"" + mid + "\");'>Replies</button>";
 
@@ -831,7 +851,7 @@ function ShowRichMsg(rmid, mid) {
             $.ajax({
                 type: "GET",
                 url: "/api/message/getrichmessage",
-                data: "richMsgID=" + encodeURIComponent(rmid),
+                data: "richMsgID=" + encodeTxt(rmid),
                 success: function (data) {
                     richmsgdiv.empty();
                     // create rich message
@@ -887,7 +907,7 @@ function LoadReplies(mid) {
     $.ajax({
         type: "GET",
         url: "/api/message/getmessagereply",
-        data: "msgID=" + encodeURIComponent(mid),
+        data: "msgID=" + encodeTxt(mid),
         success: function (data) {
             // create reply list
             replydiv.empty();
@@ -938,11 +958,11 @@ function CreateReply(replyData, isReplyFeed, isNew) {
     output += "    </div>";
     output += "    <div class='reply-content'>";
     output += "      <div class='reply-header'>"
-    output += "        <a id='reply_username_" + rid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>";
+    output += "        <a id='reply_username_" + rid + "' class='fullname' href='/profile/index?user=" + encodeTxt(user) + "'>" + username + "</a>";
     output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
     output += "      </div>";
     output += "      <div class='reply-input'>";
-    output += "        <a id='reply_tousername_" + rid + "' href='/profile/index?user=" + encodeURIComponent(touser) + "'>@" + touser + "</a>&nbsp;";
+    output += "        <a id='reply_tousername_" + rid + "' href='/profile/index?user=" + encodeTxt(touser) + "'>@" + touser + "</a>&nbsp;";
     output += "        " + encodeHtml(msg);
     output += "      </div>";
     output += "    </div>";
@@ -1000,7 +1020,7 @@ function ShowMessage(evt, mid, user) {
     $.ajax({
         type: "GET",
         url: "/api/message/getdisplaymessage",
-        data: "msgUser=" + encodeURIComponent(user) + "&msgID=" + encodeURIComponent(mid),
+        data: "msgUser=" + encodeTxt(user) + "&msgID=" + encodeTxt(mid),
         success: function (data) {
             message_div.empty();
             // create message
@@ -1025,7 +1045,7 @@ function ShowEvents(mid, eid) {
     $.ajax({
         type: "GET",
         url: "/api/message/eventline",
-        data: "eventID=" + encodeURIComponent(eid),
+        data: "eventID=" + encodeTxt(eid),
         success: function (data) {
             events_div.empty();
             // create events list
@@ -1075,14 +1095,14 @@ function CreateEvent(postData, isHeighlight) {
     output += "      </div>";
     output += "      <div class='feed-content'>";
     output += "        <div class='newpost-header'>";
-    output += "          <a id='event_username_" + eid + "' class='fullname' href='/profile/index?user=" + encodeURIComponent(user) + "'>" + username + "</a>&nbsp;";
+    output += "          <a id='event_username_" + eid + "' class='fullname' href='/profile/index?user=" + encodeTxt(user) + "'>" + username + "</a>&nbsp;";
     output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
     output += "        </div>";
 
     if (!isNullOrEmpty(owners)) {
         output += "    <div class='newpost-input'><span class=''>Owned by: </span>";
         for (var key in owners) {
-            output += "  <a href='/profile/index?user=" + encodeURIComponent(owners[key]) + "'>@" + owners[key] + "</a>&nbsp;";
+            output += "  <a href='/profile/index?user=" + encodeTxt(owners[key]) + "'>@" + owners[key] + "</a>&nbsp;";
         }
         output += "    </div>";
     }
@@ -1109,7 +1129,7 @@ function SearchTopic(keyword) {
         apiurl = "/api/topic/getalltopic";
     else {
         apiurl = "/api/topic/searchtopic";
-        apidata = "keyword=" + encodeURIComponent(keyword);
+        apidata = "keyword=" + encodeTxt(keyword);
     }
 
     $.ajax({
@@ -1147,7 +1167,7 @@ function SearchUser(keyword) {
         apiurl = "/api/account/user";
     else {
         apiurl = "/api/account/searchuser";
-        apidata = "keyword=" + encodeURIComponent(keyword);
+        apidata = "keyword=" + encodeTxt(keyword);
     }
 
     $.ajax({
@@ -1189,7 +1209,7 @@ function LoadUsers(category, user) {
     }
 
     if (!isNullOrEmpty(user)) {
-        apidata = "userid=" + encodeURIComponent(user);
+        apidata = "userid=" + encodeTxt(user);
     }
 
     $.ajax({
@@ -1237,7 +1257,7 @@ function CreateUserCard(data) {
            + "        <img class='img-rounded' id='user_pic_" + encodeEmail(userid) + "' src='" + picurl + "' width='100' height='100' />"
            + "      </div>"
            + "      <div>"
-           + "        <a class='' id='user_name_" + encodeEmail(userid) + "' href='/profile/index?user=" + encodeURIComponent(userid) + "'>" + username + "</a>"
+           + "        <a class='' id='user_name_" + encodeEmail(userid) + "' href='/profile/index?user=" + encodeTxt(userid) + "'>" + username + "</a>"
            + "      </div>"
            + "      <div>"
            + "        <span id='user_id_" + encodeEmail(userid) + "'>@" + userid + "</span>"
@@ -1380,7 +1400,7 @@ function LoadHotTopics() {
                 output += "<li class='sub-list-group-item'>";
                 output += "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>";
                 //output += "  <span class='badge'>" + topiccount + "</span>";
-                output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
+                output += "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>";
                 output += "</li>";
                 $("#topic_collapse").append(output);
                 LoadTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid);
@@ -1394,7 +1414,7 @@ function LoadHotTopics() {
 
 function LoadUserFavoriteTopics(user) {
     var apiurl = "/api/topic/getuserfavouritetopic";
-    var apidata = "userid=" + encodeURIComponent(user);
+    var apidata = "userid=" + encodeTxt(user);
 
     $.ajax({
         type: "GET",
@@ -1448,7 +1468,7 @@ function LoadMyFavoriteTopics() {
                 // shortcut panel
                 output += "<li class='sub-list-group-item'>";
                 output += "  <span class='badge'>" + unreadcount + "</span>";
-                output += "  <a href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
+                output += "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>";
                 output += "</li>";
                 $("#favorite_collapse").append(output);
 
@@ -1456,7 +1476,7 @@ function LoadMyFavoriteTopics() {
                 if (unreadcount > 0 && navlist.length > 0) {
                     output = "";
                     //output += "<li>";
-                    output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a> ";
+                    output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a> ";
                     //output += "</li>";
 
                     navlist.append(output);
@@ -1476,7 +1496,7 @@ function LoadTopicLikeBtn(btnid, topicid) {
     }
 
     var apiurl = "/api/topic/isfavouritetopic";
-    var apidata = "topicID=" + encodeURIComponent(topicid);
+    var apidata = "topicID=" + encodeTxt(topicid);
 
     $.ajax({
         type: "GET",
@@ -1563,7 +1583,7 @@ function Like(btnid, topicid) {
     $.ajax({
         type: "GET",
         url: "/api/topic/addfavouritetopic",
-        data: "topicID=" + encodeURIComponent(topicid),
+        data: "topicID=" + encodeTxt(topicid),
         success: function (data) {
             var code = data.ActionResultCode;
             var msg = data.Message;
@@ -1586,7 +1606,7 @@ function Unlike(btnid, topicid) {
     $.ajax({
         type: "GET",
         url: "/api/topic/removefavouritetopic",
-        data: "topicID=" + encodeURIComponent(topicid),
+        data: "topicID=" + encodeTxt(topicid),
         success: function (data) {
             var code = data.ActionResultCode;
             var msg = data.Message;
@@ -1610,7 +1630,7 @@ function CreateTopic(topicid, topicname, topicdesp, topiccount) {
     output += "<li class='list-group-item'>";
     output += "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>";
     output += "  <span class='badge'>" + topiccount + "</span>";
-    output += "  <a class='fullname' href='/topic/index?topic=" + encodeURIComponent(topicname) + "'>#" + topicname + "#</a>";
+    output += "  <a class='fullname' href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>";
     output += "  <span class='username' >" + (isNullOrEmpty(topicdesp) ? "" : topicdesp) + "</span>&nbsp;";
     output += "</li>";
 

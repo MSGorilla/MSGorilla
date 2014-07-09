@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla", "MSGorilla\MSGorilla.csproj", "{47634D5A-C567-4EDB-963E-A0F9B79F27E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.Library", "MSGorilla.Library\MSGorilla.Library.csproj", "{AD407F7A-F82C-4C44-98F9-C2145A5F4A50}"
@@ -18,6 +20,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Robots", "Robots", "{4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TFSMonitor", "Robots\WossTFSMonitor\TFSMonitor\TFSMonitor.csproj", "{026E8141-737D-4CFE-9AAC-C0F9B62E6A29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.Desktop", "MSGorilla.Desktop\MSGorilla.Desktop.csproj", "{516BD150-2AA8-480F-AB36-74D6B3E3DFB3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -109,11 +113,22 @@ Global
 		{026E8141-737D-4CFE-9AAC-C0F9B62E6A29}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{026E8141-737D-4CFE-9AAC-C0F9B62E6A29}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{026E8141-737D-4CFE-9AAC-C0F9B62E6A29}.Release|Win32.ActiveCfg = Release|Any CPU
+		{516BD150-2AA8-480F-AB36-74D6B3E3DFB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{516BD150-2AA8-480F-AB36-74D6B3E3DFB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{516BD150-2AA8-480F-AB36-74D6B3E3DFB3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{516BD150-2AA8-480F-AB36-74D6B3E3DFB3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{516BD150-2AA8-480F-AB36-74D6B3E3DFB3}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{516BD150-2AA8-480F-AB36-74D6B3E3DFB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{516BD150-2AA8-480F-AB36-74D6B3E3DFB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{516BD150-2AA8-480F-AB36-74D6B3E3DFB3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{516BD150-2AA8-480F-AB36-74D6B3E3DFB3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{516BD150-2AA8-480F-AB36-74D6B3E3DFB3}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{8B67E716-4250-479C-BD18-C2931556B0BC} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
 		{026E8141-737D-4CFE-9AAC-C0F9B62E6A29} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
 	EndGlobalSection
 EndGlobal

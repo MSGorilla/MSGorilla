@@ -16,6 +16,8 @@ namespace MSGorilla.Library.Models.SqlModels
         [Key, DataMember]
         public string Userid { get; set; }
         [DataMember]
+        public int UnreadImportantMsgCount { get; set; }
+        [DataMember]
         public int UnreadHomelineMsgCount { get; set; }
         [DataMember]
         public int UnreadOwnerlineMsgCount { get; set; }

@@ -633,6 +633,11 @@ namespace MSGorilla.Library
                 _homeline.Execute(insertOperation);
 
                 _notifManager.incrementHomelineNotifCount(user.Userid);
+
+                if (message.Importance == 0)
+                {
+                    _notifManager.incrementImportantMsgCount(user.Userid);
+                }
             }
         }
 

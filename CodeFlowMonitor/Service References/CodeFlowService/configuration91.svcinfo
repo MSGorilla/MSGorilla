@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="j/tsO1FEdvD1RvYIABfisrPip+k=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="CIDtaQws6Wlvz0+mMU9uXhkthXE=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="wsHttpBinding" name="WSHttpBinding_IReviewService">
       <properties>
@@ -127,10 +127,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="WSHttpBinding_IReviewService" contract="CodeFlowService.IReviewService" bindingType="wsHttpBinding" address="http://codeflow/Services/ReviewService.svc" bindingConfiguration="WSHttpBinding_IReviewService">
+    <endpoint name="WSHttpBinding_IReviewService" contract="CodeFlowService.IReviewService" bindingType="wsHttpBinding" address="http://co1cdflweb03/Services/ReviewService.svc" bindingConfiguration="WSHttpBinding_IReviewService">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>http://codeflow/Services/ReviewService.svc</serializedValue>
+          <serializedValue>http://co1cdflweb03/Services/ReviewService.svc</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />

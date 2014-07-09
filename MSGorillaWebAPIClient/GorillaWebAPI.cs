@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using MSGorilla.Library.Models.ViewModels;
+using MSGorilla.Library.Models.SqlModels;
 
 namespace MSGorilla.WebAPI.Client
 {
@@ -202,6 +203,14 @@ namespace MSGorilla.WebAPI.Client
             string ret = System.Text.Encoding.ASCII.GetString(responseArray);
 
             return JsonConvert.DeserializeObject<List<Attachment>>(ret);
+        }
+
+        public NotificationCount GetNotificationCount(string userid = "")
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriNotificationCount, userid));
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            return JsonConvert.DeserializeObject<NotificationCount>(_readResponseContent(response));
         }
     }
 }

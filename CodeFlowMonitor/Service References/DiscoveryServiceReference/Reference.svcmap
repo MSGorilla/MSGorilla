@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="684b2285-4536-4829-9fd0-2719c12b936d" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://codeflow/Services/DiscoveryService.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="DiscoveryService.xsd" MetadataType="Schema" ID="10ebf3b6-2437-4c66-8848-b4b7c63cd068" SourceId="1" SourceUrl="http://codeflow/Services/DiscoveryService.svc?xsd=xsd0" />
+    <MetadataFile FileName="DiscoveryService1.xsd" MetadataType="Schema" ID="33ee4cc5-c33e-49a5-bc5c-dfda37694e5b" SourceId="1" SourceUrl="http://codeflow/Services/DiscoveryService.svc?xsd=xsd3" />
+    <MetadataFile FileName="DiscoveryService2.xsd" MetadataType="Schema" ID="e18983e4-aa7d-4034-b2bb-ade7ea67db61" SourceId="1" SourceUrl="http://codeflow/Services/DiscoveryService.svc?xsd=xsd2" />
+    <MetadataFile FileName="DiscoveryService.wsdl" MetadataType="Wsdl" ID="3c283e7f-b0a3-4241-8e3d-9c848d06cd43" SourceId="1" SourceUrl="http://codeflow/Services/DiscoveryService.svc?wsdl" />
+    <MetadataFile FileName="DiscoveryService.disco" MetadataType="Disco" ID="29fed8ff-e63f-4848-a0e8-b5b9e29dbd80" SourceId="1" SourceUrl="http://codeflow/Services/DiscoveryService.svc?disco" />
+    <MetadataFile FileName="DiscoveryService3.xsd" MetadataType="Schema" ID="db46716e-b3b5-4e7a-9e55-ba026644deb4" SourceId="1" SourceUrl="http://codeflow/Services/DiscoveryService.svc?xsd=xsd1" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

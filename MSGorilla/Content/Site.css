@@ -200,6 +200,11 @@ input[type="checkbox"].input-validation-error {
     padding: 10px;
 }
 
+.feed-importence {
+    float: right;
+    padding: 10px;
+}
+
 .feed-content {
     margin-left: 120px;
     padding: 10px;

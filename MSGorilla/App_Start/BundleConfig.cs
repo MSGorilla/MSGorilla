@@ -12,8 +12,9 @@ namespace MSGorilla
                         "~/Scripts/jquery-{version}.js",
                         "~/Scripts/jquery.timer.js",
                         "~/Scripts/jquery.flexselect.js",
-                        "~/Scripts/liquidmetal.js"
-                        ));
+                        "~/Scripts/liquidmetal.js",
+                         "~/Scripts/common.js"
+                     ));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryui").Include(
                         "~/Scripts/jquery-ui-{version}.js"));

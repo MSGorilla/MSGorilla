@@ -15,6 +15,7 @@ namespace MSGorilla.WebAPI.Client
         public static string UriHomeLine = "/Message/HomeLine?userid={0}&count={1}&token={2}";
         public static string UriEventLine = "/Message/EventLine?eventId={0}";
         public static string UriUploadAttachment = "/attachment/upload";
+        public static string UriNotificationCount = "/Account/GetNotificationCount?userid={0}";
     }
 
     public class MessageModel

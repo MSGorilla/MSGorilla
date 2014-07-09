@@ -276,6 +276,7 @@
     <Content Include="Content\WOFF\xjAJXh38I15wypJXxuGMBobN6UDyHWBl620a-IRfuBk.woff" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\common.js" />
+    <Content Include="Scripts\echarts-plain.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
