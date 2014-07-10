@@ -60,7 +60,7 @@ namespace TFSMonitor
                     "<div class=\"container\">" +
                         "<table  class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 width=\"100%\" style='width:1000px;mso-cellspacing:0cm;border:solid green 1.5pt;mso-yfti-tbllook:1184;mso-padding-alt:0cm 0cm 0cm 0cm'>" +
                             "<tbody>" +
-                                "<tr style=\"background-color: rgb(134, 202, 247); mso-yfti-irow: 0; mso-yfti-firstrow: yes; color: black; font-family: \"Verdana\",\"sans-serif\"; font-size: 9pt\"><td>Field</td><td>New value</td><td>Old Value</td></tr>" +
+                                "<tr style=\"background-color: rgb(134, 202, 247); mso-yfti-irow: 0; mso-yfti-firstrow: yes; color: black; font-family: \"sans-serif\"; font-size: 9pt\"><td>Field</td><td>New value</td><td>Old Value</td></tr>" +
                                 "fieldChangeRows" +
                             "</tbody>" +
                         "</table>" +

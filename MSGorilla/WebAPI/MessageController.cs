@@ -1455,7 +1455,7 @@ namespace MSGorilla.WebApi
                                     [FromUri]string[] topicName = null,
                                     string richMessage = null,
                                     [FromUri]string[] attachmentID = null,
-                                    [FromUri]int importance = 2)
+                                    int importance = 2)
         {
             return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, topicName, message, richMessage, attachmentID, importance, DateTime.UtcNow), new AccountManager(), new AttachmentManager());
             //return new ActionResult();
