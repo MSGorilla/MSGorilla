@@ -13,7 +13,7 @@ using MSGorilla.Library.Models.SqlModels;
 
 namespace MSGorilla.Controllers
 {
-    public class HomeController : Controller
+    public class WelcomeController : Controller
     {
         AccountManager _accManager = new AccountManager();
 
@@ -29,5 +29,17 @@ namespace MSGorilla.Controllers
             ViewBag.FeedId = me.Userid;
             return View();
         }
+
+        public ActionResult About()
+        {
+            throw new System.Security.Cryptography.CryptographicException();
+            return View();
+        }
+
+        public ActionResult Contact()
+        {
+            return View();
+        }
+
     }
 }

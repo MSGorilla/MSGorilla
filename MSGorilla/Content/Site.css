@@ -124,9 +124,15 @@ input[type="checkbox"].input-validation-error {
 
 .newpost-input {
     margin-bottom: 10px;
-    text-wrap: normal;
     white-space: normal;
     word-wrap: break-word;
+}
+
+.newpost-richinput {
+    margin-bottom: 10px;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-x:auto;
 }
 
 .newpost-footer {

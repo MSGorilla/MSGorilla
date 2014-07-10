@@ -432,6 +432,7 @@ function PostMessage() {
             $("#postmessage").val("");
             // insert the new posted message
             $("#feedlist").prepend(CreateFeed(data));
+            // enhanceMessage(data.SchemaID, data.ID, data.MessageContent);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
@@ -499,6 +500,9 @@ function LoadMessage(user, mid) {
                 $("#feedlist").empty();
                 // create feed 
                 $("#feedlist").append(CreateFeed(data));
+                enhanceMessage(data.SchemaID, data.ID, data.MessageContent);
+                $("#rich_message_" + mid).collapse('show');
+                ShowRichMsg(data.RichMessageID, mid);
                 $("#reply_" + mid).collapse('show');
                 ShowReplies(mid);
             }
@@ -704,23 +708,23 @@ var ImportenceTags = [
     "<span class='label label-default feed-importence'>Default</span>",
 ];
 
-function CreateFeed(postData, isNew) {
+function CreateFeed(data, isNew) {
     var output = "";
-    var mid = postData.ID;
-    var sid = postData.SchemaID;
-    var eid = postData.EventID;
-    var msg = postData.MessageContent;
-    var richmsgid = postData.RichMessageID;
-    var posttime = postData.PostTime;
-    var user = postData.User.Userid;
-    var username = postData.User.DisplayName;
-    var picurl = postData.User.PortraitUrl;
-    var userdesp = postData.User.Description;
-    var owners = postData.Owner;
-    var atusers = postData.AtUser;
-    var topics = postData.TopicName;
-    var attach = postData.Attachment;
-    var importence = postData.Importance;
+    var mid = data.ID;
+    var sid = data.SchemaID;
+    var eid = data.EventID;
+    var msg = data.MessageContent;
+    var richmsgid = data.RichMessageID;
+    var posttime = data.PostTime;
+    var user = data.User.Userid;
+    var username = data.User.DisplayName;
+    var picurl = data.User.PortraitUrl;
+    var userdesp = data.User.Description;
+    var owners = data.Owner;
+    var atusers = data.AtUser;
+    var topics = data.TopicName;
+    var attach = data.Attachment;
+    var importence = data.Importance;
     var showevents = false;
 
     if (isNullOrEmpty(picurl)) {
@@ -770,7 +774,7 @@ function CreateFeed(postData, isNew) {
 
     // richmsg
     if (!isNullOrEmpty(richmsgid)) {
-        output += "    <div id='rich_message_" + mid + "' class='newpost-input panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'></div>";
+        output += "    <div id='rich_message_" + mid + "' class='newpost-richinput panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + mid + "' href='#rich_message_" + mid + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + mid + "\");'></div>";
     }
 
     // attachment
@@ -1025,6 +1029,7 @@ function ShowMessage(evt, mid, user) {
             message_div.empty();
             // create message
             message_div.append(CreateFeed(data));
+            enhanceMessage(data.SchemaID, data.ID, data.MessageContent);
             $("#reply_" + mid).collapse('show');
             ShowReplies(mid);
         },

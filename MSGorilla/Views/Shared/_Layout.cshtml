@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-        <div class="container">
+        <div class="page-container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
                     <span class="icon-bar"></span>
@@ -74,13 +74,16 @@
         </div>
     </div>
 
-    <div class="container">
+    <div class="page-container">
         <div class="body-content">
             @RenderBody()
         </div>
         <div class="clearfix"></div>
         <footer>
-            <p>&copy; @DateTime.Now.Year - MSGorilla</p>
+            <p>
+                &copy; @DateTime.Now.Year - MSGorilla
+                <a class=" ma-lt-15" href="mailto:gorillaft@microsoft.com">Contact us</a>
+            </p>
         </footer>
     </div>
 

@@ -6,7 +6,7 @@
 <div class="main-container">
     @Html.Partial("_EventModalPartial")
 
-    <div class="contents-container">
+    @*<div class="contents-container">*@
         <div id="notifications" class="posts-notification">
             @*<div class="alert alert-dismissable alert-warning">
                     <button class="close" type="button" data-dismiss="alert">×</button>
@@ -27,15 +27,15 @@
             </ul>
         </div>
 
-    </div>
+    @*</div>*@
 
     <script>
         $(LoadMessage('@ViewBag.UserId', '@ViewBag.FeedId'));
     </script>
 
-    <div class="tools-container">
+    @*<div class="tools-container">
         @Html.Partial("_MePartial")
         @Html.Partial("_ShortcutPartial")
-    </div>
+    </div>*@
 
 </div>
