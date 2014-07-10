@@ -11,8 +11,8 @@
                 <EventTrigger RoutedEvent="MouseEnter">
                     <BeginStoryboard>
                         <Storyboard>
-                            <DoubleAnimation To="44" Duration="0:0:0.1" Storyboard.TargetProperty="Width"/>
-                            <DoubleAnimation To="44" Duration="0:0:0.1" Storyboard.TargetProperty="Height"/>
+                            <DoubleAnimation To="40" Duration="0:0:0.1" Storyboard.TargetProperty="Width"/>
+                            <DoubleAnimation To="40" Duration="0:0:0.1" Storyboard.TargetProperty="Height"/>
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
@@ -37,7 +37,7 @@
             </ContextMenu>
         </Grid.ContextMenu>
 
-        <Border BorderThickness="1" BorderBrush="#FF008BFF" Name="top" Opacity="1">
+        <Border BorderThickness="1" BorderBrush="Gray" Name="top" Opacity="1">
             <!--<Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#eee"/>
@@ -52,27 +52,27 @@
         <TextBox x:Name="TBStatus" HorizontalAlignment="Left" Height="23" Margin="56,82,0,0" TextWrapping="Wrap" Text="Unknown" VerticalAlignment="Top" Width="319" IsEnabled="False" MouseMove="Drag_MouseMove" Opacity="1"/>
 
         <Grid x:Name="GridImportant" HorizontalAlignment="Left" Height="60" Width="70" Margin="5,5,0,0" VerticalAlignment="Top"  Background="#FFE20707">
-            <Image Source="D:/Project/MSGorilla/MSGorilla.Desktop/resources/img/important.png" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnHome_Click"/>
+            <Image Source="resources/img/important.png" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnHome_Click"/>
             <Label x:Name ="LabelImportant" Content="0" Foreground="White" Margin="40,0,00,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
 
         <Grid x:Name="GridHome" HorizontalAlignment="Left" Height="60" Width="70" Margin="80,5,0,0" VerticalAlignment="Top"  Background="#FF4EA604">
-            <Image Source="D:/Project/MSGorilla/MSGorilla.Desktop/resources/img/home.png" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnHome_Click"/>
+            <Image Source="resources/img/home.png" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnHome_Click"/>
             <Label x:Name ="LabelHome"  Content="0" Foreground="White" Margin="40,0,00,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
 
         <Grid x:Name="GridOwn" HorizontalAlignment="Left" Height="60" Width="70" Margin="155,5,0,0" VerticalAlignment="Top"  Background="#FF4F8FFF">
-            <Image Source="D:/Project/MSGorilla/MSGorilla.Desktop/resources/img/own.png" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnOwn_Click"/>
+            <Image Source="resources/img/own.png" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnOwn_Click"/>
             <Label x:Name ="LabelOwn"  Content="0" Foreground="White" Margin="40,0,00,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
 
         <Grid x:Name="GridAt" HorizontalAlignment="Left" Height="60" Width="70" Margin="230,5,0,0" VerticalAlignment="Top"  Background="#FFF5DA30">
-            <Image Source="D:/Project/MSGorilla/MSGorilla.Desktop/resources/img/at.png" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnAt_Click"/>
+            <Image Source="resources/img/at.png" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnAt_Click"/>
             <Label x:Name ="LabelAt"  Content="0" Foreground="White" Margin="40,0,00,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
 
         <Grid x:Name="GridReply" HorizontalAlignment="Left" Height="60" Width="70" Margin="305,5,0,0" VerticalAlignment="Top"  Background="Purple">
-            <Image Source="D:/Project/MSGorilla/MSGorilla.Desktop/resources/img/reply.png" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnReply_Click"/>
+            <Image Source="resources/img/reply.png" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnReply_Click"/>
             <Label x:Name ="LabelReply"  Content="0" Foreground="White" Margin="40,0,00,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
     </Grid>
