@@ -27,12 +27,13 @@ namespace MSGorilla.Desktop
     {
         static string GetCurrentUserID()
         {
-            string[] array = System.Security.Principal.WindowsIdentity.GetCurrent().Name.Split('\\');
-            if (array.Length > 1)
-            {
-                return array[1];
-            }
-            return array[0];
+            //string[] array = System.Security.Principal.WindowsIdentity.GetCurrent().Name.Split('\\');
+            //if (array.Length > 1)
+            //{
+            //    return array[1];
+            //}
+            //return array[0];
+            return "user1";
         }
 
         GorillaStatusHelper _helper;
@@ -45,12 +46,19 @@ namespace MSGorilla.Desktop
             if (Process.GetProcessesByName(thisProc.ProcessName).Length > 1)
             {
                 // If ther is more than one, than it is already running.
-                MessageBox.Show("Application is already running.");
+                MessageBox.Show("MSGorilla Desktop Tool is already running.");
                 Application.Current.Shutdown();
                 return;
             }
 
             this.Left = SystemParameters.PrimaryScreenWidth - this.Width - 30;
+
+            SetLabelCount(LabelHome, 0);
+            SetLabelCount(LabelAt, 0);
+            SetLabelCount(LabelOwn, 0);
+            SetLabelCount(LabelReply, 0);
+            SetLabelCount(LabelImportant, 0);
+
 
             _helper = new GorillaStatusHelper(GetCurrentUserID());
             TBStatus.Text = "Welcome to use MSGorilla, " + _helper.Userid;
@@ -79,14 +87,18 @@ namespace MSGorilla.Desktop
         {
             while (true)
             {
-                Thread.Sleep(1);                
-                this.Dispatcher.Invoke((Action)(() =>
+                try
                 {
-                    if (this.Top < 20 && this.Top > 0)
+                    Thread.Sleep(1);
+                    this.Dispatcher.Invoke((Action)(() =>
                     {
-                        this.Top = 0;
-                    }
-                }));
+                        if (this.Top < 20 && this.Top > 0)
+                        {
+                            this.Top = 0;
+                        }
+                    }));
+                }
+                catch { }
             }            
         }
 
@@ -168,26 +180,30 @@ namespace MSGorilla.Desktop
         private void BtnHome_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("https://msgorilla.cloudapp.net");
-            BtnHome.Content = "Home(0)";
-            BtnImportant.Content = "Important(0)";
+            SetLabelCount(LabelHome, 0);
+            //LabelHome.Content = "0";
+            //LabelImportant.Content = "0";
         }
 
         private void BtnOwn_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("https://msgorilla.cloudapp.net/Notification/index?category=ownerline");
-            BtnOwn.Content = "My Own(0)";
+            SetLabelCount(LabelOwn, 0);
+            //LabelOwn.Content = "0";
         }
 
         private void BtnAt_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("https://msgorilla.cloudapp.net/Notification/index?category=atline");
-            BtnAt.Content = "Mention(0)";
+            SetLabelCount(LabelAt, 0);
+            //LabelAt.Content = "0";
         }
 
         private void BtnReply_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("https://msgorilla.cloudapp.net/Notification/Replies");
-            BtnReply.Content = "Reply Me(0)";
+            SetLabelCount(LabelReply, 0);
+            //LabelReply.Content = "0";
         }
 
         private void Update()
@@ -195,10 +211,45 @@ namespace MSGorilla.Desktop
             UpdateCount();
             while (true)
             {
-                Thread.Sleep(30000);
+                Thread.Sleep(120000);
                 UpdateCount();
             }
         }
+
+        private void SetLabelCount(Label label, int count)
+        {
+            Grid parent = VisualTreeHelper.GetParent(label) as Grid;
+
+            var pos = label.Margin;
+            Image image = null;
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is Image)
+                {
+                    image = child as Image;
+                }
+            }
+
+            if (count <= 0)
+            {
+                label.Content = "";
+                pos = image.Margin;
+                pos.Left = 0;
+                image.Margin = pos;
+
+                label.Visibility = System.Windows.Visibility.Hidden;
+            }
+            else
+            {
+                label.Content = count;
+                pos = image.Margin;
+                pos.Left = -15;
+                image.Margin = pos;
+                label.Visibility = System.Windows.Visibility.Visible;
+            }
+        }
+
         private void UpdateCount()
         {
             try
@@ -211,11 +262,16 @@ namespace MSGorilla.Desktop
 
                 this.Dispatcher.Invoke((Action)(() =>
                 {
-                    BtnHome.Content = string.Format("Home({0})", notif.UnreadHomelineMsgCount);
-                    BtnAt.Content = string.Format("Mention({0})", notif.UnreadAtlineMsgCount);
-                    BtnOwn.Content = string.Format("My Own({0})", notif.UnreadOwnerlineMsgCount);
-                    BtnReply.Content = string.Format("Reply Me({0})", notif.UnreadReplyCount);
-                    BtnImportant.Content = string.Format("Important({0})", notif.UnreadImportantMsgCount);
+                    SetLabelCount(LabelHome, notif.UnreadHomelineMsgCount);
+                    SetLabelCount(LabelAt, notif.UnreadAtlineMsgCount);
+                    SetLabelCount(LabelOwn, notif.UnreadOwnerlineMsgCount);
+                    SetLabelCount(LabelReply, notif.UnreadReplyCount);
+                    SetLabelCount(LabelImportant, notif.UnreadImportantMsgCount);
+                    //LabelHome.Content = string.Format("{0}", notif.UnreadHomelineMsgCount);
+                    //LabelAt.Content = string.Format("{0}", notif.UnreadAtlineMsgCount);
+                    //LabelOwn.Content = string.Format("{0}", notif.UnreadOwnerlineMsgCount);
+                    //LabelReply.Content = string.Format("{0}", notif.UnreadReplyCount);
+                    //LabelImportant.Content = string.Format("{0}", notif.UnreadImportantMsgCount);
 
                     TBStatus.Text = "Welcome to use MSGorilla, " + notif.Userid;
                     TBStatus.Foreground = Brushes.Black;
@@ -228,7 +284,7 @@ namespace MSGorilla.Desktop
                     TBStatus.Text = e.ToString();
                     TBStatus.Foreground = Brushes.Red;
 
-                    MessageBoxResult result = MessageBox.Show(e.ToString(), "Confirmation", MessageBoxButton.OK, MessageBoxImage.Error);
+                    //MessageBoxResult result = MessageBox.Show(e.ToString(), "Confirmation", MessageBoxButton.OK, MessageBoxImage.Error);
                 }));
             }
         }
