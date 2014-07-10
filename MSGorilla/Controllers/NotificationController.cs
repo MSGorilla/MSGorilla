@@ -34,19 +34,5 @@ namespace MSGorilla.Controllers
             return View();
         }
 
-        [TokenAuthAttribute]
-        public ActionResult Replies()
-        {
-            string myid = this.Session["userid"].ToString();
-            UserProfile me = _accManager.FindUser(myid);
-            ViewBag.Myid = me.Userid;
-            ViewBag.Me = me;
-
-            ViewBag.FeedCategory = "replyline";
-            ViewBag.FeedId = "";
-
-            return View();
-        }
-
     }
 }

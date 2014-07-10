@@ -1,10 +1,9 @@
 ﻿@{
-    ViewBag.Title = "Notifications";
+    ViewBag.Title = "Welcome";
 }
 
 <script src="~/Scripts/echarts-plain.js"></script>
 <div class="main-container">
-    @Html.Partial("_MessageModalPartial")
     @Html.Partial("_EventModalPartial")
 
     <div class="contents-container">
@@ -18,8 +17,8 @@
         <div class="title-container">
             <h4>
                 @ViewBag.Title
+                @Html.Partial("_FeedFilterDropdownPartial")
             </h4>
-            @*<span class="help-block">What's happening now, tailored for you.</span>*@
         </div>
 
         @Html.Partial("_NotificationNavbarPartial")
@@ -56,6 +55,8 @@
 
     <div class="tools-container">
         @Html.Partial("_MePartial")
+        @Html.Partial("_PostPartial")
+        @Html.Partial("_FeedFilterPartial")
         @Html.Partial("_ShortcutPartial")
     </div>
 
