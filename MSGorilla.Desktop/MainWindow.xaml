@@ -56,27 +56,27 @@
         <Label Content="Status" HorizontalAlignment="Left" Margin="10,79,0,0" VerticalAlignment="Top" MouseMove="Drag_MouseMove" Opacity="1"/>
         <TextBox x:Name="TBStatus" HorizontalAlignment="Left" Height="23" Margin="56,82,0,0" TextWrapping="Wrap" Text="Unknown" VerticalAlignment="Top" Width="319" IsEnabled="False" MouseMove="Drag_MouseMove" Opacity="1"/>
 
-        <Grid x:Name="GridImportant" HorizontalAlignment="Left" Height="60" Width="70" Margin="5,5,0,0" VerticalAlignment="Top"  Background="#FFE20707">
+        <Grid x:Name="GridImportant" HorizontalAlignment="Left" Height="60" Width="70" Margin="5,5,0,0" VerticalAlignment="Top"  Background="#FF0000">
             <Image Source="resources/img/important.png" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnHome_Click"/>
             <Label x:Name ="LabelImportant" Content="0" Foreground="White" Margin="40,0,00,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
 
-        <Grid x:Name="GridHome" HorizontalAlignment="Left" Height="60" Width="70" Margin="80,5,0,0" VerticalAlignment="Top"  Background="#FF4EA604">
+        <Grid x:Name="GridHome" HorizontalAlignment="Left" Height="60" Width="70" Margin="80,5,0,0" VerticalAlignment="Top"  Background="#92D050">
             <Image Source="resources/img/home.png" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnHome_Click"/>
             <Label x:Name ="LabelHome"  Content="0" Foreground="White" Margin="40,0,00,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
 
-        <Grid x:Name="GridOwn" HorizontalAlignment="Left" Height="60" Width="70" Margin="155,5,0,0" VerticalAlignment="Top"  Background="#FF4F8FFF">
+        <Grid x:Name="GridOwn" HorizontalAlignment="Left" Height="60" Width="70" Margin="155,5,0,0" VerticalAlignment="Top"  Background="#00B0F0">
             <Image Source="resources/img/own.png" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnOwn_Click"/>
             <Label x:Name ="LabelOwn"  Content="0" Foreground="White" Margin="40,0,00,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
 
-        <Grid x:Name="GridAt" HorizontalAlignment="Left" Height="60" Width="70" Margin="230,5,0,0" VerticalAlignment="Top"  Background="#FFF5DA30">
+        <Grid x:Name="GridAt" HorizontalAlignment="Left" Height="60" Width="70" Margin="230,5,0,0" VerticalAlignment="Top"  Background="#FFC000">
             <Image Source="resources/img/at.png" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnAt_Click"/>
             <Label x:Name ="LabelAt"  Content="0" Foreground="White" Margin="40,0,00,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
 
-        <Grid x:Name="GridReply" HorizontalAlignment="Left" Height="60" Width="70" Margin="305,5,0,0" VerticalAlignment="Top"  Background="Purple">
+        <Grid x:Name="GridReply" HorizontalAlignment="Left" Height="60" Width="70" Margin="305,5,0,0" VerticalAlignment="Top"  Background="#7030A0">
             <Image Source="resources/img/reply.png" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-15,0,0,0" MouseDown="BtnReply_Click"/>
             <Label x:Name ="LabelReply"  Content="0" Foreground="White" Margin="40,0,00,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
