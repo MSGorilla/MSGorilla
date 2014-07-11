@@ -1,63 +1,52 @@
 ﻿@{
     ViewBag.Title = "Welcome";
+    Layout = "~/Views/Shared/_LayoutInverse.cshtml";
 }
 
 <script src="~/Scripts/echarts-plain.js"></script>
 <div class="main-container">
-    @Html.Partial("_EventModalPartial")
+    <div id="notifications" class="posts-notification">
+        @*<div class="alert alert-dismissable alert-warning">
+                <button class="close" type="button" data-dismiss="alert">×</button>
+                <p><a class="alert-link" href="#">You have new messages.</a></p>
+            </div>*@
+    </div>
 
-    <div class="contents-container">
-        <div id="notifications" class="posts-notification">
-            @*<div class="alert alert-dismissable alert-warning">
-                    <button class="close" type="button" data-dismiss="alert">×</button>
-                    <p><a class="alert-link" href="#">You have new messages.</a></p>
-                </div>*@
-        </div>
-
-        <div class="title-container">
-            <h4>
-                @ViewBag.Title
-                @Html.Partial("_FeedFilterDropdownPartial")
-            </h4>
-        </div>
-
-        @Html.Partial("_NotificationNavbarPartial")
-
-        <div class="posts-feeds">
-            <ul id="feedlist" class='list-group'>
-                <li id="loading_message" class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+    <div>
+        <div class="col-lg-4">
+            <div class="title-container">
+                <h4>Hottest topics</h4>
+            </div>
+            <ul id="welcome_hosttest_topics_list" class='list-group'>
+                <li class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
                 @*autofill by js*@
             </ul>
         </div>
 
-        <div class="txtaln-c">
-            <span id="lbl_seemore" class="help-block">Loading more...</span>
-            <input id="hd_token" type="hidden" value="" />
-            <input id="hd_filter" type="hidden" value="" />
-            <input id="hd_newcount" type="hidden" value="0" />
-
-            <script type="text/javascript">
-                $(window).scroll(function () {
-                    var documentTop = $(document).scrollTop();
-                    var windowHeight = $(window).height();
-                    var documentHeight = $(document).height();
-                    if (documentTop >= (documentHeight - windowHeight)) {
-                        LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId');
-                    }
-                })
-            </script>
+        <div class="col-lg-4">
+            <div class="title-container">
+                <h4>Active users</h4>
+            </div>
+            <ul id="welcome_active_users_list" class='list-group'>
+                <li class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+                @*autofill by js*@
+            </ul>
         </div>
+
+        <div class="col-lg-4">
+            <div class="title-container">
+                <h4>Latest posts</h4>
+            </div>
+            <ul id="welcome_latest_posts_list" class='list-group'>
+                <li class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+                @*autofill by js*@
+            </ul>
+        </div>
+
+        <div class="clearfix"></div>
     </div>
 
     <script>
-        $(LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId'));
+        $(RefreshWelcomePage());
     </script>
-
-    <div class="tools-container">
-        @Html.Partial("_MePartial")
-        @Html.Partial("_PostPartial")
-        @Html.Partial("_FeedFilterPartial")
-        @Html.Partial("_ShortcutPartial")
-    </div>
-
 </div>

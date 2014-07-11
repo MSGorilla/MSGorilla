@@ -1,17 +1,29 @@
 ﻿@{
     ViewBag.Title = "Contact";
 }
-<h2>@ViewBag.Title.</h2>
-<h3>@ViewBag.Message</h3>
 
-<address>
-    One Microsoft Way<br />
-    Redmond, WA 98052-6399<br />
-    <abbr title="Phone">P:</abbr>
-    425.555.0100
-</address>
-
-<address>
-    <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
-    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-</address>
+<div class="main-container">
+    <div class="block-container">
+        <div>
+            <h2>Contact us</h2>
+        </div>
+        <br />
+        <div>
+            <h4 class="help-block">
+                If you haven’t used MSGorilla, please first goto <a href="https://msgorilla.cloudapp.net/Account/Login">https://msgorilla.cloudapp.net/Account/Login</a>, <br />
+                login with your corpnet account and choose someone to follow.<br /><br />
+                Currently MSGorilla has four different robots to publish engineer events:<br />
+                <a href="/Profile/Index?user=WossBuildMonitor">@@WossBuildMonitor</a> -> Woss build related information<br />
+                <a href="/Profile/Index?user=WossTFSMonitor">@@WossTFSMonitor</a> -> Woss TFS workitem/bug related information<br />
+                <a href="/Profile/Index?user=WossWAESMonitor">@@WossWAESMonitor</a> -> Woss WAES event<br />
+                <a href="/Profile/Index?user=CFMonitor">@@CFMonitor</a> -> Woss team Code Flow related message.<br />
+                Follow them to get the latest info you are interested. Enjoy MSGorilla.<br />
+                <br />
+                If you have any questions or suggestions, please contact <a href="mailto:gorillaft@microsoft.com">MS gorilla system ft(twitter like system)</a>.<br />
+                We are happy to hear from you.<br />
+                Thank you!<br />
+            </h4>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+</div>

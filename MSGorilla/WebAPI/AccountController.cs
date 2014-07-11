@@ -611,5 +611,25 @@ namespace MSGorilla.WebApi
         //    _accountManager.DeleteUser(userid);
         //    return new ActionResult();
         //}
+
+        /// <summary>
+        /// Return a user list which posted the most messages order by message count desc.
+        /// 
+        /// </summary>
+        /// <param name="count">count of users in the list</param>
+        /// <returns></returns>
+        [HttpGet]
+        public List<DisplayUserProfile> ActiveUsers(int count = 5)
+        {
+            var userlist = _accountManager.GetActiveUsers(count);
+            var dispusers = new List<DisplayUserProfile>();
+
+            foreach (var u in userlist)
+            {
+                dispusers.Add(new DisplayUserProfile(u, IsFollowing(u.Userid)));
+            }
+
+            return dispusers;
+        }
     }
 }

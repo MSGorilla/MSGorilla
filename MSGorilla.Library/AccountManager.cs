@@ -19,6 +19,17 @@ namespace MSGorilla.Library
             //_accountCtx = new MSGorillaContext();
         }
 
+        public List<UserProfile> GetActiveUsers(int count)
+        {
+            using (var _gorillaCtx = new MSGorillaContext())
+            {
+                return _gorillaCtx.Users.SqlQuery(
+                    @"select top({0}) Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from [UserProfile] order by MessageCount desc",
+                    new object[] { count }
+                ).ToList();
+            }
+        }
+
         public List<UserProfile> GetAllUsers(){
             using (var _gorillaCtx = new MSGorillaContext())
             {

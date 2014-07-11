@@ -257,6 +257,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Images\default_avatar_bk.jpg" />
+    <Content Include="Content\Images\slide-01.png" />
+    <Content Include="Content\Images\slide-02.png" />
+    <Content Include="Content\Images\slide-03.png" />
+    <Content Include="Content\Images\slide-04.png" />
     <Content Include="Content\ms.gorilla.css" />
     <Content Include="Content\css.css" />
     <Content Include="Content\Images\default_avatar.jpg" />
@@ -340,6 +344,9 @@
     <Content Include="Views\Message\Index.cshtml" />
     <Content Include="Views\Shared\_NotificationNavbarPartial.cshtml" />
     <Content Include="Views\Welcome\Index.cshtml" />
+    <Content Include="Views\Shared\_LayoutInverse.cshtml" />
+    <Content Include="Views\Shared\_CarouselPartial.cshtml" />
+    <Content Include="Views\Shared\_LoadMorePartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

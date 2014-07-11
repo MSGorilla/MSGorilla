@@ -9,7 +9,7 @@
     @Scripts.Render("~/bundles/jquery")
 </head>
 <body>
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="page-container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
@@ -23,47 +23,47 @@
                 <ul class="nav navbar-nav">
                     @if (ViewBag.Title == "Home")
                     {
-                        @*<li class="active">@Html.ActionLink("⌂ Home", "Index", "Home")</li>*@
-                        <li class="active"><a href="/Home">⌂ Home <span class="badge" id="nav_home_count"></span></a></li>
+                    @*<li class="active">@Html.ActionLink("⌂ Home", "Index", "Home")</li>*@
+                    <li class="active"><a href="/Home">⌂ Home <span class="badge" id="nav_home_count"></span></a></li>
                     }
                     else
                     {
-                        @*<li>@Html.ActionLink("⌂ Home", "Index", "Home")</li>*@
-                        <li><a href="/Home">⌂ Home <span class="badge" id="nav_home_count"></span></a></li>
+                    @*<li>@Html.ActionLink("⌂ Home", "Index", "Home")</li>*@
+                    <li><a href="/Home">⌂ Home <span class="badge" id="nav_home_count"></span></a></li>
                     }
                     @if (ViewBag.Title == "Notifications")
                     {
-                        @*<li class="active">@Html.ActionLink("● Notifications", "Index", "Home")</li>*@
-                        <li class="active"><a href="/Notification">● Notifications <span class="badge" id="nav_notification_count"></span></a></li>
+                    @*<li class="active">@Html.ActionLink("● Notifications", "Index", "Home")</li>*@
+                    <li class="active"><a href="/Notification">● Notifications <span class="badge" id="nav_notification_count"></span></a></li>
                     }
                     else
                     {
-                        @*<li>@Html.ActionLink("● Notifications", "Index", "Notification")</li>*@
-                        <li><a href="/Notification">● Notifications <span class="badge" id="nav_notification_count"></span></a></li>
+                    @*<li>@Html.ActionLink("● Notifications", "Index", "Notification")</li>*@
+                    <li><a href="/Notification">● Notifications <span class="badge" id="nav_notification_count"></span></a></li>
                     }
                     @if (ViewBag.Title == "Square")
                     {
-                        <li class="active">@Html.ActionLink("# Square", "Index", "Square")</li>
+                    <li class="active">@Html.ActionLink("# Square", "Index", "Square")</li>
                     }
                     else
                     {
-                        <li>@Html.ActionLink("# Square", "Index", "Square")</li>
+                    <li>@Html.ActionLink("# Square", "Index", "Square")</li>
                     }
                     @if (ViewBag.Title == "Me")
                     {
-                        <li class="active">@Html.ActionLink("Ω Me", "Index", "Profile")</li>
+                    <li class="active">@Html.ActionLink("Ω Me", "Index", "Profile")</li>
                     }
                     else
                     {
-                        <li>@Html.ActionLink("Ω Me", "Index", "Profile")</li>
+                    <li>@Html.ActionLink("Ω Me", "Index", "Profile")</li>
                     }
                     @if (ViewBag.Title == "API Doc")
                     {
-                        <li class="active">@Html.ActionLink("? API Doc", "Index", "Document")</li>
+                    <li class="active">@Html.ActionLink("? API Doc", "Index", "Document")</li>
                     }
                     else
                     {
-                        <li>@Html.ActionLink("? API Doc", "Index", "Document")</li>
+                    <li>@Html.ActionLink("? API Doc", "Index", "Document")</li>
                     }
                 </ul>
                 @Html.Partial("_LoginPartial")
