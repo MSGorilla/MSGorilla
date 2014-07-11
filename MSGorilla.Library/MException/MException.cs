@@ -81,6 +81,15 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
+    public class NoAccessToUpdatePasswordException : MSGorillaBaseException
+    {
+        public NoAccessToUpdatePasswordException()
+        {
+            Description = "Fail to update password. Changing password is only available for local account.";
+            Code = 2005;
+        }
+    }
+
     public class MessageTooLongException : MSGorillaBaseException
     {
         public MessageTooLongException()

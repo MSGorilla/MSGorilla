@@ -27,13 +27,12 @@ namespace MSGorilla.Desktop
     {
         static string GetCurrentUserID()
         {
-            //string[] array = System.Security.Principal.WindowsIdentity.GetCurrent().Name.Split('\\');
-            //if (array.Length > 1)
-            //{
-            //    return array[1];
-            //}
-            //return array[0];
-            return "user1";
+            string[] array = System.Security.Principal.WindowsIdentity.GetCurrent().Name.Split('\\');
+            if (array.Length > 1)
+            {
+                return array[1];
+            }
+            return array[0];
         }
 
         GorillaStatusHelper _helper;
@@ -83,25 +82,6 @@ namespace MSGorilla.Desktop
             OnStartup();
         }
 
-        private void Magnet()
-        {
-            while (true)
-            {
-                try
-                {
-                    Thread.Sleep(1);
-                    this.Dispatcher.Invoke((Action)(() =>
-                    {
-                        if (this.Top < 20 && this.Top > 0)
-                        {
-                            this.Top = 0;
-                        }
-                    }));
-                }
-                catch { }
-            }            
-        }
-
         private void Drag_MouseMove(object sender, MouseEventArgs e)
         {
             try
@@ -122,6 +102,24 @@ namespace MSGorilla.Desktop
         }
 
         //////////////////////////////////////////UI Animation///////////////////////////////////////////////////////
+        private void Magnet()
+        {
+            while (true)
+            {
+                try
+                {
+                    Thread.Sleep(1);
+                    this.Dispatcher.Invoke((Action)(() =>
+                    {
+                        if (this.Top < 20 && this.Top > 0)
+                        {
+                            this.Top = 0;
+                        }
+                    }));
+                }
+                catch { }
+            }
+        }
 
         private void ShinkMainWindowMonitor()
         {
@@ -201,7 +199,7 @@ namespace MSGorilla.Desktop
 
         private void BtnReply_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://msgorilla.cloudapp.net/Notification/Replies");
+            Process.Start("https://msgorilla.cloudapp.net/Notification/index?category=replyline");
             SetLabelCount(LabelReply, 0);
             //LabelReply.Content = "0";
         }
@@ -267,11 +265,6 @@ namespace MSGorilla.Desktop
                     SetLabelCount(LabelOwn, notif.UnreadOwnerlineMsgCount);
                     SetLabelCount(LabelReply, notif.UnreadReplyCount);
                     SetLabelCount(LabelImportant, notif.UnreadImportantMsgCount);
-                    //LabelHome.Content = string.Format("{0}", notif.UnreadHomelineMsgCount);
-                    //LabelAt.Content = string.Format("{0}", notif.UnreadAtlineMsgCount);
-                    //LabelOwn.Content = string.Format("{0}", notif.UnreadOwnerlineMsgCount);
-                    //LabelReply.Content = string.Format("{0}", notif.UnreadReplyCount);
-                    //LabelImportant.Content = string.Format("{0}", notif.UnreadImportantMsgCount);
 
                     TBStatus.Text = "Welcome to use MSGorilla, " + notif.Userid;
                     TBStatus.Foreground = Brushes.Black;

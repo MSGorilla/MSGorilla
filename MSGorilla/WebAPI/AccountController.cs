@@ -232,10 +232,13 @@ namespace MSGorilla.WebApi
         public ActionResult UpdatePassword(string password)
         {
             UserProfile user = _accountManager.FindUser(whoami());
+            if (user.Password == null)
+            {
+                throw new NoAccessToUpdatePasswordException();
+            }
             user.Password = Utils.MD5Encoding(password);
             _accountManager.UpdateUser(user);
             return new ActionResult();
-
         }
 
         //public class RegisterModel
