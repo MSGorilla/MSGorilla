@@ -199,7 +199,7 @@ namespace MSGorilla.Desktop
 
         private void BtnReply_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://msgorilla.cloudapp.net/Notification/Replies");
+            Process.Start("https://msgorilla.cloudapp.net/Notification/index?category=replyline");
             SetLabelCount(LabelReply, 0);
             //LabelReply.Content = "0";
         }
