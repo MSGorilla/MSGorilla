@@ -24,6 +24,7 @@ namespace MSGorilla
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
+            FederatedAuthentication.ServiceConfigurationCreated += this.OnServiceConfigurationCreated; 
 
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
