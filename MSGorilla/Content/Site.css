@@ -310,6 +310,10 @@ input[type="checkbox"].input-validation-error {
     width: 100px;
 }
 
+.break-word {
+    word-wrap: break-word;
+}
+
 .top-radius-10 {
     -webkit-border-top-left-radius: 10px;
     -webkit-border-top-right-radius: 10px;

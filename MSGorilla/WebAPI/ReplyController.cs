@@ -153,10 +153,11 @@ namespace MSGorilla.WebApi
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayReplyPagination GetMyReply(int count = 25, string token = null)
+        public DisplayReplyPagination GetMyReply(int count = 25, string token = null, bool keepUnread = false)
         {
             string me = whoami();
-            if(token == null){
+            if (!keepUnread && token == null)
+            {
                 _notifManager.clearReplyNotifCount(me);
             }            
             return new DisplayReplyPagination(_replyManager.GetReply(me, count, Utils.String2Token(token)));

@@ -13,37 +13,89 @@
     </div>
 
     <div>
-        <div class="col-lg-4">
+        <div class="col-lg-3">
             <div class="title-container">
-                <h4>Hottest topics</h4>
+                <h4>
+                    Hi, @ViewBag.Me.DisplayName
+                </h4>
             </div>
-            <ul id="welcome_hosttest_topics_list" class='list-group'>
+            <ul id="welcome_new_list" class='list-group'>
                 <li class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
                 @*autofill by js*@
             </ul>
         </div>
 
-        <div class="col-lg-4">
-            <div class="title-container">
-                <h4>Active users</h4>
+        <div class="col-lg-9" style="padding-left:0px;padding-right:0px;">
+            <div class="col-lg-6">
+                <div class="title-container">
+                    <h4>Hot topics</h4>
+                </div>
+                <ul id="welcome_hot_topics_list" class='list-group'>
+                    <li class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+                    @*autofill by js*@
+                </ul>
             </div>
-            <ul id="welcome_active_users_list" class='list-group'>
-                <li class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
-                @*autofill by js*@
-            </ul>
-        </div>
 
-        <div class="col-lg-4">
-            <div class="title-container">
-                <h4>Latest posts</h4>
+            <div class="col-lg-6">
+                <div class="title-container">
+                    <h4>Active users</h4>
+                </div>
+                <ul id="welcome_active_users_list" class='list-group'>
+                    <li class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+                    @*autofill by js*@
+                </ul>
             </div>
-            <ul id="welcome_latest_posts_list" class='list-group'>
-                <li class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
-                @*autofill by js*@
-            </ul>
-        </div>
 
-        <div class="clearfix"></div>
+            <div class="col-lg-6">
+                <div class="title-container">
+                    <h4>
+                        Mentions <a class="btn btn-link btn-xs fr" href="/Notification/index?category=atline">More <span class="caret"></span></a>
+                    </h4>
+                </div>
+                <ul id="welcome_mentions_posts_list" class='list-group'>
+                    <li class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+                    @*autofill by js*@
+                </ul>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="title-container">
+                    <h4>
+                        My Owns <a class="btn btn-link btn-xs fr" href="/Notification/index?category=ownerline">More <span class="caret"></span></a>
+                    </h4>
+                </div>
+                <ul id="welcome_myowns_posts_list" class='list-group'>
+                    <li class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+                    @*autofill by js*@
+                </ul>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="title-container">
+                    <h4>
+                        Replies <a class="btn btn-link btn-xs fr" href="/Notification/index?category=replyline">More <span class="caret"></span></a>
+                    </h4>
+                </div>
+                <ul id="welcome_replies_posts_list" class='list-group'>
+                    <li class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+                    @*autofill by js*@
+                </ul>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="title-container">
+                    <h4>
+                        Latest posts <a class="btn btn-link btn-xs fr" href="/Square">More <span class="caret"></span></a>
+                    </h4>
+                </div>
+                <ul id="welcome_latest_posts_list" class='list-group'>
+                    <li class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+                    @*autofill by js*@
+                </ul>
+            </div>
+
+            <div class="clearfix"></div>
+        </div>
     </div>
 
     <script>
