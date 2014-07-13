@@ -65,10 +65,16 @@
                     {
                         <li>@Html.ActionLink("? API Doc", "Index", "Document")</li>
                     }
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" href="#" data-toggle="dropdown">↙ Download <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://msgorilla.blob.core.windows.net/tools/DesktopTool.zip">≡ Desktop Tool</a></li>
+                        </ul>
+                    </li>
                 </ul>
                 @Html.Partial("_LoginPartial")
                 <form class="navbar-form navbar-right" method="get" action="/Search/index">
-                    <input class="form-control col-lg-12 search-bar" type="text" placeholder="Search for people & topics." name="keyword">
+                    <input class="form-control col-lg-12 search-bar" type="text" placeholder="Search for people & topics." name="keyword" maxlength="30">
                 </form>
             </div>
         </div>

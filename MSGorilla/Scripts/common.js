@@ -83,13 +83,16 @@ function enhanceMessage(schema, mid, msg) {
 function cutHtml(code, length) {
     code = ((code.length > length) ? (code.substr(0, length - 3) + "...") : code);
 
-    code = code.replace(/&/mg, '&#38;');
-    code = code.replace(/</mg, '&#60;');
-    code = code.replace(/>/mg, '&#62;');
-    code = code.replace(/\"/mg, '&#34;');
-    code = code.replace(/\t/g, '  ');
-    code = code.replace(/\r?\n/g, '&nbsp;');
-    code = code.replace(/ /g, '&nbsp;');
+    code = Txt2Html(code);
+    //code = code.replace(/&/mg, '&#38;');
+    //code = code.replace(/</mg, '&#60;');
+    //code = code.replace(/>/mg, '&#62;');
+    //code = code.replace(/\"/mg, '&#34;');
+    //code = code.replace(/\t/g, '  ');
+    //code = code.replace(/\r?\n/g, '&nbsp;');
+    //code = code.replace(/ /g, '&nbsp;');
+
+    return code;
 }
 
 function encodeHtml(code, atusers, topics) {

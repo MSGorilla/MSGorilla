@@ -547,7 +547,7 @@ input[type="checkbox"].input-validation-error {
     margin-left: 10px;
     display: inline-block;
     min-width: 100px;
-    vertical-align: middle;
+    vertical-align: baseline;
     white-space: nowrap;
     text-align: center;
     float: right;
@@ -575,7 +575,7 @@ input[type="checkbox"].input-validation-error {
     float: right;
     margin-left: 10px;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: baseline;
     white-space: nowrap;
     text-align: center;
 }
