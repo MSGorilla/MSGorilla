@@ -66,6 +66,69 @@ function Html2Txt(code) {
     return code;
 }
 
+var chart_axis_template = {
+    tooltip : {
+        trigger: 'axis'
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            mark : {
+                show: true,
+                title : {
+                    mark : 'New markline',
+                    markUndo : 'Erase markline',
+                    markClear : 'Clear all marklines'
+                },
+            },
+            dataView : {
+                show: true, 
+                title : 'Data view',
+                readOnly: false
+            },
+            magicType : {
+                show: true, 
+                title : {
+                    line : 'Line view',
+                    bar : 'Bar view',
+                    stack : 'Stack view',
+                    tiled : 'Tiled view'
+                },
+                type: ['line', 'bar']
+            },
+            restore : {
+                show: true,
+                title : 'Restore'
+            },
+            saveAsImage : {
+                show: true,
+                title : 'Save as image',
+                lang : ['Click to save']
+            }
+        }
+    },
+    calculable : true,
+    title : {
+        text: '',
+        subtext: ''
+    },
+    legend: {
+        data : []
+    },
+    xAxis : [
+        {
+            type : 'category',
+            data : []
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+        }
+    ],
+    series : []
+};
+
 function enhanceMessage(schema, mid, msg) {
     switch (schema) {
         case "chart-free":
@@ -74,6 +137,21 @@ function enhanceMessage(schema, mid, msg) {
             var chart = echarts.init(dom);
             var json = eval("(" + msg + ")");
             chart.setOption(json);
+            break;
+        case "chart-axis-singleaxis":
+            $("#message_" + mid).height(500);
+            var dom = document.getElementById('message_' + mid);
+            var chart = echarts.init(dom);
+            var json = eval("(" + msg + ")");
+
+            var option = chart_axis_template;
+            option.title.text = json.title;
+            option.title.subtext = json.subtitle;
+            option.legend.data = json.legend;
+            option.xAxis[0].data = json.xAxis;
+            option.series = json.yAxis;
+
+            chart.setOption(option);
             break;
         default:
             break;
@@ -443,13 +521,13 @@ function PostMessage() {
     $.ajax({
         type: "POST",
         url: "/api/message/postmessage",
-        data: "message=" + message + "&importance=2", // + "&schemaID=" + "chart-free",
+        data: "message=" + message + "&importance=2", // + "&schemaID=" + "chart-axis-singleaxis",
         dataType: "json",
         success: function (data) {
             $("#postmessage").val("");
             // insert the new posted message
             $("#feedlist").prepend(CreateFeed(data));
-            // enhanceMessage(data.SchemaID, data.ID, data.MessageContent);
+            // enhanceMessage(data.SchemaID, data.ID, data.MessageContent);  // user can not post schema data from webpage.
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             ShowAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
@@ -530,8 +608,10 @@ function LoadMessage(user, mid) {
                 // create feed 
                 $("#feedlist").append(CreateFeed(data, false, true));
                 enhanceMessage(data.SchemaID, data.ID, data.MessageContent);
-                $("#rich_message_" + mid).collapse('show');
-                ShowRichMsg(data.RichMessageID, mid);
+                if ($("#rich_message_" + mid).length > 0) {
+                    $("#rich_message_" + mid).collapse('show');
+                    ShowRichMsg(data.RichMessageID, mid);
+                }
                 $("#reply_" + mid).collapse('show');
                 ShowReplies(mid);
             }
