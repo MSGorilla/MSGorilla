@@ -429,13 +429,13 @@ namespace MSGorilla.Library
 
         public List<Reply> GetAllReplies(string msgID)
         {
-            TableQuery<ReplyEntity> query = new TableQuery<ReplyEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, msgID));
+            TableQuery<BaseReplyEntity> query = new TableQuery<BaseReplyEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, msgID));
 
             List<Reply> replies = new List<Reply>();
             // Print the fields for each customer.
-            foreach (ReplyEntity entity in _reply.ExecuteQuery(query))
+            foreach (BaseReplyEntity entity in _reply.ExecuteQuery(query))
             {
-                replies.Add(JsonConvert.DeserializeObject<Reply>(entity.Content));
+                replies.Add(entity.ToReply());
             }
             return replies;
         }
