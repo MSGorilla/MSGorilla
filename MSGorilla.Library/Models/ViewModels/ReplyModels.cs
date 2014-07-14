@@ -33,7 +33,7 @@ namespace MSGorilla.Library.Models.ViewModels
     public class DisplayReply
     {
         public SimpleUserProfile FromUser { get; set; }
-        public SimpleUserProfile ToUser { get; set; }
+        public List<SimpleUserProfile> ToUser { get; set; }
         public string Message { get; set; }
         public DateTime PostTime { get; set; }
         public SimpleUserProfile MessageUser { get; set; }
@@ -44,7 +44,14 @@ namespace MSGorilla.Library.Models.ViewModels
         {
             // use old id
             FromUser = new SimpleUserProfile(accManager.FindUser(rpl.FromUser));
-            ToUser = new SimpleUserProfile(accManager.FindUser(rpl.ToUser));
+            ToUser = new List<SimpleUserProfile>();
+            if (rpl.ToUser != null)
+            {
+                foreach (string userid in rpl.ToUser)
+                {
+                    ToUser.Add(new SimpleUserProfile(accManager.FindUser(userid)));
+                }
+            }            
             Message = rpl.Message;
             PostTime = rpl.PostTime;
             MessageUser = new SimpleUserProfile(accManager.FindUser(rpl.MessageUser));

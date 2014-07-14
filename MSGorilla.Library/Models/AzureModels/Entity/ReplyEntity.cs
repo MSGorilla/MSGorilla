@@ -6,19 +6,18 @@ using System.Threading.Tasks;
 
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace MSGorilla.Library.Models.AzureModels
+namespace MSGorilla.Library.Models.AzureModels.Entity
 {
-    public class ReplyEntity : TableEntity
+    public class ReplyEntity : BaseReplyEntity
     {
-        public string Content { get; set; }
-
         public ReplyEntity() { }
         public ReplyEntity(Reply reply)
+            : base(reply, reply.MessageID, reply.ReplyID)
         {
-            this.PartitionKey = reply.MessageID;
-            this.RowKey = reply.ReplyID;
+            //this.PartitionKey = reply.MessageID;
+            //this.RowKey = reply.ReplyID;
 
-            Content = reply.toJsonString();
+            //Content = reply.toJsonString();
         }
     }
 }

@@ -42,18 +42,18 @@ namespace MSGorilla.Library
 
         public ReplyPagiantion GetReply(string userid, int count = 25, TableContinuationToken token = null)
         {
-            TableQuery<ReplyNotificationEntifity> query = new TableQuery<ReplyNotificationEntifity>()
+            TableQuery<BaseReplyEntity> query = new TableQuery<BaseReplyEntity>()
                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userid))
                 .Take(count);
 
-            TableQuerySegment<ReplyNotificationEntifity> queryResult = _replyNotification.ExecuteQuerySegmented(query, token);
+            TableQuerySegment<BaseReplyEntity> queryResult = _replyNotification.ExecuteQuerySegmented(query, token);
 
             ReplyPagiantion ret = new ReplyPagiantion();
             ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
             ret.reply = new List<Reply>();
-            foreach (ReplyNotificationEntifity entity in queryResult)
+            foreach (BaseReplyEntity entity in queryResult)
             {
-                ret.reply.Add(JsonConvert.DeserializeObject<Reply>(entity.Content));
+                ret.reply.Add(entity.ToReply());
             }
             return ret;
         }
@@ -91,12 +91,12 @@ namespace MSGorilla.Library
 
         public List<Reply> GetAllReply(string userid)
         {
-            TableQuery<ReplyNotificationEntifity> query = new TableQuery<ReplyNotificationEntifity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userid));
+            TableQuery<BaseReplyEntity> query = new TableQuery<BaseReplyEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userid));
             List<Reply> replies = new List<Reply>();
 
-            foreach (ReplyNotificationEntifity entity in _replyArchive.ExecuteQuery(query))
+            foreach (BaseReplyEntity entity in _replyArchive.ExecuteQuery(query))
             {
-                replies.Add(JsonConvert.DeserializeObject<Reply>(entity.Content));
+                replies.Add(entity.ToReply());
             }
             replies.Reverse();
             return replies;
@@ -104,7 +104,7 @@ namespace MSGorilla.Library
 
 
         public Reply PostReply(string fromUser,
-                                string toUser,
+                                string[] toUser,
                                 string content,
                                 DateTime timestamp,
                                 string originMessageUser,
@@ -114,14 +114,24 @@ namespace MSGorilla.Library
             {
                 throw new UserNotFoundException(fromUser);
             }
-            if (_accManager.FindUser(toUser) == null)
-            {
-                throw new UserNotFoundException(toUser);
-            }
+            
             if (_accManager.FindUser(originMessageUser) == null)
             {
                 throw new UserNotFoundException(originMessageUser);
             }
+
+            List<string> existUser = new List<string>();
+            if (toUser != null)
+            {
+                foreach (string userid in toUser)
+                {
+                    if (_accManager.FindUser(userid) != null)
+                    {
+                        existUser.Add(userid);
+                    }
+                }
+            }
+            toUser = existUser.ToArray();
 
             string pk = Message.ToMessagePK(originMessageUser, originMessageID);
             TableOperation retreiveOperation = TableOperation.Retrieve<UserLineEntity>(pk, originMessageID);
@@ -134,6 +144,7 @@ namespace MSGorilla.Library
             }
 
             Reply reply = new Reply(fromUser, toUser, content, timestamp, originMessageUser, originMessageID);
+
             //insert reply
             ReplyEntity replyEntity = new ReplyEntity(reply);
             TableOperation insertOperation = TableOperation.Insert(replyEntity);
@@ -144,13 +155,19 @@ namespace MSGorilla.Library
             TableOperation updateOperation = TableOperation.Replace(originMsg);
             _userline.Execute(updateOperation);
 
-            //notif user
-            ReplyNotificationEntifity notifEntity = new ReplyNotificationEntifity(reply);
-            TableOperation insert = TableOperation.Insert(notifEntity);
-            _replyNotification.Execute(insert);
-            _replyArchive.Execute(insert);
+            foreach(string userid in toUser){
+                if (_accManager.FindUser(userid) == null)
+                {
+                    continue;
+                }
+                //notif user
+                ReplyNotificationEntifity notifEntity = new ReplyNotificationEntifity(userid, reply);
+                TableOperation insert = TableOperation.Insert(notifEntity);
+                _replyNotification.Execute(insert);
+                _replyArchive.Execute(insert);
 
-            _notifManager.incrementReplyNotifCount(toUser);
+                _notifManager.incrementReplyNotifCount(userid);
+            }            
 
             return reply;
         }

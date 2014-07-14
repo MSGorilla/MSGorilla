@@ -107,6 +107,7 @@
     <Compile Include="Models\Attachment.cs" />
     <Compile Include="Models\AzureModels\Entity\AtLineEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\AttachmentEntity.cs" />
+    <Compile Include="Models\AzureModels\Entity\BaseReplyEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\EventLineEntity.cs">
       <SubType>Code</SubType>
     </Compile>

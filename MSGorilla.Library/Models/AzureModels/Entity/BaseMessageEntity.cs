@@ -52,7 +52,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             }
         }
 
-        public Message toMessage()
+        public Message ToMessage()
         {
             //compatible with old version one column format
             if (!string.IsNullOrEmpty(this.Content))

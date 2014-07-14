@@ -5,26 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace MSGorilla.Library.Models.AzureModels
+namespace MSGorilla.Library.Models.AzureModels.Entity
 {
-    public class ReplyNotificationEntifity : TableEntity
+    public class ReplyNotificationEntifity : BaseReplyEntity
     {
         public string Content { get; set; }
 
-        public ReplyNotificationEntifity(Reply reply)
+        public ReplyNotificationEntifity(string userid, Reply reply) : base(reply, userid, reply.ReplyID)
         {
-            this.PartitionKey = reply.ToUser;
-            this.RowKey = reply.ReplyID;
+            //this.PartitionKey = userid;
+            //this.RowKey = reply.ReplyID;
 
-            Content = reply.toJsonString();
-        }
-
-        public ReplyNotificationEntifity(string userid, Reply reply)
-        {
-            this.PartitionKey = userid;
-            this.RowKey = reply.ReplyID;
-
-            Content = reply.toJsonString();
+            //Content = reply.toJsonString();
         }
 
         public ReplyNotificationEntifity()

@@ -197,14 +197,14 @@ namespace MSGorilla.WebApi
         /// <param name="messageID">origin message id</param>
         /// <returns></returns>
         [HttpGet, HttpPost]
-        public DisplayReply PostReply(string to, string message, string messageUser, string messageID)
+        public DisplayReply PostReply([FromUri]string[] to, string message, string messageUser, string messageID)
         {
             return new DisplayReply(_replyManager.PostReply(whoami(), to, message, DateTime.UtcNow, messageUser, messageID), new AccountManager());
         }
 
         public class ReplyModel
         {
-            public string To { get; set; }
+            public string[] To { get; set; }
             public string Message { get; set; }
             public string MessageUser { get; set; }
             public string MessageID { get; set; }
