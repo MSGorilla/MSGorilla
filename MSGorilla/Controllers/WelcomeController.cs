@@ -32,7 +32,6 @@ namespace MSGorilla.Controllers
 
         public ActionResult About()
         {
-            throw new System.Security.Cryptography.CryptographicException();
             return View();
         }
 

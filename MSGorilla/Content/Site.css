@@ -1,6 +1,9 @@
-﻿body {
+﻿html {
+    background-color: rgb(6, 19, 37);
+}
+
+body {
     padding-top: 50px;
-    padding-bottom: 20px;
     background-color: aliceblue;
     background-attachment: fixed;
     background-image: url("/Content/Images/default_bg.png");
@@ -8,6 +11,14 @@
     background-size: auto;
     background-color: #C0DEED;
 }
+
+footer {
+    color: white;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background-color: rgb(6, 19, 37);
+}
+
 
 /* Set padding to keep content from hitting the edges */
 .body-content {
@@ -52,6 +63,7 @@ input[type="checkbox"].input-validation-error {
 .main-container {
     content: normal;
     display: block;
+    min-height: 1000px;
 }
 
 .contents-container {
@@ -114,7 +126,7 @@ input[type="checkbox"].input-validation-error {
     -webkit-border-bottom-right-radius: 10px;
     -moz-border-bottom-right-radius: 10px;
     border-bottom-right-radius: 10px;
-    margin-top:-20px;
+    margin-top: -20px;
     margin-bottom: 20px;
 }
 
@@ -132,7 +144,7 @@ input[type="checkbox"].input-validation-error {
     margin-bottom: 10px;
     white-space: normal;
     word-wrap: break-word;
-    overflow-x:auto;
+    overflow-x: auto;
 }
 
 .newpost-footer {
@@ -184,7 +196,7 @@ input[type="checkbox"].input-validation-error {
     -moz-border-top-right-radius: 10px;
     border-top-right-radius: 10px;
     background-color: #333333;
-    margin-bottom:20px;
+    margin-bottom: 20px;
 }
 
 .user-info {
@@ -262,12 +274,12 @@ input[type="checkbox"].input-validation-error {
 }
 
 .ma-lt-15 {
-    margin-left:15px;
+    margin-left: 15px;
 }
 
 .pd-10 {
-    padding-left:10px;
-    padding-right:10px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .bold {
@@ -296,6 +308,10 @@ input[type="checkbox"].input-validation-error {
 
 .post-btn {
     width: 100px;
+}
+
+.break-word {
+    word-wrap: break-word;
 }
 
 .top-radius-10 {
@@ -531,14 +547,14 @@ input[type="checkbox"].input-validation-error {
     margin-left: 10px;
     display: inline-block;
     min-width: 100px;
-    vertical-align: middle;
+    vertical-align: baseline;
     white-space: nowrap;
     text-align: center;
     float: right;
 }
 
     .like-btn :empty {
-        display:none;
+        display: none;
     }
 
 .list-group-item > .like-btn, .sub-list-group-item > .like-btn {
@@ -548,8 +564,24 @@ input[type="checkbox"].input-validation-error {
     min-width: 50px;
 }
 
-.hidden {
-    display: none;
+.follow-btn {
+}
+
+.list-group-item > .follow-btn, .sub-list-group-item > .follow-btn {
+    font-size: 11px;
+    padding: 1px 5px;
+    line-height: 1.5;
+    min-width: 80px;
+    float: right;
+    margin-left: 10px;
+    display: inline-block;
+    vertical-align: baseline;
+    white-space: nowrap;
+    text-align: center;
 }
 
 
+
+.hidden {
+    display: none;
+}

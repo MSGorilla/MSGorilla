@@ -75,7 +75,7 @@ namespace MSGorilla.Controllers
                         var user = _accManager.FindUser(userid);
                         SignIn(user, model.RememberMe);
 
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Index", "Welcome");
                     }
                     else
                     {

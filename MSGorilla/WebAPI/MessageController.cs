@@ -266,16 +266,16 @@ namespace MSGorilla.WebApi
         /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination HomeLine(string filter, string userid, int count = 25, string token = null)
+        public DisplayMessagePagination HomeLine(string filter, string userid, int count = 25, string token = null, bool keepUnread = false)
         {
             DateTime start, end;
             if (GetFilterDateTime(filter, out start, out end))
             {
-                return HomeLine(userid, start, end, count, token);
+                return HomeLine(userid, start, end, count, token, keepUnread);
             }
             else
             {
-                return HomeLine(userid, count, token);
+                return HomeLine(userid, count, token, keepUnread);
             }
         }
 
@@ -332,7 +332,7 @@ namespace MSGorilla.WebApi
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination HomeLine(string userid, int count = 25, string token = null)
+        public DisplayMessagePagination HomeLine(string userid, int count = 25, string token = null, bool keepUnread = false)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
@@ -341,7 +341,7 @@ namespace MSGorilla.WebApi
             }
             TableContinuationToken tok = Utils.String2Token(token);
 
-            if (me.Equals(userid) && token == null)
+            if (!keepUnread && me.Equals(userid) && token == null)
             {
                 _notifManager.clearHomelineNotifCount(me);
                 _notifManager.clearImportantMsgCount(me);
@@ -404,7 +404,7 @@ namespace MSGorilla.WebApi
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination HomeLine(string userid, DateTime start, DateTime end, int count = 25, string token = null)
+        public DisplayMessagePagination HomeLine(string userid, DateTime start, DateTime end, int count = 25, string token = null, bool keepUnread = false)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
@@ -413,7 +413,7 @@ namespace MSGorilla.WebApi
             }
             TableContinuationToken tok = Utils.String2Token(token);
 
-            if (me.Equals(userid))
+            if (!keepUnread && me.Equals(userid) && token == null)
             {
                 _notifManager.clearHomelineNotifCount(me);
                 _notifManager.clearImportantMsgCount(me);
@@ -484,16 +484,16 @@ namespace MSGorilla.WebApi
         /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination OwnerLine(string filter, string userid, int count = 25, string token = null)
+        public DisplayMessagePagination OwnerLine(string filter, string userid, int count = 25, string token = null, bool keepUnread = false)
         {
             DateTime start, end;
             if (GetFilterDateTime(filter, out start, out end))
             {
-                return OwnerLine(userid, start, end, count, token);
+                return OwnerLine(userid, start, end, count, token, keepUnread);
             }
             else
             {
-                return OwnerLine(userid, count, token);
+                return OwnerLine(userid, count, token, keepUnread);
             }
         }
 
@@ -559,7 +559,7 @@ namespace MSGorilla.WebApi
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination OwnerLine(string userid, int count = 25, string token = null)
+        public DisplayMessagePagination OwnerLine(string userid, int count = 25, string token = null, bool keepUnread = false)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
@@ -568,7 +568,7 @@ namespace MSGorilla.WebApi
             }
             TableContinuationToken tok = Utils.String2Token(token);
 
-            if (me.Equals(userid) && token == null)
+            if (!keepUnread && me.Equals(userid) && token == null)
             {
                 _notifManager.clearOwnerlineNotifCount(me);
             }
@@ -639,7 +639,7 @@ namespace MSGorilla.WebApi
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination OwnerLine(string userid, DateTime start, DateTime end, int count = 25, string token = null)
+        public DisplayMessagePagination OwnerLine(string userid, DateTime start, DateTime end, int count = 25, string token = null, bool keepUnread = false)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
@@ -648,7 +648,7 @@ namespace MSGorilla.WebApi
             }
             TableContinuationToken tok = Utils.String2Token(token);
 
-            if (me.Equals(userid) && token == null)
+            if (!keepUnread && me.Equals(userid) && token == null)
             {
                 _notifManager.clearOwnerlineNotifCount(me);
             }
@@ -718,16 +718,16 @@ namespace MSGorilla.WebApi
         /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination AtLine(string filter, string userid, int count = 25, string token = null)
+        public DisplayMessagePagination AtLine(string filter, string userid, int count = 25, string token = null, bool keepUnread = false)
         {
             DateTime start, end;
             if (GetFilterDateTime(filter, out start, out end))
             {
-                return AtLine(userid, start, end, count, token);
+                return AtLine(userid, start, end, count, token, keepUnread);
             }
             else
             {
-                return AtLine(userid, count, token);
+                return AtLine(userid, count, token, keepUnread);
             }
         }
 
@@ -793,7 +793,7 @@ namespace MSGorilla.WebApi
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination AtLine(string userid, int count = 25, string token = null)
+        public DisplayMessagePagination AtLine(string userid, int count = 25, string token = null, bool keepUnread = false)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
@@ -803,7 +803,7 @@ namespace MSGorilla.WebApi
 
             TableContinuationToken tok = Utils.String2Token(token);
 
-            if (me.Equals(userid) && token == null)
+            if (!keepUnread && me.Equals(userid) && token == null)
             {
                 _notifManager.clearAtlineNotifCount(me);
             }
@@ -875,7 +875,7 @@ namespace MSGorilla.WebApi
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination AtLine(string userid, DateTime start, DateTime end, int count = 25, string token = null)
+        public DisplayMessagePagination AtLine(string userid, DateTime start, DateTime end, int count = 25, string token = null, bool keepUnread = false)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
@@ -885,7 +885,7 @@ namespace MSGorilla.WebApi
 
             TableContinuationToken tok = Utils.String2Token(token);
 
-            if (me.Equals(userid) && token == null)
+            if (!keepUnread && me.Equals(userid) && token == null)
             {
                 _notifManager.clearAtlineNotifCount(me);
             }
