@@ -110,8 +110,10 @@ function encodeHtml(code, atusers, topics) {
     if (!isNullOrEmpty(atusers)) {
         for (var key in atusers) {
             var user = atusers[key];
+            if (typeof user != "string")
+                user = user.Userid;
             var htmluser = Txt2Html(user);
-            code = code.replace("@" + htmluser, ('<a href="/profile/index?user=' + encodeTxt(user) + '">@' + htmluser + '</a>'));
+            code = code.replace(new RegExp("@" + htmluser, "gm"), ('<a href="/profile/index?user=' + encodeTxt(user) + '">@' + htmluser + '</a>'));
         }
 
         //strRegex = "@([0-9a-z\\-]+)(\\s|$)";
@@ -133,7 +135,7 @@ function encodeHtml(code, atusers, topics) {
             var topic = topics[key];
             var htmltopic = Txt2Html(topic);
 
-            code = code.replace("#" + htmltopic + "#", ('<a href="/topic/index?topic=' + encodeTxt(topic) + '">#' + htmltopic + '#</a>'));
+            code = code.replace(new RegExp("#" + htmltopic + "#", "gm"), ('<a href="/topic/index?topic=' + encodeTxt(topic) + '">#' + htmltopic + '#</a>'));
         }
 
         //strRegex = "#(([\\w \\-]+(#{2,})?)*[\\w \\-]+)#(\\s|$)";
@@ -460,21 +462,33 @@ function PostMessage() {
 function PostReply(user, mid) {
     var replybox = $("#replymessage_" + mid);
     var message = encodeTxt(replybox.val().trim());
-    var touser = replybox.attr("replyto");
+    var replyto = replybox.attr("replyto");
+    var tousers = [];
 
     if (message.length === 0) {
         return;
     }
 
-    if (isNullOrEmpty(touser)) {
-        touser = user;
+    if (isNullOrEmpty(replyto)) {
+        tousers.append(user);
+    }
+    else {
+        tousers = replyto.split(";");
     }
 
+    var apiurl = "/api/reply/postreply";
+    var apidata = "message=" + message + "&messageUser=" + encodeTxt(user) + "&messageID=" + encodeTxt(mid);
+
+    for (var key in tousers) {
+        if (!isNullOrEmpty(tousers[key]))
+            apidata += "&to=" + encodeTxt(tousers[key]);
+    }
+    
     $("#btn_reply_" + mid).button('loading');
     $.ajax({
         type: "POST",
-        url: "/api/reply/postreply",
-        data: "to=" + encodeTxt(touser) + "&message=" + message + "&messageUser=" + encodeTxt(user) + "&messageID=" + encodeTxt(mid),
+        url: apiurl,
+        data: apidata,
         dataType: "json",
         success: function (data) {
             $("#replymessage_" + mid).val("");
@@ -829,7 +843,20 @@ function CreateFeed(data, isNew, hideOpenBtn) {
     output += "      <div class='replies-container'>";
     output += "        <div class='input-group'>";
     //output += "         <span class='input-group-addon'>Comment</span>";
-    output += "          <input class='form-control' type='text' id='replymessage_" + mid + "' replyto='" + user + "' placeholder='Reply to @" + user + "'>";
+
+    // who to reply
+    var replyto = user + ";";   // default reply to poster.
+    var replytostring = " @" + user;   // default reply to poster.
+    if (!isNullOrEmpty(owners)) {   // reply to owners if owners exist.
+        replyto = "";
+        replytostring = "";
+        for (var key in owners) {
+            replyto += owners[key] + ";";
+            replytostring += " @" + owners[key];
+        }
+    }
+    output += "          <input class='form-control' type='text' id='replymessage_" + mid + "' replyto='" + replyto + "' placeholder='Reply to" + replytostring + "'>";
+
     output += "          <span class='input-group-btn'>";
     output += "            <button class='btn btn-primary' type='button' id='btn_reply_" + mid + "' data-loading-text='Replying...' onclick='PostReply(\"" + user + "\", \"" + mid + "\");'>Reply</button>";
     output += "          </span>";
@@ -953,8 +980,7 @@ function CreateReply(replyData, isReplyFeed, isNew) {
     var posttime = replyData.PostTime;
     var rid = replyData.ReplyID;
     var mid = replyData.MessageID;
-    var touser = replyData.ToUser.Userid;
-    var tousername = replyData.ToUser.DisplayName;
+    var tousers = replyData.ToUser;
     var msguser = replyData.MessageUser.Userid;
     var msgusername = replyData.MessageUser.DisplayName;
 
@@ -983,8 +1009,7 @@ function CreateReply(replyData, isReplyFeed, isNew) {
     output += "        &nbsp;<span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
     output += "      </div>";
     output += "      <div class='reply-input'>";
-    output += "        <a id='reply_tousername_" + rid + "' href='/profile/index?user=" + encodeTxt(touser) + "'>@" + touser + "</a>&nbsp;";
-    output += "        " + encodeHtml(msg);
+    output += "        " + encodeHtml(msg, tousers);
     output += "      </div>";
     output += "    </div>";
     output += "  </div>";
@@ -1007,13 +1032,11 @@ function SetReplyTo(evt, mid, user) {
     }
 
     var replybox = $("#replymessage_" + mid);
-
     if (replybox.length == 0) {
         return;
     }
 
-    replybox.attr("replyto", user);
-    replybox.attr("placeholder", "Reply to @" + user);
+    replybox.val(replybox.val() + " @" + user + " ");
 }
 
 function ShowMessage(evt, mid, user) {
@@ -2102,8 +2125,7 @@ function RefreshWelcomeRepliesPosts() {
                     var posttime = item.PostTime;
                     var rid = item.ReplyID;
                     var mid = item.MessageID;
-                    var touser = item.ToUser.Userid;
-                    var tousername = item.ToUser.DisplayName;
+                    var tousers = item.ToUser;
                     var msguser = item.MessageUser.Userid;
                     var msgusername = item.MessageUser.DisplayName;
 
@@ -2111,7 +2133,7 @@ function RefreshWelcomeRepliesPosts() {
                            + "  <a class='fr' target='_blank' href='/Message/Index?user=" + encodeTxt(msguser) + "&msgID=" + encodeTxt(mid) + "'>Open</a>"
                            + "  <a class='fullname' href='/profile/index?user=" + encodeTxt(user) + "'>" + username + "</a>"
                            + "  <span class='username'> - " + Time2Now(posttime) + "</span>"
-                           + "  <p class='break-word'>" + (msg.length > 140 ? cutHtml(msg, 140) : encodeHtml(msg)) + "</p>"
+                           + "  <p class='break-word'>" + (msg.length > 140 ? cutHtml(msg, 140) : encodeHtml(msg, tousers)) + "</p>"
                            + "</li>";
 
                     listdiv.append(output);
