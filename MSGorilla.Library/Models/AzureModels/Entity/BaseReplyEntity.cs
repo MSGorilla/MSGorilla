@@ -57,7 +57,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             Reply oldFormatReply = new Reply(
                     (string)obj["FromUser"],
                     new string[] { (string)obj["ToUser"] },
-                    (string)obj["PostTime"],
+                    (string)obj["Message"],
                     DateTime.Parse((string)obj["PostTime"]),
                     (string)obj["MessageUser"],
                     (string)obj["MessageID"],
