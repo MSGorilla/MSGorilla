@@ -120,18 +120,23 @@ namespace MSGorilla.Library
                 throw new UserNotFoundException(originMessageUser);
             }
 
-            List<string> existUser = new List<string>();
+            //merge toUser list and @somebody in the message content
+            List<String> validToUsers = new List<String>();
+            HashSet<string> ToUserIDs = new HashSet<string>();
+            ToUserIDs.UnionWith(Utils.GetAtUserid(content));
             if (toUser != null)
             {
-                foreach (string userid in toUser)
+                ToUserIDs.UnionWith(toUser);
+            }
+            foreach (string uid in ToUserIDs)
+            {
+                var temp = _accManager.FindUser(uid);
+                if (temp != null)
                 {
-                    if (_accManager.FindUser(userid) != null)
-                    {
-                        existUser.Add(userid);
-                    }
+                    validToUsers.Add(temp.Userid);
                 }
             }
-            toUser = existUser.ToArray();
+            toUser = validToUsers.ToArray();
 
             string pk = Message.ToMessagePK(originMessageUser, originMessageID);
             TableOperation retreiveOperation = TableOperation.Retrieve<UserLineEntity>(pk, originMessageID);
