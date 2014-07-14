@@ -74,7 +74,8 @@ namespace MSGorilla
             {
                 ex = ex.InnerException;
             }
-            if (ex is System.Security.Cryptography.CryptographicException)
+            if (ex is System.Security.Cryptography.CryptographicException ||
+                ex is FormatException)
             {
                 HttpCookie cookie = new HttpCookie("ASP.NET_SessionId");
                 cookie.Expires = DateTime.Now.AddDays(-1d);
@@ -92,7 +93,7 @@ namespace MSGorilla
                 cookie.Expires = DateTime.Now.AddDays(-1d);
                 Response.Cookies.Add(cookie);
 
-                Response.Redirect("/error?message=System.Security.Cryptography.CryptographicException&returnUrl=/account/login");
+                Response.Redirect("/account/login");
             }
             //Server.Transfer("GeneralError.aspx");
         }
