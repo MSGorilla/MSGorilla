@@ -1828,7 +1828,7 @@ function RefreshWelcomeNew() {
 
     // my topics
     apiurl = "/api/topic/getmyfavouritetopic";
-    var maxcount = 30;
+    var maxcount = 15;
 
     $.ajax({
         type: "GET",
@@ -1848,7 +1848,7 @@ function RefreshWelcomeNew() {
                     var topicdesp = item.topicDescription;
                     var topiccount = item.topicMsgCount;
 
-                    if (unreadcount >= 0) {
+                    if (unreadcount > 0) {
                         output = "<li class='list-group-item'>"
                                + "  <span class='badge'>" + unreadcount + "</span>"
                                + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>"
