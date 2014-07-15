@@ -1,0 +1,178 @@
+﻿/*
+Title : the title of the chart.
+Subtitle : the subtitle of the chart.
+Legend: data categories.
+xAxis: x axis values.
+yAxis: y axis datasets. (multiple datasets supported).
+	name : the name in [legend].
+	type: 'line' or 'bar'.
+	data : y axis values.
+*/
+schemaid = "chart-axis-singleaxis"
+msgcontent = "
+{
+	title : 'The statistics of the number of users', 
+	subtitle : 'made out of whole cloth', 
+	legend : ['Number of users'], 
+	xAxis : ['7/8', '7/9', '7/10', '7/11', '7/12', '7/13', '7/14'], 
+	yAxis : [ 
+		{
+			name : 'Number of users', 
+			type: 'line', 
+			data: [3, 4, 5, 3, 6, 1, 8] 
+		} 
+	] 
+}"
+
+/*
+Title : the title of the chart.
+Subtitle : the subtitle of the chart.
+Legend: data categories.
+xAxis: x axis values.
+yAxis: y axis datasets. (multiple datasets supported).
+	name : the name in [legend].
+	type: 'line' or 'bar'.
+	stack: used by stack view, the values of the same stack name will be added up.
+	data : y axis values.
+yAxis2: the second (right) y axis.
+*/
+schemaid = "chart-axis-doubleaxes"
+msgcontent = "
+{
+	title : 'The statistics of the number of users, robots and posts', 
+	subtitle : 'made out of whole cloth', 
+	legend : ['Number of users', 'Number of robots', 'Number of posts'], 
+	xAxis : ['7/8', '7/9', '7/10', '7/11', '7/12', '7/13', '7/14'], 
+	yAxis : [ 
+		{
+			name : 'Number of users', 
+			type: 'bar', 
+			stack: 'users', 
+			data: [13, 14, 11, 8, 5, 13, 6] 
+		}, 
+		{
+			name : 'Number of robots', 
+			type: 'bar', 
+			stack: 'users', 
+			data: [3, 4, 5, 3, 6, 1, 8] 
+		}
+	], 
+	yAxis2: [ 
+		{
+			name: 'Number of posts', 
+			type: 'line', 
+			data:[55, 122, 35, 73, 45, 39, 89] 
+		} 
+	]
+ }"
+
+/*
+Title : the title of the chart.
+Subtitle : the subtitle of the chart.
+Legend: data categories.
+data: datasets.
+	name : the name in [legend].
+	type: 'scatter'.
+	data : [x, y] values.
+*/
+schemaid = "chart-scatter"
+msgcontent = "
+{ 
+	title : 'Height and weight', 
+	subtitle : 'made out of whole cloth', 
+	legend : ['Male', 'Female'], 
+	data: [
+		{ 
+			name:'Female', 
+			type:'scatter', 
+			data: [
+				[161.2, 51.6], [167.5, 59.0], [159.5, 49.2], [163.2, 55.9], [152.4, 46.5], [157.5, 54.3], [168.3, 54.8], [180.3, 60.7], [165.5, 60.0], [165.0, 62.0], [164.5, 60.3], [156.0, 52.7], [160.0, 74.3], [163.8, 67.3]
+			]
+		}, 
+		{ 
+			name:'Male', 
+			type:'scatter', 
+			data: [
+				[174.0, 65.6], [175.3, 71.8], [177.1, 83.4], [181.6, 75.5], [176.5, 73.0], [175.0, 70.2], [174.0, 73.4], [165.1, 70.5], [177.0, 68.9], [192.0, 102.3], [176.5, 68.4], [169.4, 65.9], [182.1, 75.7], [179.8, 84.5]
+			]
+		}
+	]
+}"
+
+/*
+Title : the title of the chart.
+Subtitle : the subtitle of the chart.
+Legend: data categories.
+data: datasets.
+	name : the name of the pie.
+	type: 'pie'.
+	selectedMode: 'single', 'multiple', or null.
+	radius: size of the pie. e.g. could be a number (unit: px) or percent or an expression e.g. min(width, height) / 2 * 75%. 
+		     pass an array to draw a ring. e.g. ['50%', '75%'].
+	center: position of the pie. e.g. could be a number (unit: px) or percent or an expression e.g. min(width, height) * 50% .
+	data : data of pieces.
+		value: value of one piece.
+		name : the name in [legend].
+*/
+schemaid = "chart-pie"
+msgcontent = "
+{ 
+	title : 'Bug Analysis', 
+	subtitle : 'made out of whole cloth', 
+	legend : ['Success', 'Failed', 'Warned', 'Not run', 'Diagnostics', 'Job Scheduler', 'Management', 'SOA Runtime', 'MPI'], 
+	data: [ 
+		{
+			name : 'Pass rate', 
+			type: 'pie', 
+			selectedMode: 'single', 
+			radius:'50%', 
+			center:['30%', '60%' ], 
+			data:[
+				{ 
+					value: 245, 
+					name:'Success' 
+				},
+				{ 
+					value: 985, 
+					name:'Failed' 
+				},
+				{ 
+					value: 12, 
+					name:'Warned' 
+				},
+				{ 
+					value: 365, 
+					name:'Not run' 
+				} 
+			] 
+		}, 
+		{ 
+			name : 'Failure rate', 
+			type: 'pie', 
+			radius:'50%', 
+			center:['70%', '60%' ], 
+			data:[ 
+				{ 
+					value: 362, 
+					name:'Diagnostics' 
+				},
+				{ 
+					value: 125, 
+					name:'Job Scheduler' 
+				},
+				{ 
+					value: 398, 
+					name:'Management' 
+				},
+				{ 
+					value: 99, 
+					name:'SOA Runtime' 
+				},
+				{ 
+					value: 1,
+					name:'MPI' 
+				} 
+			] 
+		} 
+	] 
+}"
