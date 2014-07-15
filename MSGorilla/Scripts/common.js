@@ -1,4 +1,19 @@
 ﻿/* common function */
+function ScrollTo(itemid) {
+    var scroll_offset = $("#" + itemid).offset();
+    $("body,html").animate({
+        scrollTop: scroll_offset.top - 60
+    }, "slow");
+}
+
+function isNullOrEmpty(strVal) {
+    if (strVal == null || strVal == undefined || strVal == '') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function isValidForUserid(c) {
     if ((c >= 'a' && c <= 'z')
         || (c >= '0' && c <= '9')
@@ -29,16 +44,9 @@ function isValidForTopic(c) {
 }
 
 function encodeEmail(code) {
-    code = code.replace('@', '_');
-    code = code.replace('.', '_');
+    code = code.replace(/@/mg, '_');
+    code = code.replace(/./mg, '_');
     return code;
-}
-
-function ScrollTo(itemname) {
-    var scroll_offset = $("#" + itemname).offset();
-    $("body,html").animate({
-        scrollTop: scroll_offset.top - 60
-    }, "slow");
 }
 
 function Txt2Html(code) {
@@ -414,14 +422,6 @@ function encodeHtml(code, atusers, topics) {
 function encodeTxt(code) {
     code = encodeURIComponent(code);
     return code;
-}
-
-function isNullOrEmpty(strVal) {
-    if (strVal == null || strVal == undefined || strVal == '') {
-        return true;
-    } else {
-        return false;
-    }
 }
 
 function DateFormat(datestring) {
