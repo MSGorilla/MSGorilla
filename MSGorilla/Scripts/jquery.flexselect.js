@@ -10,7 +10,9 @@
             inputNameTransform: function (name) { return; },
             dropdownIdTransform: function (id) { return id + "_flexselect_dropdown"; },
             counterIdTransform: function (id) { return id + "_counter"; },
-            leastResults: 5
+            leastResults: 1,
+            leastKeyLength: 3,
+            maxDropdownCount: 10,
         },
         //select: null,
         input: null,
@@ -212,6 +214,11 @@
                 this.hide();
                 return;
             }
+            // if key is too short, hide dropdown
+            if (abbreviation.length <= this.settings.leastKeyLength) {
+                this.hide();
+                return;
+            }
 
             // do nothing 
             if (abbreviation == this.lastAbbreviation) return;
@@ -220,16 +227,19 @@
             var results = [];
             var type = abbreviation.substr(0, 1);
             var key = abbreviation.substr(1);
+            var maxcount = this.settings.maxDropdownCount;
 
             switch (type) {
                 case '@':
                     $.each(this.userCache, function () {
+                        if (results.length >= maxcount) return false;
                         this.score = LiquidMetal.score(this.key, key);
                         if (this.score > 0.0) results.push(this);
                     });
                     break;
                 case '#':
                     $.each(this.topicCache, function () {
+                        if (results.length >= maxcount) return false;
                         this.score = LiquidMetal.score(this.key, key);
                         if (this.score > 0.0) results.push(this);
                     });
