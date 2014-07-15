@@ -23,7 +23,7 @@ namespace MSGorilla.StatusReporter
             {
                 HistoryData data = _collector.GetLatestData();
                 //collect and report status every day
-                if (data == null || DateTime.UtcNow.Subtract(data.Date).TotalDays >= 0.1)
+                if (data == null || DateTime.UtcNow.Subtract(data.Date).TotalDays >= 1)
                 {
                     Logger.Info("Start to update MSGorilla status.");
                     _collector.UpdateStatusAndSave();
