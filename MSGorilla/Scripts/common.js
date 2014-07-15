@@ -67,95 +67,274 @@ function Html2Txt(code) {
 }
 
 var chart_axis_template = {
-    tooltip : {
+    tooltip: {
         trigger: 'axis'
     },
     toolbox: {
-        show : true,
-        feature : {
-            mark : {
+        show: true,
+        orient: 'vertical',
+        feature: {
+            mark: {
                 show: true,
-                title : {
-                    mark : 'New markline',
-                    markUndo : 'Erase markline',
-                    markClear : 'Clear all marklines'
+                title: {
+                    mark: 'New markline',
+                    markUndo: 'Erase markline',
+                    markClear: 'Clear all marklines'
                 },
             },
-            dataView : {
-                show: true, 
-                title : 'Data view',
+            magicType: {
+                show: true,
+                title: {
+                    line: 'Line view',
+                    bar: 'Bar view',
+                    stack: 'Stack view',
+                    tiled: 'Tiled view'
+                },
+                type: ['line', 'bar', 'stack', 'tiled']
+            },
+            dataView: {
+                show: true,
+                title: 'Data view',
                 readOnly: false
             },
-            magicType : {
-                show: true, 
-                title : {
-                    line : 'Line view',
-                    bar : 'Bar view',
-                    stack : 'Stack view',
-                    tiled : 'Tiled view'
-                },
-                type: ['line', 'bar']
-            },
-            restore : {
+            restore: {
                 show: true,
-                title : 'Restore'
+                title: 'Restore'
             },
-            saveAsImage : {
+            saveAsImage: {
                 show: true,
-                title : 'Save as image',
-                lang : ['Click to save']
+                title: 'Save as image',
+                lang: ['Right click and save']
             }
         }
     },
-    calculable : true,
-    title : {
+    calculable: true,
+    title: {
         text: '',
-        subtext: ''
+        subtext: '',
+        x: 'center'
     },
     legend: {
-        data : []
+        x: 'center',
+        y: 'bottom',
+        data: []
     },
-    xAxis : [
+    xAxis: [
         {
-            type : 'category',
-            data : []
+            type: 'category',
+            data: []
         }
     ],
-    yAxis : [
+    yAxis: [
         {
-            type : 'value',
+            type: 'value',
+        },
+        {
+            type: 'value',
         }
     ],
-    series : []
+    series: []
+};
+
+var chart_scatter_template = {
+    tooltip: {
+        trigger: 'axis'
+    },
+    toolbox: {
+        show: true,
+        orient: 'vertical',
+        feature: {
+            mark: {
+                show: true,
+                title: {
+                    mark: 'New markline',
+                    markUndo: 'Erase markline',
+                    markClear: 'Clear all marklines'
+                },
+            },
+            dataZoom: {
+                show: true,
+                title: {
+                    dataZoom: 'Zoom in',
+                    dataZoomReset: 'Cancel zoom in'
+                }
+            },
+            dataView: {
+                show: true,
+                title: 'Data view',
+                readOnly: false
+            },
+            restore: {
+                show: true,
+                title: 'Restore'
+            },
+            saveAsImage: {
+                show: true,
+                title: 'Save as image',
+                lang: ['Right click and save']
+            }
+        }
+    },
+    calculable: true,
+    title: {
+        text: '',
+        subtext: '',
+        x: 'center'
+    },
+    legend: {
+        x: 'center',
+        y: 'bottom',
+        data: []
+    },
+    xAxis: [
+        {
+            type: 'value',
+            power: 1,
+            scale: true,
+        }
+    ],
+    yAxis: [
+        {
+            type: 'value',
+            power: 1,
+            scale: true,
+        }
+    ],
+    series: []
+};
+
+var chart_pie_template = {
+    tooltip: {
+        trigger: 'item',
+        formatter: "{a} <br/>{b} : {c} ({d}%)"
+    },
+    toolbox: {
+        show: true,
+        orient: 'vertical',
+        feature: {
+            mark: {
+                show: true,
+                title: {
+                    mark: 'New markline',
+                    markUndo: 'Erase markline',
+                    markClear: 'Clear all marklines'
+                },
+            },
+            dataView: {
+                show: true,
+                title: 'Data view',
+                readOnly: false
+            },
+            restore: {
+                show: true,
+                title: 'Restore'
+            },
+            saveAsImage: {
+                show: true,
+                title: 'Save as image',
+                lang: ['Right click and save']
+            }
+        }
+    },
+    calculable: true,
+    title: {
+        text: '',
+        subtext: '',
+        x: 'center'
+    },
+    legend: {
+        orient: 'vertical',
+        x: 'left',
+        y: 'top',
+        data: []
+    },
+    series: []
 };
 
 function enhanceMessage(schema, mid, msg) {
-    switch (schema) {
-        case "chart-free":
-            $("#message_" + mid).height(500);
-            var dom = document.getElementById('message_' + mid);
-            var chart = echarts.init(dom);
-            var json = eval("(" + msg + ")");
-            chart.setOption(json);
-            break;
-        case "chart-axis-singleaxis":
-            $("#message_" + mid).height(500);
-            var dom = document.getElementById('message_' + mid);
-            var chart = echarts.init(dom);
-            var json = eval("(" + msg + ")");
+    try {
+        switch (schema) {
+            case "chart-free":
+                $("#message_" + mid).height(500);
+                var dom = document.getElementById('message_' + mid);
+                var chart = echarts.init(dom);
+                var json = eval("(" + msg + ")");
 
-            var option = chart_axis_template;
-            option.title.text = json.title;
-            option.title.subtext = json.subtitle;
-            option.legend.data = json.legend;
-            option.xAxis[0].data = json.xAxis;
-            option.series = json.yAxis;
+                chart.setOption(json);
+                break;
 
-            chart.setOption(option);
-            break;
-        default:
-            break;
+            case "chart-axis-singleaxis":
+                $("#message_" + mid).height(500);
+                var dom = document.getElementById('message_' + mid);
+                var chart = echarts.init(dom);
+                var json = eval("(" + msg + ")");
+
+                var option = chart_axis_template;
+                option.title.text = json.title;
+                option.title.subtext = json.subtitle;
+                option.legend.data = json.legend;
+                option.xAxis[0].data = json.xAxis;
+                option.series = json.yAxis;
+
+                chart.setOption(option);
+                break;
+
+            case "chart-axis-doubleaxes":
+                $("#message_" + mid).height(500);
+                var dom = document.getElementById('message_' + mid);
+                var chart = echarts.init(dom);
+                var json = eval("(" + msg + ")");
+
+                var option = chart_axis_template;
+                option.title.text = json.title;
+                option.title.subtext = json.subtitle;
+                option.legend.data = json.legend;
+                option.xAxis[0].data = json.xAxis;
+                option.series = json.yAxis;
+                for (var key in json.yAxis2) {
+                    var y2 = json.yAxis2[key];
+                    y2.yAxisIndex = 1;
+                    option.series.push(y2);
+                }
+
+                chart.setOption(option);
+                break;
+
+            case "chart-scatter":
+                $("#message_" + mid).height(500);
+                var dom = document.getElementById('message_' + mid);
+                var chart = echarts.init(dom);
+                var json = eval("(" + msg + ")");
+
+                var option = chart_scatter_template;
+                option.title.text = json.title;
+                option.title.subtext = json.subtitle;
+                option.legend.data = json.legend;
+                option.series = json.data;
+
+                chart.setOption(option);
+                break;
+
+            case "chart-pie":
+                $("#message_" + mid).height(500);
+                var dom = document.getElementById('message_' + mid);
+                var chart = echarts.init(dom);
+                var json = eval("(" + msg + ")");
+
+                var option = chart_pie_template;
+                option.title.text = json.title;
+                option.title.subtext = json.subtitle;
+                option.legend.data = json.legend;
+                option.series = json.data;
+
+                chart.setOption(option);
+                break;
+
+            default:
+                break;
+        }
     }
+    catch (ex) { }
 }
 
 function cutHtml(code, length) {
@@ -521,7 +700,7 @@ function PostMessage() {
     $.ajax({
         type: "POST",
         url: "/api/message/postmessage",
-        data: "message=" + message + "&importance=2", // + "&schemaID=" + "chart-axis-singleaxis",
+        data: "message=" + message + "&importance=2", // + "&schemaID=" + "chart-pie",
         dataType: "json",
         success: function (data) {
             $("#postmessage").val("");
@@ -561,7 +740,7 @@ function PostReply(user, mid) {
         if (!isNullOrEmpty(tousers[key]))
             apidata += "&to=" + encodeTxt(tousers[key]);
     }
-    
+
     $("#btn_reply_" + mid).button('loading');
     $.ajax({
         type: "POST",
