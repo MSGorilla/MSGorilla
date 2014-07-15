@@ -1334,28 +1334,28 @@ namespace MSGorilla.WebApi
         /// Example output:
         /// [
         ///     {
-        ///         "FromUser": {
-        ///             "Userid": "user2",
-        ///             "DisplayName": "User22",
-        ///             "PortraitUrl": null,
-        ///             "Description": "user22"
-        ///         },
-        ///         "ToUser": {
+        ///         "type": "reply",
+        ///         "MessageUser": "user1",
+        ///         "MessageID": "251997929671837_bdb3414b-3232-48fc-be5b-b6c15d48902f",
+        ///         "User": {
         ///             "Userid": "user1",
         ///             "DisplayName": "User1",
         ///             "PortraitUrl": null,
         ///             "Description": "user for test"
         ///         },
-        ///         "Message": "test cloud reply",
-        ///         "PostTime": "2014-06-24T06:51:02.9789122Z",
-        ///         "MessageUser": {
-        ///             "Userid": "user1",
-        ///             "DisplayName": "User1",
-        ///             "PortraitUrl": null,
-        ///             "Description": "user for test"
-        ///         },
-        ///         "MessageID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
-        ///         "ReplyID": "251998708137021_431cab73-f6d7-4484-8872-797ec183ec68"
+        ///         "ID": "251996885624787_a9ce32f7-5409-496f-a320-3f0283144540",
+        ///         "EventID": "none",
+        ///         "SchemaID": "none",
+        ///         "Owner": null,
+        ///         "AtUser": [
+        ///             "user2"
+        ///         ],
+        ///         "TopicName": null,
+        ///         "MessageContent": "test new reply",
+        ///         "RichMessageID": null,
+        ///         "Attachment": null,
+        ///         "PostTime": "2014-07-15T09:06:15.2123811Z",
+        ///         "Importance": 2
         ///     },
         ///     ......
         /// ]

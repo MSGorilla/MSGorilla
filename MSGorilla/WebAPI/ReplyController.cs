@@ -26,52 +26,28 @@ namespace MSGorilla.WebApi
         /// Example output:
         /// [
         ///     {
-        ///         "FromUser": {
+        ///         "type": "reply",
+        ///         "MessageUser": "user1",
+        ///         "MessageID": "251997929671837_bdb3414b-3232-48fc-be5b-b6c15d48902f",
+        ///         "User": {
         ///             "Userid": "user1",
         ///             "DisplayName": "User1",
         ///             "PortraitUrl": null,
         ///             "Description": "user for test"
         ///         },
-        ///         "ToUser": {
-        ///             "Userid": "user1",
-        ///             "DisplayName": "User1",
-        ///             "PortraitUrl": null,
-        ///             "Description": "user for test"
-        ///         },
-        ///         "Message": "asdf",
-        ///         "PostTime": "2014-05-29T07:19:07.2070991Z",
-        ///         "MessageUser": {
-        ///             "Userid": "user1",
-        ///             "DisplayName": "User1",
-        ///             "PortraitUrl": null,
-        ///             "Description": "user for test"
-        ///         },
-        ///         "MessageID": "252000953520305_afbf6c35-4229-435f-8ed8-045c172176a8",
-        ///         "ReplyID": "252000952852792_5da7331e-322c-4638-a340-c47d55773649"
-        ///     },
-        ///     {
-        ///         "FromUser": {
-        ///             "Userid": "user2",
-        ///             "DisplayName": "User22",
-        ///             "PortraitUrl": null,
-        ///             "Description": "user22"
-        ///         },
-        ///         "ToUser": {
-        ///             "Userid": "user1",
-        ///             "DisplayName": "User1",
-        ///             "PortraitUrl": null,
-        ///             "Description": "user for test"
-        ///         },
-        ///         "Message": "111",
-        ///         "PostTime": "2014-05-29T08:04:14.8203109Z",
-        ///         "MessageUser": {
-        ///             "Userid": "user1",
-        ///             "DisplayName": "User1",
-        ///             "PortraitUrl": null,
-        ///             "Description": "user for test"
-        ///         },
-        ///         "MessageID": "252000953520305_afbf6c35-4229-435f-8ed8-045c172176a8",
-        ///         "ReplyID": "252000950145179_7a0cfdb0-1b2e-4ae8-bb8d-ed2e5e1a0217"
+        ///         "ID": "251996885624787_a9ce32f7-5409-496f-a320-3f0283144540",
+        ///         "EventID": "none",
+        ///         "SchemaID": "none",
+        ///         "Owner": null,
+        ///         "AtUser": [
+        ///             "user2"
+        ///         ],
+        ///         "TopicName": null,
+        ///         "MessageContent": "test new reply",
+        ///         "RichMessageID": null,
+        ///         "Attachment": null,
+        ///         "PostTime": "2014-07-15T09:06:15.2123811Z",
+        ///         "Importance": 2
         ///     },
         ///     ......
         /// ]
