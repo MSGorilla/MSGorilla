@@ -35,6 +35,13 @@ namespace MSGorilla.Library.Models.ViewModels
 
     public class DisplayMessage
     {
+        public string type
+        {
+            get
+            {
+                return "message";
+            }
+        }
         public SimpleUserProfile User { get; set; }
         public string ID { get; set; }
         public string EventID { get; set; }

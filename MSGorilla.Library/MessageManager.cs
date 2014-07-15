@@ -526,7 +526,7 @@ namespace MSGorilla.Library
             if (!string.IsNullOrEmpty(richMessage))
             {
                 richMessageID = _richMsgManager.PostRichMessage(userid, timestamp, richMessage);
-            }            
+            }
 
             // create message
             Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray(), richMessageID, attachmentID, importance);

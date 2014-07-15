@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MSGorilla.Library.Models.ViewModels
 {
-    public class ReplyPagiantion
+    public class ReplyPagination
     {
         public List<Reply> reply { get; set; }
         public string continuationToken { get; set; }
@@ -17,46 +17,37 @@ namespace MSGorilla.Library.Models.ViewModels
         public string continuationToken { get; set; }
         public List<DisplayReply> reply { get; set; }
 
-        public DisplayReplyPagination(ReplyPagiantion rpl)
+        public DisplayReplyPagination(ReplyPagination rpl)
         {
             continuationToken = rpl.continuationToken;
             var replylist = rpl.reply;
             AccountManager accManager = new AccountManager();
+            AttachmentManager attManager = new AttachmentManager();
             reply = new List<DisplayReply>();
             foreach (var r in replylist)
             {
-                reply.Add(new DisplayReply(r, accManager));
+                reply.Add(new DisplayReply(r, accManager, attManager));
             }
         }
     }
 
-    public class DisplayReply
+    public class DisplayReply : DisplayMessage
     {
-        public SimpleUserProfile FromUser { get; set; }
-        public List<SimpleUserProfile> ToUser { get; set; }
-        public string Message { get; set; }
-        public DateTime PostTime { get; set; }
-        public SimpleUserProfile MessageUser { get; set; }
-        public string MessageID { get; set; }
-        public string ReplyID { get; set; }
-
-        public DisplayReply(Reply rpl, AccountManager accManager)
+        public string type
         {
-            // use old id
-            FromUser = new SimpleUserProfile(accManager.FindUser(rpl.FromUser));
-            ToUser = new List<SimpleUserProfile>();
-            if (rpl.ToUser != null)
+            get
             {
-                foreach (string userid in rpl.ToUser)
-                {
-                    ToUser.Add(new SimpleUserProfile(accManager.FindUser(userid)));
-                }
-            }            
-            Message = rpl.Message;
-            PostTime = rpl.PostTime;
-            MessageUser = new SimpleUserProfile(accManager.FindUser(rpl.MessageUser));
-            MessageID = rpl.MessageID;
-            ReplyID = rpl.ReplyID;
+                return "reply";
+            }
+        }
+        public string MessageUser { get; set; }
+        public string MessageID { get; set; }
+
+        public DisplayReply(Reply rpl, AccountManager accManager, AttachmentManager attManager)
+            : base(rpl, accManager, attManager)
+        {
+            this.MessageID = rpl.MessageID;
+            this.MessageUser = rpl.MessageUser;
         }
     }
 }

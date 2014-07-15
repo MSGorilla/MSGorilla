@@ -1369,9 +1369,10 @@ namespace MSGorilla.WebApi
             var replylist = _messageManager.GetAllReplies(msgID);
             var reply = new List<DisplayReply>();
             AccountManager accManager = new AccountManager();
+            AttachmentManager attachmentManager = new AttachmentManager();
             foreach (var r in replylist)
             {
-                reply.Add(new DisplayReply(r, accManager));
+                reply.Add(new DisplayReply(r, accManager, attachmentManager));
             }
 
             return reply;

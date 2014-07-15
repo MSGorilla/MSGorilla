@@ -12,7 +12,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
     {
         public ReplyEntity() { }
         public ReplyEntity(Reply reply)
-            : base(reply, reply.MessageID, reply.ReplyID)
+            : base(reply, reply.MessageID, reply.ID)
         {
             //this.PartitionKey = reply.MessageID;
             //this.RowKey = reply.ReplyID;

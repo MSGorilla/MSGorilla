@@ -8,6 +8,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace MSGorilla.Library.Models.AzureModels.Entity
 {
+    //Deprecated
     public class RichMessageEntity : TableEntity
     {
         public string RichMsgID { get; set; }

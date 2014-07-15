@@ -11,7 +11,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
     {
         public string Content { get; set; }
 
-        public ReplyNotificationEntifity(string userid, Reply reply) : base(reply, userid, reply.ReplyID)
+        public ReplyNotificationEntifity(string userid, Reply reply) : base(reply, userid, reply.ID)
         {
             //this.PartitionKey = userid;
             //this.RowKey = reply.ReplyID;

@@ -29,6 +29,7 @@ namespace MSGorilla.Library
         private CloudTable _userline;
         private AccountManager _accManager;
         private NotifManager _notifManager;
+        private RichMsgManager _richMsgManager;
 
         public ReplyManager()
         {
@@ -38,9 +39,10 @@ namespace MSGorilla.Library
             _userline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Userline);
             _accManager = new AccountManager();
             _notifManager = new NotifManager();
+            _richMsgManager = new RichMsgManager();
         }
 
-        public ReplyPagiantion GetReply(string userid, int count = 25, TableContinuationToken token = null)
+        public DisplayReplyPagination GetReply(string userid, int count = 25, TableContinuationToken token = null)
         {
             TableQuery<BaseReplyEntity> query = new TableQuery<BaseReplyEntity>()
                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userid))
@@ -48,14 +50,14 @@ namespace MSGorilla.Library
 
             TableQuerySegment<BaseReplyEntity> queryResult = _replyNotification.ExecuteQuerySegmented(query, token);
 
-            ReplyPagiantion ret = new ReplyPagiantion();
+            ReplyPagination ret = new ReplyPagination();
             ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
             ret.reply = new List<Reply>();
             foreach (BaseReplyEntity entity in queryResult)
             {
                 ret.reply.Add(entity.ToReply());
             }
-            return ret;
+            return new DisplayReplyPagination(ret);
         }
 
         //public List<Reply> GetReplyNotif(string userid)
@@ -98,21 +100,23 @@ namespace MSGorilla.Library
             {
                 replies.Add(entity.ToReply());
             }
-            replies.Reverse();
+            //replies.Reverse();
             return replies;
         }
 
 
-        public Reply PostReply(string fromUser,
-                                string[] toUser,
-                                string content,
+        public Reply PostReply(string user,
+                                string[] atUser,
+                                string msgContent,
+                                string richMessage,
+                                string[] attachmentID,
                                 DateTime timestamp,
                                 string originMessageUser,
                                 string originMessageID)
         {
-            if (_accManager.FindUser(fromUser) == null)
+            if (_accManager.FindUser(user) == null)
             {
-                throw new UserNotFoundException(fromUser);
+                throw new UserNotFoundException(user);
             }
             
             if (_accManager.FindUser(originMessageUser) == null)
@@ -123,10 +127,10 @@ namespace MSGorilla.Library
             //merge toUser list and @somebody in the message content
             List<String> validToUsers = new List<String>();
             HashSet<string> ToUserIDs = new HashSet<string>();
-            ToUserIDs.UnionWith(Utils.GetAtUserid(content));
-            if (toUser != null)
+            ToUserIDs.UnionWith(Utils.GetAtUserid(msgContent));
+            if (atUser != null)
             {
-                ToUserIDs.UnionWith(toUser);
+                ToUserIDs.UnionWith(atUser);
             }
             foreach (string uid in ToUserIDs)
             {
@@ -136,7 +140,7 @@ namespace MSGorilla.Library
                     validToUsers.Add(temp.Userid);
                 }
             }
-            toUser = validToUsers.ToArray();
+            atUser = validToUsers.ToArray();
 
             string pk = Message.ToMessagePK(originMessageUser, originMessageID);
             TableOperation retreiveOperation = TableOperation.Retrieve<UserLineEntity>(pk, originMessageID);
@@ -148,7 +152,15 @@ namespace MSGorilla.Library
                 throw new MessageNotFoundException();
             }
 
-            Reply reply = new Reply(fromUser, toUser, content, timestamp, originMessageUser, originMessageID);
+            //Insert Rich Message
+            string richMessageID = null;
+            if (!string.IsNullOrEmpty(richMessage))
+            {
+                richMessageID = _richMsgManager.PostRichMessage(user, timestamp, richMessage);
+            }
+
+            //Reply reply = new Reply(user, atUser, msgContent, timestamp, originMessageUser, originMessageID);
+            Reply reply = new Reply(user, msgContent,timestamp, originMessageUser, originMessageID, atUser, richMessageID, attachmentID);
 
             //insert reply
             ReplyEntity replyEntity = new ReplyEntity(reply);
@@ -160,7 +172,7 @@ namespace MSGorilla.Library
             TableOperation updateOperation = TableOperation.Replace(originMsg);
             _userline.Execute(updateOperation);
 
-            foreach(string userid in toUser){
+            foreach(string userid in atUser){
                 if (_accManager.FindUser(userid) == null)
                 {
                     continue;

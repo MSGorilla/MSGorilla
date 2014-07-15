@@ -83,9 +83,10 @@ namespace MSGorilla.WebApi
             var replylist = _replyManager.GetAllReply(whoami());
             var reply = new List<DisplayReply>();
             AccountManager accManager = new AccountManager();
+            AttachmentManager attManager = new AttachmentManager();
             foreach (var r in replylist)
             {
-                reply.Add(new DisplayReply(r, accManager));
+                reply.Add(new DisplayReply(r, accManager, attManager));
             }
             return reply;
         }
@@ -98,52 +99,28 @@ namespace MSGorilla.WebApi
         ///     "continuationToken": "1!8!dXNlcjE-;1!72!MjUxOTk5ODEzMzAwNzc5XzNhMDNlZTM0LWRjZjEtNGRlOS1iYjM4LWFjZmRhMzAxYjMyNw--;;Primary;",
         ///     "reply": [
         ///         {
-        ///             "FromUser": {
+        ///             "type": "reply",
+        ///             "MessageUser": "user1",
+        ///             "MessageID": "251997929671837_bdb3414b-3232-48fc-be5b-b6c15d48902f",
+        ///             "User": {
         ///                 "Userid": "user1",
         ///                 "DisplayName": "User1",
         ///                 "PortraitUrl": null,
         ///                 "Description": "user for test"
         ///             },
-        ///             "ToUser": {
-        ///                 "Userid": "user1",
-        ///                 "DisplayName": "User1",
-        ///                 "PortraitUrl": null,
-        ///                 "Description": "user for test"
-        ///             },
-        ///             "Message": "good",
-        ///             "PostTime": "2014-06-13T03:04:12.1416528Z",
-        ///             "MessageUser": {
-        ///                 "Userid": "user1",
-        ///                 "DisplayName": "User1",
-        ///                 "PortraitUrl": null,
-        ///                 "Description": "user for test"
-        ///             },
-        ///             "MessageID": "251999672156363_6e66aa08-6382-4ee4-bc1a-dea53dcf4e69",
-        ///             "ReplyID": "251999672147858_3a8e1a0a-e2b6-46aa-be3f-644bd2f372df"
-        ///         },
-        ///         {
-        ///             "FromUser": {
-        ///                 "Userid": "fdy",
-        ///                 "DisplayName": "fdy",
-        ///                 "PortraitUrl": "/Content/Images/default_avatar.jpg",
-        ///                 "Description": "fdy"
-        ///             },
-        ///             "ToUser": {
-        ///                 "Userid": "user1",
-        ///                 "DisplayName": "User1",
-        ///                 "PortraitUrl": null,
-        ///                 "Description": "user for test"
-        ///             },
-        ///             "Message": "@us #top3 @fdy http://google.com/cn?aaa=baidu.com",
-        ///             "PostTime": "2014-06-12T02:45:47.890376Z",
-        ///             "MessageUser": {
-        ///                 "Userid": "user1",
-        ///                 "DisplayName": "User1",
-        ///                 "PortraitUrl": null,
-        ///                 "Description": "user for test"
-        ///             },
-        ///             "MessageID": "252000855072961_987ef186-1fd0-48f0-a344-b750cd6f29ab",
-        ///             "ReplyID": "251999759652109_0c7bb049-13dd-40ad-9a80-b9eba809f2b9"
+        ///             "ID": "251996885624787_a9ce32f7-5409-496f-a320-3f0283144540",
+        ///             "EventID": "none",
+        ///             "SchemaID": "none",
+        ///             "Owner": null,
+        ///             "AtUser": [
+        ///                 "user2"
+        ///             ],
+        ///             "TopicName": null,
+        ///             "MessageContent": "test new reply",
+        ///             "RichMessageID": null,
+        ///             "Attachment": null,
+        ///             "PostTime": "2014-07-15T09:06:15.2123811Z",
+        ///             "Importance": 2
         ///         },
         ///			......
         ///     ]
@@ -160,7 +137,7 @@ namespace MSGorilla.WebApi
             {
                 _notifManager.clearReplyNotifCount(me);
             }            
-            return new DisplayReplyPagination(_replyManager.GetReply(me, count, Utils.String2Token(token)));
+            return _replyManager.GetReply(me, count, Utils.String2Token(token));
         }
 
         /// <summary>
@@ -168,45 +145,49 @@ namespace MSGorilla.WebApi
         /// 
         /// Example output:
         /// {
-        ///     "FromUser": {
-        ///         "Userid": "user2",
-        ///         "DisplayName": "User22",
-        ///         "PortraitUrl": null,
-        ///         "Description": "user22"
-        ///     },
-        ///     "ToUser": {
+        ///     "type": "reply",
+        ///     "MessageUser": "user1",
+        ///     "MessageID": "251997929671837_bdb3414b-3232-48fc-be5b-b6c15d48902f",
+        ///     "User": {
         ///         "Userid": "user1",
         ///         "DisplayName": "User1",
         ///         "PortraitUrl": null,
         ///         "Description": "user for test"
         ///     },
-        ///     "Message": "a new reply",
-        ///     "PostTime": "2014-06-24T06:02:38.5769194Z",
-        ///     "MessageUser": {
-        ///         "Userid": "user1",
-        ///         "DisplayName": "User1",
-        ///         "PortraitUrl": null,
-        ///         "Description": "user for test"
-        ///     },
-        ///     "MessageID": "251998712005492_f4a6056b-0ac5-4b46-9d69-c8d5aa1a355c",
-        ///     "ReplyID": "251998711041423_42b1f6b8-8861-4924-be0f-bd82f1d776da"
+        ///     "ID": "251996885624787_a9ce32f7-5409-496f-a320-3f0283144540",
+        ///     "EventID": "none",
+        ///     "SchemaID": "none",
+        ///     "Owner": null,
+        ///     "AtUser": [
+        ///         "user2"
+        ///     ],
+        ///     "TopicName": null,
+        ///     "MessageContent": "test new reply",
+        ///     "RichMessageID": null,
+        ///     "Attachment": null,
+        ///     "PostTime": "2014-07-15T09:06:15.2123811Z",
+        ///     "Importance": 2
         /// }
         /// </summary>
         /// <param name="to">to user id</param>
         /// <param name="message">reply content</param>
         /// <param name="messageUser">user id of whom posted the origin message</param>
         /// <param name="messageID">origin message id</param>
+        /// <param name="richMessage">rich message</param>
+        /// <param name="attachmentID">origin message id</param>
         /// <returns></returns>
         [HttpGet, HttpPost]
-        public DisplayReply PostReply([FromUri]string[] to, string message, string messageUser, string messageID)
+        public DisplayReply PostReply([FromUri]string[] to, string message, string messageUser, string messageID, string richMessage = null, [FromUri]string[] attachmentID = null)
         {
-            return new DisplayReply(_replyManager.PostReply(whoami(), to, message, DateTime.UtcNow, messageUser, messageID), new AccountManager());
+            return new DisplayReply(_replyManager.PostReply(whoami(), to, message, richMessage, attachmentID, DateTime.UtcNow, messageUser, messageID), new AccountManager(), new AttachmentManager());
         }
 
         public class ReplyModel
         {
             public string[] To { get; set; }
             public string Message { get; set; }
+            public string richMessage { get; set; }
+            public string[] attachmentID { get; set; }
             public string MessageUser { get; set; }
             public string MessageID { get; set; }
         }
@@ -220,7 +201,7 @@ namespace MSGorilla.WebApi
         [HttpPost]
         public DisplayReply PostReply(ReplyModel reply)
         {
-            return PostReply(reply.To, reply.Message, reply.MessageUser, reply.MessageID);
+            return PostReply(reply.To, reply.Message, reply.MessageUser, reply.MessageID, reply.richMessage, reply.attachmentID);
         }
     }
 }
