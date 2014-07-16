@@ -52,10 +52,10 @@ namespace MSGorilla.Library
 
             ReplyPagination ret = new ReplyPagination();
             ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
-            ret.reply = new List<Reply>();
+            ret.message = new List<Reply>();
             foreach (BaseReplyEntity entity in queryResult)
             {
-                ret.reply.Add(entity.ToReply());
+                ret.message.Add(entity.ToReply());
             }
             return new DisplayReplyPagination(ret);
         }

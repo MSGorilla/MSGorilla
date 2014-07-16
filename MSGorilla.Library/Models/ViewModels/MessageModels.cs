@@ -35,7 +35,7 @@ namespace MSGorilla.Library.Models.ViewModels
 
     public class DisplayMessage
     {
-        public string type
+        public string Type
         {
             get
             {

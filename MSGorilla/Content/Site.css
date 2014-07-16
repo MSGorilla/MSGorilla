@@ -130,24 +130,24 @@ input[type="checkbox"].input-validation-error {
     margin-bottom: 20px;
 }
 
-.newpost-header {
+.newpost-header, .reply-header {
     margin-bottom: 10px;
 }
 
-.newpost-input {
+.newpost-input, .reply-input {
     margin-bottom: 10px;
     white-space: normal;
     word-wrap: break-word;
 }
 
-.newpost-richinput {
+.newpost-richinput, .reply-richinput {
     margin-bottom: 10px;
     white-space: normal;
     word-wrap: break-word;
     overflow-x: auto;
 }
 
-.newpost-footer {
+.newpost-footer, .reply-footer {
     text-align: right;
 }
 
@@ -160,6 +160,11 @@ input[type="checkbox"].input-validation-error {
     min-height: 1000px;
 }
 
+.replies-feeds {
+    display: block;
+    margin-top: 5px;
+}
+
 .replies-container {
     display: block;
     padding: 15px;
@@ -170,22 +175,6 @@ input[type="checkbox"].input-validation-error {
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
-}
-
-.replies-feeds {
-    margin-top: 10px;
-    display: block;
-}
-
-.reply-header {
-    margin-bottom: 10px;
-}
-
-.reply-input {
-    margin-bottom: 10px;
-    text-wrap: normal;
-    white-space: normal;
-    word-wrap: break-word;
 }
 
 .user-container {
