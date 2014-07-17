@@ -174,7 +174,7 @@ namespace MSGorilla.WebAPI.Client
             return JsonConvert.DeserializeObject<MessageDetail>(_readResponseContent(response));
         }
 
-        public string PostReply(string toUserId, string message, string originMessageUserId, string originMessageID)
+        public string PostReply(string[] toUser, string message, string originMessageUserId, string originMessageID, string richMessage = null, string[] attachmentID = null)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + Constant.UriPostReply);
             request.Method = "POST";
@@ -183,7 +183,28 @@ namespace MSGorilla.WebAPI.Client
 
             using (var writer = new StreamWriter(request.GetRequestStream()))
             {
-                writer.Write(string.Format("To={0}&Message={1}&MessageID={2}&MessageUser", toUserId, Uri.EscapeDataString(message), originMessageID, originMessageID));
+                string toUserStr = "";
+                string attachmentIdStr = "";
+
+                if (toUser != null && toUser.Count() > 0)
+                {
+                    toUserStr = string.Join("&To=", toUser); 
+                }
+                if (attachmentID != null && attachmentID.Count() > 0)
+                {
+                    attachmentIdStr = "&attachmentID=" + string.Join("&attachmentID=", attachmentID);
+                }
+
+                string post = string.Format("To={0}&Message={1}&MessageID={2}&MessageUser={3}&richMessage={4}{5}{6}",
+                    toUserStr,
+                    Uri.EscapeDataString(message),
+                    originMessageID,
+                    originMessageUserId,
+                    Uri.EscapeDataString(richMessage),
+                    toUserStr,
+                    attachmentIdStr);
+                writer.Write(post);
+                //writer.Write(string.Format("To={0}&Message={1}&MessageID={2}&MessageUser", toUserId, Uri.EscapeDataString(message), originMessageID, originMessageID));
             }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return _readResponseContent(response);
