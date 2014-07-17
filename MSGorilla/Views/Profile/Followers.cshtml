@@ -12,39 +12,9 @@
 <div class="main-container">
 
     <div class="contents-container">
-        <div class="user-container">
-            <div class="user-info ">
-                <div class="ma-btm-10">
-                    <img class="img-rounded" id="user_pic" src="/Content/Images/default_avatar.jpg" width="200" height="200" />
-                </div>
-                <div>
-                    <a class="lead" id="user_name">&nbsp;</a>
-                </div>
-                <div>
-                    <span id="user_id">&nbsp;</span>
-                </div>
-                <div class="userdesp-input">
-                    <span id="user_desp">&nbsp;</span>
-                </div>
-            </div>
-            <div class="user-postinfo">
-                <div class="btn-group btn-group-justified">
-                    <a class="btn btn-default" href="/Profile/Index?user=@ViewBag.UserId">POSTS &nbsp;<span id="user_posts" class="badge">0</span></a>
-                    <a class="btn btn-default" href="/Profile/Owned?user=@ViewBag.UserId">OWNS &nbsp;<span id="user_owned" class="badge"></span></a>
-                    <a class="btn btn-default" href="/Profile/Following?user=@ViewBag.UserId">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
-                    <a class="btn btn-default disabled">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
-                    <a class="btn btn-default" href="/Profile/Favorites?user=@ViewBag.UserId">FAVORITES &nbsp;<span id="user_favorites" class="badge"></span></a>
-                    <a class='btn btn-default' id='btn_user_follow_@ViewBag.UserId.Replace("@","-").Replace(".","_")'></a>
-                </div>
-            </div>
-        </div>
+        @Html.Partial("_UserProfilePartial")
 
-        <div id="notifications" class="posts-notification">
-            @*<div class="alert alert-dismissable alert-warning">
-                    <button class="close" type="button" data-dismiss="alert">×</button>
-                    <p><a class="alert-link" href="#">You have new messages.</a></p>
-                </div>*@
-        </div>
+        @Html.Partial("_AlertBoxPartial")
 
         <div class="block-container">
             <div>
@@ -59,8 +29,7 @@
     </div>
 
     <script>
-        $(LoadUserInfo('@ViewBag.UserId'));
-        $(LoadUsers('followers', '@ViewBag.UserId'));
+        $(LoadUsers('@ViewBag.FeedCategory', '@ViewBag.UserId'));
     </script>
 
     <div class="tools-container">

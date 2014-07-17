@@ -151,7 +151,7 @@ input[type="checkbox"].input-validation-error {
     text-align: right;
 }
 
-.posts-notification {
+.alert-box {
     display: block;
 }
 
@@ -451,7 +451,7 @@ input[type="checkbox"].input-validation-error {
         }
 
 .clickable {
-    cursor: pointer;
+    /*cursor: pointer;*/
 }
 
     .clickable:hover {

@@ -5,14 +5,14 @@
     <input id="hd_newcount" type="hidden" value="0" />
 
     <script type="text/javascript">
-                $(window).scroll(function () {
-                    var documentTop = $(document).scrollTop();
-                    var windowHeight = $(window).height();
-                    var documentHeight = $(document).height();
-                    if (documentTop >= (documentHeight - windowHeight)) {
-                        LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId');
-                    }
-                })
+        $(window).scroll(function () {
+            var documentTop = $(document).scrollTop();
+            var windowHeight = $(window).height();
+            var documentHeight = $(document).height();
+            if (documentTop >= (documentHeight - windowHeight)) {
+                LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId');
+            }
+        })
     </script>
 </div>
 

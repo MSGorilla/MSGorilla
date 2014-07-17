@@ -30,12 +30,14 @@ namespace MSGorilla.Controllers
                 ViewBag.TopicId = -1;
                 ViewBag.Topic = "";
                 ViewBag.FeedId = "";
+                ViewBag.IsLiked = false;
             }
             else
             {
                 ViewBag.TopicId = t.Id;
                 ViewBag.Topic = t.Name;
                 ViewBag.FeedId = t.Name;
+                ViewBag.IsLiked = _topicManager.IsFavouriteTopic(me.Userid, t.Id);
             }
 
             return View();

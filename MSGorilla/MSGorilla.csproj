@@ -348,6 +348,9 @@
     <Content Include="Views\Shared\_LayoutInverse.cshtml" />
     <Content Include="Views\Shared\_CarouselPartial.cshtml" />
     <Content Include="Views\Shared\_LoadMorePartial.cshtml" />
+    <Content Include="Views\Shared\_UserProfilePartial.cshtml" />
+    <Content Include="Views\Shared\_AlertBoxPartial.cshtml" />
+    <Content Include="Views\Shared\_LoadFeedListPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

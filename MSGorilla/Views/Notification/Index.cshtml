@@ -4,19 +4,8 @@
 
 <script src="~/Scripts/echarts-plain.js"></script>
 <div class="main-container">
-    @Html.Partial("_EventModalPartial")
-    @if (ViewBag.FeedCategory == "replyline")   // reply shows message
-    {
-        @Html.Partial("_MessageModalPartial");
-    }
-    
     <div class="contents-container">
-        <div id="notifications" class="posts-notification">
-            @*<div class="alert alert-dismissable alert-warning">
-                    <button class="close" type="button" data-dismiss="alert">×</button>
-                    <p><a class="alert-link" href="#">You have new messages.</a></p>
-                </div>*@
-        </div>
+        @Html.Partial("_AlertBoxPartial")
 
         <div class="title-container">
             <h4>
@@ -31,20 +20,9 @@
 
         @Html.Partial("_NotificationNavbarPartial")
 
-        <div class="posts-feeds">
-            <ul id="feedlist" class='list-group'>
-                <li id="loading_message" class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
-                @*autofill by js*@
-            </ul>
-        </div>
-
-        @Html.Partial("_LoadMorePartial")
+        @Html.Partial("_LoadFeedListPartial")
 
     </div>
-
-    <script>
-        $(LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId'));
-    </script>
 
     <div class="tools-container">
         @Html.Partial("_MePartial")

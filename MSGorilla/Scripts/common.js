@@ -1,4 +1,54 @@
-﻿/* common function */
+﻿// ajax function
+function AjaxCall(type, async, apiurl, apidata, successCallback, errorCallback, alwaysCallback, msgboxid) {
+    if (isNullOrEmpty(apiurl)) {
+        return;
+    }
+    if (isNullOrEmpty(apidata)) {
+        apidata = "";
+    }
+
+    $.ajax({
+        type: type,
+        url: apiurl,
+        data: apidata,
+        dataType: "json",
+        async: async,
+        success: function (data) {
+            if (!isNullOrEmpty(successCallback)) {
+                successCallback(data);
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message, msgboxid);
+            if (!isNullOrEmpty(errorCallback)) {
+                errorCallback(XMLHttpRequest, textStatus, errorThrown);
+            }
+        }
+    }).always(function () {
+        if (!isNullOrEmpty(alwaysCallback)) {
+            alwaysCallback();
+        }
+    });
+}
+
+function AjaxGetAsync(apiurl, apidata, successCallback, errorCallback, alwaysCallback, msgboxid) {
+    AjaxCall("GET", true, apiurl, apidata, successCallback, errorCallback, alwaysCallback, msgboxid);
+}
+
+function AjaxGetSync(apiurl, apidata, successCallback, errorCallback, alwaysCallback, msgboxid) {
+    AjaxCall("GET", false, apiurl, apidata, successCallback, errorCallback, alwaysCallback, msgboxid);
+}
+
+function AjaxPostAsync(apiurl, apidata, successCallback, errorCallback, alwaysCallback, msgboxid) {
+    AjaxCall("POST", true, apiurl, apidata, successCallback, errorCallback, alwaysCallback, msgboxid);
+}
+
+function AjaxPostSync(apiurl, apidata, successCallback, errorCallback, alwaysCallback, msgboxid) {
+    AjaxCall("POST", false, apiurl, apidata, successCallback, errorCallback, alwaysCallback, msgboxid);
+}
+
+
+// common function
 function scrollTo(itemid) {
     var scroll_offset = $("#" + itemid).offset();
     $("body,html").animate({
@@ -99,9 +149,9 @@ function Time2Now(datestring) {
     else if (diff / min > 1) {
         return "1 min";
     }
-    //else if (diff / sec > 1) {
-    //    return Math.floor(diff / sec) + "secs";
-    //}
+        //else if (diff / sec > 1) {
+        //    return Math.floor(diff / sec) + "secs";
+        //}
     else {
         return "Just now";
     }
@@ -465,7 +515,7 @@ function enhanceMessage(schema, mid, msg) {
 /* show message function */
 function showError(msg, msgboxid) {
     var msghtml = "<div class='alert alert-dismissable alert-warning'><button class='close' type='button' data-dismiss='alert'>×</button><p>" + msg + "</p></div>";
-    $("#notifications").append(msghtml);
+    $("#alert_box").append(msghtml);
 
     if (isNullOrEmpty(msgboxid)) {
         $("#loading_message").html(msg);
@@ -483,14 +533,85 @@ function showAjaxError(status, error, code, msg, msgboxid) {
 }
 
 
+/* post function */
+function PostMessage() {
+    var msgbox = $("#postmessage");
+    var message = encodeTxt(msgbox.val().trim());
+    if (message.length === 0) {
+        return;
+    }
+
+    var apiurl = "/api/message/postmessage";
+    var apidata = "message=" + message + "&importance=2"; // + "&schemaID=" + "chart-pie"
+
+    $("#btn_post").button('loading');
+    AjaxPostAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            msgbox.val("");
+            // insert the new posted message
+            $("#feedlist").prepend(CreateFeed(data));
+            // enhanceMessage(data.SchemaID, data.ID, data.MessageContent);  // user can not post schema data from webpage.
+        },
+        null,
+        function () {
+            $("#btn_post").button('reset');
+        }
+    );
+}
+
+function PostReply(user, mid) {
+    var replybox = $("#replymessage_" + mid);
+    var message = encodeTxt(replybox.val().trim());
+    var replyto = replybox.attr("replyto");
+    var tousers = [];
+    if (message.length === 0) {
+        return;
+    }
+
+    if (isNullOrEmpty(replyto)) {
+        tousers.push(user);
+    }
+    else {
+        tousers = replyto.split(";");
+    }
+
+    var apiurl = "/api/reply/postreply";
+    var apidata = "message=" + message + "&messageUser=" + encodeTxt(user) + "&messageID=" + encodeTxt(mid);
+    for (var key in tousers) {
+        if (!isNullOrEmpty(tousers[key]))
+            apidata += "&to=" + encodeTxt(tousers[key]);
+    }
+
+    $("#btn_reply_" + mid).button('loading');
+    AjaxPostAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            replybox.val("");
+            $("#replylist_" + mid).prepend(CreateReply(data));
+        },
+        null,
+        function () {
+            $("#btn_reply_" + mid).button('reset');
+        }
+    );
+}
+
+
 /* user infor function */
 function LoadMyInfo() {
+    if ($("#my_id").length == 0) {
+        return;
+    }
+
     var apiurl = "/api/account/me";
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        success: function (data) {
+    AjaxGetAsync(
+        apiurl,
+        "",
+        function (data) {
             var userid = data.Userid;
             var username = data.DisplayName;
             var picurl = data.PortraitUrl;
@@ -498,24 +619,25 @@ function LoadMyInfo() {
             var postscount = data.MessageCount;
             var followingcount = data.FollowingsCount;
             var followerscount = data.FollowersCount;
+            if (isNullOrEmpty(picurl)) {
+                picurl = "/Content/Images/default_avatar.jpg";
+            }
 
             $("#my_id").html("@" + userid);
             $("#my_name").html(username);
-            $("my_name").attr("href", "/profile");
-            if (!isNullOrEmpty(picurl)) {
-                $("#my_pic").attr("src", picurl);
-            }
+            $("#my_pic").attr("src", picurl);
             $("#my_posts").html(postscount);
             $("#my_following").html(followingcount);
             $("#my_followers").html(followerscount);
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
-    });
+    );
 }
 
 function LoadUserInfo(user) {
+    if ($("#user_id").length == 0) {
+        return;
+    }
+
     var apiurl = "";
     var apidata = "";
     if (isNullOrEmpty(user)) {
@@ -526,11 +648,10 @@ function LoadUserInfo(user) {
         apidata = "userid=" + encodeTxt(user);
     }
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        data: apidata,
-        success: function (data) {
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
             var userid = data.Userid;
             var username = data.DisplayName;
             var picurl = data.PortraitUrl;
@@ -552,11 +673,8 @@ function LoadUserInfo(user) {
             $("#user_followers").html(followerscount);
 
             LoadUserFollowBtn("btn_user_follow_" + encodeUserid(user), user, isFollowimg);
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
-    });
+    );
 }
 
 function LoadUserFollowBtn(btnid, user, isFollowing) {
@@ -595,7 +713,7 @@ function SetUnfollowBtn(btnid, user, enabled) {
     btn.text("Following");
     btn.attr("class", "btn btn-success follow-btn");
     if (enabled) {
-        btn.attr("onclick", "Unfollow('" + user + "');");
+        btn.attr("onclick", "Unfollow('" + btnid + "', '" + user + "');");
     }
     else {
         btn.attr("onclick", "");
@@ -616,7 +734,7 @@ function UnfollowBtnMouseOver(btnid) {
 }
 
 function UnfollowBtnMouseOut(btnid) {
-    var btn = $("#" +btnid);
+    var btn = $("#" + btnid);
     if (btn.length == 0) {
         return;
     }
@@ -634,7 +752,7 @@ function SetFollowBtn(btnid, user, enabled) {
     btn.text("Follow");
     btn.attr("class", "btn btn-primary follow-btn");
     if (enabled) {
-        btn.attr("onclick", "Follow('" + user + "');");
+        btn.attr("onclick", "Follow('" + btnid + "', '" + user + "');");
     }
     else {
         btn.attr("onclick", "");
@@ -770,96 +888,20 @@ function CreateUserCard(data) {
 }
 
 
-/* post function */
-function PostMessage() {
-    var msgbox = $("#postmessage");
-    var message = encodeTxt(msgbox.val().trim());
-    if (message.length === 0) {
-        return;
-    }
-
-    $("#btn_post").button('loading');
-    $.ajax({
-        type: "POST",
-        url: "/api/message/postmessage",
-        data: "message=" + message + "&importance=2", // + "&schemaID=" + "chart-pie",
-        dataType: "json",
-        success: function (data) {
-            msgbox.val("");
-            // insert the new posted message
-            $("#feedlist").prepend(CreateFeed(data));
-            // enhanceMessage(data.SchemaID, data.ID, data.MessageContent);  // user can not post schema data from webpage.
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-        }
-    }).always(function () {
-        $("#btn_post").button('reset');
-    });
-}
-
-function PostReply(user, mid) {
-    var replybox = $("#replymessage_" + mid);
-    var message = encodeTxt(replybox.val().trim());
-    var replyto = replybox.attr("replyto");
-    var tousers = [];
-
-    if (message.length === 0) {
-        return;
-    }
-
-    if (isNullOrEmpty(replyto)) {
-        tousers.push(user);
-    }
-    else {
-        tousers = replyto.split(";");
-    }
-
-    var apiurl = "/api/reply/postreply";
-    var apidata = "message=" + message + "&messageUser=" + encodeTxt(user) + "&messageID=" + encodeTxt(mid);
-    for (var key in tousers) {
-        if (!isNullOrEmpty(tousers[key]))
-            apidata += "&to=" + encodeTxt(tousers[key]);
-    }
-
-    $("#btn_reply_" + mid).button('loading');
-    $.ajax({
-        type: "POST",
-        url: apiurl,
-        data: apidata,
-        dataType: "json",
-        success: function (data) {
-            replybox.val("");
-            $("#replylist_" + mid).prepend(CreateReply(data));
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-        }
-    }).always(function () {
-        $("#btn_reply_" + mid).button('reset');
-    });
-}
-
-
 // feed function
 function LoadMessage(user, mid) {
-    var apiurl = "";
-    var apidata = "";
-
     if (isNullOrEmpty(user) || isNullOrEmpty(mid)) {
         showError("Illegal operation.");
         return;
     }
 
-    apiurl = "/api/message/getdisplaymessage";
-    apidata = "msgUser=" + encodeTxt(user) + "&msgID=" + encodeTxt(mid);
+    var apiurl = "/api/message/getdisplaymessage";
+    var apidata = "msgUser=" + encodeTxt(user) + "&msgID=" + encodeTxt(mid);
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        dataType: "json",
-        data: apidata,
-        success: function (data) {
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
             if (isNullOrEmpty(data)) {
                 showError("No content.");
             }
@@ -868,19 +910,16 @@ function LoadMessage(user, mid) {
                 // create feed 
                 $("#feedlist").append(CreateFeed(data, true));
                 enhanceMessage(data.SchemaID, data.ID, data.MessageContent);
-                if ($("#rich_message_" + mid).length > 0) {
-                    $("#rich_message_" + mid).collapse('show');
-                    ShowRichMsg(data.RichMessageID, mid);
+                if ($("#rich_message_" + data.ID).length > 0) {
+                    $("#rich_message_" + data.ID).collapse('show');
+                    ShowRichMsg(data.RichMessageID, data.ID);
                 }
-                $("#reply_" + mid).collapse('show');
-                ShowReplies(mid);
+                $("#reply_" + data.ID).collapse('show');
+                ShowReplies(data.ID);
             }
 
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
-    });
+    );
 }
 
 function FilterFeeds(category, id, filter) {
@@ -1030,8 +1069,12 @@ function LoadFeeds(category, id, filter) {
                         if (count-- > 0) {
                             $("#feed_" + item.ID).addClass('new-notification');
                         }
-
                         enhanceMessage(item.SchemaID, item.ID, item.MessageContent);
+                        // if msg is empty, show richmsg instead
+                        if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
+                            $("#rich_message_" + item.ID).collapse('show');
+                            ShowRichMsg(item.RichMessageID, item.ID);
+                        }
                     })
                 }
             }
@@ -1101,7 +1144,7 @@ function CreateFeed(data, hideOpenBtn) {
     }
 
     //output += "<ul class='list-group'>";
-    output += "  <li id='feed_" + id + "' class='list-group-item'>";
+    output += "  <li id='feed_" + id + "' class='list-group-item clickable'>";
     output += "    <div>"
 
     // user pic
@@ -1259,9 +1302,9 @@ function ShowRichMsg(rmid, mid) {
     else {
         // clear rich
         showbtn.text("More");
+        scrollTo("feed_" + mid);
     }
 
-    scrollTo("feed_" + mid);
 }
 
 
@@ -1298,6 +1341,11 @@ function LoadReplies(mid) {
             replydiv.empty();
             $.each(data, function (index, item) {
                 replydiv.append(CreateReply(item));
+                // if msg is empty, show richmsg instead
+                if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
+                    $("#rich_message_" + item.ID).collapse('show');
+                    ShowRichMsg(item.RichMessageID, item.ID);
+                }
             })
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -1331,12 +1379,12 @@ function CreateReply(data) {
         picurl = "/Content/Images/default_avatar.jpg";
     }
 
-    output += "<li class='list-group-item clickable' onclick='SetReplyTo(event, \"" + mid + "\", \"" + user + "\");'>";
+    output += "<li id='feed_" + id + "' class='list-group-item clickable'>";
     output += "  <div>"
 
     // user pic
     output += "    <div class='reply-pic'>";
-    output += "      <img class='img-rounded' id='reply_user_pic_" + id + "' src='" + picurl + "' width='50' height='50' />";
+    output += "      <img class='img-rounded' id='user_pic_" + id + "' src='" + picurl + "' width='50' height='50' />";
     output += "    </div>";
 
     // importance
@@ -1388,6 +1436,7 @@ function CreateReply(data) {
     if (!isNullOrEmpty(richmsgid)) {
         output += "    <button id='btn_showrichmsg_" + id + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + id + "\");'>More</button>";
     }
+    output += "        <button id='btn_replyto_" + id + "' class='btn btn-link btn-sm' type='button'  onclick='SetReplyTo(event, \"" + mid + "\", \"" + user + "\");'>Reply to</button>";
     output += "      </div>";
 
     output += "    </div>";
@@ -1450,8 +1499,12 @@ function ShowMessage(evt, mid, user) {
             // create message
             message_div.append(CreateFeed(data));
             enhanceMessage(data.SchemaID, data.ID, data.MessageContent);
-            $("#reply_" + mid).collapse('show');
-            ShowReplies(mid);
+            if ($("#rich_message_" + data.ID).length > 0) {
+                $("#rich_message_" + data.ID).collapse('show');
+                ShowRichMsg(data.RichMessageID, data.ID);
+            }
+            $("#reply_" + data.ID).collapse('show');
+            ShowReplies(data.ID);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
