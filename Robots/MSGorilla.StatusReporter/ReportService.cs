@@ -95,7 +95,7 @@ namespace MSGorilla.StatusReporter
         {
             serviceTimer.Interval = 3600*1000;   //run once a day
 
-            new StatusReporter().CollectStatusAndReport();
+            new MSGorillaStatusReporter().CollectStatusAndReport();
             //string line = Execute("ping localhost", 10);
             //Console.WriteLine(line);
             //Logger.Info(line);
