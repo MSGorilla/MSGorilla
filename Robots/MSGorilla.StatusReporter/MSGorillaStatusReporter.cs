@@ -24,6 +24,8 @@ namespace MSGorilla.StatusReporter
 
         public override void Report()
         {
+            Logger.Info("Report latest status to MSGorilla.");
+
             List<HistoryData> datas = _collector.LoadDataByDateUtc(DateTime.UtcNow.AddDays(-30), DateTime.UtcNow);
 
             Figure figure = new UserCountTrendFigure(datas);

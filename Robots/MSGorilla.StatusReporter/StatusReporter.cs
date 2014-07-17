@@ -27,9 +27,11 @@ namespace MSGorilla.StatusReporter
                 {
                     Logger.Info("Start to update MSGorilla status.");
                     _collector.UpdateStatusAndSave();
+                    Logger.Info("Update complete.");
 
-                    Logger.Info("Report latest status to MSGroilla.");
+                    Logger.Info("Start to report MSGorilla status.");
                     this.Report();
+                    Logger.Info("Report complete.");
                 }
             }
             catch (Exception e)
@@ -40,7 +42,7 @@ namespace MSGorilla.StatusReporter
 
         public virtual void Report()
         {
-
+            throw new Exception("Unsupportted operation");
         }
 
         private void MailReport()
