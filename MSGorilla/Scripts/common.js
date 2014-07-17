@@ -1058,7 +1058,7 @@ function LoadFeeds(category, id, filter) {
     }
 
     if (isNullOrEmpty(token)) { // first time load, not load more
-        count = getNotificationCount(category);
+        count = getNotificationCount(category, id);
         $("#hd_newcount").val(count);
     }
     else {    // load more
@@ -1654,57 +1654,81 @@ function SearchUser(keyword) {
 
 
 // notification count function and short cut function
-function getNotificationCount(category) {
+function getNotificationCount(category, id) {
     if (category != "atline"
         && category != "ownerline"
         && category != "replyline"
         && category != "homeline"
+        && category != "topicline"
         ) {
         return 0;
     }
 
     var count = 0;
-    var apiurl = "/api/account/getnotificationcount";
-    var apidata = "";
 
-    AjaxGetSync(
-        apiurl,
-        apidata,
-        function (data) {
-            if (isNullOrEmpty(data)) {
-                count = 0;
-            }
-            else {
-                var userid = data.Userid;
-                var homelineCount = data.UnreadHomelineMsgCount;
-                var ownerlineCount = data.UnreadOwnerlineMsgCount;
-                var atlineCount = data.UnreadAtlineMsgCount;
-                var replyCount = data.UnreadReplyCount;
-                var notificationCount = ownerlineCount + replyCount + atlineCount;
+    if (category == "topicline") {
+        var apiurl = "/api/topic/getmyfavouritetopicunreadcount";
+        var apidata = "topic=" + encodeTxt(id);
 
-                switch (category) {
-                    case "atline":
-                        count = atlineCount;
-                        break;
-                    case "ownerline":
-                        count = ownerlineCount;
-                        break;
-                    case "replyline":
-                        count = replyCount;
-                        break;
-                    case "homeline":
-                        count = homelineCount;
-                        break;
-                    default:
-                        count = 0;
-                        break;
+        AjaxGetSync(
+            apiurl,
+            apidata,
+            function (data) {
+                if (isNullOrEmpty(data)) {
+                    count = 0;
                 }
-            }
-        },
-        null,
-        null,
-        "no_message_box"
-    );
+                else {
+                    count = data;
+                }
+            },
+            null,
+            null,
+            "no_message_box"
+        );
+    }
+    else {
+        var apiurl = "/api/account/getnotificationcount";
+        var apidata = "";
+
+        AjaxGetSync(
+            apiurl,
+            apidata,
+            function (data) {
+                if (isNullOrEmpty(data)) {
+                    count = 0;
+                }
+                else {
+                    var userid = data.Userid;
+                    var homelineCount = data.UnreadHomelineMsgCount;
+                    var ownerlineCount = data.UnreadOwnerlineMsgCount;
+                    var atlineCount = data.UnreadAtlineMsgCount;
+                    var replyCount = data.UnreadReplyCount;
+                    var notificationCount = ownerlineCount + replyCount + atlineCount;
+
+                    switch (category) {
+                        case "atline":
+                            count = atlineCount;
+                            break;
+                        case "ownerline":
+                            count = ownerlineCount;
+                            break;
+                        case "replyline":
+                            count = replyCount;
+                            break;
+                        case "homeline":
+                            count = homelineCount;
+                            break;
+                        default:
+                            count = 0;
+                            break;
+                    }
+                }
+            },
+            null,
+            null,
+            "no_message_box"
+        );
+    }
 
     return count;
 }

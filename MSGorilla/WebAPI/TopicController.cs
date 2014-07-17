@@ -290,6 +290,24 @@ namespace MSGorilla.WebApi
             return _topicManager.GetFavouriteTopic(userid);
         }
 
+        [HttpGet]
+        public int GetMyFavouriteTopicUnreadCount(string topic)
+        {
+            return GetUserFavouriteTopicUnreadCount(whoami(), topic);
+        }
+
+        [HttpGet]
+        public int GetUserFavouriteTopicUnreadCount(string userid, string topic)
+        {
+            var t = _topicManager.FindTopicByName(topic);
+            if (t == null)
+            {
+                return 0;
+            }
+
+            return _topicManager.GetFavouriteTopicUnreadCount(userid, t.Id);
+        }
+
         /// <summary>
         /// Return whether the topic is current user's favourite topic or not
         /// 

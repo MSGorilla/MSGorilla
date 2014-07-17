@@ -18,7 +18,7 @@ namespace MSGorilla.Library
             using (var _gorillaCtx = new MSGorillaContext())
             {
                 return _gorillaCtx.Topics.ToList();
-            }            
+            }
         }
 
         public Topic AddTopic(Topic topic)
@@ -28,7 +28,7 @@ namespace MSGorilla.Library
                 topic = _gorillaCtx.Topics.Add(topic);
                 _gorillaCtx.SaveChanges();
                 return topic;
-            }            
+            }
         }
 
         public void incrementTopicCount(string topicID)
@@ -87,7 +87,7 @@ namespace MSGorilla.Library
             {
                 using (_gorillaCtx = new MSGorillaContext())
                 {
-                    
+
                     try
                     {
                         ret = _gorillaCtx.Topics.Find(int.Parse(topicID));
@@ -122,7 +122,7 @@ namespace MSGorilla.Library
 
                 }
                 return ret;
-            }            
+            }
         }
 
         public Topic FindTopic(int topicID, MSGorillaContext _gorillaCtx = null)
@@ -150,7 +150,7 @@ namespace MSGorilla.Library
                     @"select top({0}) id, name, description, msgcount from [topic] ORDER BY msgcount desc",
                     new object[] { count }
                 ).ToList();
-            }            
+            }
         }
 
         public void AddFavouriteTopic(string userid, int topicID)
@@ -189,7 +189,7 @@ namespace MSGorilla.Library
 
         public List<DisplayFavouriteTopic> GetFavouriteTopic(string userid)
         {
-            using(var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaContext())
             {
                 List<FavouriteTopic> topics = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid)).ToList();
                 List<DisplayFavouriteTopic> dtopic = new List<DisplayFavouriteTopic>();
@@ -201,6 +201,19 @@ namespace MSGorilla.Library
                 return dtopic;
             }
         }
+
+        public int GetFavouriteTopicUnreadCount(string userid, int topicid)
+        {
+            using (var _gorillaCtx = new MSGorillaContext())
+            {
+                FavouriteTopic topic = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID.Equals(topicid)).FirstOrDefault();
+                if (topic != null)
+                    return topic.UnreadMsgCount;
+
+                return 0;
+            }
+        }
+
 
         public bool IsFavouriteTopic(string userid, int topicID)
         {
