@@ -451,7 +451,7 @@ input[type="checkbox"].input-validation-error {
         }
 
 .clickable {
-    /*cursor: pointer;*/
+    cursor: pointer;
 }
 
     .clickable:hover {

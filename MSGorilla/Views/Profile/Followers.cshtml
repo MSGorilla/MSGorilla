@@ -20,17 +20,12 @@
             <div>
                 <span class="help-block">Followers</span>
             </div>
-            <ul id="userlist" class="userlist-group">
-                <li id="loading_message" class="center-block txtaln-c"><span class="spinner-loading"></span> Loading...</li>
-                @*autofill by js*@
-            </ul>
+
+            @Html.Partial("_LoadUserCardListPartial")
+
             <div class="clearfix"></div>
         </div>
     </div>
-
-    <script>
-        $(LoadUsers('@ViewBag.FeedCategory', '@ViewBag.UserId'));
-    </script>
 
     <div class="tools-container">
         @if (!ViewBag.IsMe)

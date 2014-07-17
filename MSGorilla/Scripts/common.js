@@ -513,6 +513,14 @@ function enhanceMessage(schema, mid, msg) {
 
 
 /* show message function */
+function showMessage(msg, msgboxid) {
+    if (isNullOrEmpty(msgboxid)) {
+        $("#loading_message").html(msg);
+    } else {
+        $("#" + msgboxid).html(msg);
+    }
+}
+
 function showError(msg, msgboxid) {
     var msghtml = "<div class='alert alert-dismissable alert-warning'><button class='close' type='button' data-dismiss='alert'>×</button><p>" + msg + "</p></div>";
     $("#alert_box").append(msghtml);
@@ -551,7 +559,7 @@ function PostMessage() {
         function (data) {
             msgbox.val("");
             // insert the new posted message
-            $("#feedlist").prepend(CreateFeed(data));
+            $("#feedlist").prepend(createFeed(data));
             // enhanceMessage(data.SchemaID, data.ID, data.MessageContent);  // user can not post schema data from webpage.
         },
         null,
@@ -590,7 +598,7 @@ function PostReply(user, mid) {
         apidata,
         function (data) {
             replybox.val("");
-            $("#replylist_" + mid).prepend(CreateReply(data));
+            $("#replylist_" + mid).prepend(createReply(data));
         },
         null,
         function () {
@@ -638,6 +646,13 @@ function LoadUserInfo(user) {
         return;
     }
 
+    if (isNullOrEmpty(user)) { // refresh user profile
+        user = $("#user_id").html();
+        if (!isNullOrEmpty(user)) {
+            user = user.substr(1); // remove '@'
+        }
+    }
+
     var apiurl = "";
     var apidata = "";
     if (isNullOrEmpty(user)) {
@@ -660,39 +675,40 @@ function LoadUserInfo(user) {
             var followingcount = data.FollowingsCount;
             var followerscount = data.FollowersCount;
             var isFollowimg = data.IsFollowing;
+            if (isNullOrEmpty(picurl)) {
+                picurl = "/Content/Images/default_avatar.jpg";
+            }
 
             $("#user_id").html("@" + userid);
             $("#user_name").html(username);
             $("#user_name").attr("href", "/profile/index?user=" + userid);
-            if (!isNullOrEmpty(picurl)) {
-                $("#user_pic").attr("src", picurl);
-            }
+            $("#user_pic").attr("src", picurl);
             $("#user_desp").html(desp);
             $("#user_posts").html(postscount);
             $("#user_following").html(followingcount);
             $("#user_followers").html(followerscount);
 
-            LoadUserFollowBtn("btn_user_follow_" + encodeUserid(user), user, isFollowimg);
+            setUserFollowBtn("btn_userprofile_follow_" + encodeUserid(userid), userid, isFollowimg);
         }
     );
 }
 
-function LoadUserFollowBtn(btnid, user, isFollowing) {
+function setUserFollowBtn(btnid, user, isFollowing) {
     var btn = $("#" + btnid);
     if (btn.length == 0) {
         return;
     }
 
     if (isFollowing == 0) {
-        SetFollowBtn(btnid, user, true);
+        setFollowBtn(btnid, user, true);
     } else if (isFollowing == 1) {
-        SetUnfollowBtn(btnid, user, true);
+        setUnfollowBtn(btnid, user, true);
     } else {  // -1: myself
-        SetEditProfileBtn(btnid, user);
+        setEditProfileBtn(btnid, user);
     }
 }
 
-function SetEditProfileBtn(btnid, user) {
+function setEditProfileBtn(btnid, user) {
     var btn = $("#" + btnid);
     if (btn.length == 0) {
         return;
@@ -704,7 +720,7 @@ function SetEditProfileBtn(btnid, user) {
     btn.show();
 }
 
-function SetUnfollowBtn(btnid, user, enabled) {
+function setUnfollowBtn(btnid, user, enabled) {
     var btn = $("#" + btnid);
     if (btn.length == 0) {
         return;
@@ -713,17 +729,17 @@ function SetUnfollowBtn(btnid, user, enabled) {
     btn.text("Following");
     btn.attr("class", "btn btn-success follow-btn");
     if (enabled) {
-        btn.attr("onclick", "Unfollow('" + btnid + "', '" + user + "');");
+        btn.attr("onclick", "unfollow('" + btnid + "', '" + user + "');");
     }
     else {
         btn.attr("onclick", "");
     }
-    btn.attr("onmouseover", "UnfollowBtnMouseOver('" + btnid + "');")
-    btn.attr("onmouseout", "UnfollowBtnMouseOut('" + btnid + "');")
+    btn.attr("onmouseover", "unfollowBtnMouseOver('" + btnid + "');")
+    btn.attr("onmouseout", "unfollowBtnMouseOut('" + btnid + "');")
     btn.show();
 }
 
-function UnfollowBtnMouseOver(btnid) {
+function unfollowBtnMouseOver(btnid) {
     var btn = $("#" + btnid);
     if (btn.length == 0) {
         return;
@@ -733,7 +749,7 @@ function UnfollowBtnMouseOver(btnid) {
     btn.text("Unfollow");
 }
 
-function UnfollowBtnMouseOut(btnid) {
+function unfollowBtnMouseOut(btnid) {
     var btn = $("#" + btnid);
     if (btn.length == 0) {
         return;
@@ -743,7 +759,7 @@ function UnfollowBtnMouseOut(btnid) {
     btn.text("Following");
 }
 
-function SetFollowBtn(btnid, user, enabled) {
+function setFollowBtn(btnid, user, enabled) {
     var btn = $("#" + btnid);
     if (btn.length == 0) {
         return;
@@ -752,7 +768,7 @@ function SetFollowBtn(btnid, user, enabled) {
     btn.text("Follow");
     btn.attr("class", "btn btn-primary follow-btn");
     if (enabled) {
-        btn.attr("onclick", "Follow('" + btnid + "', '" + user + "');");
+        btn.attr("onclick", "follow('" + btnid + "', '" + user + "');");
     }
     else {
         btn.attr("onclick", "");
@@ -762,53 +778,62 @@ function SetFollowBtn(btnid, user, enabled) {
     btn.show();
 }
 
-function Follow(btnid, user) {
-    SetUnfollowBtn(btnid, user, false);
-    $.ajax({
-        type: "GET",
-        url: "/api/account/follow",
-        data: "userid=" + encodeTxt(user),
-        success: function (data) {
+function follow(btnid, user) {
+    setUnfollowBtn(btnid, user, false);
+
+    var apiurl = "/api/account/follow";
+    var apidata = "userid=" + encodeTxt(user);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
             var code = data.ActionResultCode;
             var msg = data.Message;
             if (code == "0") {
-                LoadUserInfo(user);
+                setUnfollowBtn(btnid, user, true);
+                // refresh user info 
+                LoadUserInfo();
                 LoadMyInfo();
             }
             else {
                 showError(msg);
             }
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
-    });
+    );
 }
 
-function Unfollow(btnid, user) {
-    SetFollowBtn(btnid, user, false);
-    $.ajax({
-        type: "GET",
-        url: "/api/account/unfollow",
-        data: "userid=" + encodeTxt(user),
-        success: function (data) {
+function unfollow(btnid, user) {
+    setFollowBtn(btnid, user, false);
+
+    var apiurl = "/api/account/unfollow";
+    var apidata = "userid=" + encodeTxt(user);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
             var code = data.ActionResultCode;
             var msg = data.Message;
             if (code == "0") {
-                LoadUserInfo(user);
+                setFollowBtn(btnid, user, true);
+                // refresh user info 
+                LoadUserInfo();
                 LoadMyInfo();
             }
             else {
                 showError(msg);
             }
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
-    });
+    );
 }
 
 function LoadUsers(category, user) {
+    var listdiv = $("#userlist");
+    if (listdiv.length == 0) {
+        return;
+    }
+
     var apiurl = "";
     var apidata = "";
     if (isNullOrEmpty(category))
@@ -821,36 +846,32 @@ function LoadUsers(category, user) {
         showError("Illegal operation.");
         return;
     }
-
     if (!isNullOrEmpty(user)) {
         apidata = "userid=" + encodeTxt(user);
     }
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        data: apidata,
-        dataType: "json",
-        success: function (data) {
-            if (data.length == 0) {
-                showError("No content.");
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+                showMessage("No content.");
             }
             else {
-                // create user list
-                $("#userlist").empty();
+                // clear list
+                listdiv.empty();
+
+                // create list
                 $.each(data, function (index, item) {
-                    $("#userlist").append(CreateUserCard(item));
-                    LoadUserFollowBtn("btn_user_follow_" + encodeUserid(item.Userid), item.Userid, item.IsFollowing);
+                    listdiv.append(createUserCard(item));
+                    setUserFollowBtn("btn_user_follow_" + encodeUserid(item.Userid), item.Userid, item.IsFollowing);
                 })
             }
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
-    });
+    );
 }
 
-function CreateUserCard(data) {
+function createUserCard(data) {
     var output = "";
     var userid = data.Userid;
     var username = data.DisplayName;
@@ -895,6 +916,11 @@ function LoadMessage(user, mid) {
         return;
     }
 
+    var listdiv = $("#feedlist");
+    if (listdiv.length == 0) {
+        return;
+    }
+
     var apiurl = "/api/message/getdisplaymessage";
     var apidata = "msgUser=" + encodeTxt(user) + "&msgID=" + encodeTxt(mid);
 
@@ -903,56 +929,79 @@ function LoadMessage(user, mid) {
         apidata,
         function (data) {
             if (isNullOrEmpty(data)) {
-                showError("No content.");
+                showMessage("No content.");
             }
             else {
-                $("#feedlist").empty();
+                // clear list
+                listdiv.empty();
+
                 // create feed 
-                $("#feedlist").append(CreateFeed(data, true));
+                listdiv.append(createFeed(data, true));
+
+                // render feed
                 enhanceMessage(data.SchemaID, data.ID, data.MessageContent);
                 if ($("#rich_message_" + data.ID).length > 0) {
                     $("#rich_message_" + data.ID).collapse('show');
-                    ShowRichMsg(data.RichMessageID, data.ID);
+                    showRichMsg(data.RichMessageID, data.ID);
                 }
-                $("#reply_" + data.ID).collapse('show');
-                ShowReplies(data.ID);
+                if ($("#reply_" + data.ID).length > 0) {
+                    $("#reply_" + data.ID).collapse('show');
+                    showReplies(data.ID);
+                }
             }
-
         }
     );
 }
 
+var feed_filters = [
+    "all",
+    "latest24hours",
+    "latest3days",
+    "latest7days",
+    "latest1month"
+];
+
+var isLoadFeeds = false;
+
 function FilterFeeds(category, id, filter) {
     if (isLoadFeeds) return;    // if it is loading, skip this time.
 
-    var filters = [
-        "all",
-        "latest24hours",
-        "latest3days",
-        "latest7days",
-        "latest1month"
-    ];
-
-    for (var f in filters) {
-        if (filters[f] == filter) {
+    for (var f in feed_filters) {
+        if (feed_filters[f] == filter) {
             $("#feedfilter_" + filter).addClass("active");
             $("#feedfilter_title").text($("#feedfilter_" + filter).text());
             LoadFeeds(category, id, filter);
         } else {
-            $("#feedfilter_" + filters[f]).removeClass("active");
+            $("#feedfilter_" + feed_filters[f]).removeClass("active");
         }
     }
 }
 
-var isLoadFeeds = false;
 function LoadFeeds(category, id, filter) {
     if (isLoadFeeds) return;    // if it is loading, skip this time.
     isLoadFeeds = true;
+
+    var listdiv = $("#feedlist");
+    if (listdiv.length == 0) {
+        return;
+    }
 
     var apiurl = "";
     var apidata = "";
     var token = "";
     var count = 0;
+
+    if (isNullOrEmpty(filter)) { // page load or load more, don't reload
+        token = $("#hd_token").val();
+        filter = $("#hd_filter").val();
+    }
+    else {  // click on filter btn, need reload, clear current feeds and add loading gif
+        $("#hd_token").val(token);
+        $("#hd_filter").val(filter);
+
+        listdiv.empty();
+        listdiv.append("<li id='loading_message' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
+    }
 
     if (category == "homeline") {
         apiurl = "/api/message/homeline";
@@ -999,19 +1048,6 @@ function LoadFeeds(category, id, filter) {
         return;
     }
 
-
-    if (isNullOrEmpty(filter)) { // page load or load more
-        token = $("#hd_token").val();
-        filter = $("#hd_filter").val();
-    }
-    else {  // click on filter btn, clear current feeds and add loading gif
-        $("#feedlist").empty();
-        $("#feedlist").append("<li id='loading_message' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
-
-        $("#hd_token").val(token);
-        $("#hd_filter").val(filter);
-    }
-
     if (!isNullOrEmpty(filter)) {   // set filter value
         if (isNullOrEmpty(apidata)) {
             apidata = "filter=" + filter;
@@ -1022,61 +1058,60 @@ function LoadFeeds(category, id, filter) {
     }
 
     if (isNullOrEmpty(token)) { // first time load, not load more
-        count = GetNotificationCount(category);
+        count = getNotificationCount(category);
         $("#hd_newcount").val(count);
-    } else {    // load more
+    }
+    else {    // load more
         if (token == "nomore") {
             // already no more feeds, don't load any more
             isLoadFeeds = false;
             return;
         }
 
-        count = $("#hd_newcount").val();
         if (isNullOrEmpty(apidata)) {
             apidata = "token=" + token;
         }
         else {
             apidata += "&token=" + token;
         }
+
+        count = $("#hd_newcount").val();
     }
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        dataType: "json",
-        data: apidata,
-        success: function (data) {
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
             var nexttoken = null;
-            if (isNullOrEmpty(data)) {
-                showError("No content.");
+            if (isNullOrEmpty(data) || data.message.length == 0) {
+                showMessage("No content.");
             }
             else {
-                nexttoken = data.continuationToken
+                nexttoken = data.continuationToken;
                 data = data.message
-                //showError(data);
-                if (data.length == 0) {
-                    showError("No content.");
-                }
-                else {
-                    // create feed list
-                    if (isNullOrEmpty(token)) {
-                        // clear feeds at the first time 
-                        $("#feedlist").empty();
-                    }
-                    $.each(data, function (index, item) {
-                        $("#feedlist").append(CreateFeed(item));
 
-                        if (count-- > 0) {
-                            $("#feed_" + item.ID).addClass('new-notification');
-                        }
-                        enhanceMessage(item.SchemaID, item.ID, item.MessageContent);
-                        // if msg is empty, show richmsg instead
-                        if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
-                            $("#rich_message_" + item.ID).collapse('show');
-                            ShowRichMsg(item.RichMessageID, item.ID);
-                        }
-                    })
+                // clear feed list
+                if (isNullOrEmpty(token)) {
+                    // clear loading message at the first time 
+                    listdiv.empty();
                 }
+
+                // create feed list
+                $.each(data, function (index, item) {
+                    listdiv.append(createFeed(item));
+
+                    if (count-- > 0) {
+                        $("#feed_" + item.ID).addClass('new-notification');
+                    }
+
+                    enhanceMessage(item.SchemaID, item.ID, item.MessageContent);
+
+                    // if msg is empty, show richmsg instead
+                    if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
+                        $("#rich_message_" + item.ID).collapse('show');
+                        showRichMsg(item.RichMessageID, item.ID);
+                    }
+                })
             }
 
             if (isNullOrEmpty(nexttoken)) {
@@ -1094,16 +1129,16 @@ function LoadFeeds(category, id, filter) {
             LoadMyFavoriteTopics();
             isLoadFeeds = false;
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        function (XMLHttpRequest, textStatus, errorThrown) {
             $("#lbl_seemore").html("");
             $("#hd_token").val("nomore");
+            $("#hd_newcount").val(0);
             isLoadFeeds = false;
         }
-    });
+    );
 }
 
-var ImportenceTags = [
+var importence_tags = [
     "<span class='label label-danger feed-importence'>Important</span>", // 0
     "<span class='label label-info feed-importence'>Info</span>",
     "<span class='label label-primary feed-importence'>Primary</span>",
@@ -1113,7 +1148,7 @@ var ImportenceTags = [
     "<span class='label label-default feed-importence'>Default</span>",
 ];
 
-function CreateFeed(data, hideOpenBtn) {
+function createFeed(data, hideOpenBtn) {
     var output = "";
     var showevents = false;
     var type = data.Type;
@@ -1144,7 +1179,7 @@ function CreateFeed(data, hideOpenBtn) {
     }
 
     //output += "<ul class='list-group'>";
-    output += "  <li id='feed_" + id + "' class='list-group-item clickable'>";
+    output += "  <li id='feed_" + id + "' class='list-group-item'>";
     output += "    <div>"
 
     // user pic
@@ -1154,7 +1189,7 @@ function CreateFeed(data, hideOpenBtn) {
 
     // importance
     if (importence == 0) {
-        output += ImportenceTags[importence] + "&nbsp;";
+        output += importence_tags[importence] + "&nbsp;";
     }
 
     output += "      <div class='feed-content'>";
@@ -1182,14 +1217,14 @@ function CreateFeed(data, hideOpenBtn) {
 
     // richmsg
     if (!isNullOrEmpty(richmsgid)) {
-        output += "    <div id='rich_message_" + id + "' class='newpost-richinput panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + id + "\");'></div>";
+        output += "    <div id='rich_message_" + id + "' class='newpost-richinput panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='showRichMsg(\"" + richmsgid + "\", \"" + id + "\");'></div>";
     }
 
     // attachment
     if (!isNullOrEmpty(attach)) {
         output += "    <div class='newpost-input'><span class=''>Attachments: </span>";
         for (var key in attach) {
-            output += "  <a class='btn btn-link btn-xs' onclick='ShowAttach(\"" + attach[key].AttachmentID + "\", \"" + attach[key].Filetype + "\", \"" + id + "\");' >" + attach[key].Filename + " (" + attach[key].Filesize + ")</a>&nbsp;";
+            output += "  <a class='btn btn-link btn-xs' onclick='showAttach(\"" + attach[key].AttachmentID + "\", \"" + attach[key].Filetype + "\", \"" + id + "\");' >" + attach[key].Filename + " (" + attach[key].Filesize + ")</a>&nbsp;";
         }
         output += "    </div>";
         output += "    <div id='attachment_" + id + "' class='newpost-input' style='display:none;'></div>";
@@ -1203,11 +1238,11 @@ function CreateFeed(data, hideOpenBtn) {
     }
     // richmsg btn
     if (!isNullOrEmpty(richmsgid)) {
-        output += "      <button id='btn_showrichmsg_" + id + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + id + "\");'>More</button>";
+        output += "      <button id='btn_showrichmsg_" + id + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='showRichMsg(\"" + richmsgid + "\", \"" + id + "\");'>More</button>";
     }
     // replies btn
     if (type == "message") {
-        output += "      <button id='btn_showreply_" + id + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + id + "' href='#reply_" + id + "' onclick='ShowReplies(\"" + id + "\");'>Replies</button>";
+        output += "      <button id='btn_showreply_" + id + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + id + "' href='#reply_" + id + "' onclick='showReplies(\"" + id + "\");'>Replies</button>";
     }
     output += "        </div>";
 
@@ -1255,8 +1290,12 @@ function CreateFeed(data, hideOpenBtn) {
     return output;
 }
 
-function ShowAttach(aid, type, mid) {
+function showAttach(aid, type, mid) {
     var attadiv = $("#attachment_" + mid);
+    if (attadiv.length == 0) {
+        return;
+    }
+
     var apiurl = "/api/attachment/download?attachmentid=" + aid;
 
     attadiv.empty();
@@ -1267,20 +1306,33 @@ function ShowAttach(aid, type, mid) {
     }
 }
 
-function ShowRichMsg(rmid, mid) {
-    var showbtn = $("#btn_showrichmsg_" + mid);
+function showRichMsg(rmid, mid) {
     var richmsgdiv = $("#rich_message_" + mid);
+    if (richmsgdiv.length == 0) {
+        return;
+    }
+
+    var showbtn = $("#btn_showrichmsg_" + mid);
     var show = richmsgdiv.hasClass("in");
 
     if (show == false) {
         if (isNullOrEmpty(richmsgdiv.html())) {
+            // add loading pic
             richmsgdiv.append("<div class='txtaln-c'><span class='spinner-loading'></span> Loading...</div>");
+
             // load rich once
-            $.ajax({
-                type: "GET",
-                url: "/api/message/getrichmessage",
-                data: "richMsgID=" + encodeTxt(rmid),
-                success: function (data) {
+            var apiurl = "/api/message/getrichmessage";
+            var apidata = "richMsgID=" + encodeTxt(rmid);
+
+            AjaxGetAsync(
+                apiurl,
+                apidata,
+                function (data) {
+                    if (isNullOrEmpty(data)) {
+                        data = "No content.";
+                    }
+
+                    // clear 
                     richmsgdiv.empty();
                     // create rich message
                     richmsgdiv.append(data);
@@ -1288,11 +1340,10 @@ function ShowRichMsg(rmid, mid) {
                     // show rich
                     showbtn.text("Less");
                 },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    richmsgdiv.empty();
-                    showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-                }
-            });
+                null,
+                null,
+                "rich_message_" + mid
+            );
         }
         else {
             // show rich
@@ -1304,14 +1355,66 @@ function ShowRichMsg(rmid, mid) {
         showbtn.text("More");
         scrollTo("feed_" + mid);
     }
+}
 
+function showMessageModel(mid, user) {
+    if (isNullOrEmpty(user) || isNullOrEmpty(mid)) {
+        return;
+    }
+
+    var message_div = $("#message_div");
+    if (message_div.length == 0) {
+        return;
+    }
+
+    message_div.empty();
+    message_div.append("<li id='loading_message_messagemodel' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
+    $("#MessageModal").modal();
+
+    var apiurl = "/api/message/getdisplaymessage";
+    var apidata = "msgUser=" + encodeTxt(user) + "&msgID=" + encodeTxt(mid);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                showMessage("No content.", "loading_message_messagemodel");
+            }
+            else {
+                // clear
+                message_div.empty();
+
+                // create message
+                message_div.append(createFeed(data));
+
+                // render feed
+                enhanceMessage(data.SchemaID, data.ID, data.MessageContent);
+                if ($("#rich_message_" + data.ID).length > 0) {
+                    $("#rich_message_" + data.ID).collapse('show');
+                    showRichMsg(data.RichMessageID, data.ID);
+                }
+                if ($("#reply_" + data.ID).length > 0) {
+                    $("#reply_" + data.ID).collapse('show');
+                    showReplies(data.ID);
+                }
+            }
+        },
+        null,
+        null,
+        "loading_message_messagemodel"
+    );
 }
 
 
 // reply function
-function ShowReplies(mid) {
-    var showbtn = $("#btn_showreply_" + mid);
+function showReplies(mid) {
     var replydiv = $("#reply_" + mid);
+    if (replydiv.length == 0) {
+        return;
+    }
+
+    var showbtn = $("#btn_showreply_" + mid);
     var show = replydiv.hasClass("in");
 
     if (show == false) {
@@ -1329,33 +1432,40 @@ function ShowReplies(mid) {
 
 function LoadReplies(mid) {
     var replydiv = $("#replylist_" + mid);
+    if (replydiv.length == 0) {
+        return;
+    }
 
     replydiv.empty();
     replydiv.append("<li class='center-block txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
-    $.ajax({
-        type: "GET",
-        url: "/api/message/getmessagereply",
-        data: "msgID=" + encodeTxt(mid),
-        success: function (data) {
-            // create reply list
+
+    var apiurl = "/api/message/getmessagereply";
+    var apidata = "msgID=" + encodeTxt(mid);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            // clear list
             replydiv.empty();
+
+            // create reply list
             $.each(data, function (index, item) {
-                replydiv.append(CreateReply(item));
+                replydiv.append(createReply(item));
                 // if msg is empty, show richmsg instead
                 if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
                     $("#rich_message_" + item.ID).collapse('show');
-                    ShowRichMsg(item.RichMessageID, item.ID);
+                    showRichMsg(item.RichMessageID, item.ID);
                 }
             })
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
+        function (XMLHttpRequest, textStatus, errorThrown) {
             replydiv.empty();
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
-    });
+    );
 }
 
-function CreateReply(data) {
+function createReply(data) {
     var output = "";
     var type = data.Type;
     var id = data.ID;
@@ -1379,7 +1489,7 @@ function CreateReply(data) {
         picurl = "/Content/Images/default_avatar.jpg";
     }
 
-    output += "<li id='feed_" + id + "' class='list-group-item clickable'>";
+    output += "<li id='feed_" + id + "' class='list-group-item'>";
     output += "  <div>"
 
     // user pic
@@ -1389,7 +1499,7 @@ function CreateReply(data) {
 
     // importance
     if (importence == 0) {
-        output += ImportenceTags[importence] + "&nbsp;";
+        output += importence_tags[importence] + "&nbsp;";
     }
 
     output += "    <div class='reply-content'>";
@@ -1417,14 +1527,14 @@ function CreateReply(data) {
 
     // richmsg
     if (!isNullOrEmpty(richmsgid)) {
-        output += "  <div id='rich_message_" + id + "' class='reply-richinput panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + id + "\");'></div>";
+        output += "  <div id='rich_message_" + id + "' class='reply-richinput panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='showRichMsg(\"" + richmsgid + "\", \"" + id + "\");'></div>";
     }
 
     // attachment
     if (!isNullOrEmpty(attach)) {
         output += "  <div class='reply-input'><span class=''>Attachments: </span>";
         for (var key in attach) {
-            output += "<a class='btn btn-link btn-xs' onclick='ShowAttach(\"" + attach[key].AttachmentID + "\", \"" + attach[key].Filetype + "\", \"" + id + "\");' >" + attach[key].Filename + " (" + attach[key].Filesize + ")</a>&nbsp;";
+            output += "<a class='btn btn-link btn-xs' onclick='showAttach(\"" + attach[key].AttachmentID + "\", \"" + attach[key].Filetype + "\", \"" + id + "\");' >" + attach[key].Filename + " (" + attach[key].Filesize + ")</a>&nbsp;";
         }
         output += "  </div>";
         output += "  <div id='attachment_" + id + "' class='reply-input' style='display:none;'></div>";
@@ -1434,9 +1544,10 @@ function CreateReply(data) {
     output += "      <div class='reply-footer'>";
     // richmsg btn
     if (!isNullOrEmpty(richmsgid)) {
-        output += "    <button id='btn_showrichmsg_" + id + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='ShowRichMsg(\"" + richmsgid + "\", \"" + id + "\");'>More</button>";
+        output += "    <button id='btn_showrichmsg_" + id + "' class='btn btn-link btn-sm' type='button' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='showRichMsg(\"" + richmsgid + "\", \"" + id + "\");'>More</button>";
     }
-    output += "        <button id='btn_replyto_" + id + "' class='btn btn-link btn-sm' type='button'  onclick='SetReplyTo(event, \"" + mid + "\", \"" + user + "\");'>Reply to</button>";
+    // reply to btn
+    output += "        <button id='btn_replyto_" + id + "' class='btn btn-link btn-sm' type='button'  onclick='setReplyTo(\"" + mid + "\", \"" + user + "\");'>Reply to</button>";
     output += "      </div>";
 
     output += "    </div>";
@@ -1447,19 +1558,7 @@ function CreateReply(data) {
     return output;
 }
 
-function SetReplyTo(evt, mid, user) {
-    var sender = null;
-    if (window.event) {
-        sender = window.event.target;
-        event.cancelBubble = true;
-    } else if (evt) {
-        sender = evt.target;
-        evt.stopPropagation();
-    }
-    if (!isNullOrEmpty(sender.href)) {  // link clicked
-        return;
-    }
-
+function setReplyTo(mid, user) {
     var replybox = $("#replymessage_" + mid);
     if (replybox.length == 0) {
         return;
@@ -1468,55 +1567,17 @@ function SetReplyTo(evt, mid, user) {
     replybox.val(replybox.val() + " @" + user + " ");
 }
 
-function ShowMessage(evt, mid, user) {
-    var sender = null;
-    if (window.event) {
-        sender = window.event.target;
-        event.cancelBubble = true;
-    } else if (evt) {
-        sender = evt.target;
-        evt.stopPropagation();
-    }
-    if (!isNullOrEmpty(sender.href)) {  // link clicked
-        return;
-    }
-
-    var message_div = $("#message_div");
-    if (message_div.length == 0) {
-        return;
-    }
-
-    $("#MessageModal").modal();
-    message_div.empty();
-    message_div.append("<li id='loading_message' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
-
-    $.ajax({
-        type: "GET",
-        url: "/api/message/getdisplaymessage",
-        data: "msgUser=" + encodeTxt(user) + "&msgID=" + encodeTxt(mid),
-        success: function (data) {
-            message_div.empty();
-            // create message
-            message_div.append(CreateFeed(data));
-            enhanceMessage(data.SchemaID, data.ID, data.MessageContent);
-            if ($("#rich_message_" + data.ID).length > 0) {
-                $("#rich_message_" + data.ID).collapse('show');
-                ShowRichMsg(data.RichMessageID, data.ID);
-            }
-            $("#reply_" + data.ID).collapse('show');
-            ShowReplies(data.ID);
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-        }
-    });
-}
-
 
 // search function
 function SearchTopic(keyword) {
+    var listdiv = $("#topiclist");
+    if (listdiv.length == 0) {
+        return;
+    }
+
     var apiurl = "";
     var apidata = "";
+
     if (isNullOrEmpty(keyword))
         apiurl = "/api/topic/getalltopic";
     else {
@@ -1524,17 +1585,18 @@ function SearchTopic(keyword) {
         apidata = "keyword=" + encodeTxt(keyword);
     }
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        data: apidata,
-        dataType: "json",
-        success: function (data) {
-            if (data.length == 0) {
-                showError("No content.");
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+                showMessage("No content.");
             }
             else {
-                $("#topiclist").empty();
+                // clear list
+                listdiv.empty();
+
+                // create feed 
                 $.each(data, function (index, item) {
                     var topicid = item.Id;
                     var topicname = item.Name;
@@ -1542,20 +1604,23 @@ function SearchTopic(keyword) {
                     var topiccount = item.MsgCount;
                     var isliked = item.IsLiked;
 
-                    $("#topiclist").append(CreateTopic(topicid, topicname, topicdesp, topiccount));
-                    LoadTopicLikeBtn("btn_topic_like_" + topicid, topicid, isliked);
+                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount));
+                    setTopicLikeBtn("btn_topic_like_" + topicid, topicid, isliked);
                 })
             }
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
         }
-    });
+    );
 }
 
 function SearchUser(keyword) {
+    var listdiv = $("#userlist");
+    if (listdiv.length == 0) {
+        return;
+    }
+
     var apiurl = "";
     var apidata = "";
+
     if (isNullOrEmpty(keyword))
         apiurl = "/api/account/user";
     else {
@@ -1563,147 +1628,167 @@ function SearchUser(keyword) {
         apidata = "keyword=" + encodeTxt(keyword);
     }
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        data: apidata,
-        dataType: "json",
-        success: function (data) {
-            if (data.length == 0) {
-                showError("No content.", "loading_message_searchuser");
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+                showMessage("No content.", "loading_message_searchuser");
             }
             else {
+                // clear list
+                listdiv.empty();
+
                 // create user list
-                $("#userlist").empty();
                 $.each(data, function (index, item) {
-                    $("#userlist").append(CreateUserCard(item));
-                    LoadUserFollowBtn("btn_user_follow_" + encodeUserid(item.Userid), item.Userid, item.IsFollowing);
+                    listdiv.append(createUserCard(item));
+                    setUserFollowBtn("btn_user_follow_" + encodeUserid(item.Userid), item.Userid, item.IsFollowing);
                 })
             }
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message, "loading_message_searchuser");
-        }
-    });
+        null,
+        null,
+        "loading_message_searchuser"
+    );
 }
 
 
-// notification count function
-function GetNotificationCount(category) {
-    var count = 0;
-
+// notification count function and short cut function
+function getNotificationCount(category) {
     if (category != "atline"
         && category != "ownerline"
         && category != "replyline"
         && category != "homeline"
         ) {
-        return count;
+        return 0;
     }
 
+    var count = 0;
     var apiurl = "/api/account/getnotificationcount";
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        dataType: "json",
-        async: false,
-        success: function (data) {
-            var homelineCount = data.UnreadHomelineMsgCount;
-            var ownerlineCount = data.UnreadOwnerlineMsgCount;
-            var atlineCount = data.UnreadAtlineMsgCount;
-            var replyCount = data.UnreadReplyCount;
-            var userid = data.Userid;
-            var notificationCount = ownerlineCount + replyCount + atlineCount;
+    var apidata = "";
 
-            switch (category) {
-                case "atline":
-                    count = atlineCount;
-                    break;
-                case "ownerline":
-                    count = ownerlineCount;
-                    break;
-                case "replyline":
-                    count = replyCount;
-                    break;
-                case "homeline":
-                    count = homelineCount;
-                    break;
-                default:
-                    break;
+    AjaxGetSync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                count = 0;
+            }
+            else {
+                var userid = data.Userid;
+                var homelineCount = data.UnreadHomelineMsgCount;
+                var ownerlineCount = data.UnreadOwnerlineMsgCount;
+                var atlineCount = data.UnreadAtlineMsgCount;
+                var replyCount = data.UnreadReplyCount;
+                var notificationCount = ownerlineCount + replyCount + atlineCount;
+
+                switch (category) {
+                    case "atline":
+                        count = atlineCount;
+                        break;
+                    case "ownerline":
+                        count = ownerlineCount;
+                        break;
+                    case "replyline":
+                        count = replyCount;
+                        break;
+                    case "homeline":
+                        count = homelineCount;
+                        break;
+                    default:
+                        count = 0;
+                        break;
+                }
             }
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            // showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-        }
-    });
+        null,
+        null,
+        "no_message_box"
+    );
 
     return count;
 }
 
-function UpdateNotificationCount() {
-    var apiurl = "/api/account/getnotificationcount";
-
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        dataType: "json",
-        success: function (data) {
-            var homelineCount = data.UnreadHomelineMsgCount;
-            var ownerlineCount = data.UnreadOwnerlineMsgCount;
-            var atlineCount = data.UnreadAtlineMsgCount;
-            var replyCount = data.UnreadReplyCount;
-            var userid = data.Userid;
-            var notificationCount = ownerlineCount + replyCount + atlineCount;
-
-            // shortcut panel count
-            $("#shortcut_homeline_count").html(homelineCount);
-            $("#shortcut_reply_count").html(replyCount);
-            $("#shortcut_atline_count").html(atlineCount);
-            $("#shortcut_ownerline_count").html(ownerlineCount);
-            $("#shortcut_notification_count").html(notificationCount);
-
-            // homepage count
-            $("#home_reply_count").html(replyCount);
-            $("#home_atline_count").html(atlineCount);
-            $("#home_ownerline_count").html(ownerlineCount);
-
-            // nav bar count
-            if (homelineCount > 0)
-                $("#nav_home_count").html(homelineCount);
-            else
-                $("#nav_home_count").html("");
-
-            if (notificationCount > 0)
-                $("#nav_notification_count").html(notificationCount);
-            else
-                $("#nav_notification_count").html("");
-
-            // chrome desktop notification
-            notify(homelineCount, atlineCount, ownerlineCount, replyCount);
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            // showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-        }
-    });
-}
-
-function SetNotificationCount() {
+function UpdateNotificationCountTimer() {
     UpdateNotificationCount();
-    var timer = $.timer(UpdateNotificationCount, 30000, true);
+    var timer = $.timer(UpdateNotificationCount, 60000, true);
 }
 
+function UpdateNotificationCount() {
+    if ($("#shortcut_homeline_count").length == 0
+        && $("#home_reply_count").length == 0
+        && $("#nav_home_count").length == 0) {
+        return;
+    }
 
-// topic function
+    var apiurl = "/api/account/getnotificationcount";
+    var apidata = "";
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                // do nothing
+            }
+            else {
+                var userid = data.Userid;
+                var homelineCount = data.UnreadHomelineMsgCount;
+                var ownerlineCount = data.UnreadOwnerlineMsgCount;
+                var atlineCount = data.UnreadAtlineMsgCount;
+                var replyCount = data.UnreadReplyCount;
+                var notificationCount = ownerlineCount + replyCount + atlineCount;
+
+                // shortcut panel count
+                $("#shortcut_homeline_count").html(homelineCount);
+                $("#shortcut_reply_count").html(replyCount);
+                $("#shortcut_atline_count").html(atlineCount);
+                $("#shortcut_ownerline_count").html(ownerlineCount);
+                $("#shortcut_notification_count").html(notificationCount);
+
+                // notification navbar count
+                $("#home_reply_count").html(replyCount);
+                $("#home_atline_count").html(atlineCount);
+                $("#home_ownerline_count").html(ownerlineCount);
+
+                // menu navbar count
+                if (homelineCount > 0)
+                    $("#nav_home_count").html(homelineCount);
+                else
+                    $("#nav_home_count").html("");
+
+                if (notificationCount > 0)
+                    $("#nav_notification_count").html(notificationCount);
+                else
+                    $("#nav_notification_count").html("");
+
+                // chrome desktop notification (doesn't work)
+                // notify(homelineCount, atlineCount, ownerlineCount, replyCount);
+            }
+        },
+        null,
+        null,
+        "no_message_box"
+    );
+}
+
 function LoadHotTopics() {
-    var apiurl = "/api/topic/hottopics";
+    var listdiv = $("#topic_collapse");
+    if (listdiv.length == 0) {
+        return;
+    }
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        data: "count=10",
-        dataType: "json",
-        success: function (data) {
-            // create hot topic
-            $("#topic_collapse").empty();
+    var apiurl = "/api/topic/hottopics";
+    var apidata = "";
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            // clear list
+            listdiv.empty();
+
+            // create list
             $.each(data, function (index, item) {
                 var output = "";
                 var topicid = item.Id;
@@ -1713,65 +1798,38 @@ function LoadHotTopics() {
                 var isliked = item.IsLiked;
 
                 output = "<li class='sub-list-group-item'>"
-                       + "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
-                       + "  <span class='badge'>" + topiccount + "</span>"
-                       + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>"
-                       + "</li>"
-                $("#topic_collapse").append(output);
-                LoadTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid, isliked);
+                        + "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
+                        + "  <span class='badge'>" + topiccount + "</span>"
+                        + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>"
+                        + "</li>"
+                listdiv.append(output);
+                setTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid, isliked);
             })
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            // showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-        }
-    });
-}
-
-function LoadUserFavoriteTopics(user) {
-    var apiurl = "/api/topic/getuserfavouritetopic";
-    var apidata = "userid=" + encodeTxt(user);
-
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        data: apidata,
-        dataType: "json",
-        success: function (data) {
-            if (data.length == 0) {
-                showError("No content.");
-            }
-            else {
-                $("#topiclist").empty();
-                $.each(data, function (index, item) {
-                    var topicid = item.topicID;
-                    var topicname = item.topicName;
-                    var topicdesp = item.topicDescription;
-                    var topiccount = item.topicMsgCount;
-                    var isliked = item.IsLiked;
-
-                    $("#topiclist").append(CreateTopic(topicid, topicname, topicdesp, topiccount));
-                    LoadTopicLikeBtn("btn_topic_like_" + topicid, topicid, isliked);
-                })
-            }
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-        }
-    });
+        null,
+        null,
+        "no_message_box"
+    );
 }
 
 function LoadMyFavoriteTopics() {
-    var apiurl = "/api/topic/getmyfavouritetopic";
+    var listdiv = $("#favorite_collapse");
+    if (listdiv.length == 0) {
+        return;
+    }
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        dataType: "json",
-        success: function (data) {
-            // create hot topic
-            $("#favorite_collapse").empty();
+    var apiurl = "/api/topic/getmyfavouritetopic";
+    var apidata = "";
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            // clear list
+            listdiv.empty();
             var navlist = $("#home_nav_list");
             navlist.empty();
+
             $.each(data, function (index, item) {
                 var output = "";
                 var userid = item.userid;
@@ -1786,206 +1844,68 @@ function LoadMyFavoriteTopics() {
                 output += "  <span class='badge'>" + unreadcount + "</span>";
                 output += "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>";
                 output += "</li>";
-                $("#favorite_collapse").append(output);
+                listdiv.append(output);
 
                 // homepage 
                 if (unreadcount > 0 && navlist.length > 0) {
-                    output = "";
-                    //output += "<li>";
-                    output += "  <a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a> ";
-                    //output += "</li>";
-
+                    output = "<a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a> ";
                     navlist.append(output);
                 }
             })
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            //showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-        }
-    });
+        null,
+        null,
+        "no_message_box"
+    );
 }
 
-function LoadTopicLikeBtn(btnid, topicid, isLiked) {
-    var btn = $("#" + btnid);
-    if (btn.length == 0) {
-        return;
-    }
+//function notify(homelineCount, atlineCount, ownerlineCount, replyCount) {
+//    try {
+//        if (isNullOrEmpty(chrome)) {
+//            return;
+//        }
 
-    if (isLiked == true) {
-        SetUnlikeBtn(btnid, topicid, true);
-    }
-    else if (isLiked == false) {
-        SetLikeBtn(btnid, topicid, true);
-    }
-    else {
-        // do nothing.
-    }
-}
+//        //chrome.notification.getPermissionLevel(function (level) {
+//        //    if (level == "granted") {
+//        var notifitems = [];
 
-function SetUnlikeBtn(btnid, topicid, enabled) {
-    var btn = $("#" + btnid);
-    if (btn.length == 0) {
-        return;
-    }
+//        if (atlineCount > 0) {
+//            notifitems.push({
+//                title: "Mentions: ", message: atlineCount
+//            });
+//        }
+//        if (ownerlineCount > 0) {
+//            notifitems.push({
+//                title: "Owned : ", message: ownerlineCount
+//            });
+//        }
+//        if (replyCount > 0) {
+//            notifitems.push({
+//                title: "Replies : ", message: replyCount
+//            });
+//        }
 
-    btn.text("Liked");
-    btn.attr("class", "btn btn-success like-btn");
-    if (enabled) {
-        btn.attr("onclick", "Unlike('" + btnid + "', '" + topicid + "');");
-    }
-    else {
-        btn.attr("onclick", "");
-    }
-    btn.attr("onmouseover", "UnlikeBtnMouseOver('" + btnid + "');")
-    btn.attr("onmouseout", "UnlikeBtnMouseOut('" + btnid + "');")
-    btn.show();
-}
+//        var opt = {
+//            type: "list",
+//            title: "Notifications",
+//            message: "You have new unread messages.",
+//            iconUrl: "/Content/Images/default_avatar.jpg",
+//            items: notifitems
+//        };
 
-function UnlikeBtnMouseOver(btnid) {
-    var btn = $("#" + btnid);
-    if (btn.length == 0) {
-        return;
-    }
-
-    btn.attr("class", "btn btn-danger like-btn");
-    btn.text("Unlike");
-}
-
-function UnlikeBtnMouseOut(btnid) {
-    var btn = $("#" + btnid);
-    if (btn.length == 0) {
-        return;
-    }
-
-    btn.attr("class", "btn btn-success like-btn");
-    btn.text("Liked");
-}
-
-function SetLikeBtn(btnid, topicid, enabled) {
-    var btn = $("#" + btnid);
-    if (btn.length == 0) {
-        return;
-    }
-
-    btn.text("Like");
-    btn.attr("class", "btn btn-primary like-btn");
-    if (enabled) {
-        btn.attr("onclick", "Like('" + btnid + "', '" + topicid + "');");
-    }
-    else {
-        btn.attr("onclick", "");
-    }
-    btn.attr("onmouseover", "")
-    btn.attr("onmouseout", "")
-    btn.show();
-}
-
-function Like(btnid, topicid) {
-    SetUnlikeBtn(btnid, topicid, false);
-    $.ajax({
-        type: "GET",
-        url: "/api/topic/addfavouritetopic",
-        data: "topicID=" + encodeTxt(topicid),
-        success: function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                LoadMyFavoriteTopics();
-                SetUnlikeBtn(btnid, topicid, true);
-            }
-            else {
-                showError(msg);
-            }
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-        }
-    });
-}
-
-function Unlike(btnid, topicid) {
-    SetLikeBtn(btnid, topicid, false);
-    $.ajax({
-        type: "GET",
-        url: "/api/topic/removefavouritetopic",
-        data: "topicID=" + encodeTxt(topicid),
-        success: function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                LoadMyFavoriteTopics();
-                SetLikeBtn(btnid, topicid, true);
-            }
-            else {
-                showError(msg);
-            }
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-        }
-    });
-}
-
-function CreateTopic(topicid, topicname, topicdesp, topiccount) {
-    var output = "";
-
-    output = "<li class='list-group-item'>"
-           + "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
-           + "  <span class='badge'>" + topiccount + "</span>"
-           + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>"
-           + "</li>"
-
-    return output;
-}
-
-
-function notify(homelineCount, atlineCount, ownerlineCount, replyCount) {
-    try {
-        if (isNullOrEmpty(chrome)) {
-            return;
-        }
-
-        //chrome.notification.getPermissionLevel(function (level) {
-        //    if (level == "granted") {
-        var notifitems = [];
-
-        if (atlineCount > 0) {
-            notifitems.push({
-                title: "Mentions: ", message: atlineCount
-            });
-        }
-        if (ownerlineCount > 0) {
-            notifitems.push({
-                title: "Owned : ", message: ownerlineCount
-            });
-        }
-        if (replyCount > 0) {
-            notifitems.push({
-                title: "Replies : ", message: replyCount
-            });
-        }
-
-        var opt = {
-            type: "list",
-            title: "Notifications",
-            message: "You have new unread messages.",
-            iconUrl: "/Content/Images/default_avatar.jpg",
-            items: notifitems
-        };
-
-        if (notifitems.length > 0) {
-            chrome.notifications.create('chrome_notification', opt, function (id) {
-            });
-        }
-        //    }
-        //    else if (level == "denied") {
-        //        return;
-        //    }
-        //});
-    }
-    catch (e) {
-    }
-}
+//        if (notifitems.length > 0) {
+//            chrome.notifications.create('chrome_notification', opt, function (id) {
+//            });
+//        }
+//        //    }
+//        //    else if (level == "denied") {
+//        //        return;
+//        //    }
+//        //});
+//    }
+//    catch (e) {
+//    }
+//}
 
 //function notify() {
 //    alert(window.webkitNotifications);
@@ -2010,55 +1930,227 @@ function notify(homelineCount, atlineCount, ownerlineCount, replyCount) {
 //    }
 //}
 
+
+// topic function
+function LoadUserFavoriteTopics(user) {
+    var listdiv = $("#topiclist");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var apiurl = "/api/topic/getuserfavouritetopic";
+    var apidata = "userid=" + encodeTxt(user);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+                showMessage("No content.");
+            }
+            else {
+                // clear list
+                listdiv.empty();
+
+                // create list
+                $.each(data, function (index, item) {
+                    var topicid = item.topicID;
+                    var topicname = item.topicName;
+                    var topicdesp = item.topicDescription;
+                    var topiccount = item.topicMsgCount;
+                    var isliked = item.IsLiked;
+
+                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount));
+                    setTopicLikeBtn("btn_topic_like_" + topicid, topicid, isliked);
+                })
+            }
+        }
+    );
+}
+
+function setTopicLikeBtn(btnid, topicid, isLiked) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    if (isLiked == true) {
+        setUnlikeBtn(btnid, topicid, true);
+    }
+    else if (isLiked == false) {
+        setLikeBtn(btnid, topicid, true);
+    }
+    else {
+        // do nothing.
+    }
+}
+
+function setUnlikeBtn(btnid, topicid, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Liked");
+    btn.attr("class", "btn btn-success like-btn");
+    if (enabled) {
+        btn.attr("onclick", "unlike('" + btnid + "', '" + topicid + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "unlikeBtnMouseOver('" + btnid + "');")
+    btn.attr("onmouseout", "unlikeBtnMouseOut('" + btnid + "');")
+    btn.show();
+}
+
+function unlikeBtnMouseOver(btnid) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-danger like-btn");
+    btn.text("Unlike");
+}
+
+function unlikeBtnMouseOut(btnid) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-success like-btn");
+    btn.text("Liked");
+}
+
+function setLikeBtn(btnid, topicid, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Like");
+    btn.attr("class", "btn btn-primary like-btn");
+    if (enabled) {
+        btn.attr("onclick", "like('" + btnid + "', '" + topicid + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
+    btn.show();
+}
+
+function like(btnid, topicid) {
+    setUnlikeBtn(btnid, topicid, false);
+
+    var apiurl = "/api/topic/addfavouritetopic";
+    var apidata = "topicID=" + encodeTxt(topicid);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            var code = data.ActionResultCode;
+            var msg = data.Message;
+            if (code == "0") {
+                setUnlikeBtn(btnid, topicid, true);
+                // refresh topic info
+                LoadMyFavoriteTopics();
+            }
+            else {
+                showError(msg);
+            }
+        }
+    );
+}
+
+function unlike(btnid, topicid) {
+    setLikeBtn(btnid, topicid, false);
+
+    var apiurl = "/api/topic/removefavouritetopic";
+    var apidata = "topicID=" + encodeTxt(topicid);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            var code = data.ActionResultCode;
+            var msg = data.Message;
+            if (code == "0") {
+                setLikeBtn(btnid, topicid, true);
+                // refresh topic info
+                LoadMyFavoriteTopics();
+            }
+            else {
+                showError(msg);
+            }
+        }
+    );
+}
+
+function createTopic(topicid, topicname, topicdesp, topiccount) {
+    var output = "";
+
+    output = "<li class='list-group-item'>"
+           + "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
+           + "  <span class='badge'>" + topiccount + "</span>"
+           + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>"
+           + "</li>"
+
+    return output;
+}
+
+
 // Welcome
 function RefreshWelcomePageTimer() {
-    RefreshWelcomePage();
-    var timer = $.timer(RefreshWelcomePage, 60000, true);
+    refreshWelcomePage();
+    var timer = $.timer(refreshWelcomePage, 60000, true);
 }
 
 function RefreshWelcomePage() {
     // load new
-    RefreshWelcomeNew();
+    refreshWelcomeNew();
 
     // load notifications
-    RefreshWelcomeMentionsFeeds();
-    RefreshWelcomeMyOwnsFeeds();
-    RefreshWelcomeRepliesFeeds();
-
-    // load hot topics
-    RefreshWelcomeHotTopics();
-
-    // load active users
-    RefreshWelcomeActiveUsers();
+    refreshWelcomeMentionsFeeds();
+    refreshWelcomeMyOwnsFeeds();
+    refreshWelcomeRepliesFeeds();
 
     // load latest feeds
-    RefreshWelcomeLatestFeeds();
+    refreshWelcomeLatestFeeds();
 
+    // load hot topics
+    refreshWelcomeHotTopics();
+
+    // load active users
+    refreshWelcomeActiveUsers();
 }
 
-function RefreshWelcomeNew() {
+function refreshWelcomeNew() {
     var listdiv = $("#welcome_new_list");
     if (listdiv.length == 0) {
         return;
     }
 
     listdiv.empty();
-    listdiv.append("<li class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
+    listdiv.append("<li id='loading_message_new' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
 
     // notifications
     var apiurl = "/api/account/getnotificationcount";
+    var apidata = "";
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        dataType: "json",
-        async: false,
-        success: function (data) {
-            // create list
+    AjaxGetSync(
+        apiurl,
+        apidata,
+        function (data) {
+            // clear list
             listdiv.empty();
 
             if (isNullOrEmpty(data)) {
-                listdiv.append("<li class='list-group-item txtaln-c'>No content</li>");
+                // do nothing
             }
             else {
                 var output = "";
@@ -2087,7 +2179,7 @@ function RefreshWelcomeNew() {
                        + "</li>"
                 listdiv.prepend(output);
 
-                // nav bar count
+                // menu navbar count
                 if (homelineCount > 0)
                     $("#nav_home_count").html(homelineCount);
                 else
@@ -2099,26 +2191,26 @@ function RefreshWelcomeNew() {
                     $("#nav_notification_count").html("");
             }
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            // showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-            listdiv.empty();
-            listdiv.append("<li class='list-group-item txtaln-c'>" + XMLHttpRequest.responseJSON.Message + "</li>");
-        }
-    });
+        null,
+        null,
+        "loading_message_new"
+    );
 
     // my topics
-    apiurl = "/api/topic/getmyfavouritetopic";
     var maxcount = 15;
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        dataType: "json",
-        success: function (data) {
-            // create my topic
-            if (isNullOrEmpty(data)) {
+    apiurl = "/api/topic/getmyfavouritetopic";
+    apidata = "";
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+                // do nothing
             }
             else {
+                // create my topic
                 $.each(data, function (index, item) {
                     var output = "";
                     var userid = item.userid;
@@ -2142,13 +2234,13 @@ function RefreshWelcomeNew() {
                 })
             }
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            //showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-        }
-    });
+        null,
+        null,
+        "loading_message_new"
+    );
 }
 
-function RefreshWelcomeHotTopics() {
+function refreshWelcomeHotTopics() {
     var listdiv = $("#welcome_hot_topics_list");
     if (listdiv.length == 0) {
         return;
@@ -2158,21 +2250,20 @@ function RefreshWelcomeHotTopics() {
     var apidata = "count=10";
 
     listdiv.empty();
-    listdiv.append("<li class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
+    listdiv.append("<li id='loading_message_hot_topics' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        data: apidata,
-        dataType: "json",
-        success: function (data) {
-            // create list
-            listdiv.empty();
-
-            if (data.length == 0) {
-                listdiv.append("<li class='list-group-item txtaln-c'>No content</li>");
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+                showMessage("No content.", "loading_message_hot_topics");
             }
             else {
+                // clear list
+                listdiv.empty();
+
+                // create list
                 $.each(data, function (index, item) {
                     var output = "";
                     var topicid = item.Id;
@@ -2181,20 +2272,18 @@ function RefreshWelcomeHotTopics() {
                     var topiccount = item.MsgCount;
                     var isliked = item.IsLiked;
 
-                    listdiv.append(CreateTopic(topicid, topicname, topicdesp, topiccount));
-                    LoadTopicLikeBtn("btn_topic_like_" + topicid, topicid, isliked);
+                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount));
+                    setTopicLikeBtn("btn_topic_like_" + topicid, topicid, isliked);
                 })
             }
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            // showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-            listdiv.empty();
-            listdiv.append("<li class='list-group-item txtaln-c'>" + XMLHttpRequest.responseJSON.Message + "</li>");
-        }
-    });
+        null,
+        null,
+        "loading_message_hot_topics"
+    );
 }
 
-function RefreshWelcomeActiveUsers() {
+function refreshWelcomeActiveUsers() {
     var listdiv = $("#welcome_active_users_list");
     if (listdiv.length == 0) {
         return;
@@ -2204,21 +2293,20 @@ function RefreshWelcomeActiveUsers() {
     var apidata = "count=10";
 
     listdiv.empty();
-    listdiv.append("<li class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
+    listdiv.append("<li id='loading_message_active_users' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        data: apidata,
-        dataType: "json",
-        success: function (data) {
-            // create list
-            listdiv.empty();
-
-            if (data.length == 0) {
-                listdiv.append("<li class='list-group-item txtaln-c'>No content</li>");
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+                showMessage("No content.", "loading_message_active_users");
             }
             else {
+                // clear list
+                listdiv.empty();
+
+                // create list
                 $.each(data, function (index, item) {
                     var userid = item.Userid;
                     var username = item.DisplayName;
@@ -2229,44 +2317,42 @@ function RefreshWelcomeActiveUsers() {
                     var followerscount = item.FollowersCount;
                     var isFollowing = item.IsFollowing;
 
-                    //if (isNullOrEmpty(picurl)) {
-                    //    picurl = "/Content/Images/default_avatar.jpg";
-                    //}
+                    if (isNullOrEmpty(picurl)) {
+                        picurl = "/Content/Images/default_avatar.jpg";
+                    }
 
                     output = "<li class='list-group-item'>"
                            + "  <a class='btn btn-default follow-btn' id='btn_user_follow_" + encodeUserid(userid) + "' style='display:none'>&nbsp;</a>"
                            + "  <span class='badge'>" + postscount + "</span>"
-                           //+ "  <img class='img-rounded' src='" + picurl + "' width='20' height='20' />"
+                           + "  <img class='img-rounded' src='" + picurl + "' width='25' height='25' />"
                            + "  <a class='fullname' href='/profile/index?user=" + encodeTxt(userid) + "'>" + username + "</a>"
                            + "  <span class='username'>@" + userid + "</span>"
                            + "</li>";
 
                     listdiv.append(output);
-                    LoadUserFollowBtn("btn_user_follow_" + encodeUserid(userid), userid, isFollowing);
+                    setUserFollowBtn("btn_user_follow_" + encodeUserid(userid), userid, isFollowing);
                 })
             }
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            // showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
-            listdiv.empty();
-            listdiv.append("<li class='list-group-item txtaln-c'>" + XMLHttpRequest.responseJSON.Message + "</li>");
-        }
-    });
+        null,
+        null,
+        "loading_message_active_users"
+    );
 }
 
-function RefreshWelcomeLatestFeeds() {
+function refreshWelcomeLatestFeeds() {
     var listdiv = $("#welcome_latest_feeds_list");
     if (listdiv.length == 0) {
         return;
     }
 
-    var apiurl = "/api/message/publicsquareline";
-    var apidata = "count=5";
+    var apiurl = "/api/message/homeline";
+    var apidata = "userid=&count=5&keepUnread=true";
 
-    RefreshWelcomeFeeds(listdiv, apiurl, apidata, 140);
+    refreshWelcomeFeeds(listdiv, apiurl, apidata, 140);
 }
 
-function RefreshWelcomeMentionsFeeds() {
+function refreshWelcomeMentionsFeeds() {
     var listdiv = $("#welcome_mentions_feeds_list");
     if (listdiv.length == 0) {
         return;
@@ -2275,10 +2361,10 @@ function RefreshWelcomeMentionsFeeds() {
     var apiurl = "/api/message/atline";
     var apidata = "userid=&count=5&keepUnread=true";
 
-    RefreshWelcomeFeeds(listdiv, apiurl, apidata, 140);
+    refreshWelcomeFeeds(listdiv, apiurl, apidata, 140);
 }
 
-function RefreshWelcomeMyOwnsFeeds() {
+function refreshWelcomeMyOwnsFeeds() {
     var listdiv = $("#welcome_myowns_feeds_list");
     if (listdiv.length == 0) {
         return;
@@ -2287,10 +2373,10 @@ function RefreshWelcomeMyOwnsFeeds() {
     var apiurl = "/api/message/ownerline";
     var apidata = "userid=&count=5&keepUnread=true";
 
-    RefreshWelcomeFeeds(listdiv, apiurl, apidata, 140);
+    refreshWelcomeFeeds(listdiv, apiurl, apidata, 140);
 }
 
-function RefreshWelcomeRepliesFeeds() {
+function refreshWelcomeRepliesFeeds() {
     var listdiv = $("#welcome_replies_feeds_list");
     if (listdiv.length == 0) {
         return;
@@ -2299,28 +2385,27 @@ function RefreshWelcomeRepliesFeeds() {
     var apiurl = "/api/reply/getmyreply";
     var apidata = "count=5&keepUnread=true";
 
-    RefreshWelcomeFeeds(listdiv, apiurl, apidata, 140);
+    refreshWelcomeFeeds(listdiv, apiurl, apidata, 140);
 }
 
-function RefreshWelcomeFeeds(listdiv, apiurl, apidata, msgLength) {
+function refreshWelcomeFeeds(listdiv, apiurl, apidata, msgLength) {
     listdiv.empty();
     listdiv.append("<li class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
 
-    $.ajax({
-        type: "GET",
-        url: apiurl,
-        data: apidata,
-        dataType: "json",
-        success: function (data) {
-            // create list
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            // clear list
             listdiv.empty();
 
             if (isNullOrEmpty(data) || data.message.length == 0) {
-                listdiv.append("<li class='list-group-item txtaln-c'>No content</li>");
+                listdiv.append("<li class='list-group-item txtaln-c'>No content.</li>");
             }
             else {
                 data = data.message;
 
+                // create list
                 $.each(data, function (index, item) {
                     var output = "";
                     var type = item.Type;
@@ -2358,11 +2443,10 @@ function RefreshWelcomeFeeds(listdiv, apiurl, apidata, msgLength) {
                 })
             }
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            // showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message);
+        function (XMLHttpRequest, textStatus, errorThrown) {
             listdiv.empty();
             listdiv.append("<li class='list-group-item txtaln-c'>" + XMLHttpRequest.responseJSON.Message + "</li>");
         }
-    });
+    );
 }
 
