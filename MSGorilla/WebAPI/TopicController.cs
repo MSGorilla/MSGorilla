@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Net.Http;
 using System.Web.Http;
+using System.Runtime.Serialization;
 
 using MSGorilla.Library;
 using MSGorilla.Filters;
@@ -12,8 +13,24 @@ using MSGorilla.Library.Models.ViewModels;
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.SqlModels;
 
+
 namespace MSGorilla.WebApi
 {
+    public class DisplayTopic : Topic
+    {
+        [DataMember]
+        public bool IsLiked { get; private set; }
+
+        public DisplayTopic(Topic topic, bool isliked)
+        {
+            Id = topic.Id;
+            Name =topic.Name;
+            Description = topic.Description;
+            MsgCount = topic.MsgCount;
+            IsLiked = isliked;
+        }
+    }
+
     public class TopicController : BaseController
     {
         TopicManager _topicManager = new TopicManager();
@@ -32,9 +49,9 @@ namespace MSGorilla.WebApi
         /// <param name="topicid">id of the topic</param>
         /// <returns></returns>
         [HttpGet]
-        public Topic FindTopic(int topicid)
+        public DisplayTopic FindTopic(int topicid)
         {
-            return _topicManager.FindTopic(topicid);
+            return new DisplayTopic(_topicManager.FindTopic(topicid), IsFavouriteTopic(topicid));
         }
 
         /// <summary>
@@ -59,9 +76,17 @@ namespace MSGorilla.WebApi
         /// <param name="keyword">key word</param>
         /// <returns></returns>
         [HttpGet]
-        public List<Topic> SearchTopic(string keyword)
+        public List<DisplayTopic> SearchTopic(string keyword)
         {
-            return _topicManager.SearchTopic(keyword);
+            var topiclist = _topicManager.SearchTopic(keyword);
+            var disptopiclist = new List<DisplayTopic>();
+
+            foreach (var t in topiclist)
+            {
+                disptopiclist.Add(new DisplayTopic(t, IsFavouriteTopic(t.Id)));
+            }
+
+            return disptopiclist;
         }
 
         /// <summary>
@@ -79,14 +104,15 @@ namespace MSGorilla.WebApi
         /// <param name="Description">description of the topic</param>
         /// <returns></returns>
         [HttpGet]
-        public Topic AddTopic(string Name, string Description)
+        public DisplayTopic AddTopic(string Name, string Description)
         {
             whoami();
             Topic topic = new Topic();
             topic.Name = Name;
             topic.Description = Description;
             topic.MsgCount = 0;
-            return _topicManager.AddTopic(topic);
+            var newtopic = _topicManager.AddTopic(topic);
+            return new DisplayTopic(newtopic, IsFavouriteTopic(newtopic.Id));
         }
 
         /// <summary>
@@ -112,9 +138,17 @@ namespace MSGorilla.WebApi
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public List<Topic> GetAllTopic()
+        public List<DisplayTopic> GetAllTopic()
         {
-            return _topicManager.GetAllTopics();
+            var topiclist = _topicManager.GetAllTopics();
+            var disptopiclist = new List<DisplayTopic>();
+
+            foreach (var t in topiclist)
+            {
+                disptopiclist.Add(new DisplayTopic(t, IsFavouriteTopic(t.Id)));
+            }
+
+            return disptopiclist;
         }
 
         /// <summary>
@@ -145,9 +179,17 @@ namespace MSGorilla.WebApi
         /// <param name="count">count of topic in the list</param>
         /// <returns></returns>
         [HttpGet]
-        public List<Topic> HotTopics(int count = 5)
+        public List<DisplayTopic> HotTopics(int count = 5)
         {
-            return _topicManager.GetHotTopics(count);
+            var topiclist = _topicManager.GetHotTopics(count);
+            var disptopiclist = new List<DisplayTopic>();
+
+            foreach (var t in topiclist)
+            {
+                disptopiclist.Add(new DisplayTopic(t, IsFavouriteTopic(t.Id)));
+            }
+
+            return disptopiclist;
         }
 
         /// <summary>
