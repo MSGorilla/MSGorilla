@@ -103,12 +103,6 @@ namespace MSGorilla.WebAPI.Client
                 if (richMessage != null)
                 {
                     richMessageStr = "&richMessage=" + EscapeString(richMessage);
-                    
-                    // Currently azure table field only supports max 64K
-                    if (richMessageStr.Length > 60000)
-                    {
-                        richMessageStr = null;
-                    }
                 }
                 if (attachmentID != null)
                 {
