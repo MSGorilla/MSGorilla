@@ -17,11 +17,13 @@ namespace CodeFlowMonitor
     {
         private static System.Timers.Timer serviceTimer = null;
         private static string _statusFileName = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "MonitorStatus.xml");
+        private static string _trendFileName = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "CFTrendStatus.xml");
         private static List<string> _userlist = null;
         private static object _lockobj = new object();
 
         private static Dictionary<string, Dictionary<string, int>> _MonitoredReviewDict = new Dictionary<string, Dictionary<string, int>>();
-
+        private static CFTrendStatus _cfTrendStatus = new CFTrendStatus();
+        private static bool _isTrendStatusSend = false;
         public CodeFlowMonitorService()
         {
             this.ServiceName = "CodeFlowMonitorService";
@@ -40,6 +42,14 @@ namespace CodeFlowMonitor
                 using (StreamReader sr = new StreamReader(_statusFileName))
                 {
                     _MonitoredReviewDict = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, int>>>(sr.ReadToEnd());
+                }
+            }
+
+            if (File.Exists(_trendFileName))
+            {
+                using (StreamReader sr = new StreamReader(_trendFileName))
+                {
+                    _cfTrendStatus = JsonConvert.DeserializeObject<CFTrendStatus>(sr.ReadToEnd());
                 }
             }
 
@@ -88,6 +98,11 @@ namespace CodeFlowMonitor
                     sw.Write(JsonConvert.SerializeObject(_MonitoredReviewDict));
 
                 }
+                using (StreamWriter sw = new StreamWriter(_trendFileName))
+                {
+                    sw.Write(JsonConvert.SerializeObject(_cfTrendStatus));
+
+                }
             }
         }
 
@@ -119,14 +134,20 @@ namespace CodeFlowMonitor
 
                     if (reviews != null)
                     {
+                        
                         //scan each review
                         foreach (var codeReviewSummary in reviews)
                         {
+                            _cfTrendStatus.AddReviewCount(codeReviewSummary.Author.Name);
+                            
                             CodeReview r = client.GetReview(codeReviewSummary.Key);
 
                             if (!_MonitoredReviewDict[username].Keys.Contains(r.Key))
                             {
                                 _MonitoredReviewDict[username].Add(r.Key, 0);
+                                //A new submit, add to today's total Review count
+                                _cfTrendStatus.AddReviewCount(r.Author.Name);
+
                                 isNew = true;
                             }
 
@@ -228,6 +249,47 @@ namespace CodeFlowMonitor
                 Logger.WriteInfo("Exception happened, try get the codeflow info in next run");
                 Logger.WriteInfo(e.Message);
             }
+
+            //Check wether it's time to send trend data
+            if(DateTime.Now.TimeOfDay > new TimeSpan(23,30,0))
+            {
+                if(!_isTrendStatusSend)
+                {
+                    GorillaWebAPI webapi = new GorillaWebAPI("CFMonitor", "User@123");
+                    if(DateTime.Now.DayOfWeek == DayOfWeek.Friday)
+                    {
+                        var winner =  _cfTrendStatus.ReviewCountPeople.OrderByDescending(p=>p.Value).First();
+                        string winnerThisWeek = string.Format("This Week's CodeFlow winner is @{0}, who submitted {1} CodeReviews!!!", winner.Key, winner.Value);
+                        webapi.PostMessage(winnerThisWeek, "none", "none", new string[] { "WOSS CodeFlow" });
+                    }
+
+                    StringBuilder dailyTrendValue = new StringBuilder();
+                    foreach(var value in _cfTrendStatus.ReviewCountHistory.OrderBy(t=>t.Key).Select(t=>t.Value))
+                    {
+                        dailyTrendValue.AppendFormat("{0},", value);
+                    }
+                    string dTrendValue = dailyTrendValue.ToString().TrimEnd(',');
+
+                    StringBuilder dailyTrendDate = new StringBuilder();
+                    foreach (var value in _cfTrendStatus.ReviewCountHistory.OrderBy(t => t.Key).Select(t => t.Key))
+                    {
+                        dailyTrendDate.AppendFormat("'{0}',", value.ToShortDateString());
+                    }
+                    string dTrendDate = dailyTrendDate.ToString().TrimEnd(',');
+
+                    string dailyTrend = string.Format("{{title:'WOSS Daily New CodeReview Number',legend:['New CodeRview Number'],xAxis:[{0}],yAxis:[{{name:'New CodeRview Number',type:'line',data:[{1}]}}]}}", dTrendDate, dTrendValue);
+
+                    webapi.PostMessage(dailyTrend, "chart-axis-singleaxis", "none", new string[] { "WOSS CodeFlow" });
+
+                    _isTrendStatusSend = true;
+                }
+            }
+
+            if (DateTime.Now.TimeOfDay < new TimeSpan(23, 00, 0))
+            {
+                _isTrendStatusSend = false;
+            }
+
             _recordMonitorStatus();
         }
     }

@@ -37,7 +37,7 @@ namespace MSGorilla.Controllers
                 ViewBag.TopicId = t.Id;
                 ViewBag.Topic = t.Name;
                 ViewBag.FeedId = t.Name;
-                ViewBag.IsLiked = _topicManager.IsFavouriteTopic(me.Userid, t.Id);
+                ViewBag.IsLiked = _topicManager.IsFavouriteTopic(me.Userid, t.Id) ? 1 : 0;
             }
 
             return View();

@@ -351,6 +351,7 @@
     <Content Include="Views\Shared\_UserProfilePartial.cshtml" />
     <Content Include="Views\Shared\_AlertBoxPartial.cshtml" />
     <Content Include="Views\Shared\_LoadFeedListPartial.cshtml" />
+    <Content Include="Views\Shared\_LoadUserCardListPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

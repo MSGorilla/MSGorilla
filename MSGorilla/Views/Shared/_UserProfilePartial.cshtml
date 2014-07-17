@@ -17,45 +17,45 @@
         <div class="btn-group btn-group-justified">
             @if (ViewBag.FeedCategory == "userline")
             {
-                <a class="btn btn-default" href="/Profile/Index?user=@ViewBag.UserId">POSTS &nbsp;<span id="user_posts" class="badge">0</span></a>
+                <a class="btn btn-default disabled">POSTS &nbsp;<span id="user_posts" class="badge">0</span></a>
             }
             else
             {
-                <a class="btn btn-default disabled">POSTS &nbsp;<span id="user_posts" class="badge">0</span></a>
+                <a class="btn btn-default" href="/Profile/Index?user=@ViewBag.UserId">POSTS &nbsp;<span id="user_posts" class="badge">0</span></a>
             }
             @if (ViewBag.FeedCategory == "ownerline")
             {
-                <a class="btn btn-default" href="/Profile/Owned?user=@ViewBag.UserId">OWNS &nbsp;<span id="user_owned" class="badge"></span></a>
+                <a class="btn btn-default disabled">OWNS &nbsp;<span id="user_owned" class="badge"></span></a>
             }
             else
             {
-                <a class="btn btn-default disabled">OWNS &nbsp;<span id="user_owned" class="badge"></span></a>
+                <a class="btn btn-default" href="/Profile/Owned?user=@ViewBag.UserId">OWNS &nbsp;<span id="user_owned" class="badge"></span></a>
             }
             @if (ViewBag.FeedCategory == "following")
             {
-                <a class="btn btn-default" href="/Profile/Following?user=@ViewBag.UserId">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
+                <a class="btn btn-default disabled">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
             }
             else
             {
-                <a class="btn btn-default disabled">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
+                <a class="btn btn-default" href="/Profile/Following?user=@ViewBag.UserId">FOLLOWING &nbsp;<span id="user_following" class="badge">0</span></a>
             }
             @if (ViewBag.FeedCategory == "followers")
             {
-                <a class="btn btn-default" href="/Profile/Followers?user=@ViewBag.UserId">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
+                <a class="btn btn-default disabled">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
             }
             else
             {
-                <a class="btn btn-default disabled">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
+                <a class="btn btn-default" href="/Profile/Followers?user=@ViewBag.UserId">FOLLOWERS &nbsp;<span id="user_followers" class="badge">0</span></a>
             }
             @if (ViewBag.FeedCategory == "favorites")
             {
-                <a class="btn btn-default" href="/Profile/Favorites?user=@ViewBag.UserId">FAVORITES &nbsp;<span id="user_favorites" class="badge"></span></a>
+                <a class="btn btn-default disabled">FAVORITES &nbsp;<span id="user_favorites" class="badge"></span></a>
             }
             else
             {
-                <a class="btn btn-default disabled">FAVORITES &nbsp;<span id="user_favorites" class="badge"></span></a>
+                <a class="btn btn-default" href="/Profile/Favorites?user=@ViewBag.UserId">FAVORITES &nbsp;<span id="user_favorites" class="badge"></span></a>
             }
-            <a class='btn btn-default' id='btn_user_follow_@ViewBag.UserId.Replace("@","-").Replace(".","_")'></a>
+            <a class='btn btn-default' id='btn_userprofile_follow_@ViewBag.UserId.Replace("@","-").Replace(".","_")'></a>
         </div>
     </div>
 </div>
