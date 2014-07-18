@@ -1448,7 +1448,7 @@ namespace MSGorilla.WebApi
         /// <param name="importance">importance of the message</param>
         /// <returns></returns>
         [HttpGet, HttpPost]
-        public DisplayMessage PostMessage(string message,
+        public DisplayMessage PostMessage(string message = "",
                                     string schemaID = "none",
                                     string eventID = "none",
                                     [FromUri]string[] owner = null,
