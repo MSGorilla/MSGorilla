@@ -157,6 +157,18 @@ function Time2Now(datestring) {
     }
 }
 
+function cutCount(count) {
+    if (isNullOrEmpty(count)) {
+        return 0;
+    }
+
+    if (count > 99) {
+        return "99+";
+    }
+
+    return count;
+}
+
 function cutHtml(code, length, atusers, topics) {
     if (isNullOrEmpty(code)) {
         return "";
