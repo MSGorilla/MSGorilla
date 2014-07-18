@@ -253,5 +253,12 @@ namespace MSGorilla.Library
             var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
             return base64EncodedBytes;
         }
+
+        public static string CaseInsenstiveReplace(string originalString, string oldValue, string newValue)
+        {
+            Regex regEx = new Regex(oldValue,
+               RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            return regEx.Replace(originalString, newValue);
+        }
     }
 }
