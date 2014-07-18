@@ -204,7 +204,7 @@ namespace MSGorilla.WebAPI.Client
             return _readResponseContent(response);
         }
 
-        public List<Attachment> UploadAttachment(string filePath)
+        public Attachment UploadAttachment(string filePath)
         {
             string url = _rootUri + Constant.UriUploadAttachment;
 
@@ -217,7 +217,7 @@ namespace MSGorilla.WebAPI.Client
             byte[] responseArray = myWebClient.UploadFile(url, filePath);
             string ret = System.Text.Encoding.ASCII.GetString(responseArray);
 
-            return JsonConvert.DeserializeObject<List<Attachment>>(ret);
+            return JsonConvert.DeserializeObject<List<Attachment>>(ret)[0];
         }
 
         public NotificationCount GetNotificationCount(string userid = "")
