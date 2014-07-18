@@ -23,6 +23,8 @@ namespace MSGorilla.WebApi
         NotifManager _notifManager = new NotifManager();
         TopicManager _topicManager = new TopicManager();
         RichMsgManager _richMsgManager = new RichMsgManager();
+        AccountManager _accManager = new AccountManager();
+        AttachmentManager _attManager = new AttachmentManager();
 
         /// <summary>
         /// Return the messages in the current user's userline in a list
@@ -1325,7 +1327,7 @@ namespace MSGorilla.WebApi
         public DisplayMessage GetDisplayMessage(string msgUser, string msgID)
         {
             whoami();
-            return _messageManager.GetDisplayMessage(msgUser, msgID);
+            return new DisplayMessage(_messageManager.GetMessage(msgUser, msgID), _accManager, _attManager);
         }
 
         /// <summary>
@@ -1368,11 +1370,9 @@ namespace MSGorilla.WebApi
             whoami();
             var replylist = _messageManager.GetAllReplies(msgID);
             var reply = new List<DisplayReply>();
-            AccountManager accManager = new AccountManager();
-            AttachmentManager attachmentManager = new AttachmentManager();
             foreach (var r in replylist)
             {
-                reply.Add(new DisplayReply(r, accManager, attachmentManager));
+                reply.Add(new DisplayReply(r, _accManager, _attManager));
             }
 
             return reply;

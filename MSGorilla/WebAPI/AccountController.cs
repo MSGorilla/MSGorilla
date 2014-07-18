@@ -15,6 +15,7 @@ using MSGorilla.Filters;
 using MSGorilla.Library.Models;
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.SqlModels;
+using MSGorilla.Library.Models.ViewModels;
 
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,24 +27,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MSGorilla.WebApi
 {
-    public class DisplayUserProfile : UserProfile
-    {
-        [DataMember]
-        public int IsFollowing { get; private set; }
-
-        public DisplayUserProfile(UserProfile user, int isFollowing)
-        {
-            Userid = user.Userid;
-            DisplayName = user.DisplayName;
-            PortraitUrl = user.PortraitUrl;
-            Description = user.Description;
-            FollowingsCount = user.FollowingsCount;
-            FollowersCount = user.FollowersCount;
-            MessageCount = user.MessageCount;
-            IsFollowing = isFollowing;
-        }
-    }
-
     public class AccountController : BaseController
     {
         private NotifManager _notifManager = new NotifManager();
