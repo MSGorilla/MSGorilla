@@ -112,6 +112,8 @@ namespace MSGorilla.Library
                 originUser.DisplayName = user.DisplayName;
                 originUser.Description = user.Description;
                 originUser.PortraitUrl = user.PortraitUrl;
+                originUser.MessageCount = user.MessageCount;
+
                 _gorillaCtx.SaveChanges();
 
                 return _gorillaCtx.Users.Find(user.Userid);
