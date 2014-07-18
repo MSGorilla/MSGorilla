@@ -136,6 +136,7 @@
     <Compile Include="Models\ViewModels\DisplayFavouriteTopic.cs" />
     <Compile Include="Models\ViewModels\MessageModels.cs" />
     <Compile Include="Models\ViewModels\ReplyModels.cs" />
+    <Compile Include="Models\ViewModels\DisplayUserProfile.cs" />
     <Compile Include="Models\ViewModels\SimpleUserProfile.cs" />
     <Compile Include="NotifManager.cs" />
     <Compile Include="ReplyManager.cs" />

@@ -157,6 +157,18 @@ function Time2Now(datestring) {
     }
 }
 
+function cutCount(count) {
+    if (isNullOrEmpty(count)) {
+        return 0;
+    }
+
+    if (count > 99) {
+        return "99+";
+    }
+
+    return count;
+}
+
 function cutHtml(code, length, atusers, topics) {
     if (isNullOrEmpty(code)) {
         return "";
@@ -180,8 +192,8 @@ function encodeHtml(code, atusers, topics) {
     code = txt2Html(code);
 
     // autolink http[s]
-    //var strRegex = "http[s]?://(([0-9a-z]+(\\-)?)*[0-9a-z]+(\\.))*[0-9a-z]+(:[0-9]{1,5})?(/([\\w\\-/\\+\\?%#=\\.:{}]|(&#38;))*)?";
-    var strRegex = "(https?://)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([/\\w \\.-]*)*/?";
+    var strRegex = "http[s]?://(([0-9a-z]+(\\-)?)*[0-9a-z]+(\\.))*[0-9a-z]+(:[0-9]{1,5})?(/([\\w\\-/\\+\\?%#=\\.:{}]|(&#38;))*)?";
+    //var strRegex = "(https?://)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([/\\w \\.-]*)*/?";
     var linkre = new RegExp(strRegex, "gi");
 
     code = code.replace(linkre, function (s) {
