@@ -466,7 +466,7 @@ namespace MSGorilla.Library
                                     int importance,
                                     DateTime timestamp)
         {
-            if (message == null)
+            if ("none".Equals(message))
             {
                 message = "";
             }
