@@ -1317,7 +1317,10 @@ function createFeed(data, hideOpenBtn) {
 
     // richmsg
     if (!isNullOrEmpty(richmsgid)) {
-        output += "    <div id='rich_message_" + id + "' class='newpost-richinput panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='showRichMsg(\"" + richmsgid + "\", \"" + id + "\", event);'></div>";
+        output += "    <div id='rich_message_" + id + "' class='newpost-richinput panel-collapse collapse out'>";
+        output += "      <hr/>";
+        output += "      <div id='rich_message_inner_" + id + "' class='clickable' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='showRichMsg(\"" + richmsgid + "\", \"" + id + "\", event);'></div>";
+        output += "    </div>";
     }
 
     // attachment
@@ -1412,13 +1415,14 @@ function showRichMsg(rmid, mid, evt) {
         return;
     }
 
+    var richmsginner = $("#rich_message_inner_" + mid);
     var showbtn = $("#btn_showrichmsg_" + mid);
     var show = richmsgdiv.hasClass("in");
 
     if (show == false) {
-        if (isNullOrEmpty(richmsgdiv.html())) {
+        if (isNullOrEmpty(richmsginner.html())) {
             // add loading pic
-            richmsgdiv.append("<div class='txtaln-c'><span class='spinner-loading'></span> Loading...</div>");
+            richmsginner.append("<div class='txtaln-c'><span class='spinner-loading'></span> Loading...</div>");
 
             // load rich once
             var apiurl = "/api/message/getrichmessage";
@@ -1433,16 +1437,16 @@ function showRichMsg(rmid, mid, evt) {
                     }
 
                     // clear 
-                    richmsgdiv.empty();
+                    richmsginner.empty();
                     // create rich message
-                    richmsgdiv.append(data);
+                    richmsginner.append(data);
 
                     // show rich
                     showbtn.text("Less");
                 },
                 null,
                 null,
-                "rich_message_" + mid
+                "rich_message_inner_" + mid
             );
         }
         else {
@@ -1451,25 +1455,27 @@ function showRichMsg(rmid, mid, evt) {
         }
     }
     else {
-        if(!isNullOrEmpty(evt)){
+        if (!isNullOrEmpty(evt)) {
             var e = window.event || evt;
-            var srcElement = e.srcElement || e.target;
-            if (!isNullOrEmpty(srcElement.href)) {
-                if (window.event) {
-                    e.cancelBubble = true;
+            var ele = e.srcElement || e.target;
+
+            while (ele) {
+                if (!isNullOrEmpty(ele.href)) {
+                    if (window.event) {
+                        e.cancelBubble = true;
+                    }
+                    else {
+                        //e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    return;
                 }
-                else {
-                    //e.preventDefault();
-                    e.stopPropagation();
-                }
-                return;
+                ele = ele.parentElement;
             }
         }
-
         // clear rich
         showbtn.text("More");
         scrollTo("feed_" + mid);
-        
     }
 }
 
@@ -1649,7 +1655,10 @@ function createReply(data) {
 
     // richmsg
     if (!isNullOrEmpty(richmsgid)) {
-        output += "  <div id='rich_message_" + id + "' class='reply-richinput panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='showRichMsg(\"" + richmsgid + "\", \"" + id + "\", event);'></div>";
+        output += "  <div id='rich_message_" + id + "' class='reply-richinput panel-collapse collapse out'>";
+        output += "    <hr/>";
+        output += "    <div id='rich_message_inner_" + id + "' class='clickable' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='showRichMsg(\"" + richmsgid + "\", \"" + id + "\", event);'></div>";
+        output += "  </div>";
     }
 
     // attachment
