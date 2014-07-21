@@ -1451,21 +1451,24 @@ function showRichMsg(rmid, mid, evt) {
         }
     }
     else {
-        if(!isNullOrEmpty(evt)){
+        if (!isNullOrEmpty(evt)) {
             var e = window.event || evt;
-            var srcElement = e.srcElement || e.target;
-            if (!isNullOrEmpty(srcElement.href)) {
-                if (window.event) {
-                    e.cancelBubble = true;
+            var ele = e.srcElement || e.target;
+
+            while (ele) {
+                if (!isNullOrEmpty(ele.href)) {
+                    if (window.event) {
+                        e.cancelBubble = true;
+                    }
+                    else {
+                        //e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    return;
                 }
-                else {
-                    //e.preventDefault();
-                    e.stopPropagation();
-                }
-                return;
+                ele = ele.parentElement;
             }
         }
-
         // clear rich
         showbtn.text("More");
         scrollTo("feed_" + mid);
