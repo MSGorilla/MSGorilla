@@ -466,6 +466,10 @@ namespace MSGorilla.Library
                                     int importance,
                                     DateTime timestamp)
         {
+            if ("none".Equals(message))
+            {
+                message = "";
+            }
             if (message.Length > 2048)
             {
                 throw new MessageTooLongException();
