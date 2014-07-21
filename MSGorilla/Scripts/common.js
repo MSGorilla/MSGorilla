@@ -572,6 +572,8 @@ function PostMessage() {
             msgbox.val("");
             // insert the new posted message
             $("#feedlist").prepend(createFeed(data));
+            // render feed
+            initUserPopover("user_pic_" + data.ID, data.User.Userid);
             // enhanceMessage(data.SchemaID, data.ID, data.MessageContent);  // user can not post schema data from webpage.
         },
         null,
@@ -611,6 +613,8 @@ function PostReply(user, mid) {
         function (data) {
             replybox.val("");
             $("#replylist_" + mid).prepend(createReply(data));
+            // render feed
+            initUserPopover("user_pic_" + data.ID, data.User.Userid);
         },
         null,
         function () {
@@ -904,10 +908,10 @@ function createUserCard(data) {
            + "        <img class='img-rounded' id='user_pic_" + encodeUserid(userid) + "' src='" + picurl + "' width='100' height='100' />"
            + "      </div>"
            + "      <div>"
-           + "        <a class='' id='user_name_" + encodeUserid(userid) + "' href='/profile/index?user=" + encodeTxt(userid) + "'>" + username + "</a>"
+           + "        <a class='fullname' id='user_name_" + encodeUserid(userid) + "' href='/profile/index?user=" + encodeTxt(userid) + "'>" + username + "</a>"
            + "      </div>"
            + "      <div>"
-           + "        <span id='user_id_" + encodeUserid(userid) + "'>@" + userid + "</span>"
+           + "        <span class='username' id='user_id_" + encodeUserid(userid) + "'>@" + userid + "</span>"
            + "      </div>"
            + "    </div>"
            + "    <div class='user-card-postinfo'>"
@@ -916,6 +920,87 @@ function createUserCard(data) {
            + "      </div>"
            + "    </div>"
            + "  </li>";
+
+    return output;
+}
+
+function initUserPopover(eid, user) {
+    var options = {
+        toggle: 'popover',
+        container: 'body',
+        placement: 'right',
+        html: true,
+        trigger: 'focus',
+        content: function (e) {
+            var output = "";
+            var apiurl = "/api/account/user";
+            var apidata = "userid=" + encodeTxt(user);
+
+            AjaxGetSync(
+                apiurl,
+                apidata,
+                function (data) {
+                    output = createUserPopover(data);
+                }
+            );
+
+            return output;
+        }
+    };
+
+    $("#" + eid).popover(options);
+}
+
+function createUserPopover(data) {
+    var output = "";
+    var userid = data.Userid;
+    var username = data.DisplayName;
+    var picurl = data.PortraitUrl;
+    var desp = data.Description;
+    var postscount = data.MessageCount;
+    var followingcount = data.FollowingsCount;
+    var followerscount = data.FollowersCount;
+    var isFollowing = data.IsFollowing;
+    if (isNullOrEmpty(picurl)) {
+        picurl = "/Content/Images/default_avatar.jpg";
+    }
+
+    output = "  <div>"
+           + "    <div class='user-popover-info'>"
+           + "      <div class='user-popover-pic'>"
+           + "        <img class='img-rounded' src='" + picurl + "' width='100' height='100' />"
+           + "      </div>"
+           + "      <div class='user-popover-content'>"
+           + "        <div>"
+           + "          <a class='fullname' href='/profile/index?user=" + encodeTxt(userid) + "'>" + username + "</a>"
+           + "        </div>"
+           + "        <div>"
+           + "          <span class='username'>@" + userid + "</span>"
+           + "        </div>"
+           + "        <div>"
+           + "          <span class='word-break'>" + desp + "</span>"
+           + "        </div>"
+           + "      </div>"
+           + "    </div>"
+           + "    <div class='user-popover-postinfo'>"
+           + "      <div class='btn-group btn-group-justified'>"
+           + "        <a class='btn btn-link btn-xs' href='/Profile?user=" + encodeTxt(userid) + "'>POSTS <br /><span class='badge'>" + postscount + "</span></a>"
+           + "        <a class='btn btn-link btn-xs' href='/Profile/Following?user=" + encodeTxt(userid) + "'>FLWING <br /><span class='badge'>" + followingcount + "</span></a>"
+           + "        <a class='btn btn-link btn-xs' href='/Profile/Followers?user=" + encodeTxt(userid) + "'>FLWERS <br /><span class='badge'>" + followerscount + "</span></a>"
+           + "      </div>"
+           + "    </div>"
+           + "    <div class='user-popover-footer'>";
+
+    if (isFollowing == 0) {
+        output += "<a class='btn btn-primary follow-btn' id='btn_userpopover_follow_" + encodeUserid(userid) + "' onclick='follow(\"btn_userpopover_follow_" + encodeUserid(userid) + "\", \"" + userid + "\");'>Follow</a>";
+    } else if (isFollowing == 1) {
+        output += "<a class='btn btn-success follow-btn' id='btn_userpopover_follow_" + encodeUserid(userid) + "' onclick='unfollow(\"btn_userpopover_follow_" + encodeUserid(userid) + "\", \"" + userid + "\");' onmouseover='unfollowBtnMouseOver(\"btn_userpopover_follow_" + encodeUserid(userid) + "\");' onmouseout='unfollowBtnMouseOut(\"btn_userpopover_follow_" + encodeUserid(userid) + "\");' >Following</a>";
+    } else {  // -1: myself
+        output += "<a class='btn btn-info follow-btn' id='btn_userpopover_follow_" + encodeUserid(userid) + "' href='/account/manage'>Edit profile</a>";
+    }
+
+    output += "    </div>"
+           + "  </div>";
 
     return output;
 }
@@ -951,6 +1036,7 @@ function LoadMessage(user, mid) {
                 listdiv.append(createFeed(data, true));
 
                 // render feed
+                initUserPopover("user_pic_" + data.ID, data.User.Userid);
                 enhanceMessage(data.SchemaID, data.ID, data.MessageContent);
                 if ($("#rich_message_" + data.ID).length > 0) {
                     $("#rich_message_" + data.ID).collapse('show');
@@ -1112,12 +1198,12 @@ function LoadFeeds(category, id, filter) {
                 $.each(data, function (index, item) {
                     listdiv.append(createFeed(item));
 
+                    // render feed
                     if (count-- > 0) {
                         $("#feed_" + item.ID).addClass('new-notification');
                     }
-
+                    initUserPopover("user_pic_" + item.ID, item.User.Userid);
                     enhanceMessage(item.SchemaID, item.ID, item.MessageContent);
-
                     // if msg is empty, show richmsg instead
                     if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
                         $("#rich_message_" + item.ID).collapse('show');
@@ -1196,7 +1282,9 @@ function createFeed(data, hideOpenBtn) {
 
     // user pic
     output += "      <div class='feed-pic'>";
-    output += "        <img class='img-rounded' id='user_pic_" + id + "' src='" + picurl + "' width='100' height='100' />";
+    output += "        <a id='user_pic_" + id + "' href='javascript:void(0);'>";
+    output += "          <img class='img-rounded' src='" + picurl + "' width='100' height='100'/>";
+    output += "        </a>";
     output += "      </div>";
 
     // importance
@@ -1401,6 +1489,7 @@ function showMessageModel(mid, user) {
                 message_div.append(createFeed(data));
 
                 // render feed
+                initUserPopover("user_pic_" + data.ID, data.User.Userid);
                 enhanceMessage(data.SchemaID, data.ID, data.MessageContent);
                 if ($("#rich_message_" + data.ID).length > 0) {
                     $("#rich_message_" + data.ID).collapse('show');
@@ -1464,6 +1553,9 @@ function LoadReplies(mid) {
             // create reply list
             $.each(data, function (index, item) {
                 replydiv.append(createReply(item));
+
+                // render feed
+                initUserPopover("user_pic_" + item.ID, item.User.Userid);
                 // if msg is empty, show richmsg instead
                 if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
                     $("#rich_message_" + item.ID).collapse('show');
@@ -1506,7 +1598,9 @@ function createReply(data) {
 
     // user pic
     output += "    <div class='reply-pic'>";
-    output += "      <img class='img-rounded' id='user_pic_" + id + "' src='" + picurl + "' width='50' height='50' />";
+    output += "      <a id='user_pic_" + id + "' href='javascript:void(0);'>";
+    output += "        <img class='img-rounded' src='" + picurl + "' width='50' height='50' />";
+    output += "      </a>";
     output += "    </div>";
 
     // importance

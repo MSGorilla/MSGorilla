@@ -422,6 +422,29 @@ input[type="checkbox"].input-validation-error {
 .user-card-postinfo {
 }
 
+.user-popover-info {
+    
+}
+
+.user-popover-pic {
+    display:inline-block;
+    padding:5px;
+}
+
+.user-popover-content {
+    display:inline-block;
+    padding:5px;
+}
+
+.user-popover-postinfo {
+    margin-top:5px;
+}
+
+.user-popover-footer {
+    margin-top:10px;
+    text-align:right;
+}
+
 .shortcut-container {
 }
 
@@ -556,12 +579,12 @@ input[type="checkbox"].input-validation-error {
 .follow-btn {
 }
 
-.feed-pic > .follow-btn {
-    font-size: 11px;
+.user-popover-footer > .follow-btn {
+    font-size: 14px;
     padding: 1px 5px;
-    line-height: 1.5;
-    min-width: 80px;
-    margin-top: 5px;
+    line-height: 2;
+    margin-left: 10px;
+    min-width: 100px;
     display: block;
     vertical-align: baseline;
     white-space: nowrap;
@@ -580,8 +603,6 @@ input[type="checkbox"].input-validation-error {
     white-space: nowrap;
     text-align: center;
 }
-
-
 
 .hidden {
     display: none;
