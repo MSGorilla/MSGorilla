@@ -9,10 +9,10 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 {
     public class HomeLineEntity : BaseMessageEntity
     {
-        public HomeLineEntity()
-        {
-            ;
-        }
+        //public HomeLineEntity()
+        //{
+        //    ;
+        //}
 
         public HomeLineEntity(string user,
                                     Message msg) : base(msg)

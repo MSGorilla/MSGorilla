@@ -10,10 +10,10 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 {
     class AtLineEntity : BaseMessageEntity
     {
-        public AtLineEntity()
-        {
-            ;
-        }
+        //public AtLineEntity()
+        //{
+        //    ;
+        //}
 
         public AtLineEntity(string atUserid, Message msg) : base(msg)
         {

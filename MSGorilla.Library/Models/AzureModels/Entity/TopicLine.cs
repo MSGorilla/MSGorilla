@@ -10,10 +10,10 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 {
     class TopicLine : BaseMessageEntity
     {
-        public TopicLine()
-        {
-            ;
-        }
+        //public TopicLine()
+        //{
+        //    ;
+        //}
 
         public TopicLine( Message msg, string topicID) : base(msg)
         {

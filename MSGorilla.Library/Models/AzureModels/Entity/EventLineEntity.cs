@@ -9,14 +9,14 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 {
     public class EventLineEntity : BaseMessageEntity
     {        
-        public EventLineEntity()
-        {
-            ;
-        }
+        //public EventLineEntity()
+        //{
+        //    ;
+        //}
 
         public EventLineEntity(Message msg) : base(msg)
         {
-            this.PartitionKey = string.Format("{0}_{1}", msg.EventID, 
+            this.PartitionKey = string.Format("{0}_{1}", this.EventID, 
                 Utils.ToAzureStorageDayBasedString(msg.PostTime.ToUniversalTime()));
             this.RowKey = msg.ID;
         }

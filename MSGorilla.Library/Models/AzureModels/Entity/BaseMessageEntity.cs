@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,7 +32,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
         {
             this.User = message.User;
             this.ID = message.ID;
-            this.EventID = message.EventID;
+            this.EventID = HttpUtility.UrlEncode(message.EventID);
             this.SchemaID = message.SchemaID;
             this.Owner = Utils.StringArray2String(message.Owner);
             this.AtUser = Utils.StringArray2String(message.AtUser);
@@ -64,7 +65,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
                     this.User,
                     this.MessageContent,
                     this.PostTime,
-                    this.EventID,
+                    HttpUtility.UrlDecode(this.EventID),
                     this.SchemaID,
                     Utils.String2StringArray(this.Owner),
                     Utils.String2StringArray(this.AtUser),

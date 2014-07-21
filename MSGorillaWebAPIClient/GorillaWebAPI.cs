@@ -109,7 +109,16 @@ namespace MSGorilla.WebAPI.Client
                     attachmentStr = "&attachmentID=" + string.Join("&attachmentID=", attachmentID);
                 }
 
-                string msg = string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}{6}{7}&importance={8}", Uri.EscapeDataString(message), schemaID, eventID, topicNameStr, ownerStr, atUserStr, richMessageStr, attachmentStr, importance);
+                string msg = string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}{6}{7}&importance={8}", 
+                                            Uri.EscapeDataString(message), 
+                                            Uri.EscapeDataString(schemaID), 
+                                            Uri.EscapeDataString(eventID), 
+                                            topicNameStr, 
+                                            ownerStr, 
+                                            atUserStr, 
+                                            richMessageStr, 
+                                            attachmentStr, 
+                                            importance);
                 writer.Write(msg);
             }
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;

@@ -9,10 +9,10 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 {
     public class PublicSquareLineEntity : BaseMessageEntity
     {
-        public PublicSquareLineEntity()
-        {
-            ;
-        }
+        //public PublicSquareLineEntity()
+        //{
+        //    ;
+        //}
 
         public PublicSquareLineEntity(Message msg) : base(msg)
         {

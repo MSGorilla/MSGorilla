@@ -9,10 +9,10 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 {
     class OwnerLineEntity : BaseMessageEntity
     {
-        public OwnerLineEntity()
-        {
-            ;
-        }
+        //public OwnerLineEntity()
+        //{
+        //    ;
+        //}
 
         public OwnerLineEntity(string ownerid, Message msg) : base(msg)
         {
