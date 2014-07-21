@@ -446,16 +446,14 @@ function enhanceMessage(schema, mid, msg) {
     try {
         switch (schema) {
             case "chart-free":
-                msgdiv.height(500);
-                var chart = echarts.init(msgdiv[0]);
                 var json = eval("(" + msg + ")");
 
+                msgdiv.height(400);
+                var chart = echarts.init(msgdiv[0]);
                 chart.setOption(json);
                 break;
 
             case "chart-axis-singleaxis":
-                msgdiv.height(500);
-                var chart = echarts.init(msgdiv[0]);
                 var json = eval("(" + msg + ")");
 
                 var option = chart_axis_template;
@@ -465,12 +463,12 @@ function enhanceMessage(schema, mid, msg) {
                 option.xAxis[0].data = json.xAxis;
                 option.series = json.yAxis;
 
+                msgdiv.height(400);
+                var chart = echarts.init(msgdiv[0]);
                 chart.setOption(option);
                 break;
 
             case "chart-axis-doubleaxes":
-                msgdiv.height(500);
-                var chart = echarts.init(msgdiv[0]);
                 var json = eval("(" + msg + ")");
 
                 var option = chart_axis_template;
@@ -485,12 +483,12 @@ function enhanceMessage(schema, mid, msg) {
                     option.series.push(y2);
                 }
 
+                msgdiv.height(400);
+                var chart = echarts.init(msgdiv[0]);
                 chart.setOption(option);
                 break;
 
             case "chart-scatter":
-                msgdiv.height(500);
-                var chart = echarts.init(msgdiv[0]);
                 var json = eval("(" + msg + ")");
 
                 var option = chart_scatter_template;
@@ -499,12 +497,12 @@ function enhanceMessage(schema, mid, msg) {
                 option.legend.data = json.legend;
                 option.series = json.data;
 
+                msgdiv.height(400);
+                var chart = echarts.init(msgdiv[0]);
                 chart.setOption(option);
                 break;
 
             case "chart-pie":
-                msgdiv.height(500);
-                var chart = echarts.init(msgdiv[0]);
                 var json = eval("(" + msg + ")");
 
                 var option = chart_pie_template;
@@ -513,6 +511,8 @@ function enhanceMessage(schema, mid, msg) {
                 option.legend.data = json.legend;
                 option.series = json.data;
 
+                msgdiv.height(400);
+                var chart = echarts.init(msgdiv[0]);
                 chart.setOption(option);
                 break;
 
@@ -1317,7 +1317,7 @@ function createFeed(data, hideOpenBtn) {
 
     // richmsg
     if (!isNullOrEmpty(richmsgid)) {
-        output += "    <div id='rich_message_" + id + "' class='newpost-richinput panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='showRichMsg(\"" + richmsgid + "\", \"" + id + "\");'></div>";
+        output += "    <div id='rich_message_" + id + "' class='newpost-richinput panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='showRichMsg(\"" + richmsgid + "\", \"" + id + "\", event);'></div>";
     }
 
     // attachment
@@ -1406,7 +1406,7 @@ function showAttach(aid, type, mid) {
     }
 }
 
-function showRichMsg(rmid, mid) {
+function showRichMsg(rmid, mid, evt) {
     var richmsgdiv = $("#rich_message_" + mid);
     if (richmsgdiv.length == 0) {
         return;
@@ -1451,9 +1451,25 @@ function showRichMsg(rmid, mid) {
         }
     }
     else {
+        if(!isNullOrEmpty(evt)){
+            var e = window.event || evt;
+            var srcElement = e.srcElement || e.target;
+            if (!isNullOrEmpty(srcElement.href)) {
+                if (window.event) {
+                    e.cancelBubble = true;
+                }
+                else {
+                    //e.preventDefault();
+                    e.stopPropagation();
+                }
+                return;
+            }
+        }
+
         // clear rich
         showbtn.text("More");
         scrollTo("feed_" + mid);
+        
     }
 }
 
@@ -1633,7 +1649,7 @@ function createReply(data) {
 
     // richmsg
     if (!isNullOrEmpty(richmsgid)) {
-        output += "  <div id='rich_message_" + id + "' class='reply-richinput panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='showRichMsg(\"" + richmsgid + "\", \"" + id + "\");'></div>";
+        output += "  <div id='rich_message_" + id + "' class='reply-richinput panel-collapse collapse out clickable' data-toggle='collapse' data-parent='#feed_" + id + "' href='#rich_message_" + id + "' onclick='showRichMsg(\"" + richmsgid + "\", \"" + id + "\", event);'></div>";
     }
 
     // attachment
