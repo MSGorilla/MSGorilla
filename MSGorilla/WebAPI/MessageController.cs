@@ -1237,6 +1237,28 @@ namespace MSGorilla.WebApi
             return new DisplayMessagePagination(_messageManager.TopicLine(t.Id.ToString(), start, end, count, tok));
         }
 
+        /// <summary>
+        /// Return a raw message
+        /// 
+        /// Example output:
+        /// {
+        ///     "User": "user2",
+        ///     "ID": "251996365812114_b5627431-2d8e-4a11-b2a2-a4a05affa04a",
+        ///     "EventID": "AAQkAGU0N2MzZjk5LTZiZDQtNDgzMy1hODE3LThiMjUxYWU1NjIzMQAQAKciM9jy2slMoqdIuthUExI=",
+        ///     "SchemaID": "none",
+        ///     "Owner": null,
+        ///     "AtUser": null,
+        ///     "TopicName": null,
+        ///     "MessageContent": "",
+        ///     "PostTime": "2014-07-21T09:29:47.8851473Z",
+        ///     "RichMessageID": "user2_2916624;1fee9aca-766c-4925-bfd3-a2e195d48f98",
+        ///     "AttachmentID": null,
+        ///     "Importance": 2
+        /// }
+        /// </summary>
+        /// <param name="userid">user id of whom posted the message</param>
+        /// <param name="messageID">message id</param>
+        /// <returns></returns>
         [HttpGet]
         public Message GetRawMessage(string userid, string messageID)
         {
