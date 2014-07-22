@@ -67,9 +67,9 @@ namespace MSGorilla.EmailMonitor
                 return;
             }
 
-            //ResponseMessage responseMsg = lastMail.CreateReply(true);
-            ResponseMessage responseMsg = lastMail.CreateReply(false);
-            responseMsg.ToRecipients.Add("t-yig@microsoft.com");
+            ResponseMessage responseMsg = lastMail.CreateReply(true);
+            //ResponseMessage responseMsg = lastMail.CreateReply(false);
+            //responseMsg.ToRecipients.Add("t-yig@microsoft.com");
 
             responseMsg.BodyPrefix = string.Format(
                 "This reply was sent by <a href=\"https://msgorilla.cloudapp.net/profile/index?user={0}\">{0}</a>"
