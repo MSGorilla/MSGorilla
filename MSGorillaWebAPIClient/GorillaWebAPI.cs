@@ -177,6 +177,22 @@ namespace MSGorilla.WebAPI.Client
             return JsonConvert.DeserializeObject<MessageDetail>(_readResponseContent(response));
         }
 
+        public Message GetRawMessage(string userid, string messageID)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriGetRawMessage, userid, messageID));
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            return JsonConvert.DeserializeObject<Message>(_readResponseContent(response));
+        }
+
+        public DisplayReplyPagination GetReply(int count = 25, string token = null)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriGetMyReply, count, token));
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            return JsonConvert.DeserializeObject<DisplayReplyPagination>(_readResponseContent(response));
+        }
+
         public string PostReply(string[] toUser, string message, string originMessageUserId, string originMessageID, string richMessage = null, string[] attachmentID = null)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + Constant.UriPostReply);

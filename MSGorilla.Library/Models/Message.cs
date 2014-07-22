@@ -29,6 +29,7 @@ namespace MSGorilla.Library.Models
         public string[] AttachmentID { get; set; }
         public int Importance { get; set; }
 
+        public Message() { }
         public Message(string userid,
                         string message,
                         DateTime timestamp,

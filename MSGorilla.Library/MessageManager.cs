@@ -407,6 +407,20 @@ namespace MSGorilla.Library
             return ret;
         }
 
+        public Message GetRawMessage(string userid, string messageID)
+        {
+            string pk = Message.ToMessagePK(userid, messageID);
+            TableOperation retrieveOperation = TableOperation.Retrieve<BaseMessageEntity>(pk, messageID);
+
+            TableResult retrievedResult = _userline.Execute(retrieveOperation);
+            if (retrievedResult.Result != null)
+            {
+                BaseMessageEntity entity = (BaseMessageEntity)retrievedResult.Result;
+                return entity.ToMessage();
+            }
+            return null;
+        }
+
         public MessageDetail GetMessageDetail(string userid, string messageID)
         {
             string pk = Message.ToMessagePK(userid, messageID);

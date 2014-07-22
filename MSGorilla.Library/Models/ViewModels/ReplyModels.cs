@@ -17,6 +17,7 @@ namespace MSGorilla.Library.Models.ViewModels
         public string continuationToken { get; set; }
         public List<DisplayReply> message { get; set; }
 
+        public DisplayReplyPagination() { }
         public DisplayReplyPagination(ReplyPagination rpl)
         {
             continuationToken = rpl.continuationToken;
@@ -43,6 +44,7 @@ namespace MSGorilla.Library.Models.ViewModels
         public string MessageUser { get; set; }
         public string MessageID { get; set; }
 
+        public DisplayReply() { }
         public DisplayReply(Reply rpl, AccountManager accManager, AttachmentManager attManager)
             : base(rpl, accManager, attManager)
         {

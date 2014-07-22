@@ -1237,6 +1237,13 @@ namespace MSGorilla.WebApi
             return new DisplayMessagePagination(_messageManager.TopicLine(t.Id.ToString(), start, end, count, tok));
         }
 
+        [HttpGet]
+        public Message GetRawMessage(string userid, string messageID)
+        {
+            whoami();
+            return _messageManager.GetRawMessage(userid, messageID);
+        }
+
         /// <summary>
         /// Deprecated. Return the detail of a Message
         /// 

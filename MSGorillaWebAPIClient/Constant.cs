@@ -12,10 +12,12 @@ namespace MSGorilla.WebAPI.Client
         public static string UriPostMessage = "/Message/PostMessage";
         public static string UriPostReply = "/Reply/PostReply";
         public static string UriGetMessage = "/Message/GetMessage?userid={0}&messageId={1}";
+        public static string UriGetRawMessage = "/Message/GetRawMessage?userid={0}&messageId={1}";
         public static string UriHomeLine = "/Message/HomeLine?userid={0}&count={1}&token={2}";
         public static string UriEventLine = "/Message/EventLine?eventId={0}";
         public static string UriUploadAttachment = "/attachment/upload";
         public static string UriNotificationCount = "/Account/GetNotificationCount?userid={0}";
+        public static string UriGetMyReply = "/Reply/GetMyReply?count={0}&token={1}";
     }
 
     public class MessageModel
