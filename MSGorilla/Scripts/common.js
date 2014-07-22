@@ -1381,6 +1381,8 @@ function createFeed(data, hideOpenBtn) {
         // replies
         output += "        <div class='replies-feeds'>";
         output += "          <ul id='replylist_" + id + "' class='list-group'></ul>";
+        output += "          <ul id='replylist_older_" + id + "' class='hidden'></ul>";
+        output += "          <div class='txtaln-c'><a id='show_more_replies_" + id + "' class='btn btn-link btn-xs' style='display:none' onclick='showMoreReplies(\"" + id + "\");'></a></div>";
         output += "        </div>";
 
         output += "      </div>";
@@ -1558,10 +1560,15 @@ function LoadReplies(mid) {
     if (replydiv.length == 0) {
         return;
     }
+    var replyolderdiv = $("#replylist_older_" + mid);
+    var showmorebtn = $("#show_more_replies_" + mid);
 
     replydiv.empty();
+    replyolderdiv.empty();
     replydiv.append("<li class='center-block txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
 
+    var newcount = 2;
+    var totlecount = 0;
     var apiurl = "/api/message/getmessagereply";
     var apidata = "msgID=" + encodeTxt(mid);
 
@@ -1574,21 +1581,49 @@ function LoadReplies(mid) {
 
             // create reply list
             $.each(data, function (index, item) {
-                replydiv.append(createReply(item));
+                if (index < newcount) {
+                    replydiv.append(createReply(item));
+                }
+                else {
+                    replyolderdiv.append(createReply(item));
+                }
+                totlecount++;
 
                 // render feed
-                initUserPopover("user_pic_" + item.ID, item.User.Userid);
+                initUserPopover("user_pic_" +item.ID, item.User.Userid);
                 // if msg is empty, show richmsg instead
-                if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
-                    $("#rich_message_" + item.ID).collapse('show');
+                if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" +item.ID).length > 0) {
+                    $("#rich_message_" +item.ID).collapse('show');
                     showRichMsg(item.RichMessageID, item.ID);
                 }
             })
+
+            if (totlecount > newcount) {
+                var morecount = totlecount - newcount;
+                if (morecount > 1)
+                    showmorebtn.text("Show " + morecount + " older replies.");
+                else
+                    showmorebtn.text("Show " + morecount + " older reply.");
+                showmorebtn.show();
+            }
         },
         function (XMLHttpRequest, textStatus, errorThrown) {
             replydiv.empty();
         }
     );
+}
+
+function showMoreReplies(mid) {
+    var replydiv = $("#replylist_" + mid);
+    if (replydiv.length == 0) {
+        return;
+    }
+    var replyolderdiv = $("#replylist_older_" + mid);
+    var showmorebtn = $("#show_more_replies_" + mid);
+
+    // move replies from older div to reply div
+    replydiv.append(replyolderdiv.children());
+    showmorebtn.hide();
 }
 
 function createReply(data) {
