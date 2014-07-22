@@ -25,7 +25,7 @@ namespace MSGorilla.EmailMonitor
             _service = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
             _service.Credentials = new WebCredentials(address, password);
             _service.TraceEnabled = false;
-            //service.TraceFlags = TraceFlags.None;
+            _service.TraceFlags = TraceFlags.All;
 
             _service.AutodiscoverUrl(address, RedirectionUrlValidationCallback);
         }
@@ -137,6 +137,7 @@ namespace MSGorilla.EmailMonitor
             view.OrderBy.Add(ItemSchema.DateTimeReceived, SortDirection.Ascending);
 
             FindItemsResults<Item> findResults = _service.FindItems(WellKnownFolderName.Inbox, sf, view);
+            Logger.Debug("Server return " + findResults.TotalCount + " records.");
 
             List<EmailMessage> result = new List<EmailMessage>();
             foreach(Item item in findResults)
@@ -144,7 +145,15 @@ namespace MSGorilla.EmailMonitor
                 if(item is EmailMessage)
                 {
                     EmailMessage emailMessage = EmailMessage.Bind(_service, item.Id);
-                    result.Add(emailMessage);
+                    if (emailMessage.DateTimeReceived > start && emailMessage.DateTimeReceived <= end)
+                    {
+                        result.Add(emailMessage);
+                    }
+                    else
+                    {
+                        Logger.Debug(string.Format(@"Exchange server filter error. Find mail subject:{0} received {1:s} is not filted by DatetimeReceived from {2:s} to {3:s}",
+                        emailMessage.Subject, emailMessage.DateTimeReceived, start, end));
+                    }                    
                 }
             }
 

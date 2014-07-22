@@ -49,7 +49,9 @@ namespace MSGorilla.EmailMonitor
                     }
                     else
                     {
-                        start = history.LastUpdateTimestamp;
+                        //timestamp in sql is Universal time.However somehow sql server lose the timezone
+                        //User the following to create a correct Utc Datetime
+                        start = history.LastUpdateTimestamp.ToLocalTime().ToUniversalTime();
                     }
 
 

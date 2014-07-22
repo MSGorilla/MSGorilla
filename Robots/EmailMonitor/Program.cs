@@ -32,10 +32,7 @@ namespace HelloWorld
                 {
                     int count = monitor.ScanAndReport();
 
-                    if (count == 0)
-                    {
-                        Thread.Sleep(60000);
-                    }
+                    Thread.Sleep(60000);
                 }
                 catch (Exception e)
                 {

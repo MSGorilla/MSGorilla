@@ -143,13 +143,15 @@ namespace MSGorilla.EmailMonitor
                                         <b>From:</b> {0}<br>
                                         <b>Sent:</b> {1:f}<br>
                                         <b>To:</b> {2}<br>
-                                        <b>Subject:</b> {3}<o:p></o:p>
+                                        <b>CC:</b> {3}<br>
+                                        <b>Subject:</b> {4}<o:p></o:p>
                                     </p>
                                 </div>
                               </div>";
             string from = email.From.Name;
             string to = EmailAddrCollection2Str(email.ToRecipients);
-            return string.Format(vector, from, email.DateTimeSent, to, email.Subject);
+            string cc = EmailAddrCollection2Str(email.CcRecipients);
+            return string.Format(vector, from, email.DateTimeSent, to, cc, email.Subject);
         }
 
         private static string GetCompleteMailBodyHtml(EmailMessage email)
