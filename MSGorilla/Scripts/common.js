@@ -1282,9 +1282,9 @@ function createFeed(data, hideOpenBtn) {
 
     // user pic
     output += "      <div class='feed-pic'>";
-    output += "        <a id='user_pic_" + id + "' href='javascript:void(0);'>";
+    output += "        <button class='btn btn-img' type='button' id='user_pic_" + id + "' href='javascript:void(0);'>";
     output += "          <img class='img-rounded' src='" + picurl + "' width='100' height='100'/>";
-    output += "        </a>";
+    output += "        </button>";
     output += "      </div>";
 
     // importance
@@ -1655,9 +1655,9 @@ function createReply(data) {
 
     // user pic
     output += "    <div class='reply-pic'>";
-    output += "      <a id='user_pic_" + id + "' href='javascript:void(0);'>";
+    output += "      <button class='btn btn-img' type='button' id='user_pic_" + id + "' href='javascript:void(0);'>";
     output += "        <img class='img-rounded' src='" + picurl + "' width='50' height='50' />";
-    output += "      </a>";
+    output += "      </button>";
     output += "    </div>";
 
     // importance
