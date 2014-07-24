@@ -69,6 +69,16 @@ namespace MSGorilla.Library
             //return timestamp.ToUniversalTime().ToString("yyyyMMdd");
         }
 
+        public static string ToAzureStorageMonthBasedString(DateTime timestamp, bool toUtc = true)
+        {
+            if (toUtc)
+            {
+                timestamp = timestamp.ToUniversalTime();
+            }
+            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalDays / 30).ToString();
+            //return timestamp.ToUniversalTime().ToString("yyyyMMdd");
+        }
+
         public static string NextKeyString(string current)
         {
             if (string.IsNullOrEmpty(current))
@@ -167,7 +177,7 @@ namespace MSGorilla.Library
                 return AtUser;
             }
 
-            Regex r = new Regex(@"(\s|^)@([0-9a-z-]+)(?=\s|$)", RegexOptions.IgnoreCase);
+            Regex r = new Regex(@"(\s|^)@([0-9a-z\-]+)(?=\s|$)", RegexOptions.IgnoreCase);
             MatchCollection matches = r.Matches(message);
 
             foreach (Match m in matches)
@@ -187,7 +197,7 @@ namespace MSGorilla.Library
                 return topicNames;
             }
 
-            Regex r = new Regex(@"(\s|^)#([\w][\w -\.,:&\*\+]*)?[\w]#(?=\s|$)", RegexOptions.IgnoreCase);
+            Regex r = new Regex(@"(\s|^)#([\w][\w \-\.,:&\*\+]*)?[\w]#(?=\s|$)", RegexOptions.IgnoreCase);
             //Regex r = new Regex(@"#(([\w \-]+(#{2})?)*[\w \-]+)#(\s|$)", RegexOptions.IgnoreCase);
             MatchCollection matches = r.Matches(message);
 

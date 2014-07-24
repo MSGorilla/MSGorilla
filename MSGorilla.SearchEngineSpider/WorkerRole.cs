@@ -12,6 +12,11 @@ using Microsoft.WindowsAzure.Storage.Queue;
 
 using MSGorilla.Library;
 using MSGorilla.Library.Azure;
+using MSGorilla.Library.Models;
+using MSGorilla.Library.Models.AzureModels;
+using MSGorilla.Library.Models.SqlModels;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace MSGorilla.SearchEngineSpider
 {
@@ -23,6 +28,7 @@ namespace MSGorilla.SearchEngineSpider
             Trace.TraceInformation("MSGorilla.SearchEngineSpider entry point called");
 
             CloudQueue _queue = AzureFactory.GetQueue(AzureFactory.MSGorillaQueue.SearchEngineSpider);
+            SearchManager _manager = new SearchManager();
 
             while (true)
             {
@@ -38,13 +44,11 @@ namespace MSGorilla.SearchEngineSpider
                         TimeSpan.FromSeconds(60.0),  // Make it visible immediately.
                         MessageUpdateFields.Visibility);
 
+                    Message msg = JsonConvert.DeserializeObject<Message>(message.AsString);
+                    //string content = (string)mess.Content;
+                    //Message tweet = JsonConvert.DeserializeObject<Message>(content);
 
-
-
-
-
-
-
+                    _manager.SpideMessage(msg);
                     _queue.DeleteMessage(message);
                 }
                 catch (Exception e)
