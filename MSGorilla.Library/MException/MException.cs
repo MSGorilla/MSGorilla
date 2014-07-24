@@ -170,4 +170,19 @@ namespace MSGorilla.Library.Exceptions
             Code = 5001;
         }
     }
+
+    public class GroupAlreadyExistException : MSGorillaBaseException
+    {
+        public GroupAlreadyExistException(string groupID)
+        {
+            Description = string.Format("GroupID {0} already exists.", groupID);
+            Code = 6001;
+        }
+
+        public GroupAlreadyExistException(string groupID, string Description)
+        {
+            Code = 6001;
+            this.Description = Description;
+        }
+    }
 }

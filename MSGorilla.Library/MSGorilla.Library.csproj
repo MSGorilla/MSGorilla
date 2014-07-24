@@ -82,6 +82,7 @@
     <Compile Include="AttachmentManager.cs" />
     <Compile Include="Azure\AzureFactory.cs" />
     <Compile Include="DAL\MSGorillaContext.cs" />
+    <Compile Include="GroupManager.cs" />
     <Compile Include="MException\MException.cs" />
     <Compile Include="Migrations\201405190317263_initialCreate.cs" />
     <Compile Include="Migrations\201405190317263_initialCreate.Designer.cs">
