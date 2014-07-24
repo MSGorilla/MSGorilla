@@ -41,7 +41,15 @@ namespace MSGorilla.Library
 
         public void Search(string keywords)
         {
+            // segment keywords
 
+            // search every keyword
+
+            // merge search result
+
+            // sort merge result
+
+            // return result
         }
 
         private string GenarateMessageString(Message message)
