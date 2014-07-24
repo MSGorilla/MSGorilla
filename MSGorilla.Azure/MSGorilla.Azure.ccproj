@@ -38,11 +38,15 @@
     <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="MSGorilla.SearchEngineSpiderContent\" />
     <Folder Include="MSGorilla.WokerContent\" />
     <Folder Include="MSGorillaContent\" />
     <Folder Include="Profiles" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="MSGorilla.SearchEngineSpiderContent\diagnostics.wadcfg">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="MSGorilla.WokerContent\diagnostics.wadcfg">
       <SubType>Content</SubType>
     </Content>
@@ -51,6 +55,14 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MSGorilla.SearchEngineSpider\MSGorilla.SearchEngineSpider.csproj">
+      <Name>MSGorilla.SearchEngineSpider</Name>
+      <Project>{d32a56f2-4e8f-4f07-8945-0d084bfb6ffc}</Project>
+      <Private>True</Private>
+      <RoleType>Worker</RoleType>
+      <RoleName>MSGorilla.SearchEngineSpider</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
     <ProjectReference Include="..\MSGorilla.Woker\MSGorilla.Woker.csproj">
       <Name>MSGorilla.Woker</Name>
       <Project>{a054e07c-849a-44a4-9300-ff892e2f4479}</Project>
