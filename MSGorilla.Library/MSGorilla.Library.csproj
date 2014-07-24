@@ -145,6 +145,7 @@
     <Compile Include="MessageManager.cs" />
     <Compile Include="RichMsgManager.cs" />
     <Compile Include="SchemaManager.cs" />
+    <Compile Include="SearchManager.cs" />
     <Compile Include="StatisticsManager.cs" />
     <Compile Include="TopicManager.cs" />
     <Compile Include="Utils.cs" />
