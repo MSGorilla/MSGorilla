@@ -32,63 +32,80 @@ namespace MSGorilla.Library.Azure
             Statistics
         }
 
-        public const string AttachmentContainer = "attachment";
-        public const string QueueName = "messagequeue";
+        public enum MSGorillaQueue
+        {
+            Dispatcher,
+            SearchEngineSpider
+        }
+
+        public enum MSGorillaBlobContainer
+        {
+            Attachment
+        }
 
         private static CloudStorageAccount _storageAccount;
-        private static Dictionary<MSGorillaTable, string> _dict;
+        private static Dictionary<MSGorillaTable, string> _tableDict;
+        private static Dictionary<MSGorillaQueue, string> _queueDict;
+        private static Dictionary<MSGorillaBlobContainer, string> _containerDict;
+
         static AzureFactory()
         {
+            // init storage account
             string connectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
             if (string.IsNullOrEmpty(connectionString))
             {
                 connectionString = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
             }
             _storageAccount = CloudStorageAccount.Parse(connectionString);
-            _dict = new Dictionary<MSGorillaTable, string>();
 
-            _dict.Add(MSGorillaTable.Homeline, "Homeline");
-            _dict.Add(MSGorillaTable.Userline, "Userline");
-            _dict.Add(MSGorillaTable.EventLine, "EventlineTweet");
-            _dict.Add(MSGorillaTable.PublicSquareLine, "PublicSquareline");
-            _dict.Add(MSGorillaTable.TopicLine, "Topicline");
-            _dict.Add(MSGorillaTable.OwnerLine, "Ownerline");
-            _dict.Add(MSGorillaTable.AtLine, "Atline");
-            _dict.Add(MSGorillaTable.Reply, "Reply");
-            _dict.Add(MSGorillaTable.ReplyNotification, "ReplyNotification");
-            _dict.Add(MSGorillaTable.ReplyArchive, "ReplyArchive");
-            _dict.Add(MSGorillaTable.Attachment, "Attachment");
-            _dict.Add(MSGorillaTable.RichMessage, "RichMessage");
-            _dict.Add(MSGorillaTable.Statistics, "Statistics");
+            // init table dict
+            _tableDict = new Dictionary<MSGorillaTable, string>();
+            _tableDict.Add(MSGorillaTable.Homeline, "Homeline");
+            _tableDict.Add(MSGorillaTable.Userline, "Userline");
+            _tableDict.Add(MSGorillaTable.EventLine, "EventlineTweet");
+            _tableDict.Add(MSGorillaTable.PublicSquareLine, "PublicSquareline");
+            _tableDict.Add(MSGorillaTable.TopicLine, "Topicline");
+            _tableDict.Add(MSGorillaTable.OwnerLine, "Ownerline");
+            _tableDict.Add(MSGorillaTable.AtLine, "Atline");
+            _tableDict.Add(MSGorillaTable.Reply, "Reply");
+            _tableDict.Add(MSGorillaTable.ReplyNotification, "ReplyNotification");
+            _tableDict.Add(MSGorillaTable.ReplyArchive, "ReplyArchive");
+            _tableDict.Add(MSGorillaTable.Attachment, "Attachment");
+            _tableDict.Add(MSGorillaTable.RichMessage, "RichMessage");
+            _tableDict.Add(MSGorillaTable.Statistics, "Statistics");
+
+            // init queue dict
+            _queueDict = new Dictionary<MSGorillaQueue, string>();
+            _queueDict.Add(MSGorillaQueue.Dispatcher, "messagequeue");
+            _queueDict.Add(MSGorillaQueue.SearchEngineSpider, "spider");
+
+            // init blob container dict
+            _containerDict = new Dictionary<MSGorillaBlobContainer, string>();
+            _containerDict.Add(MSGorillaBlobContainer.Attachment, "attachment");
         }
 
         public static CloudTable GetTable(MSGorillaTable table)
         {
             var client = _storageAccount.CreateCloudTableClient();
-            var aztable = client.GetTableReference(_dict[table]);
+            var aztable = client.GetTableReference(_tableDict[table]);
             aztable.CreateIfNotExists();
             return aztable;
         }
 
-        public static CloudQueue GetQueue()
+        public static CloudQueue GetQueue(MSGorillaQueue queue)
         {
             var client = _storageAccount.CreateCloudQueueClient();
-            var azqueue = client.GetQueueReference(QueueName);
+            var azqueue = client.GetQueueReference(_queueDict[queue]);
             azqueue.CreateIfNotExists();
             return azqueue;
         }
 
-        public static CloudBlobContainer GetBlobContainer()
+        public static CloudBlobContainer GetBlobContainer(MSGorillaBlobContainer container)
         {
             var client = _storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container = client.GetContainerReference(AttachmentContainer);
-            container.CreateIfNotExists();
-            //container.SetPermissions(new BlobContainerPermissions
-            //{
-            //    PublicAccess = BlobContainerPublicAccessType.Blob
-            //});
-
-            return container;
+            var azcontainer = client.GetContainerReference(_containerDict[container]);
+            azcontainer.CreateIfNotExists();
+            return azcontainer;
         }
     }
 }

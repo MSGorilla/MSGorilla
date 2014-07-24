@@ -33,5 +33,18 @@
     <Certificates>
       <Certificate name="Msgorilla" storeLocation="LocalMachine" storeName="My" />
     </Certificates>
+    <LocalResources>
+      <LocalStorage name="DiagnosticStore" sizeInMB="20000" cleanOnRoleRecycle="false" />
+    </LocalResources>
   </WebRole>
+  <WorkerRole name="MSGorilla.SearchEngineSpider" vmsize="Small">
+    <Imports>
+      <Import moduleName="Diagnostics" />
+      <Import moduleName="RemoteAccess" />
+      <Import moduleName="RemoteForwarder" />
+    </Imports>
+    <ConfigurationSettings>
+      <Setting name="StorageConnectionString" />
+    </ConfigurationSettings>
+  </WorkerRole>
 </ServiceDefinition>

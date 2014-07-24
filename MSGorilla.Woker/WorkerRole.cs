@@ -27,8 +27,7 @@ namespace MSGorilla.Woker
             // This is a sample worker implementation. Replace with your logic.
             Trace.TraceInformation("WorkerRole entry point called");
             MessageManager manager = new MessageManager();
-            CloudQueue _queue = AzureFactory.GetQueue();
-
+            CloudQueue _queue = AzureFactory.GetQueue(AzureFactory.MSGorillaQueue.Dispatcher);
 
             while (true)
             {

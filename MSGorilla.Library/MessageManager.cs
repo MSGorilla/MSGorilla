@@ -34,6 +34,7 @@ namespace MSGorilla.Library
         private CloudTable _reply;
 
         private CloudQueue _queue;
+        private CloudQueue _spiderqueue;
 
         private AccountManager _accManager;
         private AttachmentManager _attManager;
@@ -53,7 +54,8 @@ namespace MSGorilla.Library
             _atline = AzureFactory.GetTable(Azure.AzureFactory.MSGorillaTable.AtLine);
             _reply = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Reply);
 
-            _queue = AzureFactory.GetQueue();
+            _queue = AzureFactory.GetQueue(AzureFactory.MSGorillaQueue.Dispatcher);
+            _spiderqueue = AzureFactory.GetQueue(AzureFactory.MSGorillaQueue.SearchEngineSpider);
 
             _accManager = new AccountManager();
             _attManager = new AttachmentManager();
@@ -544,6 +546,7 @@ namespace MSGorilla.Library
             //insert into QueueMessage
             //QueueMessage queueMessage = new QueueMessage(QueueMessage.TypeMessage, msg.ToJsonString());
             _queue.AddMessage(msg.toAzureCloudQueueMessage());
+            _spiderqueue.AddMessage(msg.toAzureCloudQueueMessage());
 
             user.MessageCount++;
             _accManager.UpdateUser(user);

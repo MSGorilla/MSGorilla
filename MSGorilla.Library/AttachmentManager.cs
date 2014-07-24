@@ -51,7 +51,7 @@ namespace MSGorilla.Library
         public AttachmentManager()
         {
             _attachment = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Attachment);
-            _blobcontainer = AzureFactory.GetBlobContainer();
+            _blobcontainer = AzureFactory.GetBlobContainer(AzureFactory.MSGorillaBlobContainer.Attachment);
 
             BlobContainerPermissions blobPermissions = new BlobContainerPermissions();
 
@@ -70,7 +70,7 @@ namespace MSGorilla.Library
             // Set the permission policy on the container.
             _blobcontainer.SetPermissions(blobPermissions);
 
-            // Get the shared access signature to share with users.            
+            // Get the shared access signature to share with users.
         }
 
         
