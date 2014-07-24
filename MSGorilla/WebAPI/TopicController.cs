@@ -14,7 +14,7 @@ using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.SqlModels;
 
 
-namespace MSGorilla.WebApi
+namespace MSGorilla.WebAPI
 {
     public class DisplayTopic : Topic
     {

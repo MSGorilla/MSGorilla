@@ -18,7 +18,7 @@ namespace MSGorilla.Library.Models.SqlModels
         [DataMember]
         public string GroupID { get; set; }
         [DataMember]
-        public string EntityID { get; set; }
+        public string MemberID { get; set; }
         [DataMember]
         public string Role { get; set; }
     }

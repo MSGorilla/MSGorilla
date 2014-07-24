@@ -185,4 +185,22 @@ namespace MSGorilla.Library.Exceptions
             this.Description = Description;
         }
     }
+
+    public class GroupNotExistException : MSGorillaBaseException
+    {
+        public GroupNotExistException()
+        {
+            Description = "The specified group does not exist.";
+            Code = 6002;
+        }
+    }
+
+    public class UnauthroizedActionException : MSGorillaBaseException
+    {
+        public UnauthroizedActionException()
+        {
+            Description = "You're not authorized to perform this action. Contact the group admin";
+            Code = 6003;
+        }
+    }
 }

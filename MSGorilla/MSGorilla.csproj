@@ -249,6 +249,7 @@
     <Compile Include="WebAPI\AccountController.cs" />
     <Compile Include="WebAPI\AttachmentController.cs" />
     <Compile Include="WebAPI\BaseController.cs" />
+    <Compile Include="WebAPI\GroupController.cs" />
     <Compile Include="WebAPI\MessageController.cs">
       <SubType>Code</SubType>
     </Compile>

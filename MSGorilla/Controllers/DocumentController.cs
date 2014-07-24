@@ -40,6 +40,7 @@ namespace MSGorilla.Controllers
             dict["api/message"] = FindControllerApi("api/message");
             dict["api/reply"] = FindControllerApi("api/reply");
             dict["api/topic"] = FindControllerApi("api/topic");
+            dict["api/group"] = FindControllerApi("api/group");
             //dict["api/schema"] = FindControllerApi("api/schema");
 
             return dict;

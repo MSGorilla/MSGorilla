@@ -35,7 +35,7 @@ namespace MSGorilla.Library.Models.SqlModels
         [DataMember]
         public int MessageCount { get; set; }
         [DataMember]
-        public bool IsRobot { get; set; }
+        public Boolean IsRobot { get; set; }
 
         public string Password { get; set; }
         

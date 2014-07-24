@@ -28,7 +28,7 @@ using MSGorilla.Library.Models;
 //using Microsoft.Owin.Security;
 //using Microsoft.Owin.Security.Cookies;
 
-namespace MSGorilla.WebApi
+namespace MSGorilla.WebAPI
 {
     public class BaseController : ApiController
     {

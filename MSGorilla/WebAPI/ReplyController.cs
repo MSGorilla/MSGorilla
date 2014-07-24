@@ -12,7 +12,7 @@ using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.SqlModels;
 using MSGorilla.Library.Models.ViewModels;
 
-namespace MSGorilla.WebApi
+namespace MSGorilla.WebAPI
 {
     public class ReplyController : BaseController
     {

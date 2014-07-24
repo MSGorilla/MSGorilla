@@ -24,7 +24,7 @@ namespace MSGorilla.Library
             using (var _gorillaCtx = new MSGorillaContext())
             {
                 return _gorillaCtx.Users.SqlQuery(
-                    @"select top({0}) Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from [UserProfile] order by MessageCount desc",
+                    @"select top({0}) * from [UserProfile] order by MessageCount desc",
                     new object[] { count }
                 ).ToList();
             }

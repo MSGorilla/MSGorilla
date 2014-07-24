@@ -25,7 +25,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace MSGorilla.WebApi
+namespace MSGorilla.WebAPI
 {
     public class AccountController : BaseController
     {
@@ -157,7 +157,7 @@ namespace MSGorilla.WebApi
         /// <param name="Description">description of the user</param>
         /// <returns></returns>
         [HttpGet, System.Web.Mvc.RequireHttps]
-        public UserProfile Register(string Username, string DisplayName, string Password, string Description)
+        private UserProfile Register(string Username, string DisplayName, string Password, string Description)
         {
             UserProfile user = new UserProfile();
             //account.Userid = 0;

@@ -15,7 +15,7 @@ using MSGorilla.Library.Models.SqlModels;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace MSGorilla.WebApi
+namespace MSGorilla.WebAPI
 {
     public class MessageController : BaseController
     {

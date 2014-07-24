@@ -147,7 +147,7 @@ namespace MSGorilla.Library
             using (var _gorillaCtx = new MSGorillaContext())
             {
                 return _gorillaCtx.Topics.SqlQuery(
-                    @"select top({0}) id, name, description, msgcount from [topic] ORDER BY msgcount desc",
+                    @"select top({0}) * from [topic] ORDER BY msgcount desc",
                     new object[] { count }
                 ).ToList();
             }

@@ -21,5 +21,14 @@ namespace MSGorilla.Library.Models.SqlModels
         public string Description { get; set; }
         [DataMember]
         public bool IsOpen { get; set; }
+
+        public Group() { }
+        public Group(string id, string name, string description, bool isOpen)
+        {
+            this.GroupID = id;
+            this.DisplayName = name;
+            this.Description = description;
+            this.IsOpen = IsOpen;
+        }
     }
 }
