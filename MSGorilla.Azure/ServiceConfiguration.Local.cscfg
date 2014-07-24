@@ -34,12 +34,11 @@
     <Instances count="1" />
     <ConfigurationSettings>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
-      <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
       <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
       <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountUsername" value="MSGorilla" />
       <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountEncryptedPassword" value="MIIBnQYJKoZIhvcNAQcDoIIBjjCCAYoCAQAxggFOMIIBSgIBADAyMB4xHDAaBgNVBAMME1dpbmRvd3MgQXp1cmUgVG9vbHMCEB2M4qECQxmUT3Na2x3m70swDQYJKoZIhvcNAQEBBQAEggEAa0Td9/yA3NhnSe2zqMYiJJqLVEcDm+59YddZgmEn66GTT7ufQHtl+F7sADNjfQsc1PWLtpP2lsecZn/CNao34lCr+qAwO3N0+VF1rFIoO2jQnYgtZdyQl+Lcf052Hy1hidOZKYH9B1Z1sAoyDf+CsjXHopCvCFL8VyZ7PwCeLV0WOYiw/s54S7wTAjdAyzy+MWt9yWETodw3xlLg4y5B8UHWg7Ig732LjF1bMrejWqYnDYx8c+BgUFqW7taEybVinOMdkTgkT31gsmZd0mcS1XPY8yyjzi7ZafWelGLqxGyXdAKRM4nJfsZvRs7RO3nCNdwVdljCm4iqgeZUTPp/TzAzBgkqhkiG9w0BBwEwFAYIKoZIhvcNAwcECAnDaLwDf733gBAZfBwT3uauUuz6TvPAsE4v" />
       <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountExpiration" value="2015-09-01T23:59:59.0000000+08:00" />
-      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteForwarder.Enabled" value="true" />
+      <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
     </ConfigurationSettings>
     <Certificates>
       <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="3D5300F6333137F4F3E24D5B8D0E4ECCB54104A0" thumbprintAlgorithm="sha1" />
