@@ -20,5 +20,7 @@ namespace MSGorilla.Library.Models.SqlModels
         public string Description { get; set; }
         [DataMember]
         public int MsgCount { get; set; }
+        [DataMember]
+        public string GroupID { get; set; }
     }
 }

@@ -16,6 +16,8 @@ namespace MSGorilla.Library.DAL
         public DbSet<Topic> Topics { get; set; }
         public DbSet<NotificationCount> NotifCounts { get; set; }
         public DbSet<FavouriteTopic> favouriteTopic { get; set; }
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<Membership> Memberships { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
