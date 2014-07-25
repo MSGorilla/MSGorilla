@@ -44,6 +44,7 @@ namespace MSGorilla.Library.Models.ViewModels
         }
         public SimpleUserProfile User { get; set; }
         public string ID { get; set; }
+        public string Group { get; set; }
         public string EventID { get; set; }
         public string SchemaID { get; set; }
         public string[] Owner { get; set; }
@@ -65,6 +66,7 @@ namespace MSGorilla.Library.Models.ViewModels
 
             // use old id
             this.ID = msg.ID;
+            this.Group = msg.Group;
             this.EventID = msg.EventID;
             this.SchemaID = msg.SchemaID;
             this.Owner = msg.Owner;

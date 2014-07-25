@@ -23,10 +23,11 @@ namespace MSGorilla.Library
         {
             using (var _gorillaCtx = new MSGorillaContext())
             {
-                return _gorillaCtx.Users.SqlQuery(
-                    @"select top({0}) * from [UserProfile] order by MessageCount desc",
-                    new object[] { count }
-                ).ToList();
+                return _gorillaCtx.Users.OrderByDescending(user => user.MessageCount).Take(count).ToList();
+                //return _gorillaCtx.Users.SqlQuery(
+                //    @"select top({0}) * from [UserProfile] order by MessageCount desc",
+                //    new object[] { count }
+                //).ToList();
             }
         }
 
@@ -180,17 +181,23 @@ namespace MSGorilla.Library
                     throw new UserNotFoundException(userid);
                 }
 
-                return _gorillaCtx.Users.SqlQuery(
-                    @"select FollowingUserid as Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from (
-	                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from 
-		                [Subscription] f
-		                join
-		                [UserProfile] u
-		                on f.FollowingUserid = u.Userid 
-		                ) ff 
-	                where ff.userid = {0}",
-                        new object[] { userid }
-                    ).ToList();
+                return  (
+                            from u in _gorillaCtx.Users join su in _gorillaCtx.Subscriptions 
+                                on u.Userid equals su.FollowingUserid 
+                                where su.Userid == userid select u
+                        ).ToList<UserProfile>();
+
+//                return _gorillaCtx.Users.SqlQuery(
+//                    @"select FollowingUserid as Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount, IsRobot from (
+//	                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount, IsRobot from 
+//		                [Subscription] f
+//		                join
+//		                [UserProfile] u
+//		                on f.FollowingUserid = u.Userid 
+//		                ) ff 
+//	                where ff.userid = {0}",
+//                        new object[] { userid }
+//                    ).ToList();
             }
         }
 
@@ -204,17 +211,25 @@ namespace MSGorilla.Library
                     throw new UserNotFoundException(userid);
                 }
 
-                return _gorillaCtx.Users.SqlQuery(
-                    @"select Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from (
-		                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from 
-			                [Subscription] f
-			                join
-			                [UserProfile] u
-			                on f.Userid = u.Userid 
-	                ) ff 
-	                where ff.FollowingUserid = {0}",
-                        new object[] { userid }
-                    ).ToList();
+                return (
+                            from u in _gorillaCtx.Users
+                            join su in _gorillaCtx.Subscriptions
+                                on u.Userid equals su.Userid
+                            where su.FollowingUserid == userid
+                            select u
+                        ).ToList<UserProfile>();
+
+//                return _gorillaCtx.Users.SqlQuery(
+//                    @"select Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from (
+//		                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from 
+//			                [Subscription] f
+//			                join
+//			                [UserProfile] u
+//			                on f.Userid = u.Userid 
+//	                ) ff 
+//	                where ff.FollowingUserid = {0}",
+//                        new object[] { userid }
+//                    ).ToList();
             }
         }
 

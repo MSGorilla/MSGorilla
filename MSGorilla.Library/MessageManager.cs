@@ -123,7 +123,7 @@ namespace MSGorilla.Library
             }
 
             string query = TableQuery.GenerateFilterCondition(
-                "PartitionKey",
+                propertyName,
                 QueryComparisons.LessThan,
                 Utils.NextKeyString(startWith));
 
@@ -131,7 +131,7 @@ namespace MSGorilla.Library
                 query,
                 TableOperators.And,
                 TableQuery.GenerateFilterCondition(
-                    "PartitionKey",
+                    propertyName,
                     QueryComparisons.GreaterThanOrEqual,
                     startWith
                 )
