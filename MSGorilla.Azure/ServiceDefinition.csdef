@@ -37,7 +37,7 @@
       <LocalStorage name="DiagnosticStore" sizeInMB="20000" cleanOnRoleRecycle="false" />
     </LocalResources>
   </WebRole>
-  <WorkerRole name="MSGorilla.SearchEngineSpider" vmsize="Small">
+  <WorkerRole name="MSGorilla.Spider" vmsize="Small">
     <Imports>
       <Import moduleName="Diagnostics" />
       <Import moduleName="RemoteAccess" />
