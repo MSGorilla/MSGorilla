@@ -41,7 +41,7 @@ namespace MSGorilla.Library.Models.ViewModels
                 return "reply";
             }
         }
-        public string MessageUser { get; set; }
+        //public string MessageUser { get; set; }
         public string MessageID { get; set; }
 
         public DisplayReply() { }
@@ -49,7 +49,6 @@ namespace MSGorilla.Library.Models.ViewModels
             : base(rpl, accManager, attManager)
         {
             this.MessageID = rpl.MessageID;
-            this.MessageUser = rpl.MessageUser;
         }
     }
 }

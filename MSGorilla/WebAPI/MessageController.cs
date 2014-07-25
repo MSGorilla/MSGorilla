@@ -11,9 +11,11 @@ using MSGorilla.Library.Models;
 using MSGorilla.Library.Models.ViewModels;
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.SqlModels;
+using MSGorilla.Utility;
 
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage.Table;
+
 
 namespace MSGorilla.WebAPI
 {
@@ -81,16 +83,16 @@ namespace MSGorilla.WebAPI
         /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination UserLine(string filter, string userid, int count = 25, string token = null)
+        public DisplayMessagePagination UserLine(string filter, string userid, string groupID, int count = 25, string token = null)
         {
             DateTime start, end;
             if (GetFilterDateTime(filter, out start, out end))
             {
-                return UserLine(userid, start, end, count, token);
+                return UserLine(userid, groupID, start, end, count, token);
             }
             else
             {
-                return UserLine(userid, count, token);
+                return UserLine(userid, groupID, count, token);
             }
         }
 
@@ -148,15 +150,17 @@ namespace MSGorilla.WebAPI
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination UserLine(string userid, int count = 25, string token = null)
+        public DisplayMessagePagination UserLine(string userid, string groupID, int count = 25, string token = null)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
             {
                 userid = me;
             }
+            MembershipHelper.CheckMembership(groupID, me);
+
             TableContinuationToken tok = Utils.String2Token(token);
-            return new DisplayMessagePagination(_messageManager.UserLine(userid, count, tok));
+            return new DisplayMessagePagination(_messageManager.UserLine(userid, groupID, count, tok));
         }
 
         /// <summary>
@@ -203,15 +207,17 @@ namespace MSGorilla.WebAPI
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination UserLine(string userid, DateTime start, DateTime end, int count = 25, string token = null)
+        public DisplayMessagePagination UserLine(string userid, string groupID, DateTime start, DateTime end, int count = 25, string token = null)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
             {
                 userid = me;
             }
+            MembershipHelper.CheckMembership(groupID, me);
+            
             TableContinuationToken tok = Utils.String2Token(token);
-            return new DisplayMessagePagination(_messageManager.UserLine(userid, start, end, count, tok));
+            return new DisplayMessagePagination(_messageManager.UserLine(userid, groupID, start, end, count, tok));
         }
 
         /// <summary>
@@ -268,16 +274,16 @@ namespace MSGorilla.WebAPI
         /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination HomeLine(string filter, string userid, int count = 25, string token = null, bool keepUnread = false)
+        public DisplayMessagePagination HomeLine(string filter, string userid, string groupID, int count = 25, string token = null, bool keepUnread = false)
         {
             DateTime start, end;
             if (GetFilterDateTime(filter, out start, out end))
             {
-                return HomeLine(userid, start, end, count, token, keepUnread);
+                return HomeLine(userid, groupID, start, end, count, token, keepUnread);
             }
             else
             {
-                return HomeLine(userid, count, token, keepUnread);
+                return HomeLine(userid, groupID, count, token, keepUnread);
             }
         }
 
@@ -334,7 +340,7 @@ namespace MSGorilla.WebAPI
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination HomeLine(string userid, int count = 25, string token = null, bool keepUnread = false)
+        public DisplayMessagePagination HomeLine(string userid, string groupID, int count = 25, string token = null, bool keepUnread = false)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
@@ -342,13 +348,14 @@ namespace MSGorilla.WebAPI
                 userid = me;
             }
             TableContinuationToken tok = Utils.String2Token(token);
+            MembershipHelper.CheckMembership(groupID, me);
 
             if (!keepUnread && me.Equals(userid) && token == null)
             {
                 _notifManager.clearHomelineNotifCount(me);
                 _notifManager.clearImportantMsgCount(me);
             }
-            return new DisplayMessagePagination(_messageManager.HomeLine(userid, count, tok));
+            return new DisplayMessagePagination(_messageManager.HomeLine(userid, groupID, count, tok));
         }
 
         /// <summary>
@@ -406,13 +413,16 @@ namespace MSGorilla.WebAPI
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination HomeLine(string userid, DateTime start, DateTime end, int count = 25, string token = null, bool keepUnread = false)
+        public DisplayMessagePagination HomeLine(string userid, string groupID, DateTime start, DateTime end, int count = 25, string token = null, bool keepUnread = false)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
             {
                 userid = me;
             }
+
+            MembershipHelper.CheckMembership(groupID, me);
+
             TableContinuationToken tok = Utils.String2Token(token);
 
             if (!keepUnread && me.Equals(userid) && token == null)
@@ -420,7 +430,7 @@ namespace MSGorilla.WebAPI
                 _notifManager.clearHomelineNotifCount(me);
                 _notifManager.clearImportantMsgCount(me);
             }
-            return new DisplayMessagePagination(_messageManager.HomeLine(userid, start, end, count, tok));
+            return new DisplayMessagePagination(_messageManager.HomeLine(userid, groupID, start, end, count, tok));
         }
 
         /// <summary>
@@ -989,16 +999,16 @@ namespace MSGorilla.WebAPI
         /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination PublicSquareLine(string filter, int count = 25, string token = null)
+        public DisplayMessagePagination PublicSquareLine(string groupID, string filter, int count = 25, string token = null)
         {
             DateTime start, end;
             if (GetFilterDateTime(filter, out start, out end))
             {
-                return PublicSquareLine(start, end, count, token);
+                return PublicSquareLine(groupID, start, end, count, token);
             }
             else
             {
-                return PublicSquareLine(count, token);
+                return PublicSquareLine(groupID, count, token);
             }
         }
 
@@ -1062,11 +1072,13 @@ namespace MSGorilla.WebAPI
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination PublicSquareLine(DateTime start, DateTime end, int count = 25, string token = null)
+        public DisplayMessagePagination PublicSquareLine(string groupID, DateTime start, DateTime end, int count = 25, string token = null)
         {
-            whoami();
+            string me = whoami();
+            MembershipHelper.CheckMembership(groupID, me);
+
             TableContinuationToken tok = Utils.String2Token(token);
-            return new DisplayMessagePagination(_messageManager.PublicSquareLine(start, end, count, tok));
+            return new DisplayMessagePagination(_messageManager.PublicSquareLine(groupID, start, end, count, tok));
         }
 
         /// <summary>
@@ -1127,11 +1139,12 @@ namespace MSGorilla.WebAPI
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination PublicSquareLine(int count = 25, string token = null)
+        public DisplayMessagePagination PublicSquareLine(string groupID, int count = 25, string token = null)
         {
-            whoami();
+            string me = whoami();
+            MembershipHelper.CheckMembership(groupID, me);
             TableContinuationToken tok = Utils.String2Token(token);
-            return new DisplayMessagePagination(_messageManager.PublicSquareLine(count, tok));
+            return new DisplayMessagePagination(_messageManager.PublicSquareLine(groupID, count, tok));
         }
 
         /// <summary>
@@ -1143,16 +1156,16 @@ namespace MSGorilla.WebAPI
         /// <param name="filter">filter, can be "latest24hours", "latest7days", "latest1month" or "all"</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination TopicLine(string filter, string topic, int count = 25, string token = null)
+        public DisplayMessagePagination TopicLine(string filter, string topic, int count = 25, [FromUri]string[] group = null, string token = null)
         {
             DateTime start, end;
             if (GetFilterDateTime(filter, out start, out end))
             {
-                return TopicLine(topic, start, end, count, token);
+                return TopicLine(topic, start, end, count, group, token);
             }
             else
             {
-                return TopicLine(topic, count, token);
+                return TopicLine(topic, count, group, token);
             }
         }
 
@@ -1193,10 +1206,10 @@ namespace MSGorilla.WebAPI
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination TopicLine(string topic, int count = 25, string token = null)
+        public DisplayMessagePagination TopicLine(string topic, int count = 25, [FromUri]string[] group = null, string token = null)
         {
             string me = whoami();
-            var t = _topicManager.FindTopicByName(topic);
+            var t = _topicManager.FindTopicByName(topic, MembershipHelper.CheckJoinedGroup(group));
             if (t == null)
             {
                 return null;
@@ -1220,10 +1233,10 @@ namespace MSGorilla.WebAPI
         /// <param name="token">continuous token</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessagePagination TopicLine(string topic, DateTime start, DateTime end, int count = 25, string token = null)
+        public DisplayMessagePagination TopicLine(string topic, DateTime start, DateTime end, int count = 25, [FromUri]string[] group = null, string token = null)
         {
             string me = whoami();
-            var t = _topicManager.FindTopicByName(topic);
+            var t = _topicManager.FindTopicByName(topic, MembershipHelper.CheckJoinedGroup(group));
             if (t == null)
             {
                 return null;
@@ -1256,74 +1269,73 @@ namespace MSGorilla.WebAPI
         ///     "Importance": 2
         /// }
         /// </summary>
-        /// <param name="userid">user id of whom posted the message</param>
         /// <param name="messageID">message id</param>
         /// <returns></returns>
         [HttpGet]
-        public Message GetRawMessage(string userid, string messageID)
+        public Message GetRawMessage(string messageID)
         {
             whoami();
-            return _messageManager.GetRawMessage(userid, messageID);
+            return _messageManager.GetRawMessage(messageID);
         }
 
-        /// <summary>
-        /// Deprecated. Return the detail of a Message
-        /// 
-        /// Example output:
-        /// {
-        ///     "ReplyCount": 3,
-        ///     "Replies": [
-        ///         {
-        ///             "FromUser": "user2",
-        ///             "ToUser": "user1",
-        ///             "Message": "test cloud reply",
-        ///             "PostTime": "2014-06-24T06:51:02.9789122Z",
-        ///             "MessageUser": "user1",
-        ///             "MessageID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
-        ///             "ReplyID": "251998708137021_431cab73-f6d7-4484-8872-797ec183ec68"
-        ///         },
-        ///         {
-        ///             "FromUser": "user2",
-        ///             "ToUser": "user1",
-        ///             "Message": "greate",
-        ///             "PostTime": "2014-06-24T06:48:26.5283644Z",
-        ///             "MessageUser": "user1",
-        ///             "MessageID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
-        ///             "ReplyID": "251998708293471_0e283889-18e2-44d3-a681-c07c35824c19"
-        ///         },
-        ///         {
-        ///             "FromUser": "user2",
-        ///             "ToUser": "user1",
-        ///             "Message": "hello",
-        ///             "PostTime": "2014-06-24T06:48:08.9586062Z",
-        ///             "MessageUser": "user1",
-        ///             "MessageID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
-        ///             "ReplyID": "251998708311041_51bfb009-53a2-435f-8559-5bf8e222887b"
-        ///         }
-        ///     ],
-        ///     "User": "user1",
-        ///     "ID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
-        ///     "EventID": "none",
-        ///     "SchemaID": "none",
-        ///     "Owner": null,
-        ///     "AtUser": null,
-        ///     "TopicName": null,
-        ///     "MessageContent": "a new cloud message",
-        ///     "PostTime": "2014-06-24T06:47:51.0325756Z",
-        ///     "RichMessageID" : null,
-        ///     "AttachmentID" : null,
-        ///     "Importance": 2
-        /// }
-        /// </summary>
-        /// <param name="userid">user id of whom posted the message</param>
-        /// <param name="messageID">message id</param>
-        /// <returns></returns>
-        [HttpGet]
-        public MessageDetail GetMessage(string userid, string messageID)
-        {
-            whoami();
-            return _messageManager.GetMessageDetail(userid, messageID);
-        }
+        ///// <summary>
+        ///// Deprecated. Return the detail of a Message
+        ///// 
+        ///// Example output:
+        ///// {
+        /////     "ReplyCount": 3,
+        /////     "Replies": [
+        /////         {
+        /////             "FromUser": "user2",
+        /////             "ToUser": "user1",
+        /////             "Message": "test cloud reply",
+        /////             "PostTime": "2014-06-24T06:51:02.9789122Z",
+        /////             "MessageUser": "user1",
+        /////             "MessageID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
+        /////             "ReplyID": "251998708137021_431cab73-f6d7-4484-8872-797ec183ec68"
+        /////         },
+        /////         {
+        /////             "FromUser": "user2",
+        /////             "ToUser": "user1",
+        /////             "Message": "greate",
+        /////             "PostTime": "2014-06-24T06:48:26.5283644Z",
+        /////             "MessageUser": "user1",
+        /////             "MessageID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
+        /////             "ReplyID": "251998708293471_0e283889-18e2-44d3-a681-c07c35824c19"
+        /////         },
+        /////         {
+        /////             "FromUser": "user2",
+        /////             "ToUser": "user1",
+        /////             "Message": "hello",
+        /////             "PostTime": "2014-06-24T06:48:08.9586062Z",
+        /////             "MessageUser": "user1",
+        /////             "MessageID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
+        /////             "ReplyID": "251998708311041_51bfb009-53a2-435f-8559-5bf8e222887b"
+        /////         }
+        /////     ],
+        /////     "User": "user1",
+        /////     "ID": "251998708328967_9cc961ff-0600-43e8-902a-0b60e5087e8b",
+        /////     "EventID": "none",
+        /////     "SchemaID": "none",
+        /////     "Owner": null,
+        /////     "AtUser": null,
+        /////     "TopicName": null,
+        /////     "MessageContent": "a new cloud message",
+        /////     "PostTime": "2014-06-24T06:47:51.0325756Z",
+        /////     "RichMessageID" : null,
+        /////     "AttachmentID" : null,
+        /////     "Importance": 2
+        ///// }
+        ///// </summary>
+        ///// <param name="userid">user id of whom posted the message</param>
+        ///// <param name="messageID">message id</param>
+        ///// <returns></returns>
+        //[HttpGet]
+        //public MessageDetail GetMessage(string userid, string messageID)
+        //{
+        //    whoami();
+        //    return _messageManager.GetMessageDetail(userid, messageID);
+        //}
 
         /// <summary>
         /// Return the details of a message
@@ -1353,10 +1365,10 @@ namespace MSGorilla.WebAPI
         /// <param name="msgID">message id</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMessage GetDisplayMessage(string msgUser, string msgID)
+        public DisplayMessage GetDisplayMessage(string msgID)
         {
             whoami();
-            return new DisplayMessage(_messageManager.GetMessage(msgUser, msgID), _accManager, _attManager);
+            return new DisplayMessage(_messageManager.GetMessage(msgID), _accManager, _attManager);
         }
 
         /// <summary>
@@ -1478,6 +1490,7 @@ namespace MSGorilla.WebAPI
         /// <returns></returns>
         [HttpGet, HttpPost]
         public DisplayMessage PostMessage(string message,
+                                    string groupID,
                                     string schemaID = "none",
                                     string eventID = "none",
                                     [FromUri]string[] owner = null,
@@ -1487,7 +1500,9 @@ namespace MSGorilla.WebAPI
                                     [FromUri]string[] attachmentID = null,
                                     int importance = 2)
         {
-            return new DisplayMessage(_messageManager.PostMessage(whoami(), eventID, schemaID, owner, atUser, topicName, message, richMessage, attachmentID, importance, DateTime.UtcNow), new AccountManager(), new AttachmentManager());
+            string me = whoami();
+            MembershipHelper.CheckMembership(groupID, me);
+            return new DisplayMessage(_messageManager.PostMessage(whoami(), groupID, eventID, schemaID, owner, atUser, topicName, message, richMessage, attachmentID, importance, DateTime.UtcNow), new AccountManager(), new AttachmentManager());
             //return new ActionResult();
         }
 
@@ -1497,6 +1512,7 @@ namespace MSGorilla.WebAPI
         public class MessageModel
         {
             public string Message { get; set; }
+            public string GroupID { get; set; }
             public string SchemaID { get; set; }
             public string EventID { get; set; }
             public string[] TopicName { get; set; }
@@ -1522,7 +1538,7 @@ namespace MSGorilla.WebAPI
             {
                 msg.EventID = "none";
             }
-            return PostMessage(msg.Message, msg.SchemaID, msg.EventID, msg.Owner, msg.AtUser, msg.TopicName, msg.RichMessage, msg.AttachmentID, msg.Importance);
+            return PostMessage(msg.Message, msg.GroupID, msg.SchemaID, msg.EventID, msg.Owner, msg.AtUser, msg.TopicName, msg.RichMessage, msg.AttachmentID, msg.Importance);
             //return new ActionResult();
         }
 

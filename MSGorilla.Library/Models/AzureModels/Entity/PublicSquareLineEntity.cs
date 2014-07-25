@@ -16,7 +16,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 
         public PublicSquareLineEntity(Message msg) : base(msg)
         {
-            this.PartitionKey = Utils.ToAzureStorageDayBasedString(msg.PostTime.ToUniversalTime());
+            this.PartitionKey = msg.Group + "_" + Utils.ToAzureStorageDayBasedString(msg.PostTime.ToUniversalTime());
             this.RowKey = msg.ID;
         }
     }

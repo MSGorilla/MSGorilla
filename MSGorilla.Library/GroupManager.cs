@@ -71,8 +71,6 @@ namespace MSGorilla.Library
         {
             using (var ctx = new MSGorillaContext())
             {
-                CheckAdmin(group.GroupID, admin, ctx);
-
                 Group groupUpdate = ctx.Groups.Find(group.GroupID);
                 groupUpdate.Description = group.Description;
                 groupUpdate.DisplayName = group.DisplayName;
@@ -148,6 +146,14 @@ namespace MSGorilla.Library
             return member;
         }
 
+        public void CheckAdmin(string groupID, string userid)
+        {
+            using (var ctx = new MSGorillaContext())
+            {
+                CheckAdmin(groupID, userid, ctx);
+            }
+        }
+
         public void CheckAdmin(string groupID, string userid, MSGorillaContext ctx)
         {
             if (!"admin".Equals(CheckMembership(groupID, userid, ctx).Role))
@@ -160,8 +166,6 @@ namespace MSGorilla.Library
         {
             using (var ctx = new MSGorillaContext())
             {
-                CheckAdmin(groupID, admin, ctx);
-
                 Membership member = new Membership();
                 member.GroupID = groupID;
                 member.MemberID = userid;
@@ -177,8 +181,6 @@ namespace MSGorilla.Library
         {
             using (var ctx = new MSGorillaContext())
             {
-                CheckAdmin(groupID, admin, ctx);
-
                 Membership member = ctx.Memberships.SqlQuery(
                     "select * from membership where groupid={0} and memberid={1}",
                     groupID,
@@ -195,7 +197,6 @@ namespace MSGorilla.Library
         {
             using (var ctx = new MSGorillaContext())
             {
-                CheckAdmin(groupID, admin, ctx);
                 Membership member = CheckMembership(groupID, userid, ctx);
                 member.Role = role;
                 ctx.SaveChanges();
@@ -207,8 +208,6 @@ namespace MSGorilla.Library
         {
             using (var ctx = new MSGorillaContext())
             {
-                CheckMembership(groupID, userid, ctx);
-
                 return ctx.Memberships.SqlQuery("select * from membership where groupid={0}", groupID).ToList<Membership>();
             }
         }
@@ -241,8 +240,6 @@ namespace MSGorilla.Library
         {
             using (var ctx = new MSGorillaContext())
             {
-                CheckAdmin(groupID, admin, ctx);
-
                 robot.IsRobot = true;
                 new AccountManager().AddUser(robot);
 

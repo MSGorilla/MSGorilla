@@ -10,6 +10,8 @@ using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.ViewModels;
 using MSGorilla.Library.Models;
 
+using MSGorilla.Utility;
+
 namespace MSGorilla.WebAPI
 {
     public class GroupController : BaseController
@@ -36,6 +38,7 @@ namespace MSGorilla.WebAPI
         public Group AddGroup(string groupID, string displayName = null, string description = null, bool isOpen = false)
         {
             string me = whoami();
+            CacheHelper.Remove(MembershipHelper.JoinedGroupKey);
 
             if(string.IsNullOrEmpty(displayName)){
                 displayName = groupID;
@@ -78,25 +81,33 @@ namespace MSGorilla.WebAPI
         [HttpGet]
         public Group UpdateGroup(string groupID, string displayname = null, string description = null, bool isOpen = false)
         {
-            Group group = new Group(groupID, displayname, description, isOpen);
-            return _groupManager.UpdateGroup(whoami(), group);
+            string me = whoami();
+            MembershipHelper.CheckAdmin(groupID, me);
+
+            Group group = new Group(groupID, displayname, description, isOpen);            
+            return _groupManager.UpdateGroup(me, group);
         }
 
         [HttpGet, HttpPost]
         public Membership JoinGroup(string groupID)
         {
+            CacheHelper.Remove(MembershipHelper.JoinedGroupKey);
             return _groupManager.JoinGroup(whoami(), groupID);
         }
 
         [HttpGet, HttpPost, HttpPut]
         public Membership AddMember(string userid, string groupID)
         {
+            string me = whoami();
+            MembershipHelper.CheckAdmin(groupID, me);
             return _groupManager.AddMember(groupID, whoami(), userid);
         }
 
         [HttpGet, HttpPost, HttpDelete]
         public ActionResult RemoveMember(string userid, string groupID)
         {
+            string me = whoami();
+            MembershipHelper.CheckAdmin(groupID, me);
             _groupManager.RemoveMember(groupID, whoami(), userid);
             return ActionResult.Success();
         }
@@ -104,12 +115,16 @@ namespace MSGorilla.WebAPI
         [HttpGet, HttpPost, HttpPut]
         public Membership UpdateMembership(string groupID, string userid, string role)
         {
+            string me = whoami();
+            MembershipHelper.CheckAdmin(groupID, me);
             return _groupManager.UpdateMembership(groupID, whoami(), userid, role);
         }
 
         [HttpGet]
         public List<Membership> GetAllGroupMember(string groupID)
         {
+            string me = whoami();
+            MembershipHelper.CheckMembership(groupID, me);
             return _groupManager.GetAllGroupMember(groupID, whoami());
         }
 
@@ -129,6 +144,8 @@ namespace MSGorilla.WebAPI
         public UserProfile CreateGroupRobotAccount(string groupID, string userid, string password, string displayname, string description)
         {
             string me = whoami();
+            MembershipHelper.CheckAdmin(groupID, me);
+
             UserProfile robot = new UserProfile();
             robot.Userid = userid;
             robot.DisplayName = displayname;

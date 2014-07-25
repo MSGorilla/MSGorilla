@@ -203,4 +203,13 @@ namespace MSGorilla.Library.Exceptions
             Code = 6003;
         }
     }
+
+    public class TopicNotFoundException : MSGorillaBaseException
+    {
+        public TopicNotFoundException()
+        {
+            Description = "The specified topic not found.";
+            Code = 7001;
+        }
+    }
 }

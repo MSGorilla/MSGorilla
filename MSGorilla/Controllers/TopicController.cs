@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using MSGorilla.Filters;
 using MSGorilla.Library;
 using MSGorilla.Library.Models.SqlModels;
+using MSGorilla.Utility;
 
 namespace MSGorilla.Controllers
 {
@@ -15,7 +16,7 @@ namespace MSGorilla.Controllers
         TopicManager _topicManager = new TopicManager();
 
         [TokenAuthAttribute]
-        public ActionResult Index(string topic)
+        public ActionResult Index(string topic, string[] group = null)
         {
             string myid = this.Session["userid"].ToString();
             UserProfile me = _accManager.FindUser(myid);
@@ -24,7 +25,7 @@ namespace MSGorilla.Controllers
 
             ViewBag.FeedCategory = "topicline";
 
-            var t = _topicManager.FindTopicByName(topic);
+            var t = _topicManager.FindTopicByName(topic, MembershipHelper.CheckJoinedGroup(group));
             if (t == null)
             {
                 ViewBag.TopicId = -1;

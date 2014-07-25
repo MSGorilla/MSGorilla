@@ -18,6 +18,7 @@ namespace MSGorilla.Library.Models
     {
         public string User { get; set; }
         public string ID { get; set; }
+        public string Group { get; set; }
         public string EventID { get; set; }
         public string SchemaID { get; set; }
         public string[] Owner { get; set; }
@@ -31,6 +32,7 @@ namespace MSGorilla.Library.Models
 
         public Message() { }
         public Message(string userid,
+                        string groupID,
                         string message,
                         DateTime timestamp,
                         string eventID,
@@ -45,6 +47,7 @@ namespace MSGorilla.Library.Models
                 )
         {
             User = userid;
+            Group = groupID;
             MessageContent = message;
             EventID = eventID;
             SchemaID = schemaID;
@@ -57,8 +60,10 @@ namespace MSGorilla.Library.Models
 
             if (string.IsNullOrEmpty(msgID))
             {
-                ID = string.Format("{0}_{1}",
+                ID = string.Format("{0}_{1}_{2}_{3}",
                                 Utils.ToAzureStorageSecondBasedString(PostTime),
+                                Group,
+                                User,
                                 Guid.NewGuid().ToString());
             }
             else
@@ -81,21 +86,6 @@ namespace MSGorilla.Library.Models
             //JavaScriptSerializer serialize = new JavaScriptSerializer();
             //return serialize.Serialize(this);
             return JsonConvert.SerializeObject(this);
-        }
-
-        public static string ToMessagePK(string userid, string messageID)
-        {
-            try
-            {
-                double timespan = Double.Parse(messageID.Split('_')[0]);
-                DateTime timestamp = DateTime.MaxValue.AddMilliseconds(0 - timespan);
-
-                return string.Format("{0}_{1}", userid, Utils.ToAzureStorageDayBasedString(timestamp, false));
-            }
-            catch
-            {
-                throw new InvalidMessageIDException();
-            }
         }
 
         public CloudQueueMessage toAzureCloudQueueMessage()

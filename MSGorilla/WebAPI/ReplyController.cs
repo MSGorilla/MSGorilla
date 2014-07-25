@@ -153,9 +153,9 @@ namespace MSGorilla.WebAPI
         /// <param name="attachmentID">origin message id</param>
         /// <returns></returns>
         [HttpGet, HttpPost]
-        public DisplayReply PostReply([FromUri]string[] to, string message, string messageUser, string messageID, string richMessage = null, [FromUri]string[] attachmentID = null)
+        public DisplayReply PostReply([FromUri]string[] to, string message, string messageID, string richMessage = null, [FromUri]string[] attachmentID = null)
         {
-            return new DisplayReply(_replyManager.PostReply(whoami(), to, message, richMessage, attachmentID, DateTime.UtcNow, messageUser, messageID), new AccountManager(), new AttachmentManager());
+            return new DisplayReply(_replyManager.PostReply(whoami(), to, message, richMessage, attachmentID, DateTime.UtcNow, messageID), new AccountManager(), new AttachmentManager());
         }
 
         public class ReplyModel
@@ -164,7 +164,6 @@ namespace MSGorilla.WebAPI
             public string Message { get; set; }
             public string richMessage { get; set; }
             public string[] attachmentID { get; set; }
-            public string MessageUser { get; set; }
             public string MessageID { get; set; }
         }
 
@@ -177,7 +176,7 @@ namespace MSGorilla.WebAPI
         [HttpPost]
         public DisplayReply PostReply(ReplyModel reply)
         {
-            return PostReply(reply.To, reply.Message, reply.MessageUser, reply.MessageID, reply.richMessage, reply.attachmentID);
+            return PostReply(reply.To, reply.Message, reply.MessageID, reply.richMessage, reply.attachmentID);
         }
     }
 }

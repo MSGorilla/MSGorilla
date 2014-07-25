@@ -13,11 +13,16 @@ namespace MSGorilla.Library
     {
         //private MSGorillaContext _gorillaCtx;
 
-        public List<Topic> GetAllTopics()
+        public List<Topic> GetAllTopics(string[] groups)
         {
+            if (groups == null || groups.Length == 0)
+            {
+                return new List<Topic>();
+            }
+
             using (var _gorillaCtx = new MSGorillaContext())
             {
-                return _gorillaCtx.Topics.ToList();
+                return _gorillaCtx.Topics.Where(topic => groups.Any(groupID => topic.GroupID == groupID)).ToList();
             }
         }
 
@@ -28,19 +33,6 @@ namespace MSGorilla.Library
                 topic = _gorillaCtx.Topics.Add(topic);
                 _gorillaCtx.SaveChanges();
                 return topic;
-            }
-        }
-
-        public void incrementTopicCount(string topicID)
-        {
-            using (var _gorillaCtx = new MSGorillaContext())
-            {
-                Topic topic = FindTopic(topicID, _gorillaCtx);
-                if (topic != null)
-                {
-                    topic.MsgCount++;
-                    _gorillaCtx.SaveChanges();
-                }
             }
         }
 
@@ -80,42 +72,18 @@ namespace MSGorilla.Library
             }
         }
 
-        public Topic FindTopic(string topicID, MSGorillaContext _gorillaCtx = null)
+        public Topic FindTopicByName(string name, string[] groupIDs)
         {
-            Topic ret = null;
-            if (_gorillaCtx == null)
+            if (groupIDs == null || groupIDs.Length == 0)
             {
-                using (_gorillaCtx = new MSGorillaContext())
-                {
-
-                    try
-                    {
-                        ret = _gorillaCtx.Topics.Find(int.Parse(topicID));
-                    }
-                    catch
-                    {
-                    }
-                    return ret;
-                }
+                return null;
             }
-            try
-            {
-                ret = _gorillaCtx.Topics.Find(int.Parse(topicID));
-            }
-            catch
-            {
-            }
-            return ret;
-        }
-
-        public Topic FindTopicByName(string name)
-        {
             using (var _gorillaCtx = new MSGorillaContext())
             {
                 Topic ret = null;
                 try
                 {
-                    ret = _gorillaCtx.Topics.Where(topic => topic.Name == name).Single();
+                    ret = _gorillaCtx.Topics.Where(topic => topic.Name == name && groupIDs.Any(groupID => groupID == topic.GroupID)).Single();
                 }
                 catch
                 {
@@ -127,29 +95,45 @@ namespace MSGorilla.Library
 
         public Topic FindTopic(int topicID, MSGorillaContext _gorillaCtx = null)
         {
-            if (_gorillaCtx == null)
+            if (_gorillaCtx != null)
             {
-                _gorillaCtx = new MSGorillaContext();
+                return _gorillaCtx.Topics.Find(topicID);
+                
             }
-            return _gorillaCtx.Topics.Find(topicID);
-        }
-
-        public List<Topic> SearchTopic(string keyword)
-        {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (_gorillaCtx = new MSGorillaContext())
             {
-                return _gorillaCtx.Topics.Where(topic => topic.Name.Contains(keyword)).ToList();
+                return _gorillaCtx.Topics.Find(topicID);
             }
         }
 
-        public List<Topic> GetHotTopics(int count = 5)
+        public List<Topic> SearchTopic(string keyword, string[] groupIDs)
         {
+            if (groupIDs == null || groupIDs.Length == 0)
+            {
+                return new List<Topic>();
+            }
             using (var _gorillaCtx = new MSGorillaContext())
             {
-                return _gorillaCtx.Topics.SqlQuery(
-                    @"select top({0}) * from [topic] ORDER BY msgcount desc",
-                    new object[] { count }
-                ).ToList();
+                return _gorillaCtx.Topics.Where
+                    (
+                        topic => topic.Name.Contains(keyword) 
+                            && groupIDs.Any(groupID => groupID == topic.GroupID)
+                    ).ToList();
+            }
+        }
+
+        public List<Topic> GetHotTopics(string[] groupIDs, int count = 5)
+        {
+            if (groupIDs == null || groupIDs.Length == 0)
+            {
+                return new List<Topic>();
+            }
+
+            using (var _gorillaCtx = new MSGorillaContext())
+            {
+                return _gorillaCtx.Topics.Where(
+                   topic => groupIDs.Any(groupid => groupid == topic.GroupID)
+                ).OrderByDescending(topic => topic.MsgCount).Take(count).ToList();
             }
         }
 
@@ -157,14 +141,6 @@ namespace MSGorilla.Library
         {
             using (var _gorillaCtx = new MSGorillaContext())
             {
-                if (_gorillaCtx.Users.Find(userid) == null)
-                {
-                    return;
-                }
-                if (_gorillaCtx.Topics.Find(topicID) == null)
-                {
-                    return;
-                }
                 if (_gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).Count() == 0)
                 {
                     FavouriteTopic ftopic = new FavouriteTopic();

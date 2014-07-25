@@ -111,17 +111,12 @@ namespace MSGorilla.Library
                                 string richMessage,
                                 string[] attachmentID,
                                 DateTime timestamp,
-                                string originMessageUser,
+                                //string originMessageUser,
                                 string originMessageID)
         {
             if (_accManager.FindUser(user) == null)
             {
                 throw new UserNotFoundException(user);
-            }
-            
-            if (_accManager.FindUser(originMessageUser) == null)
-            {
-                throw new UserNotFoundException(originMessageUser);
             }
 
             //merge toUser list and @somebody in the message content
@@ -142,8 +137,7 @@ namespace MSGorilla.Library
             }
             atUser = validToUsers.ToArray();
 
-            string pk = Message.ToMessagePK(originMessageUser, originMessageID);
-            TableOperation retreiveOperation = TableOperation.Retrieve<UserLineEntity>(pk, originMessageID);
+            TableOperation retreiveOperation = MessageManager.RetrieveUserlineMsgByID<UserLineEntity>(originMessageID);
             TableResult retreiveResult = _userline.Execute(retreiveOperation);
             UserLineEntity originMsg = ((UserLineEntity)retreiveResult.Result);
 
@@ -160,7 +154,7 @@ namespace MSGorilla.Library
             }
 
             //Reply reply = new Reply(user, atUser, msgContent, timestamp, originMessageUser, originMessageID);
-            Reply reply = new Reply(user, msgContent,timestamp, originMessageUser, originMessageID, atUser, richMessageID, attachmentID);
+            Reply reply = new Reply(user, originMsg.Group, msgContent, timestamp, originMessageID, atUser, richMessageID, attachmentID);
 
             //insert reply
             ReplyEntity replyEntity = new ReplyEntity(reply);
