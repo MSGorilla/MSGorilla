@@ -7,7 +7,7 @@
     <ProjectGuid>{9B379A6D-8342-4B10-9F92-739FDA720BA8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MSGorillaWebAPIClient</RootNamespace>
+    <RootNamespace>MSGorilla.WebAPI.Client</RootNamespace>
     <AssemblyName>MSGorillaWebAPIClient</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

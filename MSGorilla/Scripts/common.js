@@ -762,7 +762,7 @@ function unfollowBtnMouseOver(btnid) {
     }
 
     btn.attr("class", "btn btn-danger follow-btn");
-    btn.text("Unfollow");
+    btn.text("- Unfollow");
 }
 
 function unfollowBtnMouseOut(btnid) {
@@ -781,7 +781,7 @@ function setFollowBtn(btnid, user, enabled) {
         return;
     }
 
-    btn.text("Follow");
+    btn.text("+ Follow");
     btn.attr("class", "btn btn-primary follow-btn");
     if (enabled) {
         btn.attr("onclick", "follow('" + btnid + "', '" + user + "');");
@@ -992,7 +992,7 @@ function createUserPopover(data) {
            + "    <div class='user-popover-footer'>";
 
     if (isFollowing == 0) {
-        output += "<a class='btn btn-primary follow-btn' id='btn_userpopover_follow_" + encodeUserid(userid) + "' onclick='follow(\"btn_userpopover_follow_" + encodeUserid(userid) + "\", \"" + userid + "\");'>Follow</a>";
+        output += "<a class='btn btn-primary follow-btn' id='btn_userpopover_follow_" + encodeUserid(userid) + "' onclick='follow(\"btn_userpopover_follow_" + encodeUserid(userid) + "\", \"" + userid + "\");'>+ Follow</a>";
     } else if (isFollowing == 1) {
         output += "<a class='btn btn-success follow-btn' id='btn_userpopover_follow_" + encodeUserid(userid) + "' onclick='unfollow(\"btn_userpopover_follow_" + encodeUserid(userid) + "\", \"" + userid + "\");' onmouseover='unfollowBtnMouseOver(\"btn_userpopover_follow_" + encodeUserid(userid) + "\");' onmouseout='unfollowBtnMouseOut(\"btn_userpopover_follow_" + encodeUserid(userid) + "\");' >Following</a>";
     } else {  // -1: myself
@@ -2201,7 +2201,7 @@ function unlikeBtnMouseOver(btnid) {
     }
 
     btn.attr("class", "btn btn-danger like-btn");
-    btn.text("Unlike");
+    btn.text("- Unlike");
 }
 
 function unlikeBtnMouseOut(btnid) {
@@ -2220,7 +2220,7 @@ function setLikeBtn(btnid, topicid, enabled) {
         return;
     }
 
-    btn.text("Like");
+    btn.text("+ Like");
     btn.attr("class", "btn btn-primary like-btn");
     if (enabled) {
         btn.attr("onclick", "like('" + btnid + "', '" + topicid + "');");

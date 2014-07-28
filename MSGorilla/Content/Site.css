@@ -573,7 +573,7 @@ input[type="checkbox"].input-validation-error {
     font-size: 11px;
     padding: 1px 5px;
     line-height: 1.5;
-    min-width: 50px;
+    min-width: 60px;
 }
 
 .follow-btn {

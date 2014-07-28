@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E6E93222-7D5F-422F-8DFE-D0FDBA190AE8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MSGorilla.SearchEngine</RootNamespace>
+    <AssemblyName>MSGorilla.SearchEngine</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common\Cache.cs" />
+    <Compile Include="Common\Catalog.cs" />
+    <Compile Include="Common\CatalogBinder.cs" />
+    <Compile Include="Common\CatalogWordFile.cs" />
+    <Compile Include="Common\File.cs" />
+    <Compile Include="Common\GoWords\GoWords.cs" />
+    <Compile Include="Common\GoWords\IGoWord.cs" />
+    <Compile Include="Common\Kelvin.cs" />
+    <Compile Include="Common\Location.cs" />
+    <Compile Include="Common\Preferences.cs" />
+    <Compile Include="Common\ResultFile.cs" />
+    <Compile Include="Common\Stemming\IStemming.cs" />
+    <Compile Include="Common\Stemming\NoStemming.cs" />
+    <Compile Include="Common\Stemming\PorterStemmer.cs" />
+    <Compile Include="Common\StopWords\IStopper.cs" />
+    <Compile Include="Common\StopWords\StopWords.cs" />
+    <Compile Include="Common\Word.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Search.cs" />
+    <Compile Include="Common\Documents\Document.cs" />
+    <Compile Include="Common\Documents\DocumentFactory.cs" />
+    <Compile Include="Common\Documents\DocxDocument.cs" />
+    <Compile Include="Common\Documents\DownloadDocument.cs" />
+    <Compile Include="Common\Documents\FilterDocument.cs" />
+    <Compile Include="Common\Documents\HtmlAgilityDocument.cs" />
+    <Compile Include="Common\Documents\HtmlDocument.cs" />
+    <Compile Include="Common\Documents\IgnoreDocument.cs" />
+    <Compile Include="Common\Documents\JpegDocument.cs" />
+    <Compile Include="Common\Documents\PdfDocument.cs" />
+    <Compile Include="Common\Documents\PptxDocument.cs" />
+    <Compile Include="Common\Documents\RtfDocument.cs" />
+    <Compile Include="Common\Documents\TextDocument.cs" />
+    <Compile Include="Common\Documents\XhtmlDocument.cs" />
+    <Compile Include="Common\Documents\XlsxDocument.cs" />
+    <Compile Include="Common\Documents\XmlDocument.cs" />
+    <Compile Include="Common\Documents\XpsDocument.cs" />
+    <Compile Include="ProgressEventArgs.cs" />
+    <Compile Include="RobotsTxt.cs" />
+    <Compile Include="Spider.cs" />
+    <Compile Include="Zip\Crc32.cs" />
+    <Compile Include="Zip\Zip.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
