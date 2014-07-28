@@ -38,12 +38,14 @@ namespace MSGorilla.WebAPI
         public Group AddGroup(string groupID, string displayName = null, string description = null, bool isOpen = false)
         {
             string me = whoami();
-            CacheHelper.Remove(MembershipHelper.JoinedGroupKey);
 
             if(string.IsNullOrEmpty(displayName)){
                 displayName = groupID;
             }
-            return _groupManager.AddGroup(me, groupID, displayName, description, isOpen);
+            Group group =  _groupManager.AddGroup(me, groupID, displayName, description, isOpen);
+
+            MembershipHelper.RefreshJoinedGroup(me);
+            return group;
         }
 
         /// <summary>
@@ -91,8 +93,10 @@ namespace MSGorilla.WebAPI
         [HttpGet, HttpPost]
         public Membership JoinGroup(string groupID)
         {
-            CacheHelper.Remove(MembershipHelper.JoinedGroupKey);
-            return _groupManager.JoinGroup(whoami(), groupID);
+            string me = whoami();
+            Membership member = _groupManager.JoinGroup(whoami(), groupID);
+            MembershipHelper.RefreshJoinedGroup(me);
+            return member;
         }
 
         [HttpGet, HttpPost, HttpPut]
@@ -100,7 +104,9 @@ namespace MSGorilla.WebAPI
         {
             string me = whoami();
             MembershipHelper.CheckAdmin(groupID, me);
-            return _groupManager.AddMember(groupID, whoami(), userid);
+            Membership member = _groupManager.AddMember(groupID, whoami(), userid);
+            MembershipHelper.RefreshJoinedGroup(userid);
+            return member;
         }
 
         [HttpGet, HttpPost, HttpDelete]

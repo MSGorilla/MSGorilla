@@ -7,7 +7,7 @@ namespace MSGorilla.Utility
 {
     public class CacheHelper
     {
-        public static int cacheTimeSpanMin = 10;
+        public static int cacheTimeSpanMin = 15;
         public static void Add<T>(string key, T value) where T : class
         {
             HttpContext.Current.Cache.Insert(

@@ -11,6 +11,7 @@ using MSGorilla.Library.Models;
 using Microsoft.IdentityModel.Claims;
 using System.Web.Http;
 using MSGorilla.Library.Models.ViewModels;
+using MSGorilla.Library.Models.SqlModels;
 
 namespace MSGorilla.Utility
 {
@@ -19,59 +20,88 @@ namespace MSGorilla.Utility
         static AccountManager _accountManager = new AccountManager();
         static GroupManager _groupManager = new GroupManager();
 
-        private static string _userPrefix = "user@";
-        private static string _adminPrefix = "admin@";
+        private static string _membershipPrefix = "membership#";
         private static string _defaultGroup = "defaultGroup";
-        public const string JoinedGroupKey = "joinedGroup";
+        private static string JoinedGroupPrefix = "joinedGroup";
 
         public static void CheckMembership(string groupID, string userid)
         {
-            var session = HttpContext.Current.Session;
-            if (session != null && "true".Equals(session[_userPrefix + groupID]))
+            string key = string.Format("{0}{1}@{2}", _membershipPrefix, userid, groupID);
+            if (CacheHelper.Contains(key))
             {
                 return;
             }
 
             _groupManager.CheckMembership(groupID, userid);
-            session[_userPrefix + groupID] = "true";
+            CacheHelper.Add(key, "member");
         }
 
         public static void CheckAdmin(string groupID, string userid)
         {
-            var session = HttpContext.Current.Session;
-            if (session != null && "true".Equals(session[_adminPrefix + groupID]))
+            string key = string.Format("{0}{1}@{2}", _membershipPrefix, userid, groupID);
+            if (CacheHelper.Contains(key) && "admin".Equals(CacheHelper.Get<string>(key)))
             {
                 return;
             }
 
             _groupManager.CheckAdmin(groupID, userid);
-            session[_adminPrefix + groupID] = "true";
+            CacheHelper.Add(key, "admin");
         }
 
-        public static string[] CheckJoinedGroup(string[] groups = null)
+        public static string[] CheckJoinedGroup(string userid, string[] groups = null)
         {
             if (groups == null)
             {
-                return JoinedGroup().ToArray();
+                return JoinedGroup(userid).ToArray();
             }
 
-            return JoinedGroup().Intersect(groups).ToArray();
+            return JoinedGroup(userid).Intersect(groups).ToArray();
         }
-        public static string[] JoinedGroup()
+
+        public static string DefaultGroup(string userid)
         {
-            if (CacheHelper.Contains(JoinedGroupKey))
+            var session = HttpContext.Current.Session;
+            object obj = session[_defaultGroup];
+            if (obj != null)
             {
-                return CacheHelper.Get<string[]>(JoinedGroupKey);
+                return obj.ToString();
             }
-            List<DisplayMembership> groups = _groupManager.GetJoinedGroup(whoami());
+
+            UserProfile profile = _accountManager.FindUser(userid);
+            if (profile.IsRobot)
+            {
+                session[_defaultGroup] = _groupManager.GetJoinedGroup(profile.Userid)[0].GroupID;
+                return session[_defaultGroup].ToString();
+            }
+            else
+            {
+                session[_defaultGroup] = "microsoft";
+                return "microsoft";
+            }
+        }
+        public static string[] JoinedGroup(string userid)
+        {
+            string key = JoinedGroupPrefix + "#" + userid;
+            if (CacheHelper.Contains(key))
+            {
+                return CacheHelper.Get<string[]>(key);
+            }
+            List<DisplayMembership> groups = _groupManager.GetJoinedGroup(userid);
             List<string> groupIDs = new List<string>();
             foreach (DisplayMembership member in groups)
             {
                 groupIDs.Add(member.GroupID);
             }
 
-            CacheHelper.Add<string[]>(JoinedGroupKey, groupIDs.ToArray());
+            CacheHelper.Add<string[]>(key, groupIDs.ToArray());
             return groupIDs.ToArray();
+        }
+
+        public static string[] RefreshJoinedGroup(string userid)
+        {
+            string key = JoinedGroupPrefix + "#" + userid;
+            CacheHelper.Remove(key);
+            return JoinedGroup(userid);
         }
         public static string whoami()
         {
@@ -89,16 +119,6 @@ namespace MSGorilla.Utility
             
             if(string.IsNullOrEmpty(userid)){
                 throw new AccessDenyException();
-            }
-
-            UserProfile profile = _accountManager.FindUser(userid);
-            if (profile.IsRobot)
-            {
-                session[_defaultGroup] = _groupManager.GetJoinedGroup(profile.Userid)[0].GroupID;
-            }
-            else
-            {
-                session[_defaultGroup] = "microsoft";
             }
 
             return userid;
@@ -162,7 +182,7 @@ namespace MSGorilla.Utility
                 authString = HttpContext.Current.Request.Headers.Get("Authorization");
             }
 
-            if (!string.IsNullOrEmpty(authString))
+            if (string.IsNullOrEmpty(authString))
             {
                 return null;
             }

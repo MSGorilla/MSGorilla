@@ -25,7 +25,7 @@ namespace MSGorilla.Controllers
 
             ViewBag.FeedCategory = "topicline";
 
-            var t = _topicManager.FindTopicByName(topic, MembershipHelper.CheckJoinedGroup(group));
+            var t = _topicManager.FindTopicByName(topic, MembershipHelper.CheckJoinedGroup(myid, group));
             if (t == null)
             {
                 ViewBag.TopicId = -1;

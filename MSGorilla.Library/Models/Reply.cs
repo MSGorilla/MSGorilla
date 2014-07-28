@@ -9,14 +9,14 @@ namespace MSGorilla.Library.Models
 {
     public class Reply : Message
     {
-        //public string MessageUser { get; set; }
+        public string MessageUser { get; set; }
         public string MessageID { get; set; }
         public Reply(
                         string userid,
                         string groupID,
                         string message,
                         DateTime timestamp,
-                        //string messageUser,
+                        string messageUser,
                         string messageID,
                         string[] atUser = null,
                         string richMessageID = null,
@@ -25,7 +25,7 @@ namespace MSGorilla.Library.Models
                 )
             : base(userid, groupID, message, timestamp, "none", "none", null, atUser, null, richMessageID, attachmentID, 2, id)
         {
-            //MessageUser = messageUser;
+            MessageUser = messageUser;
             MessageID = messageID;           
         }
         public string toJsonString(){

@@ -154,7 +154,7 @@ namespace MSGorilla.Library
             }
 
             //Reply reply = new Reply(user, atUser, msgContent, timestamp, originMessageUser, originMessageID);
-            Reply reply = new Reply(user, originMsg.Group, msgContent, timestamp, originMessageID, atUser, richMessageID, attachmentID);
+            Reply reply = new Reply(user, originMsg.Group, msgContent, timestamp, null, originMessageID, atUser, richMessageID, attachmentID);
 
             //insert reply
             ReplyEntity replyEntity = new ReplyEntity(reply);

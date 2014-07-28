@@ -11,7 +11,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 {
     public class BaseReplyEntity : BaseMessageEntity
     {
-        //public string MessageUser { get; set; }
+        public string MessageUser { get; set; }
         public string MessageID { get; set; }
 
         public BaseReplyEntity() { }
@@ -30,7 +30,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
                 this.Group,
                 this.MessageContent,
                 this.PostTime,
-                //this.MessageUser,
+                this.MessageUser,
                 this.MessageID,
                 Utils.String2StringArray(this.AtUser),
                 this.RichMessageID,

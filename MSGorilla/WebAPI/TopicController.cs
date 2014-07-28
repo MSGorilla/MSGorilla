@@ -88,7 +88,7 @@ namespace MSGorilla.WebAPI
         [HttpGet]
         public List<DisplayTopic> SearchTopic(string keyword, [FromUri]string[] group = null)
         {
-            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(group);
+            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(whoami(), group);
             var topiclist = _topicManager.SearchTopic(keyword, joinedGroup);
             var disptopiclist = new List<DisplayTopic>();
 
@@ -151,7 +151,7 @@ namespace MSGorilla.WebAPI
         [HttpGet]
         public List<DisplayTopic> GetAllTopic([FromUri]string[] group = null)
         {
-            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(group);
+            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(whoami(), group);
             var topiclist = _topicManager.GetAllTopics(joinedGroup);
             var disptopiclist = new List<DisplayTopic>();
 
@@ -193,7 +193,7 @@ namespace MSGorilla.WebAPI
         [HttpGet]
         public List<DisplayTopic> HotTopics(int count = 5, [FromUri]string[] group = null)
         {
-            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(group);
+            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(whoami(), group);
             var topiclist = _topicManager.GetHotTopics(joinedGroup, count);
             var disptopiclist = new List<DisplayTopic>();
 
@@ -354,7 +354,7 @@ namespace MSGorilla.WebAPI
         [HttpGet]
         public bool IsFavouriteTopic(string topic, [FromUri]string[] group)
         {
-            group = MembershipHelper.CheckJoinedGroup(group);
+            group = MembershipHelper.CheckJoinedGroup(whoami(), group);
             var t = _topicManager.FindTopicByName(topic, group);
             if (t == null)
             {

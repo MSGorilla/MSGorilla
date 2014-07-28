@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailMonitor", "Robots\Emai
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.SearchEngineSpider", "MSGorilla.SearchEngineSpider\MSGorilla.SearchEngineSpider.csproj", "{D32A56F2-4E8F-4F07-8945-0D084BFB6FFC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportanceCleaner", "ImportanceCleaner\ImportanceCleaner.csproj", "{049459D7-8670-46BC-8B1C-069DF045F61E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -147,6 +149,16 @@ Global
 		{D32A56F2-4E8F-4F07-8945-0D084BFB6FFC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{D32A56F2-4E8F-4F07-8945-0D084BFB6FFC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{D32A56F2-4E8F-4F07-8945-0D084BFB6FFC}.Release|Win32.ActiveCfg = Release|Any CPU
+		{049459D7-8670-46BC-8B1C-069DF045F61E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{049459D7-8670-46BC-8B1C-069DF045F61E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{049459D7-8670-46BC-8B1C-069DF045F61E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{049459D7-8670-46BC-8B1C-069DF045F61E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{049459D7-8670-46BC-8B1C-069DF045F61E}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{049459D7-8670-46BC-8B1C-069DF045F61E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{049459D7-8670-46BC-8B1C-069DF045F61E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{049459D7-8670-46BC-8B1C-069DF045F61E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{049459D7-8670-46BC-8B1C-069DF045F61E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{049459D7-8670-46BC-8B1C-069DF045F61E}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

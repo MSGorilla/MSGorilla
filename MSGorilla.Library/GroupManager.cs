@@ -166,9 +166,15 @@ namespace MSGorilla.Library
         {
             using (var ctx = new MSGorillaContext())
             {
+                UserProfile user = ctx.Users.Find(userid);
+                if (user == null)
+                {
+                    throw new UserNotFoundException(userid);
+                }
+
                 Membership member = new Membership();
                 member.GroupID = groupID;
-                member.MemberID = userid;
+                member.MemberID = user.Userid;
                 member.Role = role;
                 ctx.Memberships.Add(member);
 
