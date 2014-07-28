@@ -172,13 +172,18 @@ namespace MSGorilla.Library
                     throw new UserNotFoundException(userid);
                 }
 
-                Membership member = new Membership();
-                member.GroupID = groupID;
-                member.MemberID = user.Userid;
-                member.Role = role;
-                ctx.Memberships.Add(member);
+                Membership member = ctx.Memberships.Where(m => m.GroupID == groupID && m.MemberID == userid).FirstOrDefault();
+                if (member == null)
+                {
+                    member = new Membership();
+                    member.GroupID = groupID;
+                    member.MemberID = user.Userid;
+                    member.Role = role;
+                    ctx.Memberships.Add(member);
 
-                ctx.SaveChanges();
+                    ctx.SaveChanges();
+                }
+                
                 return member;
             }
         }
