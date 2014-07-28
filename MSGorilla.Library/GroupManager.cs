@@ -162,7 +162,7 @@ namespace MSGorilla.Library
             }
         }
 
-        public Membership AddMember(string groupID, string admin, string userid, string role = "user")
+        public Membership AddMember(string groupID, string userid, string role = "user")
         {
             using (var ctx = new MSGorillaContext())
             {

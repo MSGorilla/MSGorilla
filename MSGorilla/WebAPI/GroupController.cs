@@ -104,7 +104,7 @@ namespace MSGorilla.WebAPI
         {
             string me = whoami();
             MembershipHelper.CheckAdmin(groupID, me);
-            Membership member = _groupManager.AddMember(groupID, whoami(), userid);
+            Membership member = _groupManager.AddMember(groupID, userid);
             MembershipHelper.RefreshJoinedGroup(userid);
             return member;
         }

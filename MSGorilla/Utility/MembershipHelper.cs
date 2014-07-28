@@ -145,6 +145,10 @@ namespace MSGorilla.Utility
                 {
                     UserProfile newUser = Utils.CreateNewUser(userid, GetDisplayName(claims), GetUserTitle(claims));
                     _accountManager.AddUser(newUser);
+
+                    //join default microsoft group
+                    new GroupManager().AddMember("microsoft", newUser.Userid, "user");
+
                     profile = newUser;
                 }
                 if (string.IsNullOrEmpty(profile.PortraitUrl))
