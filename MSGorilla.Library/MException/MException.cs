@@ -204,6 +204,15 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
+    public class HandleRobotMembershipException : MSGorillaBaseException
+    {
+        public HandleRobotMembershipException()
+        {
+            Description = "You can't update a robot's membership.";
+            Code = 6004;
+        }
+    }
+
     public class TopicNotFoundException : MSGorillaBaseException
     {
         public TopicNotFoundException()

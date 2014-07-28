@@ -72,6 +72,10 @@ namespace MSGorilla.Library
             using (var ctx = new MSGorillaContext())
             {
                 Group groupUpdate = ctx.Groups.Find(group.GroupID);
+                if (groupUpdate == null)
+                {
+                    throw new GroupNotExistException();
+                }
                 groupUpdate.Description = group.Description;
                 groupUpdate.DisplayName = group.DisplayName;
                 groupUpdate.IsOpen = group.IsOpen;
@@ -89,6 +93,17 @@ namespace MSGorilla.Library
                 if (group == null)
                 {
                     throw new GroupNotExistException();
+                }
+
+                UserProfile user = ctx.Users.Find(userid);
+                if (user == null)
+                {
+                    throw new UserNotFoundException(userid);
+                }
+
+                if (user.IsRobot)
+                {
+                    throw new HandleRobotMembershipException();
                 }
 
                 Membership member = ctx.Memberships.SqlQuery(
@@ -172,6 +187,11 @@ namespace MSGorilla.Library
                     throw new UserNotFoundException(userid);
                 }
 
+                if (user.IsRobot == true)
+                {
+                    throw new HandleRobotMembershipException();
+                }
+
                 Membership member = ctx.Memberships.Where(m => m.GroupID == groupID && m.MemberID == userid).FirstOrDefault();
                 if (member == null)
                 {
@@ -209,6 +229,10 @@ namespace MSGorilla.Library
             using (var ctx = new MSGorillaContext())
             {
                 Membership member = CheckMembership(groupID, userid, ctx);
+                if ("robot".Equals(member.Role))
+                {
+                    throw new HandleRobotMembershipException();
+                }
                 member.Role = role;
                 ctx.SaveChanges();
                 return member;
