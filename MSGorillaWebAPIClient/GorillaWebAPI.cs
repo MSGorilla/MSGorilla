@@ -74,7 +74,7 @@ namespace MSGorilla.WebAPI.Client
             return sb.ToString();
         }
 
-        public string PostMessage(string message, string schemaID = "none", string eventID = "none", string[] topicName = null, string[] owner = null, string[] atUser = null, string richMessage = null, string[] attachmentID = null, int importance = 2)
+        public string PostMessage(string message, string groupID = null, string schemaID = "none", string eventID = "none", string[] topicName = null, string[] owner = null, string[] atUser = null, string richMessage = null, string[] attachmentID = null, int importance = 2)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + Constant.UriPostMessage);
             request.Method = "POST";
@@ -109,7 +109,8 @@ namespace MSGorilla.WebAPI.Client
                     attachmentStr = "&attachmentID=" + string.Join("&attachmentID=", attachmentID);
                 }
 
-                string msg = string.Format("Message={0}&SchemaID={1}&EventID={2}{3}{4}{5}{6}{7}&importance={8}", 
+                string msg = string.Format("Message={0}&group={1}&SchemaID={2}&EventID={3}{4}{5}{6}{7}{8}&importance={9}", 
+                                            Uri.EscapeDataString(groupID),
                                             Uri.EscapeDataString(message), 
                                             Uri.EscapeDataString(schemaID), 
                                             Uri.EscapeDataString(eventID), 
@@ -153,7 +154,7 @@ namespace MSGorilla.WebAPI.Client
             return Uri.EscapeDataString(longStr);
         }
 
-        public DisplayMessagePagination HomeLine(string userid, int count = 25, string token = "")
+        public DisplayMessagePagination HomeLine(string userid, string group = null, int count = 25, string token = "")
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriHomeLine, userid, count, token));
             request.Headers["Authorization"] = _authHeader;
@@ -169,17 +170,17 @@ namespace MSGorilla.WebAPI.Client
             return JsonConvert.DeserializeObject<List<Message>>(_readResponseContent(response));
         }
 
-        public MessageDetail GetMessage(string userid, string messageID)
-        {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriGetMessage, userid, messageID));
-            request.Headers["Authorization"] = _authHeader;
-            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-            return JsonConvert.DeserializeObject<MessageDetail>(_readResponseContent(response));
-        }
+        //public MessageDetail GetMessage(string userid, string messageID)
+        //{
+        //    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriGetMessage, userid, messageID));
+        //    request.Headers["Authorization"] = _authHeader;
+        //    HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+        //    return JsonConvert.DeserializeObject<MessageDetail>(_readResponseContent(response));
+        //}
 
-        public Message GetRawMessage(string userid, string messageID)
+        public Message GetRawMessage(string messageID)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriGetRawMessage, userid, messageID));
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriGetRawMessage, messageID));
             request.Headers["Authorization"] = _authHeader;
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return JsonConvert.DeserializeObject<Message>(_readResponseContent(response));
@@ -193,7 +194,7 @@ namespace MSGorilla.WebAPI.Client
             return JsonConvert.DeserializeObject<DisplayReplyPagination>(_readResponseContent(response));
         }
 
-        public string PostReply(string[] toUser, string message, string originMessageUserId, string originMessageID, string richMessage = null, string[] attachmentID = null)
+        public string PostReply(string[] toUser, string message, string originMessageID, string richMessage = null, string[] attachmentID = null)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + Constant.UriPostReply);
             request.Method = "POST";
@@ -214,11 +215,10 @@ namespace MSGorilla.WebAPI.Client
                     attachmentIdStr = "&attachmentID=" + string.Join("&attachmentID=", attachmentID);
                 }
 
-                string post = string.Format("To={0}&Message={1}&MessageID={2}&MessageUser={3}&richMessage={4}{5}{6}",
+                string post = string.Format("To={0}&Message={1}&MessageID={2}&richMessage={4}{5}{6}",
                     toUserStr,
                     Uri.EscapeDataString(message),
                     originMessageID,
-                    originMessageUserId,
                     Uri.EscapeDataString(richMessage),
                     toUserStr,
                     attachmentIdStr);
