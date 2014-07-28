@@ -46,7 +46,7 @@ namespace MSGorilla.Library.Models.ViewModels
 
         public DisplayReply() { }
         public DisplayReply(Reply rpl, AccountManager accManager, AttachmentManager attManager)
-            : base(rpl, accManager, attManager)
+            : base(rpl, attManager, accManager)
         {
             this.MessageID = rpl.MessageID;
         }

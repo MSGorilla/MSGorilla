@@ -8,7 +8,7 @@ namespace MSGorilla.WebAPI.Client
 {
     public static class Constant
     {
-        public static string UriRoot = "https://msgorilla.cloudapp.net/api";
+        public  string UriRoot = "https://msgorilla.cloudapp.net/api";
         public static string UriPostMessage = "/Message/PostMessage";
         public static string UriPostReply = "/Reply/PostReply";
         public static string UriGetMessage = "/Message/GetMessage?userid={0}&messageId={1}";

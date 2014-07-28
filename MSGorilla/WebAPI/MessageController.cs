@@ -28,6 +28,35 @@ namespace MSGorilla.WebAPI
         AccountManager _accManager = new AccountManager();
         AttachmentManager _attManager = new AttachmentManager();
 
+        private SimpleUserProfile GetSimpleUserProfile(string userid)
+        {
+            string key = CacheHelper.SimpleUserprofilePrefix + userid;
+            if (CacheHelper.Contains(key))
+            {
+                return CacheHelper.Get<SimpleUserProfile>(key);
+            }
+
+            SimpleUserProfile userprofile = new SimpleUserProfile(_accManager.FindUser(userid));
+            CacheHelper.Add<SimpleUserProfile>(key, userprofile);
+            return userprofile;
+        }
+        private DisplayMessagePagination CreateDisplayMsgPag(MessagePagination msgPag)
+        {
+            DisplayMessagePagination dmp = new DisplayMessagePagination();
+            dmp.continuationToken = msgPag.continuationToken;
+            List<DisplayMessage> msgs = new List<DisplayMessage>();
+            dmp.message = msgs;
+
+            foreach (Message msg in msgPag.message)
+            {
+                DisplayMessage dmsg = new DisplayMessage(msg, _attManager, null);
+                dmsg.User = GetSimpleUserProfile(msg.User);
+                msgs.Add(dmsg);
+            }
+            return dmp;
+        }
+
+
         /// <summary>
         /// Return the messages in the current user's userline in a list
         /// 
@@ -164,7 +193,7 @@ namespace MSGorilla.WebAPI
             MembershipHelper.CheckMembership(group, me);
 
             TableContinuationToken tok = Utils.String2Token(token);
-            return new DisplayMessagePagination(_messageManager.UserLine(userid, group, count, tok));
+            return CreateDisplayMsgPag(_messageManager.UserLine(userid, group, count, tok));
         }
 
         /// <summary>
@@ -225,7 +254,7 @@ namespace MSGorilla.WebAPI
             MembershipHelper.CheckMembership(group, me);
             
             TableContinuationToken tok = Utils.String2Token(token);
-            return new DisplayMessagePagination(_messageManager.UserLine(userid, group, start, end, count, tok));
+            return CreateDisplayMsgPag(_messageManager.UserLine(userid, group, start, end, count, tok));
         }
 
         /// <summary>
@@ -367,7 +396,7 @@ namespace MSGorilla.WebAPI
                 _notifManager.clearHomelineNotifCount(me);
                 _notifManager.clearImportantMsgCount(me);
             }
-            return new DisplayMessagePagination(_messageManager.HomeLine(userid, group, count, tok));
+            return CreateDisplayMsgPag(_messageManager.HomeLine(userid, group, count, tok));
         }
 
         /// <summary>
@@ -445,7 +474,7 @@ namespace MSGorilla.WebAPI
                 _notifManager.clearHomelineNotifCount(me);
                 _notifManager.clearImportantMsgCount(me);
             }
-            return new DisplayMessagePagination(_messageManager.HomeLine(userid, group, start, end, count, tok));
+            return CreateDisplayMsgPag(_messageManager.HomeLine(userid, group, start, end, count, tok));
         }
 
         /// <summary>
@@ -599,7 +628,7 @@ namespace MSGorilla.WebAPI
             {
                 _notifManager.clearOwnerlineNotifCount(me);
             }
-            return new DisplayMessagePagination(_messageManager.OwnerLine(userid, count, tok));
+            return CreateDisplayMsgPag(_messageManager.OwnerLine(userid, count, tok));
         }
 
         /// <summary>
@@ -679,7 +708,7 @@ namespace MSGorilla.WebAPI
             {
                 _notifManager.clearOwnerlineNotifCount(me);
             }
-            return new DisplayMessagePagination(_messageManager.OwnerLine(userid, start, end, count, tok));
+            return CreateDisplayMsgPag(_messageManager.OwnerLine(userid, start, end, count, tok));
         }
 
         /// <summary>
@@ -835,7 +864,7 @@ namespace MSGorilla.WebAPI
                 _notifManager.clearAtlineNotifCount(me);
             }
 
-            return new DisplayMessagePagination(_messageManager.AtLine(userid, count, tok));
+            return CreateDisplayMsgPag(_messageManager.AtLine(userid, count, tok));
         }
 
         /// <summary>
@@ -917,7 +946,7 @@ namespace MSGorilla.WebAPI
                 _notifManager.clearAtlineNotifCount(me);
             }
 
-            return new DisplayMessagePagination(_messageManager.AtLine(userid, start, end, count, tok));
+            return CreateDisplayMsgPag(_messageManager.AtLine(userid, start, end, count, tok));
         }
 
         /// <summary>
@@ -946,7 +975,7 @@ namespace MSGorilla.WebAPI
             AttachmentManager attManage = new AttachmentManager();
             foreach (var m in msglist)
             {
-                msg.Add(new DisplayMessage(m, accManager, attManage));
+                msg.Add(new DisplayMessage(m, attManage, accManager));
             }
 
             return msg;
@@ -1093,7 +1122,7 @@ namespace MSGorilla.WebAPI
             MembershipHelper.CheckMembership(group, me);
 
             TableContinuationToken tok = Utils.String2Token(token);
-            return new DisplayMessagePagination(_messageManager.PublicSquareLine(group, start, end, count, tok));
+            return CreateDisplayMsgPag(_messageManager.PublicSquareLine(group, start, end, count, tok));
         }
 
         /// <summary>
@@ -1163,7 +1192,7 @@ namespace MSGorilla.WebAPI
             }
             MembershipHelper.CheckMembership(group, me);
             TableContinuationToken tok = Utils.String2Token(token);
-            return new DisplayMessagePagination(_messageManager.PublicSquareLine(group, count, tok));
+            return CreateDisplayMsgPag(_messageManager.PublicSquareLine(group, count, tok));
         }
 
         /// <summary>
@@ -1239,7 +1268,7 @@ namespace MSGorilla.WebAPI
             {
                 _topicManager.clearUnreadMsgCountOfFavouriteTopic(me, t.Id);
             }
-            return new DisplayMessagePagination(_messageManager.TopicLine(t.Id.ToString(), count, tok));
+            return CreateDisplayMsgPag(_messageManager.TopicLine(t.Id.ToString(), count, tok));
         }
 
         /// <summary>
@@ -1266,7 +1295,7 @@ namespace MSGorilla.WebAPI
             {
                 _topicManager.clearUnreadMsgCountOfFavouriteTopic(me, t.Id);
             }
-            return new DisplayMessagePagination(_messageManager.TopicLine(t.Id.ToString(), start, end, count, tok));
+            return CreateDisplayMsgPag(_messageManager.TopicLine(t.Id.ToString(), start, end, count, tok));
         }
 
         /// <summary>
@@ -1387,7 +1416,7 @@ namespace MSGorilla.WebAPI
         public DisplayMessage GetDisplayMessage(string msgID)
         {
             whoami();
-            return new DisplayMessage(_messageManager.GetMessage(msgID), _accManager, _attManager);
+            return new DisplayMessage(_messageManager.GetMessage(msgID), _attManager, _accManager);
         }
 
         /// <summary>
@@ -1529,8 +1558,8 @@ namespace MSGorilla.WebAPI
             {
                 MembershipHelper.CheckMembership(group, me);
             }
-            
-            return new DisplayMessage(_messageManager.PostMessage(whoami(), group, eventID, schemaID, owner, atUser, topicName, message, richMessage, attachmentID, importance, DateTime.UtcNow), new AccountManager(), new AttachmentManager());
+
+            return new DisplayMessage(_messageManager.PostMessage(whoami(), group, eventID, schemaID, owner, atUser, topicName, message, richMessage, attachmentID, importance, DateTime.UtcNow), new AttachmentManager(), new AccountManager());
             //return new ActionResult();
         }
 

@@ -7,6 +7,11 @@ namespace MSGorilla.Utility
 {
     public class CacheHelper
     {
+        public const string MembershipPrefix = "membership#";
+        public const string JoinedGroupPrefix = "joinedGroup#";
+        public const string SimpleUserprofilePrefix = "simpleUserprofile#";
+
+
         public static int cacheTimeSpanMin = 15;
         public static void Add<T>(string key, T value) where T : class
         {

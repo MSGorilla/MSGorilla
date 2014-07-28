@@ -20,13 +20,13 @@ namespace MSGorilla.Utility
         static AccountManager _accountManager = new AccountManager();
         static GroupManager _groupManager = new GroupManager();
 
-        private static string _membershipPrefix = "membership#";
         private static string _defaultGroup = "defaultGroup";
-        private static string JoinedGroupPrefix = "joinedGroup";
+
+        
 
         public static void CheckMembership(string groupID, string userid)
         {
-            string key = string.Format("{0}{1}@{2}", _membershipPrefix, userid, groupID);
+            string key = string.Format("{0}{1}@{2}", CacheHelper.MembershipPrefix, userid, groupID);
             if (CacheHelper.Contains(key))
             {
                 return;
@@ -38,7 +38,7 @@ namespace MSGorilla.Utility
 
         public static void CheckAdmin(string groupID, string userid)
         {
-            string key = string.Format("{0}{1}@{2}", _membershipPrefix, userid, groupID);
+            string key = string.Format("{0}{1}@{2}", CacheHelper.MembershipPrefix, userid, groupID);
             if (CacheHelper.Contains(key) && "admin".Equals(CacheHelper.Get<string>(key)))
             {
                 return;
@@ -81,7 +81,7 @@ namespace MSGorilla.Utility
         }
         public static string[] JoinedGroup(string userid)
         {
-            string key = JoinedGroupPrefix + "#" + userid;
+            string key = CacheHelper.JoinedGroupPrefix + userid;
             if (CacheHelper.Contains(key))
             {
                 return CacheHelper.Get<string[]>(key);
@@ -99,7 +99,7 @@ namespace MSGorilla.Utility
 
         public static string[] RefreshJoinedGroup(string userid)
         {
-            string key = JoinedGroupPrefix + "#" + userid;
+            string key = CacheHelper.JoinedGroupPrefix + userid;
             CacheHelper.Remove(key);
             return JoinedGroup(userid);
         }
