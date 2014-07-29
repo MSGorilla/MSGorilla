@@ -99,11 +99,11 @@ namespace MSGorilla.Library
             }
 
             if (id.Contains('\\') ||
-                id.Contains('|') || 
+                id.Contains('|') ||
                 id.Contains(' ') ||
-                id.Contains('@') || 
-                id.Contains('?') || 
-                id.Contains('/') || 
+                id.Contains('@') ||
+                id.Contains('?') ||
+                id.Contains('/') ||
                 id.Contains('#') ||
                 id.Contains('\t') ||
                 id.Contains('\n') ||
@@ -237,6 +237,58 @@ namespace MSGorilla.Library
             return str.Split('|');
         }
 
+        public static string Array2String<T>(T[] array)
+        {
+            if (array == null || array.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < (array.Length - 1); i++)
+            {
+                sb.Append(array[i].ToString());
+                sb.Append("|");
+            }
+            sb.Append(array[array.Length - 1]);
+            return sb.ToString();
+        }
+
+        public static int[] String2IntArray(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return new int[0];
+            }
+
+            var l = str.Split('|');
+            List<int> a = new List<int>();
+            foreach (var s in l)
+            {
+                a.Add(Convert.ToInt32(s));
+            }
+
+            return a.ToArray();
+        }
+
+        public delegate T String2T<T>(string s);
+        public static T[] String2Array<T>(string str, String2T<T> convert)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return new T[0];
+            }
+
+            var l = str.Split('|');
+            List<T> a = new List<T>();
+            foreach (var s in l)
+            {
+                a.Add(convert(s));
+            }
+
+            return a.ToArray<T>();
+        }
+
         public static string Txt2Html(string text)
         {
             if (string.IsNullOrEmpty(text))
@@ -281,6 +333,20 @@ namespace MSGorilla.Library
             int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
             double num = Math.Round(bytes / Math.Pow(1024, place), 1);
             return (Math.Sign(byteCount) * num).ToString() + suf[place];
+        }
+
+        public static bool IsNullOrEmptyOrNone(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return true;
+            }
+            if (str.Equals("none", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

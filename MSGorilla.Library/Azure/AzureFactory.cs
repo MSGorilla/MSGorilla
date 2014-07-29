@@ -29,7 +29,8 @@ namespace MSGorilla.Library.Azure
             ReplyArchive,
             Attachment,
             RichMessage,
-            Statistics
+            Statistics,
+            WordsIndex
         }
 
         public enum MSGorillaQueue
@@ -73,6 +74,7 @@ namespace MSGorilla.Library.Azure
             _tableDict.Add(MSGorillaTable.Attachment, "Attachment");
             _tableDict.Add(MSGorillaTable.RichMessage, "RichMessage");
             _tableDict.Add(MSGorillaTable.Statistics, "Statistics");
+            _tableDict.Add(MSGorillaTable.WordsIndex, "WordsIndex");
 
             // init queue dict
             _queueDict = new Dictionary<MSGorillaQueue, string>();

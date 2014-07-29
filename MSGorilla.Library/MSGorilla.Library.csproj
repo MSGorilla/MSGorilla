@@ -126,6 +126,7 @@
     <Compile Include="Models\AzureModels\Entity\StatisticsEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\TopicLine.cs" />
     <Compile Include="Models\AzureModels\Entity\UserLineEntity.cs" />
+    <Compile Include="Models\AzureModels\Entity\WordIndexEntity.cs" />
     <Compile Include="Models\AzureModels\Queue\QueueMessage.cs" />
     <Compile Include="Models\Reply.cs" />
     <Compile Include="Models\SqlModels\FavouriteTopic.cs" />
@@ -178,6 +179,12 @@
     <EmbeddedResource Include="Migrations\201407030519350_add_important_msg_count.resx">
       <DependentUpon>201407030519350_add_important_msg_count.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MSGorilla.SearchEngine\MSGorilla.SearchEngine.csproj">
+      <Project>{e6e93222-7d5f-422f-8dfe-d0fdba190ae8}</Project>
+      <Name>MSGorilla.SearchEngine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
