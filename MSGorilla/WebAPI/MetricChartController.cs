@@ -14,6 +14,13 @@ namespace MSGorilla.WebAPI
     {
         MetricManager _metricManager = new MetricManager();
 
+        [HttpGet]
+        public MetricDataSet GetDataSet(int id)
+        {
+            string me = whoami();
+            return _metricManager.GetDateSet(id);
+        }
+
         [HttpGet, HttpPost]
         public MetricDataSet AddDataSet(string name, string group, string description = null)
         {
