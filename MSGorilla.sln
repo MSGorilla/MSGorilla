@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla", "MSGorilla\MSGo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.Library", "MSGorilla.Library\MSGorilla.Library.csproj", "{AD407F7A-F82C-4C44-98F9-C2145A5F4A50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.Woker", "MSGorilla.Woker\MSGorilla.Woker.csproj", "{A054E07C-849A-44A4-9300-FF892E2F4479}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.Worker", "MSGorilla.Woker\MSGorilla.Worker.csproj", "{A054E07C-849A-44A4-9300-FF892E2F4479}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeFlowMonitor", "CodeFlowMonitor\CodeFlowMonitor.csproj", "{8B67E716-4250-479C-BD18-C2931556B0BC}"
 EndProject

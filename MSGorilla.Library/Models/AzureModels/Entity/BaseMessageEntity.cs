@@ -13,6 +13,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
     public class BaseMessageEntity : TableEntity
     {
         public string User { get; set; }
+        public string Group { get; set; }
         public string ID { get; set; }
         public string EventID { get; set; }
         public string SchemaID { get; set; }
@@ -31,6 +32,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
         public BaseMessageEntity(Message message, string pk = null, string rk = null)
         {
             this.User = message.User;
+            this.Group = message.Group;
             this.ID = message.ID;
             this.EventID = HttpUtility.UrlEncode(message.EventID);
             this.SchemaID = message.SchemaID;
@@ -63,6 +65,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 
             Message message = new Message(
                     this.User,
+                    this.Group,
                     this.MessageContent,
                     this.PostTime,
                     HttpUtility.UrlDecode(this.EventID),

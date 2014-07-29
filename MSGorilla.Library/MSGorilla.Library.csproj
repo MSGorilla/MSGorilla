@@ -86,6 +86,7 @@
     <Compile Include="Azure\AzureFactory.cs" />
     <Compile Include="DAL\MSGorillaContext.cs" />
     <Compile Include="GroupManager.cs" />
+    <Compile Include="MetricManager.cs" />
     <Compile Include="MException\MException.cs" />
     <Compile Include="Migrations\201405190317263_initialCreate.cs" />
     <Compile Include="Migrations\201405190317263_initialCreate.Designer.cs">
@@ -132,6 +133,7 @@
     <Compile Include="Models\SqlModels\FavouriteTopic.cs" />
     <Compile Include="Models\SqlModels\Group.cs" />
     <Compile Include="Models\SqlModels\Membership.cs" />
+    <Compile Include="Models\SqlModels\MetricDataSet.cs" />
     <Compile Include="Models\SqlModels\NotificationCount.cs" />
     <Compile Include="Models\SqlModels\Schema.cs" />
     <Compile Include="Models\SqlModels\Subscription.cs" />

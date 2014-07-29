@@ -203,4 +203,31 @@ namespace MSGorilla.Library.Exceptions
             Code = 6003;
         }
     }
+
+    public class HandleRobotMembershipException : MSGorillaBaseException
+    {
+        public HandleRobotMembershipException()
+        {
+            Description = "You can't update a robot's membership.";
+            Code = 6004;
+        }
+    }
+
+    public class TopicNotFoundException : MSGorillaBaseException
+    {
+        public TopicNotFoundException()
+        {
+            Description = "The specified topic not found.";
+            Code = 7001;
+        }
+    }
+
+    public class MetricDataSetNotFoundException : MSGorillaBaseException
+    {
+        public MetricDataSetNotFoundException()
+        {
+            Description = "The specified metric data not found.";
+            Code = 8001;
+        }
+    }
 }

@@ -39,7 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MSGorilla.SpiderContent\" />
-    <Folder Include="MSGorilla.WokerContent\" />
+    <Folder Include="MSGorilla.WorkerContent" />
     <Folder Include="MSGorillaContent\" />
     <Folder Include="Profiles" />
   </ItemGroup>
@@ -47,7 +47,7 @@
     <Content Include="MSGorilla.SpiderContent\diagnostics.wadcfg">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="MSGorilla.WokerContent\diagnostics.wadcfg">
+    <Content Include="MSGorilla.WorkerContent\diagnostics.wadcfg">
       <SubType>Content</SubType>
     </Content>
     <Content Include="MSGorillaContent\diagnostics.wadcfg">
@@ -63,13 +63,12 @@
       <RoleName>MSGorilla.Spider</RoleName>
       <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
-    <ProjectReference Include="..\MSGorilla.Woker\MSGorilla.Woker.csproj">
-      <Name>MSGorilla.Woker</Name>
+    <ProjectReference Include="..\MSGorilla.Woker\MSGorilla.Worker.csproj">
+      <Name>MSGorilla.Worker</Name>
       <Project>{a054e07c-849a-44a4-9300-ff892e2f4479}</Project>
       <Private>True</Private>
       <RoleType>Worker</RoleType>
-      <RoleName>MSGorilla.Woker</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+      <RoleName>MSGorilla.Worker</RoleName>
     </ProjectReference>
     <ProjectReference Include="..\MSGorilla\MSGorilla.csproj">
       <Name>MSGorilla</Name>

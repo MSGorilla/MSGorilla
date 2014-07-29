@@ -29,6 +29,7 @@ namespace MSGorilla.Library.Azure
             ReplyArchive,
             Attachment,
             RichMessage,
+            MetricDataSet,
             Statistics,
             WordsIndex
         }
@@ -73,6 +74,7 @@ namespace MSGorilla.Library.Azure
             _tableDict.Add(MSGorillaTable.ReplyArchive, "ReplyArchive");
             _tableDict.Add(MSGorillaTable.Attachment, "Attachment");
             _tableDict.Add(MSGorillaTable.RichMessage, "RichMessage");
+            _tableDict.Add(MSGorillaTable.MetricDataSet, "MetricDataSet");
             _tableDict.Add(MSGorillaTable.Statistics, "Statistics");
             _tableDict.Add(MSGorillaTable.WordsIndex, "WordsIndex");
 

@@ -16,7 +16,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
         {
             //this.PartitionKey = reply.MessageID;
             //this.RowKey = reply.ReplyID;
-
+       
             //Content = reply.toJsonString();
         }
     }

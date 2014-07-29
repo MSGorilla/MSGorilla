@@ -19,16 +19,15 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
         public BaseReplyEntity(Reply reply, string pk = null, string rk = null ):
             base(reply, pk, rk)
         {
-            this.MessageUser = reply.MessageUser;
+            //this.MessageUser = reply.MessageUser;
             this.MessageID = reply.MessageID;
         }
 
         public Reply ToReply()
         {
-            //if (string.IsNullOrEmpty(this.Content))
-            //{
             Reply reply = new Reply(
                 this.User,
+                this.Group,
                 this.MessageContent,
                 this.PostTime,
                 this.MessageUser,
@@ -39,20 +38,6 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
                 this.ID
             );
             return reply;
-            //}
-
-            ////compatible with old version one column format
-            //JObject obj = JObject.Parse(this.Content);
-            //Reply oldFormatReply = new Reply(
-            //        (string)obj["FromUser"],
-            //        new string[] { (string)obj["ToUser"] },
-            //        (string)obj["Message"],
-            //        DateTime.Parse((string)obj["PostTime"]),
-            //        (string)obj["MessageUser"],
-            //        (string)obj["MessageID"],
-            //        (string)obj["ReplyID"]
-            //    );
-            //return oldFormatReply;
         }
     }
 }

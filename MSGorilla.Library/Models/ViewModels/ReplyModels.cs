@@ -41,15 +41,14 @@ namespace MSGorilla.Library.Models.ViewModels
                 return "reply";
             }
         }
-        public string MessageUser { get; set; }
+        //public string MessageUser { get; set; }
         public string MessageID { get; set; }
 
         public DisplayReply() { }
         public DisplayReply(Reply rpl, AccountManager accManager, AttachmentManager attManager)
-            : base(rpl, accManager, attManager)
+            : base(rpl, attManager, accManager)
         {
             this.MessageID = rpl.MessageID;
-            this.MessageUser = rpl.MessageUser;
         }
     }
 }

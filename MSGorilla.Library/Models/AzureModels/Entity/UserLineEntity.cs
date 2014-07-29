@@ -15,7 +15,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
         {
             this.PartitionKey = string.Format("{0}_{1}", msg.User,
                 Utils.ToAzureStorageDayBasedString(msg.PostTime.ToUniversalTime()));    //Partition key
-            this.RowKey = msg.ID;
+            this.RowKey = string.Format("{0}_{1}", msg.Group, msg.ID);
             ReplyCount = replyCount;
         }
 

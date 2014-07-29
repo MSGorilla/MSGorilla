@@ -13,6 +13,7 @@ namespace MSGorilla.Library.Models
         public string MessageID { get; set; }
         public Reply(
                         string userid,
+                        string groupID,
                         string message,
                         DateTime timestamp,
                         string messageUser,
@@ -21,8 +22,8 @@ namespace MSGorilla.Library.Models
                         string richMessageID = null,
                         string[] attachmentID = null,
                         string id = null
-                ) 
-            : base(userid, message, timestamp, "none", "none", null, atUser, null, richMessageID, attachmentID, 2, id)
+                )
+            : base(userid, groupID, message, timestamp, "none", "none", null, atUser, null, richMessageID, attachmentID, 2, id)
         {
             MessageUser = messageUser;
             MessageID = messageID;           
