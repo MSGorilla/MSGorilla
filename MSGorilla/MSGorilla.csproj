@@ -255,6 +255,7 @@
     <Compile Include="WebAPI\MessageController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="WebAPI\MetricChartController.cs" />
     <Compile Include="WebAPI\ReplyController.cs" />
     <Compile Include="WebAPI\SchemaController.cs" />
     <Compile Include="WebAPI\TopicController.cs" />
@@ -360,6 +361,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Views\Attachment\" />
     <Folder Include="Views\HandleCustomError\" />
+    <Folder Include="Views\MetricChart\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

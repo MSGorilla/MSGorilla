@@ -221,4 +221,13 @@ namespace MSGorilla.Library.Exceptions
             Code = 7001;
         }
     }
+
+    public class MetricDataSetNotFoundException : MSGorillaBaseException
+    {
+        public MetricDataSetNotFoundException()
+        {
+            Description = "The specified metric data not found.";
+            Code = 8001;
+        }
+    }
 }

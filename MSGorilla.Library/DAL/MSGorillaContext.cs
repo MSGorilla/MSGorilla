@@ -18,6 +18,7 @@ namespace MSGorilla.Library.DAL
         public DbSet<FavouriteTopic> favouriteTopic { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Membership> Memberships { get; set; }
+        public DbSet<MetricDataSet> MetricDatas { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
