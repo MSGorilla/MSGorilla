@@ -12,14 +12,18 @@ namespace MSGorilla.Utility
         public const string SimpleUserprofilePrefix = "simpleUserprofile#";
 
 
-        public static int cacheTimeSpanMin = 15;
-        public static void Add<T>(string key, T value) where T : class
+        private const int DefaultCacheTimeSpanMin = 15;
+        public static void Add<T>(string key, T value, DateTime? absoluteExpiration = null) where T : class
         {
+            if (absoluteExpiration == null)
+            {
+                absoluteExpiration = DateTime.Now.AddMinutes(DefaultCacheTimeSpanMin);
+            }
             HttpContext.Current.Cache.Insert(
                     key,
                     value,
                     null,
-                    DateTime.Now.AddMinutes(cacheTimeSpanMin),
+                    absoluteExpiration.Value,
                     System.Web.Caching.Cache.NoSlidingExpiration
                 );
         }

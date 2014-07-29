@@ -38,7 +38,7 @@ namespace MSGorilla.Library
         }
 
 
-        public const int MaxMetricRecord = 5;
+        public const int MaxMetricRecord = 100;
 
         public int Count
         {
