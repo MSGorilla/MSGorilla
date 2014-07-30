@@ -12,26 +12,25 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
     public class WordIndexEntity : TableEntity
     {
         public string Word { get; set; }
-        public DateTime CreatedTime { get; set; }
         public string MessageUserId { get; set; }
         public string MessageId { get; set; }
         public int WordCount { get; set; }
         public string WordPositions { get; set; }
         //public string MessageSnapshot { get; set; }
 
-        public WordIndexEntity(string word, string userId, string msgId, List<int> posList)
+        public WordIndexEntity(string word, MessageIdentity msg, List<int> posList)
         {
             Word = word;
-            CreatedTime = DateTime.UtcNow;
-            MessageUserId = userId;
-            MessageId = msgId;
+            MessageUserId = msg.UserId;
+            MessageId = msg.MessageId;
             WordCount = posList.Count();
             WordPositions = Utils.Array2String<int>(posList.ToArray());
             ///MessageSnapshot = GenarateMessageSnapshot(word, posList, msgWords);
 
+            DateTime createdDate = DateTime.UtcNow;
             this.PartitionKey = string.Format("{0}_{1}", Word,
-                Utils.ToAzureStorageDayBasedString(CreatedTime));
-            this.RowKey = msgId;
+                Utils.ToAzureStorageDayBasedString(createdDate));
+            this.RowKey = Utils.ToAzureStorageSecondBasedString(createdDate) + "_" + MessageId;
         }
 
         public MessageIdentity GetMessage()

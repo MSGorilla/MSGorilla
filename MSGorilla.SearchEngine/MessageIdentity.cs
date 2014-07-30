@@ -9,16 +9,9 @@ namespace MSGorilla.SearchEngine
     public class MessageIdentity
     {
         #region Fields
-        private int _indexId;
         private string _userId;
         private string _messageId;
         #endregion
-
-        public int IndexId
-        {
-            get { return _indexId; }
-            set { _indexId = value; }
-        }
 
         public string UserId
         {
@@ -34,14 +27,12 @@ namespace MSGorilla.SearchEngine
 
         public MessageIdentity()
         {
-            _indexId = -1;
         }
 
         public MessageIdentity(string userId, string messageId)
         {
             _userId = userId;
             _messageId = messageId;
-            _indexId = -1;
         }
 
         public string ToMessageString()
@@ -54,7 +45,6 @@ namespace MSGorilla.SearchEngine
             var a = msgString.Split(';');
             _userId = a[0];
             _messageId = a[1];
-            _indexId = -1;
 
             return this;
         }

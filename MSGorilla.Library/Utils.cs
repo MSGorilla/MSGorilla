@@ -55,7 +55,7 @@ namespace MSGorilla.Library
             {
                 timestamp = timestamp.ToUniversalTime();
             }
-            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalMilliseconds).ToString();
+            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalMilliseconds).ToString("D15");
             //return timestamp.ToUniversalTime().ToString("yyyyMMddHHmmss");
         }
 
@@ -65,17 +65,17 @@ namespace MSGorilla.Library
             {
                 timestamp = timestamp.ToUniversalTime();
             }
-            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalDays).ToString();
+            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalDays).ToString("D7");
             //return timestamp.ToUniversalTime().ToString("yyyyMMdd");
         }
 
-        public static string ToAzureStorageMonthBasedString(DateTime timestamp, bool toUtc = true)
+        public static string ToAzureStorageHourBasedString(DateTime timestamp, bool toUtc = true)
         {
             if (toUtc)
             {
                 timestamp = timestamp.ToUniversalTime();
             }
-            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalDays / 30).ToString();
+            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalHours).ToString();
             //return timestamp.ToUniversalTime().ToString("yyyyMMdd");
         }
 

@@ -28,9 +28,13 @@ namespace MSGorilla.Library
 {
     public class SearchManager
     {
+        #region private fields
         private readonly string Separator = Environment.NewLine;
+        private readonly double SearchDelaySeconds = 600;
 
         private CloudTable _wordsIndexTable = null;
+        private CloudTable _searchResultsTable = null;
+        private CloudTable _searchHistoryTable = null;
 
         /// <summary>Stemmer to use</summary>
         private IStemming _stemmer = new PorterStemmer();
@@ -42,14 +46,14 @@ namespace MSGorilla.Library
         private IGoWord _goWord = new ListGoWord();
 
         /// <summary>Display string: time the search too</summary>
-        private string _DisplayTime;
-
-        /// <summary>Display string: matches (links and number of)</summary>
-        private string _Matches = "";
+        private TimeSpan _searchTime;
+        #endregion
 
         public SearchManager()
         {
             _wordsIndexTable = AzureFactory.GetTable(AzureFactory.MSGorillaTable.WordsIndex);
+            _searchResultsTable = AzureFactory.GetTable(AzureFactory.MSGorillaTable.SearchResults);
+            _searchHistoryTable = AzureFactory.GetTable(AzureFactory.MSGorillaTable.SearchHistory);
         }
 
         public void SpideMessage(Message message)
@@ -65,31 +69,72 @@ namespace MSGorilla.Library
             // segment msg text string to word list
             Dictionary<string, Word> wordsIndex = GenarateWordsIndex(message, msgText);
 
-            // add counted result into table
+            // save counted results into table
             SaveWordsIndex(wordsIndex);
         }
 
-        public SortedList SearchMessage(string keywords)
+        public string SearchMessage(string keywords)
         {
-            SortedList output = new SortedList();
-
             if (string.IsNullOrEmpty(keywords.Trim()))
             {
-                return output;
+                return string.Empty;
             }
 
             // segment keywords
             string[] keywordsArray = SplitWords(keywords);
             if (keywordsArray == null || keywordsArray.Count() == 0)
             {
-                return output;
+                return string.Empty;
+            }
+
+            // get search id
+            string searchId = GenarateSearchId(keywordsArray);
+
+            // check whether we have to search again
+            DateTime now = DateTime.UtcNow;
+            DateTime lastSearchDate = GetSearchHistory(searchId);
+            if (now.Subtract(lastSearchDate).TotalSeconds < SearchDelaySeconds)
+            {   // do not search, use last search result
+                return searchId;
             }
 
             // search every keyword
-            output = SearchKeywords(keywordsArray);
+            var searchResults = SearchKeywords(keywordsArray, lastSearchDate);
 
-            // return result
-            return output;
+            // save results into table
+            SaveSearchResults(searchId, searchResults);
+
+            // update search history
+            UpdateSearchHistory(searchId, now);
+
+            // return search id
+            return searchId;
+        }
+
+        public MessagePagination GetSearchResults(string resultId, int count = 25, TableContinuationToken continuationToken = null)
+        {
+            var mm = new MessageManager();
+
+            string query = TableQuery.GenerateFilterCondition(
+                "PartitionKey",
+                QueryComparisons.Equal,
+                resultId);
+
+            TableQuery<SearchResultEntity> tableQuery = new TableQuery<SearchResultEntity>().Where(query).Take(count);
+            TableQuerySegment<SearchResultEntity> queryResult = _searchResultsTable.ExecuteQuerySegmented(tableQuery, continuationToken);
+
+            MessagePagination ret = new MessagePagination();
+            ret.continuationToken = Utils.Token2String(queryResult.ContinuationToken);
+            ret.message = new List<Message>();
+            foreach (SearchResultEntity entity in queryResult)
+            {
+                var message = mm.GetMessage(entity.MessageId);
+                if (message != null)
+                {
+                    ret.message.Add(message);
+                }
+            }
+            return ret;
         }
 
         private string GenarateMessageString(Message message)
@@ -220,6 +265,7 @@ namespace MSGorilla.Library
             foreach (string word in wordsArray)
             {
                 key = word.ToLower();
+
                 if (!_goWord.IsGoWord(key))
                 {	// not a special case, parse like any other word
                     RemovePunctuation(ref key);
@@ -262,16 +308,100 @@ namespace MSGorilla.Library
                     msg.FromMessageString(m.Key);
                     var pos = m.Value;
 
-                    WordIndexEntity entity = new WordIndexEntity(word.Text, msg.UserId, msg.MessageId, pos);
+                    WordIndexEntity entity = new WordIndexEntity(word.Text, msg, pos);
                     TableOperation insertOperation = TableOperation.InsertOrReplace(entity);
                     _wordsIndexTable.Execute(insertOperation);
                 }
             }
         }
 
-        private Dictionary<string, List<int>> SearchWordsIndex(string keyword)
+        private string GenarateSearchId(string[] keywordsArray)
         {
-            string query = GeneratePKStartWithConditionQuery(keyword + "_");
+            StringBuilder sb = new StringBuilder();
+            foreach (var s in keywordsArray)
+            {
+                if (!string.IsNullOrEmpty(s))
+                {
+                    sb.Append(s + "_");
+                }
+            }
+            return Utils.MD5Encoding(sb.ToString());
+        }
+
+        private Dictionary<string, int> SearchKeywords(string[] keywordsArray, DateTime lastSearchDate)
+        {
+            Dictionary<string, int> output = new Dictionary<string, int>();
+            // Array of arrays of results that match ONE of the search criteria
+            Dictionary<string, List<int>>[] searchResultsArrayArray = new Dictionary<string, List<int>>[keywordsArray.Length];
+            // finalResultsArray is populated with pages that *match* either of the search criteria
+            Dictionary<string, int[]> finalResultsArray = new Dictionary<string, int[]>();
+            DateTime start = DateTime.Now;  // to show 'time taken' to perform search
+
+            // ##### THE SEARCH #####
+            for (int i = 0; i < keywordsArray.Length; i++)
+            {
+                if (string.IsNullOrEmpty(keywordsArray[i]))
+                {
+                    searchResultsArrayArray[i] = null;
+                }
+                else
+                {
+                    searchResultsArrayArray[i] = SearchWordsIndex(keywordsArray[i], lastSearchDate);
+                }
+            }
+
+            // merge arraylist
+            foreach (var searchResultsArray in searchResultsArrayArray)
+            {
+                foreach (string mi in searchResultsArray.Keys)
+                {
+                    int weight = searchResultsArray[mi].Count;
+                    if (!finalResultsArray.ContainsKey(mi))
+                    {   // new add
+
+                        finalResultsArray.Add(mi, new int[2] { 1, weight });
+                    }
+                    else
+                    {   // modify
+                        int[] i = finalResultsArray[mi];
+                        i[0]++;
+                        i[1] += weight;
+                        finalResultsArray[mi] = i;
+                    }
+                }
+            }
+
+            // Time taken calculation
+            Int64 ticks = DateTime.Now.Ticks - start.Ticks;
+            _searchTime = new TimeSpan(ticks);
+
+            // Format the results
+            if (finalResultsArray.Count > 0)
+            {
+                int sortrank = 0;
+
+                // build each result row
+                foreach (string mi in finalResultsArray.Keys)
+                {
+                    sortrank = finalResultsArray[mi][0] * finalResultsArray[mi][1];
+                    if (output.ContainsKey(mi))
+                    {
+                        output[mi] = Math.Max(output[mi], sortrank);
+                    }
+                    else
+                    {
+                        output.Add(mi, sortrank);
+                    }
+                    sortrank = 0;	// reset for next pass
+                }
+            } // else Count == 0, so output SortedList will be empty
+
+            return output;
+        }
+
+        private Dictionary<string, List<int>> SearchWordsIndex(string keyword, DateTime lastSearchDate)
+        {
+            string query = GenerateWordIndexConditionQuery(keyword, lastSearchDate);
 
             TableQuery<WordIndexEntity> tableQuery = new TableQuery<WordIndexEntity>().Where(query);
             var queryResult = _wordsIndexTable.ExecuteQuery<WordIndexEntity>(tableQuery);
@@ -296,17 +426,47 @@ namespace MSGorilla.Library
             return ret;
         }
 
-        private string GeneratePKStartWithConditionQuery(string startWith)
+        private void SaveSearchResults(string searchId, Dictionary<string, int> searchResults)
         {
-            if (!Utils.IsValidID(startWith))
+            foreach (var key in searchResults.Keys)
             {
-                throw new InvalidIDException();
-            }
+                var mi = new MessageIdentity().FromMessageString(key);
+                var rank = searchResults[key];
 
+                SearchResultEntity entity = new SearchResultEntity(searchId, rank, mi);
+                TableOperation insertOperation = TableOperation.InsertOrReplace(entity);
+                _searchResultsTable.Execute(insertOperation);
+            }
+        }
+
+        private DateTime GetSearchHistory(string searchId)
+        {
+            TableResult result = _searchHistoryTable.Execute(TableOperation.Retrieve<SearchHistoryEntity>(searchId, searchId));
+            SearchHistoryEntity entity = result.Result as SearchHistoryEntity;
+            if (entity != null)
+            {
+                return entity.LastSearchDateUTC;
+            }
+            else
+            {
+                return DateTime.MinValue;
+            }
+        }
+
+        private void UpdateSearchHistory(string searchId, DateTime searchDate)
+        {
+            SearchHistoryEntity entity = new SearchHistoryEntity(searchId, searchDate);
+            TableResult result = _searchHistoryTable.Execute(TableOperation.InsertOrReplace(entity));
+        }
+
+        private string GenerateWordIndexConditionQuery(string word, DateTime fromDate)
+        {
+            var wordStr = word + "_";
+            // pk = word_-days
             string query = TableQuery.GenerateFilterCondition(
                 "PartitionKey",
                 QueryComparisons.LessThan,
-                Utils.NextKeyString(startWith));
+                Utils.NextKeyString(wordStr));
 
             query = TableQuery.CombineFilters(
                 query,
@@ -314,108 +474,23 @@ namespace MSGorilla.Library
                 TableQuery.GenerateFilterCondition(
                     "PartitionKey",
                     QueryComparisons.GreaterThanOrEqual,
-                    startWith
+                    wordStr
                 )
             );
+
+            // rk = -ms_msgid
+            var dateStr = Utils.ToAzureStorageSecondBasedString(fromDate) + "_";
+            query = TableQuery.CombineFilters(
+                query,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition(
+                    "RowKey",
+                    QueryComparisons.LessThan,
+                    Utils.NextKeyString(dateStr)
+                )
+            );
+
             return query;
-        }
-
-        private SortedList SearchKeywords(string[] keywordsArray)
-        {
-            SortedList output = new SortedList();
-            // Array of arrays of results that match ONE of the search criteria
-            Dictionary<string, List<int>>[] searchResultsArrayArray = new Dictionary<string, List<int>>[keywordsArray.Length];
-            // finalResultsArray is populated with pages that *match* either of the search criteria
-            Dictionary<string, int[]> finalResultsArray = new Dictionary<string, int[]>();
-            DateTime start = DateTime.Now;  // to show 'time taken' to perform search
-
-            // ##### THE SEARCH #####
-            for (int i = 0; i < keywordsArray.Length; i++)
-            {
-                if (string.IsNullOrEmpty(keywordsArray[i]))
-                {
-                    searchResultsArrayArray[i] = null;
-                }
-                else
-                {
-                    searchResultsArrayArray[i] = SearchWordsIndex(keywordsArray[i]);
-                }
-            }
-
-            // merge arraylist
-            foreach (var searchResultsArray in searchResultsArrayArray)
-            {
-                foreach (string mi in searchResultsArray.Keys)
-                {
-                    int weight = searchResultsArray[mi].Count;
-                    if (!finalResultsArray.ContainsKey(mi))
-                    {   // new add
-
-                        finalResultsArray.Add(mi, new int[2] { 1, weight });
-                    }
-                    else
-                    {   // modify
-                        int[] i = finalResultsArray[mi];
-                        i[0]++;
-                        i[1] = i[0] * i[1] + weight;
-                        finalResultsArray[mi] = i;
-                    }
-                }
-            }
-
-            // Time taken calculation
-            Int64 ticks = DateTime.Now.Ticks - start.Ticks;
-            TimeSpan taken = new TimeSpan(ticks);
-            if (taken.Seconds > 1)
-            {
-                _DisplayTime = taken.Seconds + " seconds";
-            }
-            else if (taken.TotalMilliseconds > 1)
-            {
-                _DisplayTime = Convert.ToInt32(taken.TotalMilliseconds) + " milliseconds";
-            }
-            else
-            {
-                _DisplayTime = "less than 1 millisecond";
-            }
-
-            // Format the results
-            if (finalResultsArray.Count > 0)
-            {	// intermediate data-structure for 'ranked' result HTML
-                //SortedList 
-                output = new SortedList(finalResultsArray.Count); // empty sorted list
-                int sortrank = 0;
-
-                // build each result row
-                foreach (string mi in finalResultsArray.Keys)
-                {
-                    sortrank = finalResultsArray[mi][1] * -1000;		// Assume not 'thousands' of results
-                    if (output.Contains(sortrank))
-                    { // rank exists - drop key index one number until it fits
-                        for (int i = 1; i < 999; i++)
-                        {
-                            sortrank++;
-                            if (!output.Contains(sortrank))
-                            {
-                                MessageIdentity m = new MessageIdentity();
-                                m.FromMessageString(mi);
-                                output.Add(sortrank, m);
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        MessageIdentity m = new MessageIdentity();
-                        m.FromMessageString(mi);
-                        output.Add(sortrank, m);
-                    }
-                    sortrank = 0;	// reset for next pass
-                }
-
-            } // else Count == 0, so output SortedList will be empty
-
-            return output;
         }
 
         /// <summary>

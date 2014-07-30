@@ -31,7 +31,9 @@ namespace MSGorilla.Library.Azure
             RichMessage,
             MetricDataSet,
             Statistics,
-            WordsIndex
+            WordsIndex,
+            SearchResults,
+            SearchHistory
         }
 
         public enum MSGorillaQueue
@@ -77,6 +79,8 @@ namespace MSGorilla.Library.Azure
             _tableDict.Add(MSGorillaTable.MetricDataSet, "MetricDataSet");
             _tableDict.Add(MSGorillaTable.Statistics, "Statistics");
             _tableDict.Add(MSGorillaTable.WordsIndex, "WordsIndex");
+            _tableDict.Add(MSGorillaTable.SearchResults, "SearchResults");
+            _tableDict.Add(MSGorillaTable.SearchHistory, "SearchHistory");
 
             // init queue dict
             _queueDict = new Dictionary<MSGorillaQueue, string>();
