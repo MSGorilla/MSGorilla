@@ -172,6 +172,11 @@ namespace MSGorilla.Library
         private const string RowKeyFormat = "000000000";
         public void AppendDataRecord(int id, string key, string value)
         {
+            if (System.Text.UTF8Encoding.UTF8.GetByteCount(key) > MetricRecordKeyTooLongException.MaxKeyLengthInByte)
+            {
+                throw new MetricRecordKeyTooLongException();
+            }
+
             using (var _gorillaCtx = new MSGorillaEntities())
             {
                 MetricDataSet data = _gorillaCtx.MetricDataSets.Find(id);

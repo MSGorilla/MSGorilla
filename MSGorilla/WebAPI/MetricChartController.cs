@@ -46,12 +46,12 @@ namespace MSGorilla.WebAPI
         }
 
         [HttpGet, HttpPost]
-        public ActionResult AddRecord(int id, string key, string value)
+        public ActionResult AddRecord(int id, string key, double value)
         {
             MetricDataSet dataset = _metricManager.GetDateSet(id);
             MembershipHelper.CheckMembership(dataset.GroupID, whoami());
 
-            _metricManager.AppendDataRecord(id, key, value);
+            _metricManager.AppendDataRecord(id, key, value.ToString());
             return new ActionResult();
         }
 

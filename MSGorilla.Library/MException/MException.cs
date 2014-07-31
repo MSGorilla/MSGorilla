@@ -239,4 +239,14 @@ namespace MSGorilla.Library.Exceptions
             Code = 8001;
         }
     }
+
+    public class MetricRecordKeyTooLongException : MSGorillaBaseException
+    {
+        public const int MaxKeyLengthInByte = 2048;
+        public MetricRecordKeyTooLongException()
+        {
+            Description = string.Format("Metric record key length should be no long than {0} bytes.", MaxKeyLengthInByte);
+            Code = 8002;
+        }
+    }
 }
