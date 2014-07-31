@@ -1012,7 +1012,7 @@ function createUserPopover(data) {
 
 
 // feed function
-function LoadMessage(user, mid) {
+function LoadMessage(mid) {
     if (isNullOrEmpty(user) || isNullOrEmpty(mid)) {
         showError("Illegal operation.");
         return;
@@ -1024,7 +1024,7 @@ function LoadMessage(user, mid) {
     }
 
     var apiurl = "/api/message/getdisplaymessage";
-    var apidata = "msgUser=" + encodeTxt(user) + "&msgID=" + encodeTxt(mid);
+    var apidata = "msgID=" + encodeTxt(mid);
 
     AjaxGetAsync(
         apiurl,
@@ -1122,7 +1122,7 @@ function LoadFeeds(isReload) {
     if (isReload == true) { // reload
         token = "";
         $("#hd_token").val(token);
-        count = getNotificationCount(category, id); // homeline not supported yet.
+        count = getNotificationCount(category, id, group); // homeline not supported yet.
         $("#hd_newcount").val(count);
 
         listdiv.empty();
@@ -1529,7 +1529,7 @@ function showMessageModel(mid, user) {
     $("#MessageModal").modal();
 
     var apiurl = "/api/message/getdisplaymessage";
-    var apidata = "msgUser=" + encodeTxt(user) + "&msgID=" + encodeTxt(mid);
+    var apidata = "msgID=" + encodeTxt(mid);
 
     AjaxGetAsync(
         apiurl,
@@ -1856,7 +1856,7 @@ function SearchMessage(keyword) {
 }
 
 // notification count function and short cut function
-function getNotificationCount(category, id) {
+function getNotificationCount(category, id, group) {
     if (category != "atline"
         && category != "ownerline"
         && category != "replyline"
@@ -1870,7 +1870,7 @@ function getNotificationCount(category, id) {
 
     if (category == "topicline") {
         var apiurl = "/api/topic/getmyfavouritetopicunreadcount";
-        var apidata = "topic=" + encodeTxt(id);
+        var apidata = "topic=" + encodeTxt(id) + "&groupID=" + encodeTxt(group);
 
         AjaxGetSync(
             apiurl,
@@ -2683,6 +2683,7 @@ function LoadMyGroupNavbar() {
     if (listdiv.length == 0) {
         return;
     }
+    var setdefaultbtn = $("#btn_set_default_group");
 
     var apiurl = "/api/group/getjoinedgroup";
     var apidata = "";
@@ -2693,6 +2694,7 @@ function LoadMyGroupNavbar() {
         function (data) {
             // clear list
             listdiv.empty();
+            setdefaultbtn.hide();
 
             if (isNullOrEmpty(data) || data.length == 0) {
                 // do nothing
@@ -2710,6 +2712,7 @@ function LoadMyGroupNavbar() {
 
                     if (index == 0) {   // first is default
                         $("#hd_current_group").val(groupid);
+                        $("#hd_default_group").val(groupid);
                         output = "<li id='group_navbar_" + encodeId(groupid) + "' class='active'>";
                     }
                     else {
@@ -2729,10 +2732,14 @@ function LoadMyGroupNavbar() {
 }
 
 function switchCurrentGroup(gid) {
+    if (isLoadFeeds) return;    // if it is loading, skip this time.
+
     var listdiv = $("#group_navabar");
     if (listdiv.length == 0) {
         return;
     }
+    var setdefaultbtn = $("#btn_set_default_group");
+    var defaultgroup = $("#hd_default_group").val();
 
     var items = listdiv.children("li");
     for (var i = 0; i < items.length; i++) {
@@ -2745,6 +2752,13 @@ function switchCurrentGroup(gid) {
         else {
             item.classList.remove("active");
         }
+    }
+
+    if (gid == defaultgroup) {
+        setdefaultbtn.hide();
+    }
+    else {
+        setdefaultbtn.show();
     }
 }
 
@@ -2793,3 +2807,110 @@ function LoadPostGroupList() {
         "no_message_box"
     );
 }
+
+function SetDefaultGroup() {
+    var curgroup = $("#hd_current_group").val();
+    if (isNullOrEmpty(curgroup)) {
+        return;
+    }
+    var btn = $("#btn_set_default_group");
+
+    var apiurl = "/api/group/setdefaultgroup";
+    var apidata = "group=" + encodeTxt(curgroup);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            var code = data.ActionResultCode;
+            var msg = data.Message;
+            if (code == "0") {
+                $("#hd_default_group").val(curgroup);
+                btn.hide();
+            }
+            else {
+                showError(msg);
+            }
+        }
+    );
+}
+
+function LoadGroups(category, group) {
+    var listdiv = $("#grouplist");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var apiurl = "";
+    var apidata = "";
+    if (isNullOrEmpty(category) || category == "allgroups")
+        apiurl = "/api/group/getallgroup";
+    else if (category == "joinedgroups")
+        apiurl = "/api/group/getjoinedgroup";
+    else if (category == "ownedgroups")
+        apiurl = "/api/group/getownedgroup";
+    else {
+        showError("Illegal operation.");
+        return;
+    }
+    if (!isNullOrEmpty(group)) {
+        apidata = "groupid=" + encodeTxt(group);
+    }
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+                showMessage("No content.");
+            }
+            else {
+                // clear list
+                listdiv.empty();
+
+                // create list
+                $.each(data, function (index, item) {
+                    listdiv.append(createGroupCard(item));
+                    //setGroupFollowBtn("btn_group_follow_" + encodeId(item.Groupid), item.Groupid, item.IsFollowing);
+                })
+            }
+        }
+    );
+}
+
+function createGroupCard(data) {
+    var output = "";
+    var groupid = data.GroupID;
+    var groupname = data.DisplayName;
+    var picurl = "";
+    var desp = data.Description;
+    var isopen = data.IsOpen;
+    var isjoined = false;
+
+    if (isNullOrEmpty(picurl)) {
+        picurl = "/Content/Images/default_avatar.jpg";
+    }
+
+    output = "  <li class='grouplist-group-item'>"
+           + "    <div class='group-card-info'>"
+           + "      <div class='ma-btm-10'>"
+           + "        <img class='img-rounded' id='group_pic_" + encodeId(groupid) + "' src='" + picurl + "' width='100' height='100' />"
+           + "      </div>"
+           + "      <div>"
+           + "        <a class='fullname' id='group_name_" + encodeId(groupid) + "' href='/profile/index?group=" + encodeTxt(groupid) + "'>" + groupname + "</a>"
+           + "      </div>"
+           + "      <div>"
+           + "        <span class='groupname' id='group_id_" + encodeId(groupid) + "'>@" + groupid + "</span>"
+           + "      </div>"
+           + "    </div>"
+           + "    <div class='group-card-postinfo'>"
+           + "      <div class='btn-group btn-group-justified'>"
+           + "        <a class='btn btn-default follow-btn' id='btn_group_follow_" + encodeId(groupid) + "'>&nbsp;</a>"
+           + "      </div>"
+           + "    </div>"
+           + "  </li>";
+
+    return output;
+}
+
+
