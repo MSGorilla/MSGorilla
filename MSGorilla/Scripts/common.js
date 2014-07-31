@@ -182,7 +182,7 @@ function cutHtml(code, length, atusers, topics) {
     }
 }
 
-function encodeUserid(code) {
+function encodeId(code) {
     code = code.replace(/@/mg, '_');
     code = code.replace(/\./mg, '_');
     return code;
@@ -202,8 +202,8 @@ function encodeHtml(code, atusers, topics) {
 
     // autolink @user
     if (!isNullOrEmpty(atusers)) {
-        for (var key in atusers) {
-            var user = atusers[key];
+        for (var i = 0; i < atusers.length; i++) {
+            var user = atusers[i];
             var htmluser = txt2Html(user);
             code = code.replace(new RegExp("@" + htmluser, "gm"), ('<a href="/profile/index?user=' + encodeTxt(user) + '">@' + htmluser + '</a>'));
         }
@@ -223,8 +223,8 @@ function encodeHtml(code, atusers, topics) {
 
     // autolink #topic#
     if (!isNullOrEmpty(topics)) {
-        for (var key in topics) {
-            var topic = topics[key];
+        for (var i = 0; i < topics.length; i++) {
+            var topic = topics[i];
             var htmltopic = txt2Html(topic);
             code = code.replace(new RegExp("#" + htmltopic + "#", "gm"), ('<a href="/topic/index?topic=' + encodeTxt(topic) + '">#' + htmltopic + '#</a>'));
         }
@@ -477,8 +477,8 @@ function enhanceMessage(schema, mid, msg) {
                 option.legend.data = json.legend;
                 option.xAxis[0].data = json.xAxis;
                 option.series = json.yAxis;
-                for (var key in json.yAxis2) {
-                    var y2 = json.yAxis2[key];
+                for (var i = 0; i < json.yAxis2.length; i++) {
+                    var y2 = json.yAxis2[i];
                     y2.yAxisIndex = 1;
                     option.series.push(y2);
                 }
@@ -560,9 +560,11 @@ function PostMessage() {
     if (message.length === 0) {
         return;
     }
+    var group = $("#postmessage_groups").val();
+    var curgroup = $("#hd_current_group").val();
 
     var apiurl = "/api/message/postmessage";
-    var apidata = "message=" + message + "&importance=2"; // + "&schemaID=" + "chart-pie"
+    var apidata = "message=" + message + "&group=" + encodeTxt(group) + "&importance=2"; // + "&schemaID=" + "chart-pie"
 
     $("#btn_post").button('loading');
     AjaxPostAsync(
@@ -570,11 +572,14 @@ function PostMessage() {
         apidata,
         function (data) {
             msgbox.val("");
-            // insert the new posted message
-            $("#feedlist").prepend(createFeed(data));
-            // render feed
-            initUserPopover("user_pic_" + data.ID, data.User.Userid);
-            // enhanceMessage(data.SchemaID, data.ID, data.MessageContent);  // user can not post schema data from webpage.
+
+            if (group == curgroup) {
+                // insert the new posted message
+                $("#feedlist").prepend(createFeed(data));
+                // render feed
+                initUserPopover("user_pic_" + data.ID, data.User.Userid);
+                // enhanceMessage(data.SchemaID, data.ID, data.MessageContent);  // user can not post schema data from webpage.
+            }
         },
         null,
         function () {
@@ -601,9 +606,9 @@ function PostReply(user, mid) {
 
     var apiurl = "/api/reply/postreply";
     var apidata = "message=" + message + "&messageUser=" + encodeTxt(user) + "&messageID=" + encodeTxt(mid);
-    for (var key in tousers) {
-        if (!isNullOrEmpty(tousers[key]))
-            apidata += "&to=" + encodeTxt(tousers[key]);
+    for (var i = 0; i < tousers.length; i++) {
+        if (!isNullOrEmpty(tousers[i]))
+            apidata += "&to=" + encodeTxt(tousers[i]);
     }
 
     $("#btn_reply_" + mid).button('loading');
@@ -704,7 +709,7 @@ function LoadUserInfo(user) {
             $("#user_following").html(followingcount);
             $("#user_followers").html(followerscount);
 
-            setUserFollowBtn("btn_userprofile_follow_" + encodeUserid(userid), userid, isFollowimg);
+            setUserFollowBtn("btn_userprofile_follow_" + encodeId(userid), userid, isFollowimg);
         }
     );
 }
@@ -880,7 +885,7 @@ function LoadUsers(category, user) {
                 // create list
                 $.each(data, function (index, item) {
                     listdiv.append(createUserCard(item));
-                    setUserFollowBtn("btn_user_follow_" + encodeUserid(item.Userid), item.Userid, item.IsFollowing);
+                    setUserFollowBtn("btn_user_follow_" + encodeId(item.Userid), item.Userid, item.IsFollowing);
                 })
             }
         }
@@ -905,18 +910,18 @@ function createUserCard(data) {
     output = "  <li class='userlist-group-item'>"
            + "    <div class='user-card-info'>"
            + "      <div class='ma-btm-10'>"
-           + "        <img class='img-rounded' id='user_pic_" + encodeUserid(userid) + "' src='" + picurl + "' width='100' height='100' />"
+           + "        <img class='img-rounded' id='user_pic_" + encodeId(userid) + "' src='" + picurl + "' width='100' height='100' />"
            + "      </div>"
            + "      <div>"
-           + "        <a class='fullname' id='user_name_" + encodeUserid(userid) + "' href='/profile/index?user=" + encodeTxt(userid) + "'>" + username + "</a>"
+           + "        <a class='fullname' id='user_name_" + encodeId(userid) + "' href='/profile/index?user=" + encodeTxt(userid) + "'>" + username + "</a>"
            + "      </div>"
            + "      <div>"
-           + "        <span class='username' id='user_id_" + encodeUserid(userid) + "'>@" + userid + "</span>"
+           + "        <span class='username' id='user_id_" + encodeId(userid) + "'>@" + userid + "</span>"
            + "      </div>"
            + "    </div>"
            + "    <div class='user-card-postinfo'>"
            + "      <div class='btn-group btn-group-justified'>"
-           + "        <a class='btn btn-default follow-btn' id='btn_user_follow_" + encodeUserid(userid) + "'>&nbsp;</a>"
+           + "        <a class='btn btn-default follow-btn' id='btn_user_follow_" + encodeId(userid) + "'>&nbsp;</a>"
            + "      </div>"
            + "    </div>"
            + "  </li>";
@@ -992,11 +997,11 @@ function createUserPopover(data) {
            + "    <div class='user-popover-footer'>";
 
     if (isFollowing == 0) {
-        output += "<a class='btn btn-primary follow-btn' id='btn_userpopover_follow_" + encodeUserid(userid) + "' onclick='follow(\"btn_userpopover_follow_" + encodeUserid(userid) + "\", \"" + userid + "\");'>+ Follow</a>";
+        output += "<a class='btn btn-primary follow-btn' id='btn_userpopover_follow_" + encodeId(userid) + "' onclick='follow(\"btn_userpopover_follow_" + encodeId(userid) + "\", \"" + userid + "\");'>+ Follow</a>";
     } else if (isFollowing == 1) {
-        output += "<a class='btn btn-success follow-btn' id='btn_userpopover_follow_" + encodeUserid(userid) + "' onclick='unfollow(\"btn_userpopover_follow_" + encodeUserid(userid) + "\", \"" + userid + "\");' onmouseover='unfollowBtnMouseOver(\"btn_userpopover_follow_" + encodeUserid(userid) + "\");' onmouseout='unfollowBtnMouseOut(\"btn_userpopover_follow_" + encodeUserid(userid) + "\");' >Following</a>";
+        output += "<a class='btn btn-success follow-btn' id='btn_userpopover_follow_" + encodeId(userid) + "' onclick='unfollow(\"btn_userpopover_follow_" + encodeId(userid) + "\", \"" + userid + "\");' onmouseover='unfollowBtnMouseOver(\"btn_userpopover_follow_" + encodeId(userid) + "\");' onmouseout='unfollowBtnMouseOut(\"btn_userpopover_follow_" + encodeId(userid) + "\");' >Following</a>";
     } else {  // -1: myself
-        output += "<a class='btn btn-info follow-btn' id='btn_userpopover_follow_" + encodeUserid(userid) + "' href='/account/manage'>Edit profile</a>";
+        output += "<a class='btn btn-info follow-btn' id='btn_userpopover_follow_" + encodeId(userid) + "' href='/account/manage'>Edit profile</a>";
     }
 
     output += "    </div>"
@@ -1061,21 +1066,22 @@ var feed_filters = [
 
 var isLoadFeeds = false;
 
-function FilterFeeds(category, id, filter) {
+function FilterFeeds(filter) {
     if (isLoadFeeds) return;    // if it is loading, skip this time.
 
-    for (var f in feed_filters) {
-        if (feed_filters[f] == filter) {
+    for (var i = 0; i < feed_filters.length; i++) {
+        if (feed_filters[i] == filter) {
             $("#feedfilter_" + filter).addClass("active");
             $("#feedfilter_title").text($("#feedfilter_" + filter).text());
-            LoadFeeds(category, id, filter);
+            $("#hd_filter").val(filter);
+            LoadFeeds(true);
         } else {
-            $("#feedfilter_" + feed_filters[f]).removeClass("active");
+            $("#feedfilter_" + feed_filters[i]).removeClass("active");
         }
     }
 }
 
-function LoadFeeds(category, id, filter) {
+function LoadFeeds(isReload) {
     if (isLoadFeeds) return;    // if it is loading, skip this time.
     isLoadFeeds = true;
 
@@ -1086,21 +1092,51 @@ function LoadFeeds(category, id, filter) {
 
     var apiurl = "";
     var apidata = "";
+    var category = "";
+    var id = "";
+    var group = "";
+    var filter = "";
     var token = "";
     var count = 0;
 
-    if (isNullOrEmpty(filter)) { // page load or load more, don't reload
-        token = $("#hd_token").val();
+    // get paras from page
+    if ($("#hd_feed_category").length > 0) {
+        category = $("#hd_feed_category").val();
+    }
+    if ($("#hd_feed_id").length > 0) {
+        id = $("#hd_feed_id").val();
+    }
+    if ($("#hd_current_group").length > 0) {
+        group = $("#hd_current_group").val();
+    }
+    if ($("#hd_filter").length > 0) {
         filter = $("#hd_filter").val();
     }
-    else {  // click on filter btn, need reload, clear current feeds and add loading gif
+    if ($("#hd_token").length > 0) {
+        token = $("#hd_token").val();
+    }
+    if ($("#hd_newcount").length > 0) {
+        count = $("#hd_newcount").val();
+    }
+
+    if (isReload == true) { // reload
+        token = "";
         $("#hd_token").val(token);
-        $("#hd_filter").val(filter);
+        count = getNotificationCount(category, id); // homeline not supported yet.
+        $("#hd_newcount").val(count);
 
         listdiv.empty();
         listdiv.append("<li id='loading_message' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
     }
+    else { // load more
+        if (token == "nomore") {
+            // already no more feeds, don't load any more
+            isLoadFeeds = false;
+            return;
+        }
+    }
 
+    // get
     if (category == "homeline") {
         apiurl = "/api/message/homeline";
         apidata = "userid=" + encodeTxt(id);
@@ -1146,6 +1182,15 @@ function LoadFeeds(category, id, filter) {
         return;
     }
 
+    if (!isNullOrEmpty(group)) {   // set group value
+        if (isNullOrEmpty(apidata)) {
+            apidata = "group=" + group;
+        }
+        else {
+            apidata += "&group=" + group;
+        }
+    }
+
     if (!isNullOrEmpty(filter)) {   // set filter value
         if (isNullOrEmpty(apidata)) {
             apidata = "filter=" + filter;
@@ -1155,25 +1200,13 @@ function LoadFeeds(category, id, filter) {
         }
     }
 
-    if (isNullOrEmpty(token)) { // first time load, not load more
-        count = getNotificationCount(category, id);
-        $("#hd_newcount").val(count);
-    }
-    else {    // load more
-        if (token == "nomore") {
-            // already no more feeds, don't load any more
-            isLoadFeeds = false;
-            return;
-        }
-
+    if (!isNullOrEmpty(token)) { // set token value
         if (isNullOrEmpty(apidata)) {
             apidata = "token=" + token;
         }
         else {
             apidata += "&token=" + token;
         }
-
-        count = $("#hd_newcount").val();
     }
 
     AjaxGetAsync(
@@ -1304,8 +1337,8 @@ function createFeed(data, hideOpenBtn) {
     if (!isNullOrEmpty(owners)) {
         output += "    <div class='newpost-input'>";
         output += "      <span class=''>Owned by: </span>";
-        for (var key in owners) {
-            output += "  <a href='/profile/index?user=" + encodeTxt(owners[key]) + "'>@" + owners[key] + "</a>&nbsp;";
+        for (var i = 0; i < owners.length; i++) {
+            output += "  <a href='/profile/index?user=" + encodeTxt(owners[i]) + "'>@" + owners[i] + "</a>&nbsp;";
         }
         output += "    </div>";
     }
@@ -1326,8 +1359,8 @@ function createFeed(data, hideOpenBtn) {
     // attachment
     if (!isNullOrEmpty(attach)) {
         output += "    <div class='newpost-input'><span class=''>Attachments: </span>";
-        for (var key in attach) {
-            output += "  <a class='btn btn-link btn-xs' onclick='showAttach(\"" + attach[key].AttachmentID + "\", \"" + attach[key].Filetype + "\", \"" + id + "\");' >" + attach[key].Filename + " (" + attach[key].Filesize + ")</a>&nbsp;";
+        for (var i = 0; i < attach.length; i++) {
+            output += "  <a class='btn btn-link btn-xs' onclick='showAttach(\"" + attach[i].AttachmentID + "\", \"" + attach[i].Filetype + "\", \"" + id + "\");' >" + attach[i].Filename + " (" + attach[i].Filesize + ")</a>&nbsp;";
         }
         output += "    </div>";
         output += "    <div id='attachment_" + id + "' class='newpost-input' style='display:none;'></div>";
@@ -1359,9 +1392,9 @@ function createFeed(data, hideOpenBtn) {
         if (!isNullOrEmpty(owners)) {   // reply to owners if owners exist.
             replyto = "";
             replytostring = "";
-            for (var key in owners) {
-                replyto += owners[key] + ";";
-                replytostring += " @" + owners[key];
+            for (var i = 0; i < owners.length; i++) {
+                replyto += owners[i] + ";";
+                replytostring += " @" + owners[i];
             }
         }
 
@@ -1590,10 +1623,10 @@ function LoadReplies(mid) {
                 totlecount++;
 
                 // render feed
-                initUserPopover("user_pic_" +item.ID, item.User.Userid);
+                initUserPopover("user_pic_" + item.ID, item.User.Userid);
                 // if msg is empty, show richmsg instead
-                if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" +item.ID).length > 0) {
-                    $("#rich_message_" +item.ID).collapse('show');
+                if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
+                    $("#rich_message_" + item.ID).collapse('show');
                     showRichMsg(item.RichMessageID, item.ID);
                 }
             })
@@ -1677,8 +1710,8 @@ function createReply(data) {
     if (!isNullOrEmpty(owners)) {
         output += "  <div class='reply-input'>";
         output += "    <span class=''>Owned by: </span>";
-        for (var key in owners) {
-            output += "<a href='/profile/index?user=" + encodeTxt(owners[key]) + "'>@" + owners[key] + "</a>&nbsp;";
+        for (var i = 0; i < owners.length; i++) {
+            output += "<a href='/profile/index?user=" + encodeTxt(owners[i]) + "'>@" + owners[i] + "</a>&nbsp;";
         }
         output += "  </div>";
     }
@@ -1699,8 +1732,8 @@ function createReply(data) {
     // attachment
     if (!isNullOrEmpty(attach)) {
         output += "  <div class='reply-input'><span class=''>Attachments: </span>";
-        for (var key in attach) {
-            output += "<a class='btn btn-link btn-xs' onclick='showAttach(\"" + attach[key].AttachmentID + "\", \"" + attach[key].Filetype + "\", \"" + id + "\");' >" + attach[key].Filename + " (" + attach[key].Filesize + ")</a>&nbsp;";
+        for (var i = 0; i < attach.length; i++) {
+            output += "<a class='btn btn-link btn-xs' onclick='showAttach(\"" + attach[i].AttachmentID + "\", \"" + attach[i].Filetype + "\", \"" + id + "\");' >" + attach[i].Filename + " (" + attach[i].Filesize + ")</a>&nbsp;";
         }
         output += "  </div>";
         output += "  <div id='attachment_" + id + "' class='reply-input' style='display:none;'></div>";
@@ -1808,7 +1841,7 @@ function SearchUser(keyword) {
                 // create user list
                 $.each(data, function (index, item) {
                     listdiv.append(createUserCard(item));
-                    setUserFollowBtn("btn_user_follow_" + encodeUserid(item.Userid), item.Userid, item.IsFollowing);
+                    setUserFollowBtn("btn_user_follow_" + encodeId(item.Userid), item.Userid, item.IsFollowing);
                 })
             }
         },
@@ -1827,7 +1860,7 @@ function getNotificationCount(category, id) {
     if (category != "atline"
         && category != "ownerline"
         && category != "replyline"
-        && category != "homeline"
+        // && category != "homeline" // homeline not supported yet.
         && category != "topicline"
         ) {
         return 0;
@@ -1909,7 +1942,7 @@ function UpdateNotificationCountTimer() {
 
 function UpdateNotificationCount() {
     if ($("#shortcut_homeline_count").length == 0
-        && $("#home_reply_count").length == 0
+        && $("#notification_navabar_reply_count").length == 0
         && $("#nav_home_count").length == 0) {
         return;
     }
@@ -1940,9 +1973,9 @@ function UpdateNotificationCount() {
                 $("#shortcut_notification_count").html(notificationCount);
 
                 // notification navbar count
-                $("#home_reply_count").html(replyCount);
-                $("#home_atline_count").html(atlineCount);
-                $("#home_ownerline_count").html(ownerlineCount);
+                $("#notification_navabar_reply_count").html(replyCount);
+                $("#notification_navabar_atline_count").html(atlineCount);
+                $("#notification_navabar_ownerline_count").html(ownerlineCount);
 
                 // menu navbar count
                 if (homelineCount > 0)
@@ -2020,7 +2053,7 @@ function LoadMyFavoriteTopics() {
         function (data) {
             // clear list
             listdiv.empty();
-            var navlist = $("#home_nav_list");
+            var navlist = $("#notification_navabar");
             navlist.empty();
 
             $.each(data, function (index, item) {
@@ -2515,7 +2548,7 @@ function refreshWelcomeActiveUsers() {
                     }
 
                     output = "<li class='list-group-item'>"
-                           + "  <a class='btn btn-default follow-btn' id='btn_user_follow_" + encodeUserid(userid) + "' style='display:none'>&nbsp;</a>"
+                           + "  <a class='btn btn-default follow-btn' id='btn_user_follow_" + encodeId(userid) + "' style='display:none'>&nbsp;</a>"
                            + "  <span class='badge'>" + postscount + "</span>"
                            + "  <img class='img-rounded' src='" + picurl + "' width='25' height='25' />"
                            + "  <a class='fullname' href='/profile/index?user=" + encodeTxt(userid) + "'>" + username + "</a>"
@@ -2523,7 +2556,7 @@ function refreshWelcomeActiveUsers() {
                            + "</li>";
 
                     listdiv.append(output);
-                    setUserFollowBtn("btn_user_follow_" + encodeUserid(userid), userid, isFollowing);
+                    setUserFollowBtn("btn_user_follow_" + encodeId(userid), userid, isFollowing);
                 })
             }
         },
@@ -2633,7 +2666,7 @@ function refreshWelcomeFeeds(listdiv, apiurl, apidata, msgLength) {
                            + "</li>";
 
                     listdiv.append(output);
-                })
+                });
             }
         },
         function (XMLHttpRequest, textStatus, errorThrown) {
@@ -2645,6 +2678,118 @@ function refreshWelcomeFeeds(listdiv, apiurl, apidata, msgLength) {
 
 
 // Group
-function LoadMyGroup() {
+function LoadMyGroupNavbar() {
+    var listdiv = $("#group_navabar");
+    if (listdiv.length == 0) {
+        return;
+    }
 
+    var apiurl = "/api/group/getjoinedgroup";
+    var apidata = "";
+
+    AjaxGetSync(
+        apiurl,
+        apidata,
+        function (data) {
+            // clear list
+            listdiv.empty();
+
+            if (isNullOrEmpty(data) || data.length == 0) {
+                // do nothing
+            }
+            else {
+                // create list
+                $.each(data, function (index, item) {
+                    var output = "";
+                    var groupid = item.GroupID;
+                    var displayname = item.DisplayName;
+                    var description = item.Description;
+                    var isopen = item.IsOpen;
+                    var memberid = item.MemberID;
+                    var role = item.Role;
+
+                    if (index == 0) {   // first is default
+                        $("#hd_current_group").val(groupid);
+                        output = "<li id='group_navbar_" + encodeId(groupid) + "' class='active'>";
+                    }
+                    else {
+                        output = "<li id='group_navbar_" + encodeId(groupid) + "'>";
+                    }
+                    output += "  <a href= 'javascript:void(0);' onclick='switchCurrentGroup(\"" + groupid + "\");'>" + displayname + "</a>"
+                           + "</li>";
+
+                    listdiv.append(output);
+                });
+            }
+        },
+        null,
+        null,
+        "no_message_box"
+    );
+}
+
+function switchCurrentGroup(gid) {
+    var listdiv = $("#group_navabar");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var items = listdiv.children("li");
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        if (item.id == ("group_navbar_" + gid)) {
+            item.classList.add("active");
+            $("#hd_current_group").val(gid);
+            LoadFeeds(true);
+        }
+        else {
+            item.classList.remove("active");
+        }
+    }
+}
+
+function LoadPostGroupList() {
+    var listdiv = $("#postmessage_groups");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var apiurl = "/api/group/getjoinedgroup";
+    var apidata = "";
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            // disable post btn
+            $("#btn_post").attr("disabled", "disabled");
+            // clear list
+            listdiv.empty();
+
+            if (isNullOrEmpty(data) || data.length == 0) {
+                // do nothing
+            }
+            else {
+                // create list
+                $.each(data, function (index, item) {
+                    var output = "";
+                    var groupid = item.GroupID;
+                    var displayname = item.DisplayName;
+                    var description = item.Description;
+                    var isopen = item.IsOpen;
+                    var memberid = item.MemberID;
+                    var role = item.Role;
+
+                    output = "<option value='" + groupid + "'>" + displayname + "</option>";
+                    listdiv.append(output);
+                });
+
+                // enable post btn
+                $("#btn_post").removeAttr("disabled");
+            }
+        },
+        null,
+        null,
+        "no_message_box"
+    );
 }

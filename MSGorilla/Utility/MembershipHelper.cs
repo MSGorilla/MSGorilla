@@ -50,7 +50,7 @@ namespace MSGorilla.Utility
 
         public static string[] CheckJoinedGroup(string userid, string[] groups = null)
         {
-            if (groups == null)
+            if (groups == null || groups.Count() == 0)
             {
                 return JoinedGroup(userid).ToArray();
             }
