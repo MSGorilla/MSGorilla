@@ -1,0 +1,639 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="MSGorillaModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="FavouriteTopic">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Userid" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="TopicID" Type="int" Nullable="false" />
+          <Property Name="UnreadMsgCount" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Group">
+          <Key>
+            <PropertyRef Name="GroupID" />
+          </Key>
+          <Property Name="GroupID" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="DisplayName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="IsOpen" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Membership">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GroupID" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="MemberID" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Role" Type="nvarchar" MaxLength="128" Nullable="false" />
+        </EntityType>
+        <EntityType Name="MetricDataSet">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="256" />
+          <Property Name="GroupID" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Creater" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="RecordCount" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="NotificationCount">
+          <Key>
+            <PropertyRef Name="Userid" />
+          </Key>
+          <Property Name="Userid" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="UnreadHomelineMsgCount" Type="int" Nullable="false" />
+          <Property Name="UnreadOwnerlineMsgCount" Type="int" Nullable="false" />
+          <Property Name="UnreadAtlineMsgCount" Type="int" Nullable="false" />
+          <Property Name="UnreadReplyCount" Type="int" Nullable="false" />
+          <Property Name="UnreadImportantMsgCount" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Schema">
+          <Key>
+            <PropertyRef Name="SchemaID" />
+          </Key>
+          <Property Name="SchemaID" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="SchemaContent" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Subscription">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Userid" Type="nvarchar" MaxLength="128" />
+          <Property Name="FollowingUserid" Type="nvarchar(max)" />
+          <Property Name="FollowingUserDisplayName" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Topic">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="MsgCount" Type="int" Nullable="false" />
+          <Property Name="GroupID" Type="nvarchar" MaxLength="128" />
+        </EntityType>
+        <EntityType Name="UserProfile">
+          <Key>
+            <PropertyRef Name="Userid" />
+          </Key>
+          <Property Name="Userid" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="DisplayName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="PortraitUrl" Type="nvarchar(max)" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="FollowingsCount" Type="int" Nullable="false" />
+          <Property Name="FollowersCount" Type="int" Nullable="false" />
+          <Property Name="Password" Type="nvarchar" MaxLength="128" />
+          <Property Name="MessageCount" Type="int" Nullable="false" />
+          <Property Name="IsRobot" Type="bit" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_dbo_Subscription_dbo_UserProfile_Userid">
+          <End Role="UserProfile" Type="Self.UserProfile" Multiplicity="0..1" />
+          <End Role="Subscription" Type="Self.Subscription" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserProfile">
+              <PropertyRef Name="Userid" />
+            </Principal>
+            <Dependent Role="Subscription">
+              <PropertyRef Name="Userid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FAVOURITETOPIC_TOPICID">
+          <End Role="Topic" Type="Self.Topic" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="FavouriteTopic" Type="Self.FavouriteTopic" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Topic">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FavouriteTopic">
+              <PropertyRef Name="TopicID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FAVOURITETOPIC_USERID">
+          <End Role="UserProfile" Type="Self.UserProfile" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="FavouriteTopic" Type="Self.FavouriteTopic" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserProfile">
+              <PropertyRef Name="Userid" />
+            </Principal>
+            <Dependent Role="FavouriteTopic">
+              <PropertyRef Name="Userid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MEMBERSHIP_GROUPID">
+          <End Role="Group" Type="Self.Group" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Membership" Type="Self.Membership" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="GroupID" />
+            </Principal>
+            <Dependent Role="Membership">
+              <PropertyRef Name="GroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MEMBERSHIP_MEMBERID">
+          <End Role="UserProfile" Type="Self.UserProfile" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Membership" Type="Self.Membership" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserProfile">
+              <PropertyRef Name="Userid" />
+            </Principal>
+            <Dependent Role="Membership">
+              <PropertyRef Name="MemberID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_METRICDATASET_GROUPID">
+          <End Role="Group" Type="Self.Group" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="MetricDataSet" Type="Self.MetricDataSet" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="GroupID" />
+            </Principal>
+            <Dependent Role="MetricDataSet">
+              <PropertyRef Name="GroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NOTIFCOUNT_USERID">
+          <End Role="UserProfile" Type="Self.UserProfile" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="NotificationCount" Type="Self.NotificationCount" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="UserProfile">
+              <PropertyRef Name="Userid" />
+            </Principal>
+            <Dependent Role="NotificationCount">
+              <PropertyRef Name="Userid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TOPIC_GROUPID">
+          <End Role="Group" Type="Self.Group" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Topic" Type="Self.Topic" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="GroupID" />
+            </Principal>
+            <Dependent Role="Topic">
+              <PropertyRef Name="GroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="MSGorillaModelStoreContainer">
+          <EntitySet Name="FavouriteTopic" EntityType="Self.FavouriteTopic" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Group" EntityType="Self.Group" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Membership" EntityType="Self.Membership" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MetricDataSet" EntityType="Self.MetricDataSet" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="NotificationCount" EntityType="Self.NotificationCount" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Schema" EntityType="Self.Schema" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Subscription" EntityType="Self.Subscription" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Topic" EntityType="Self.Topic" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserProfile" EntityType="Self.UserProfile" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_dbo_Subscription_dbo_UserProfile_Userid" Association="Self.FK_dbo_Subscription_dbo_UserProfile_Userid">
+            <End Role="UserProfile" EntitySet="UserProfile" />
+            <End Role="Subscription" EntitySet="Subscription" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FAVOURITETOPIC_TOPICID" Association="Self.FK_FAVOURITETOPIC_TOPICID">
+            <End Role="Topic" EntitySet="Topic" />
+            <End Role="FavouriteTopic" EntitySet="FavouriteTopic" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FAVOURITETOPIC_USERID" Association="Self.FK_FAVOURITETOPIC_USERID">
+            <End Role="UserProfile" EntitySet="UserProfile" />
+            <End Role="FavouriteTopic" EntitySet="FavouriteTopic" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MEMBERSHIP_GROUPID" Association="Self.FK_MEMBERSHIP_GROUPID">
+            <End Role="Group" EntitySet="Group" />
+            <End Role="Membership" EntitySet="Membership" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MEMBERSHIP_MEMBERID" Association="Self.FK_MEMBERSHIP_MEMBERID">
+            <End Role="UserProfile" EntitySet="UserProfile" />
+            <End Role="Membership" EntitySet="Membership" />
+          </AssociationSet>
+          <AssociationSet Name="FK_METRICDATASET_GROUPID" Association="Self.FK_METRICDATASET_GROUPID">
+            <End Role="Group" EntitySet="Group" />
+            <End Role="MetricDataSet" EntitySet="MetricDataSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NOTIFCOUNT_USERID" Association="Self.FK_NOTIFCOUNT_USERID">
+            <End Role="UserProfile" EntitySet="UserProfile" />
+            <End Role="NotificationCount" EntitySet="NotificationCount" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TOPIC_GROUPID" Association="Self.FK_TOPIC_GROUPID">
+            <End Role="Group" EntitySet="Group" />
+            <End Role="Topic" EntitySet="Topic" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="MSGorillaModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="FavouriteTopic">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Userid" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="TopicID" Type="Int32" Nullable="false" />
+          <Property Name="UnreadMsgCount" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Topic" Relationship="MSGorillaModel.FK_FAVOURITETOPIC_TOPICID" FromRole="FavouriteTopic" ToRole="Topic" />
+          <NavigationProperty Name="UserProfile" Relationship="MSGorillaModel.FK_FAVOURITETOPIC_USERID" FromRole="FavouriteTopic" ToRole="UserProfile" />
+        </EntityType>
+        <EntityType Name="Group">
+          <Key>
+            <PropertyRef Name="GroupID" />
+          </Key>
+          <Property Name="GroupID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="DisplayName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IsOpen" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Memberships" Relationship="MSGorillaModel.FK_MEMBERSHIP_GROUPID" FromRole="Group" ToRole="Membership" />
+          <NavigationProperty Name="MetricDataSets" Relationship="MSGorillaModel.FK_METRICDATASET_GROUPID" FromRole="Group" ToRole="MetricDataSet" />
+          <NavigationProperty Name="Topics" Relationship="MSGorillaModel.FK_TOPIC_GROUPID" FromRole="Group" ToRole="Topic" />
+        </EntityType>
+        <EntityType Name="Membership">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GroupID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="MemberID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Role" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Group" Relationship="MSGorillaModel.FK_MEMBERSHIP_GROUPID" FromRole="Membership" ToRole="Group" />
+          <NavigationProperty Name="UserProfile" Relationship="MSGorillaModel.FK_MEMBERSHIP_MEMBERID" FromRole="Membership" ToRole="UserProfile" />
+        </EntityType>
+        <EntityType Name="MetricDataSet">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="GroupID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Creater" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="RecordCount" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Group" Relationship="MSGorillaModel.FK_METRICDATASET_GROUPID" FromRole="MetricDataSet" ToRole="Group" />
+        </EntityType>
+        <EntityType Name="NotificationCount">
+          <Key>
+            <PropertyRef Name="Userid" />
+          </Key>
+          <Property Name="Userid" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="UnreadHomelineMsgCount" Type="Int32" Nullable="false" />
+          <Property Name="UnreadOwnerlineMsgCount" Type="Int32" Nullable="false" />
+          <Property Name="UnreadAtlineMsgCount" Type="Int32" Nullable="false" />
+          <Property Name="UnreadReplyCount" Type="Int32" Nullable="false" />
+          <Property Name="UnreadImportantMsgCount" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="UserProfile" Relationship="MSGorillaModel.FK_NOTIFCOUNT_USERID" FromRole="NotificationCount" ToRole="UserProfile" />
+        </EntityType>
+        <EntityType Name="Schema">
+          <Key>
+            <PropertyRef Name="SchemaID" />
+          </Key>
+          <Property Name="SchemaID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="SchemaContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="Subscription">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Userid" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="FollowingUserid" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="FollowingUserDisplayName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="UserProfile" Relationship="Self.FK_dbo_Subscription_dbo_UserProfile_Userid" FromRole="Subscription" ToRole="UserProfile" />
+        </EntityType>
+        <EntityType Name="Topic">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="MsgCount" Type="Int32" Nullable="false" />
+          <Property Name="GroupID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="FavouriteTopics" Relationship="MSGorillaModel.FK_FAVOURITETOPIC_TOPICID" FromRole="Topic" ToRole="FavouriteTopic" />
+          <NavigationProperty Name="Group" Relationship="MSGorillaModel.FK_TOPIC_GROUPID" FromRole="Topic" ToRole="Group" />
+        </EntityType>
+        <EntityType Name="UserProfile">
+          <Key>
+            <PropertyRef Name="Userid" />
+          </Key>
+          <Property Name="Userid" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="DisplayName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PortraitUrl" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="FollowingsCount" Type="Int32" Nullable="false" />
+          <Property Name="FollowersCount" Type="Int32" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="MessageCount" Type="Int32" Nullable="false" />
+          <Property Name="IsRobot" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Subscriptions" Relationship="Self.FK_dbo_Subscription_dbo_UserProfile_Userid" FromRole="UserProfile" ToRole="Subscription" />
+          <NavigationProperty Name="NotificationCount" Relationship="MSGorillaModel.FK_NOTIFCOUNT_USERID" FromRole="UserProfile" ToRole="NotificationCount" />
+          <NavigationProperty Name="FavouriteTopics" Relationship="MSGorillaModel.FK_FAVOURITETOPIC_USERID" FromRole="UserProfile" ToRole="FavouriteTopic" />
+          <NavigationProperty Name="Memberships" Relationship="MSGorillaModel.FK_MEMBERSHIP_MEMBERID" FromRole="UserProfile" ToRole="Membership" />
+        </EntityType>
+        <Association Name="FK_dbo_Subscription_dbo_UserProfile_Userid">
+          <End Role="UserProfile" Type="Self.UserProfile" Multiplicity="0..1" />
+          <End Role="Subscription" Type="Self.Subscription" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserProfile">
+              <PropertyRef Name="Userid" />
+            </Principal>
+            <Dependent Role="Subscription">
+              <PropertyRef Name="Userid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="MSGorillaEntities1" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="FavouriteTopics" EntityType="Self.FavouriteTopic" />
+          <EntitySet Name="Groups" EntityType="Self.Group" />
+          <EntitySet Name="Memberships" EntityType="Self.Membership" />
+          <EntitySet Name="MetricDataSets" EntityType="Self.MetricDataSet" />
+          <EntitySet Name="NotificationCounts" EntityType="Self.NotificationCount" />
+          <EntitySet Name="Schemata" EntityType="Self.Schema" />
+          <EntitySet Name="Subscriptions" EntityType="Self.Subscription" />
+          <EntitySet Name="Topics" EntityType="Self.Topic" />
+          <EntitySet Name="UserProfiles" EntityType="Self.UserProfile" />
+          <AssociationSet Name="FK_dbo_Subscription_dbo_UserProfile_Userid" Association="Self.FK_dbo_Subscription_dbo_UserProfile_Userid">
+            <End Role="UserProfile" EntitySet="UserProfiles" />
+            <End Role="Subscription" EntitySet="Subscriptions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NOTIFCOUNT_USERID" Association="MSGorillaModel.FK_NOTIFCOUNT_USERID">
+            <End Role="UserProfile" EntitySet="UserProfiles" />
+            <End Role="NotificationCount" EntitySet="NotificationCounts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FAVOURITETOPIC_TOPICID" Association="MSGorillaModel.FK_FAVOURITETOPIC_TOPICID">
+            <End Role="Topic" EntitySet="Topics" />
+            <End Role="FavouriteTopic" EntitySet="FavouriteTopics" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FAVOURITETOPIC_USERID" Association="MSGorillaModel.FK_FAVOURITETOPIC_USERID">
+            <End Role="UserProfile" EntitySet="UserProfiles" />
+            <End Role="FavouriteTopic" EntitySet="FavouriteTopics" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MEMBERSHIP_GROUPID" Association="MSGorillaModel.FK_MEMBERSHIP_GROUPID">
+            <End Role="Group" EntitySet="Groups" />
+            <End Role="Membership" EntitySet="Memberships" />
+          </AssociationSet>
+          <AssociationSet Name="FK_METRICDATASET_GROUPID" Association="MSGorillaModel.FK_METRICDATASET_GROUPID">
+            <End Role="Group" EntitySet="Groups" />
+            <End Role="MetricDataSet" EntitySet="MetricDataSets" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TOPIC_GROUPID" Association="MSGorillaModel.FK_TOPIC_GROUPID">
+            <End Role="Group" EntitySet="Groups" />
+            <End Role="Topic" EntitySet="Topics" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MEMBERSHIP_MEMBERID" Association="MSGorillaModel.FK_MEMBERSHIP_MEMBERID">
+            <End Role="UserProfile" EntitySet="UserProfiles" />
+            <End Role="Membership" EntitySet="Memberships" />
+          </AssociationSet>
+        </EntityContainer>
+        <Association Name="FK_NOTIFCOUNT_USERID">
+          <End Type="MSGorillaModel.UserProfile" Role="UserProfile" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="MSGorillaModel.NotificationCount" Role="NotificationCount" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="UserProfile">
+              <PropertyRef Name="Userid" />
+            </Principal>
+            <Dependent Role="NotificationCount">
+              <PropertyRef Name="Userid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FAVOURITETOPIC_TOPICID">
+          <End Type="MSGorillaModel.Topic" Role="Topic" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="MSGorillaModel.FavouriteTopic" Role="FavouriteTopic" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Topic">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FavouriteTopic">
+              <PropertyRef Name="TopicID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FAVOURITETOPIC_USERID">
+          <End Type="MSGorillaModel.UserProfile" Role="UserProfile" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="MSGorillaModel.FavouriteTopic" Role="FavouriteTopic" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserProfile">
+              <PropertyRef Name="Userid" />
+            </Principal>
+            <Dependent Role="FavouriteTopic">
+              <PropertyRef Name="Userid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MEMBERSHIP_GROUPID">
+          <End Type="MSGorillaModel.Group" Role="Group" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="MSGorillaModel.Membership" Role="Membership" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="GroupID" />
+            </Principal>
+            <Dependent Role="Membership">
+              <PropertyRef Name="GroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_METRICDATASET_GROUPID">
+          <End Type="MSGorillaModel.Group" Role="Group" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="MSGorillaModel.MetricDataSet" Role="MetricDataSet" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="GroupID" />
+            </Principal>
+            <Dependent Role="MetricDataSet">
+              <PropertyRef Name="GroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TOPIC_GROUPID">
+          <End Type="MSGorillaModel.Group" Role="Group" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="MSGorillaModel.Topic" Role="Topic" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="GroupID" />
+            </Principal>
+            <Dependent Role="Topic">
+              <PropertyRef Name="GroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MEMBERSHIP_MEMBERID">
+          <End Type="MSGorillaModel.UserProfile" Role="UserProfile" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="MSGorillaModel.Membership" Role="Membership" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserProfile">
+              <PropertyRef Name="Userid" />
+            </Principal>
+            <Dependent Role="Membership">
+              <PropertyRef Name="MemberID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="MSGorillaModelStoreContainer" CdmEntityContainer="MSGorillaEntities1">
+          <EntitySetMapping Name="FavouriteTopics">
+            <EntityTypeMapping TypeName="MSGorillaModel.FavouriteTopic">
+              <MappingFragment StoreEntitySet="FavouriteTopic">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Userid" ColumnName="Userid" />
+                <ScalarProperty Name="TopicID" ColumnName="TopicID" />
+                <ScalarProperty Name="UnreadMsgCount" ColumnName="UnreadMsgCount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Groups">
+            <EntityTypeMapping TypeName="MSGorillaModel.Group">
+              <MappingFragment StoreEntitySet="Group">
+                <ScalarProperty Name="GroupID" ColumnName="GroupID" />
+                <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="IsOpen" ColumnName="IsOpen" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Memberships">
+            <EntityTypeMapping TypeName="MSGorillaModel.Membership">
+              <MappingFragment StoreEntitySet="Membership">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="GroupID" ColumnName="GroupID" />
+                <ScalarProperty Name="MemberID" ColumnName="MemberID" />
+                <ScalarProperty Name="Role" ColumnName="Role" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MetricDataSets">
+            <EntityTypeMapping TypeName="MSGorillaModel.MetricDataSet">
+              <MappingFragment StoreEntitySet="MetricDataSet">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="GroupID" ColumnName="GroupID" />
+                <ScalarProperty Name="Creater" ColumnName="Creater" />
+                <ScalarProperty Name="RecordCount" ColumnName="RecordCount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="NotificationCounts">
+            <EntityTypeMapping TypeName="MSGorillaModel.NotificationCount">
+              <MappingFragment StoreEntitySet="NotificationCount">
+                <ScalarProperty Name="Userid" ColumnName="Userid" />
+                <ScalarProperty Name="UnreadHomelineMsgCount" ColumnName="UnreadHomelineMsgCount" />
+                <ScalarProperty Name="UnreadOwnerlineMsgCount" ColumnName="UnreadOwnerlineMsgCount" />
+                <ScalarProperty Name="UnreadAtlineMsgCount" ColumnName="UnreadAtlineMsgCount" />
+                <ScalarProperty Name="UnreadReplyCount" ColumnName="UnreadReplyCount" />
+                <ScalarProperty Name="UnreadImportantMsgCount" ColumnName="UnreadImportantMsgCount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Schemata">
+            <EntityTypeMapping TypeName="MSGorillaModel.Schema">
+              <MappingFragment StoreEntitySet="Schema">
+                <ScalarProperty Name="SchemaID" ColumnName="SchemaID" />
+                <ScalarProperty Name="SchemaContent" ColumnName="SchemaContent" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Subscriptions">
+            <EntityTypeMapping TypeName="MSGorillaModel.Subscription">
+              <MappingFragment StoreEntitySet="Subscription">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Userid" ColumnName="Userid" />
+                <ScalarProperty Name="FollowingUserid" ColumnName="FollowingUserid" />
+                <ScalarProperty Name="FollowingUserDisplayName" ColumnName="FollowingUserDisplayName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Topics">
+            <EntityTypeMapping TypeName="MSGorillaModel.Topic">
+              <MappingFragment StoreEntitySet="Topic">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="MsgCount" ColumnName="MsgCount" />
+                <ScalarProperty Name="GroupID" ColumnName="GroupID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserProfiles">
+            <EntityTypeMapping TypeName="MSGorillaModel.UserProfile">
+              <MappingFragment StoreEntitySet="UserProfile">
+                <ScalarProperty Name="Userid" ColumnName="Userid" />
+                <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
+                <ScalarProperty Name="PortraitUrl" ColumnName="PortraitUrl" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="FollowingsCount" ColumnName="FollowingsCount" />
+                <ScalarProperty Name="FollowersCount" ColumnName="FollowersCount" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="MessageCount" ColumnName="MessageCount" />
+                <ScalarProperty Name="IsRobot" ColumnName="IsRobot" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

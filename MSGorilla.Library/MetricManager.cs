@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 
 using MSGorilla.Library.Models.SqlModels;
-using MSGorilla.Library.DAL;
+
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Azure;
 using Newtonsoft.Json;
@@ -117,24 +117,24 @@ namespace MSGorilla.Library
 
         public MetricDataSet GetDateSet(int id)
         {
-            using(var ctx = new MSGorillaContext())
+            using(var _gorillaCtx = new MSGorillaEntities())
             {
-                MetricDataSet dataset = ctx.MetricDatas.Find(id);
+                MetricDataSet dataset = _gorillaCtx.MetricDataSets.Find(id);
                 return dataset;
             }
         }
 
         public MetricDataSet AddDataSet(string creater, string name, string groupID, string description = null)
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                Group group = ctx.Groups.Find(groupID);
+                Group group = _gorillaCtx.Groups.Find(groupID);
                 if (group == null)
                 {
                     throw new GroupNotExistException();
                 }
 
-                UserProfile user = ctx.Users.Find(creater);
+                UserProfile user = _gorillaCtx.UserProfiles.Find(creater);
                 if (user == null)
                 {
                     throw new UserNotFoundException(creater);
@@ -147,8 +147,8 @@ namespace MSGorilla.Library
                 data.Creater = creater;
                 data.RecordCount = 0;
 
-                ctx.MetricDatas.Add(data);
-                ctx.SaveChanges();
+                _gorillaCtx.MetricDataSets.Add(data);
+                _gorillaCtx.SaveChanges();
 
                 return data;
             }
@@ -156,25 +156,25 @@ namespace MSGorilla.Library
 
         public void RemoveDataSet(int id)
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                MetricDataSet data = ctx.MetricDatas.Find(id);
+                MetricDataSet data = _gorillaCtx.MetricDataSets.Find(id);
                 if (data == null)
                 {
                     throw new MetricDataSetNotFoundException();
                 }
 
-                ctx.MetricDatas.Remove(data);
-                ctx.SaveChanges();
+                _gorillaCtx.MetricDataSets.Remove(data);
+                _gorillaCtx.SaveChanges();
             }
         }
 
         private const string RowKeyFormat = "000000000";
         public void AppendDataRecord(int id, string key, string value)
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                MetricDataSet data = ctx.MetricDatas.Find(id);
+                MetricDataSet data = _gorillaCtx.MetricDataSets.Find(id);
                 if (data == null)
                 {
                     throw new MetricDataSetNotFoundException();
@@ -205,7 +205,7 @@ namespace MSGorilla.Library
                 _metricData.Execute(operation);
 
                 data.RecordCount++;
-                ctx.SaveChanges();
+                _gorillaCtx.SaveChanges();
             }
         }
 

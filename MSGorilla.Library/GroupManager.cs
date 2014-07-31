@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using MSGorilla.Library.DAL;
+
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.SqlModels;
 using MSGorilla.Library.Models.ViewModels;
@@ -13,23 +13,23 @@ namespace MSGorilla.Library
 {
     public class GroupManager
     {
-        public Group GetGroupByID(string GroupID, MSGorillaContext ctx = null)
+        public Group GetGroupByID(string GroupID, MSGorillaEntities _gorillaCtx = null)
         {
-            if (ctx == null)
+            if (_gorillaCtx == null)
             {
-                using (ctx = new MSGorillaContext())
+                using (_gorillaCtx = new MSGorillaEntities())
                 {
-                    return ctx.Groups.Find(GroupID);
+                    return _gorillaCtx.Groups.Find(GroupID);
                 }
             }
-            return ctx.Groups.Find(GroupID);
+            return _gorillaCtx.Groups.Find(GroupID);
         }
 
         public List<Group> GetAllGroup()
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                return ctx.Groups.ToList();
+                return _gorillaCtx.Groups.ToList();
             }
         }
 
@@ -40,7 +40,7 @@ namespace MSGorilla.Library
                 throw new InvalidIDException();
             }
 
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 Group group = GetGroupByID(groupID);
                 if (group != null)
@@ -54,24 +54,24 @@ namespace MSGorilla.Library
                 group.DisplayName = displayName;
                 group.Description = description;
                 group.IsOpen = isOpen;
-                ctx.Groups.Add(group);
+                _gorillaCtx.Groups.Add(group);
                 //add creater as default admin
                 Membership member = new Membership();
                 member.GroupID = groupID;
                 member.MemberID = creater;
                 member.Role = "admin";
-                ctx.Memberships.Add(member);
+                _gorillaCtx.Memberships.Add(member);
 
-                ctx.SaveChanges();
+                _gorillaCtx.SaveChanges();
                 return group;
             }
         }
 
         public Group UpdateGroup(string admin, Group group)
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                Group groupUpdate = ctx.Groups.Find(group.GroupID);
+                Group groupUpdate = _gorillaCtx.Groups.Find(group.GroupID);
                 if (groupUpdate == null)
                 {
                     throw new GroupNotExistException();
@@ -80,22 +80,22 @@ namespace MSGorilla.Library
                 groupUpdate.DisplayName = group.DisplayName;
                 groupUpdate.IsOpen = group.IsOpen;
 
-                ctx.SaveChanges();
+                _gorillaCtx.SaveChanges();
                 return groupUpdate;
             }
         }
 
         public Membership JoinGroup(string userid, string groupID)
         {
-            using(var ctx = new MSGorillaContext())
+            using(var _gorillaCtx = new MSGorillaEntities())
             {
-                Group group = GetGroupByID(groupID, ctx);
+                Group group = GetGroupByID(groupID, _gorillaCtx);
                 if (group == null)
                 {
                     throw new GroupNotExistException();
                 }
 
-                UserProfile user = ctx.Users.Find(userid);
+                UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
                 if (user == null)
                 {
                     throw new UserNotFoundException(userid);
@@ -106,7 +106,7 @@ namespace MSGorilla.Library
                     throw new HandleRobotMembershipException();
                 }
 
-                Membership member = ctx.Memberships.SqlQuery(
+                Membership member = _gorillaCtx.Memberships.SqlQuery(
                     "select * from membership where groupid={0} and memberid={1}",
                     groupID,
                     userid).FirstOrDefault();
@@ -125,8 +125,8 @@ namespace MSGorilla.Library
                 member.GroupID = groupID;
                 member.MemberID = userid;
                 member.Role = "user";
-                ctx.Memberships.Add(member);
-                ctx.SaveChanges();
+                _gorillaCtx.Memberships.Add(member);
+                _gorillaCtx.SaveChanges();
 
                 return member;
             }
@@ -134,21 +134,21 @@ namespace MSGorilla.Library
 
         public Membership CheckMembership(string groupID, string userid)
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                return CheckMembership(groupID, userid, ctx);
+                return CheckMembership(groupID, userid, _gorillaCtx);
             }
         }
 
-        public Membership CheckMembership(string groupID, string userid, MSGorillaContext ctx)
+        public Membership CheckMembership(string groupID, string userid, MSGorillaEntities _gorillaCtx)
         {
-            Group group = ctx.Groups.Find(groupID);
+            Group group = _gorillaCtx.Groups.Find(groupID);
             if (group == null)
             {
                 throw new GroupNotExistException();
             }
 
-            Membership member = ctx.Memberships.SqlQuery(
+            Membership member = _gorillaCtx.Memberships.SqlQuery(
                 "select * from membership where groupid={0} and memberid={1}",
                 groupID,
                 userid).FirstOrDefault();
@@ -163,13 +163,13 @@ namespace MSGorilla.Library
 
         public void CheckAdmin(string groupID, string userid)
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                CheckAdmin(groupID, userid, ctx);
+                CheckAdmin(groupID, userid, _gorillaCtx);
             }
         }
 
-        public void CheckAdmin(string groupID, string userid, MSGorillaContext ctx)
+        public void CheckAdmin(string groupID, string userid, MSGorillaEntities ctx)
         {
             if (!"admin".Equals(CheckMembership(groupID, userid, ctx).Role))
             {
@@ -179,9 +179,9 @@ namespace MSGorilla.Library
 
         public Membership AddMember(string groupID, string userid, string role = "user")
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                UserProfile user = ctx.Users.Find(userid);
+                UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
                 if (user == null)
                 {
                     throw new UserNotFoundException(userid);
@@ -192,16 +192,16 @@ namespace MSGorilla.Library
                     throw new HandleRobotMembershipException();
                 }
 
-                Membership member = ctx.Memberships.Where(m => m.GroupID == groupID && m.MemberID == userid).FirstOrDefault();
+                Membership member = _gorillaCtx.Memberships.Where(m => m.GroupID == groupID && m.MemberID == userid).FirstOrDefault();
                 if (member == null)
                 {
                     member = new Membership();
                     member.GroupID = groupID;
                     member.MemberID = user.Userid;
                     member.Role = role;
-                    ctx.Memberships.Add(member);
+                    _gorillaCtx.Memberships.Add(member);
 
-                    ctx.SaveChanges();
+                    _gorillaCtx.SaveChanges();
                 }
                 
                 return member;
@@ -210,48 +210,48 @@ namespace MSGorilla.Library
 
         public void RemoveMember(string groupID, string admin, string userid)
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                Membership member = ctx.Memberships.SqlQuery(
+                Membership member = _gorillaCtx.Memberships.SqlQuery(
                     "select * from membership where groupid={0} and memberid={1}",
                     groupID,
                     userid).FirstOrDefault();
                 if (member != null)
                 {
-                    ctx.Memberships.Remove(member);
+                    _gorillaCtx.Memberships.Remove(member);
                 }
-                ctx.SaveChanges();
+                _gorillaCtx.SaveChanges();
             }
         }
 
         public Membership UpdateMembership(string groupID, string admin, string userid, string role)
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                Membership member = CheckMembership(groupID, userid, ctx);
+                Membership member = CheckMembership(groupID, userid, _gorillaCtx);
                 if ("robot".Equals(member.Role))
                 {
                     throw new HandleRobotMembershipException();
                 }
                 member.Role = role;
-                ctx.SaveChanges();
+                _gorillaCtx.SaveChanges();
                 return member;
             }
         }
 
         public List<Membership> GetAllGroupMember(string groupID, string userid)
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                return ctx.Memberships.SqlQuery("select * from membership where groupid={0}", groupID).ToList<Membership>();
+                return _gorillaCtx.Memberships.SqlQuery("select * from membership where groupid={0}", groupID).ToList<Membership>();
             }
         }
 
         public List<DisplayMembership> GetJoinedGroup(string userid)
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                return ctx.Database.SqlQuery<DisplayMembership>(
+                return _gorillaCtx.Database.SqlQuery<DisplayMembership>(
                     @"select g.GroupID, g.DisplayName, g.Description, g.IsOpen, m.MemberID, m.Role 
                         from membership m join [group] g on m.groupid = g.groupid where memberid={0}",
                     userid
@@ -261,9 +261,9 @@ namespace MSGorilla.Library
 
         public List<DisplayMembership> GetOwnedGroup(string userid)
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                return ctx.Database.SqlQuery<DisplayMembership>(
+                return _gorillaCtx.Database.SqlQuery<DisplayMembership>(
                     @"select g.GroupID, g.DisplayName, g.Description, g.IsOpen, m.MemberID, m.Role 
                         from membership m join [group] g on m.groupid = g.groupid where memberid={0} and role='admin'",
                     userid
@@ -273,7 +273,7 @@ namespace MSGorilla.Library
 
         public UserProfile CreateGroupRobotAccount(string groupID, string admin, UserProfile robot)
         {
-            using (var ctx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 robot.IsRobot = true;
                 new AccountManager().AddUser(robot);
@@ -282,9 +282,9 @@ namespace MSGorilla.Library
                 member.GroupID = groupID;
                 member.MemberID = robot.Userid;
                 member.Role = "robot";
-                ctx.Memberships.Add(member);
+                _gorillaCtx.Memberships.Add(member);
 
-                ctx.SaveChanges();
+                _gorillaCtx.SaveChanges();
 
                 return robot;
             }

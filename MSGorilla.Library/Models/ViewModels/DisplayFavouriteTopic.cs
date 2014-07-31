@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using MSGorilla.Library.Models.SqlModels;
-using MSGorilla.Library.DAL;
+
 
 namespace MSGorilla.Library.Models.ViewModels
 {
@@ -18,7 +18,7 @@ namespace MSGorilla.Library.Models.ViewModels
         public string topicDescription { get; set; }
         public int topicMsgCount { get; set; }
 
-        public DisplayFavouriteTopic(FavouriteTopic ftopic, MSGorillaContext _gorillaCtx)
+        public DisplayFavouriteTopic(FavouriteTopic ftopic, MSGorillaEntities _gorillaCtx)
         {
             Topic topic;
             if (ftopic == null || ((topic = _gorillaCtx.Topics.Find(ftopic.TopicID)) == null))

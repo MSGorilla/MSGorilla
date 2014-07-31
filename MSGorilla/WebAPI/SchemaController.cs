@@ -75,7 +75,9 @@ namespace MSGorilla.WebAPI
         [HttpGet,HttpPost]
         public Schema PostSchema(string schemaID, string schemaContent)
         {
-            Schema schema = new Schema(schemaID, schemaContent);
+            Schema schema = new Schema();
+            schema.SchemaID = schemaID;
+            schema.SchemaContent = schemaContent;
             _schemaManager.PostSchema(schema);
             return schema;
         }

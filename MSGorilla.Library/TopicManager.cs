@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using MSGorilla.Library.DAL;
+
 using MSGorilla.Library.Models.SqlModels;
 using MSGorilla.Library.Models.ViewModels;
 namespace MSGorilla.Library
 {
     public class TopicManager
     {
-        //private MSGorillaContext _gorillaCtx;
+        //private MSGorillaEntities _gorillaCtx;
 
         public List<Topic> GetAllTopics(string[] groups)
         {
@@ -20,7 +20,7 @@ namespace MSGorilla.Library
                 return new List<Topic>();
             }
 
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 return _gorillaCtx.Topics.Where(topic => groups.Any(groupID => topic.GroupID == groupID)).ToList();
             }
@@ -28,7 +28,7 @@ namespace MSGorilla.Library
 
         public Topic AddTopic(Topic topic)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 topic = _gorillaCtx.Topics.Add(topic);
                 _gorillaCtx.SaveChanges();
@@ -38,7 +38,7 @@ namespace MSGorilla.Library
 
         public void incrementTopicCount(int topicID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 Topic topic = FindTopic(topicID, _gorillaCtx);
                 if (topic != null)
@@ -51,9 +51,9 @@ namespace MSGorilla.Library
 
         public void clearUnreadMsgCountOfFavouriteTopic(string userid, int topicID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                FavouriteTopic ftopic = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).FirstOrDefault();
+                FavouriteTopic ftopic = _gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).FirstOrDefault();
                 if (ftopic != null)
                 {
                     ftopic.UnreadMsgCount = 0;
@@ -64,7 +64,7 @@ namespace MSGorilla.Library
 
         public void incrementUnreadMsgCountOfFavouriteTopic(int topicID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 _gorillaCtx.Database.ExecuteSqlCommand(
                     "update [favouritetopic] set UnreadMsgcount = UnreadMsgcount  + 1 where topicid={0}",
@@ -78,7 +78,7 @@ namespace MSGorilla.Library
             {
                 return null;
             }
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 Topic ret = null;
                 try
@@ -93,14 +93,14 @@ namespace MSGorilla.Library
             }
         }
 
-        public Topic FindTopic(int topicID, MSGorillaContext _gorillaCtx = null)
+        public Topic FindTopic(int topicID, MSGorillaEntities _gorillaCtx = null)
         {
             if (_gorillaCtx != null)
             {
                 return _gorillaCtx.Topics.Find(topicID);
                 
             }
-            using (_gorillaCtx = new MSGorillaContext())
+            using (_gorillaCtx = new MSGorillaEntities())
             {
                 return _gorillaCtx.Topics.Find(topicID);
             }
@@ -112,7 +112,7 @@ namespace MSGorilla.Library
             {
                 return new List<Topic>();
             }
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 return _gorillaCtx.Topics.Where
                     (
@@ -129,7 +129,7 @@ namespace MSGorilla.Library
                 return new List<Topic>();
             }
 
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 return _gorillaCtx.Topics.Where(
                    topic => groupIDs.Any(groupid => groupid == topic.GroupID)
@@ -139,15 +139,15 @@ namespace MSGorilla.Library
 
         public void AddFavouriteTopic(string userid, int topicID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                if (_gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).Count() == 0)
+                if (_gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).Count() == 0)
                 {
                     FavouriteTopic ftopic = new FavouriteTopic();
                     ftopic.TopicID = topicID;
                     ftopic.Userid = userid;
                     ftopic.UnreadMsgCount = 0;
-                    _gorillaCtx.favouriteTopic.Add(ftopic);
+                    _gorillaCtx.FavouriteTopics.Add(ftopic);
                     _gorillaCtx.SaveChanges();
                 }
             }
@@ -155,19 +155,19 @@ namespace MSGorilla.Library
 
         public void Remove(string userid, int topicID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                List<FavouriteTopic> finds = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).ToList();
-                _gorillaCtx.favouriteTopic.RemoveRange(finds);
+                List<FavouriteTopic> finds = _gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).ToList();
+                _gorillaCtx.FavouriteTopics.RemoveRange(finds);
                 _gorillaCtx.SaveChanges();
             }
         }
 
         public List<DisplayFavouriteTopic> GetFavouriteTopic(string userid)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                List<FavouriteTopic> topics = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid)).ToList();
+                List<FavouriteTopic> topics = _gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid)).ToList();
                 List<DisplayFavouriteTopic> dtopic = new List<DisplayFavouriteTopic>();
 
                 foreach (FavouriteTopic t in topics)
@@ -180,9 +180,9 @@ namespace MSGorilla.Library
 
         public int GetFavouriteTopicUnreadCount(string userid, int topicid)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                FavouriteTopic topic = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID.Equals(topicid)).FirstOrDefault();
+                FavouriteTopic topic = _gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid) && f.TopicID.Equals(topicid)).FirstOrDefault();
                 if (topic != null)
                     return topic.UnreadMsgCount;
 
@@ -193,9 +193,9 @@ namespace MSGorilla.Library
 
         public bool IsFavouriteTopic(string userid, int topicID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                FavouriteTopic ftopic = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).FirstOrDefault();
+                FavouriteTopic ftopic = _gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).FirstOrDefault();
                 if (ftopic != null)
                 {
                     return true;

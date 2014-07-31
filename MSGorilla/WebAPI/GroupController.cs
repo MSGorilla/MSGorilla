@@ -35,7 +35,7 @@ namespace MSGorilla.WebAPI
         /// <param name="isOpen">If the group is open, userid do not need admin's permission to join the group</param>
         /// <returns></returns>
         [HttpGet, HttpPost]
-        public Group AddGroup(string groupID, string displayName = null, string description = null, bool isOpen = false)
+        public DisplayGroup AddGroup(string groupID, string displayName = null, string description = null, bool isOpen = false)
         {
             string me = whoami();
 
@@ -62,7 +62,7 @@ namespace MSGorilla.WebAPI
         /// <param name="groupID">group id</param>
         /// <returns></returns>
         [HttpGet]
-        public Group GetGroup(string groupID)
+        public DisplayGroup GetGroup(string groupID)
         {
             string me = whoami();
             Group group = _groupManager.GetGroupByID(groupID);
@@ -95,10 +95,15 @@ namespace MSGorilla.WebAPI
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public List<Group> GetAllGroup()
+        public List<DisplayGroup> GetAllGroup()
         {
             string me = whoami();
-            return _groupManager.GetAllGroup();
+            List<DisplayGroup> result = new List<DisplayGroup>();
+            foreach (Group g in _groupManager.GetAllGroup())
+            {
+                result.Add(g);
+            }
+            return result;
         }
 
         /// <summary>
@@ -118,12 +123,16 @@ namespace MSGorilla.WebAPI
         /// <param name="isOpen">Is open group? User can join a open group without approval</param>
         /// <returns></returns>
         [HttpGet]
-        public Group UpdateGroup(string groupID, string displayname = null, string description = null, bool isOpen = false)
+        public DisplayGroup UpdateGroup(string groupID, string displayname = null, string description = null, bool isOpen = false)
         {
             string me = whoami();
             MembershipHelper.CheckAdmin(groupID, me);
 
-            Group group = new Group(groupID, displayname, description, isOpen);            
+            Group group = new Group();
+            group.GroupID = groupID;
+            group.DisplayName = displayname;
+            group.Description = description;
+            group.IsOpen = isOpen;
             return _groupManager.UpdateGroup(me, group);
         }
 
@@ -132,7 +141,6 @@ namespace MSGorilla.WebAPI
         /// 
         /// example output:
         /// {
-        ///     "Id": 85,
         ///     "GroupID": "woss",
         ///     "MemberID": "user1",
         ///     "Role": "user"
@@ -141,7 +149,7 @@ namespace MSGorilla.WebAPI
         /// <param name="groupID">group id</param>
         /// <returns></returns>
         [HttpGet, HttpPost]
-        public Membership JoinGroup(string groupID)
+        public MembershipView JoinGroup(string groupID)
         {
             string me = whoami();
             Membership member = _groupManager.JoinGroup(whoami(), groupID);
@@ -154,7 +162,6 @@ namespace MSGorilla.WebAPI
         /// 
         /// example output:
         /// {
-        ///     "Id": 114,
         ///     "GroupID": "woss",
         ///     "MemberID": "yidguo2",
         ///     "Role": "user"
@@ -164,7 +171,7 @@ namespace MSGorilla.WebAPI
         /// <param name="groupID">group id</param>
         /// <returns></returns>
         [HttpGet, HttpPost, HttpPut]
-        public Membership AddMember(string userid, string groupID)
+        public MembershipView AddMember(string userid, string groupID)
         {
             string me = whoami();
             MembershipHelper.CheckAdmin(groupID, me);
@@ -201,7 +208,6 @@ namespace MSGorilla.WebAPI
         /// 
         /// example output:
         /// {
-        ///     "Id": 114,
         ///     "GroupID": "woss",
         ///     "MemberID": "yidguo2",
         ///     "Role": "user"
@@ -212,7 +218,7 @@ namespace MSGorilla.WebAPI
         /// <param name="role">Can be "admin" or "user"</param>
         /// <returns></returns>
         [HttpGet, HttpPost, HttpPut]
-        public Membership UpdateMembership(string groupID, string userid, string role)
+        public MembershipView UpdateMembership(string groupID, string userid, string role)
         {
             string me = whoami();
             MembershipHelper.CheckAdmin(groupID, me);
@@ -225,14 +231,12 @@ namespace MSGorilla.WebAPI
         /// example output:
         /// [
         ///     {
-        ///         "Id": 102,
         ///         "GroupID": "msgorilladev",
         ///         "MemberID": "t-yig",
         ///         "Role": "admin"
         ///     },
         ///     ......
         ///     {
-        ///         "Id": 113,
         ///         "GroupID": "msgorilladev",
         ///         "MemberID": "bekimd",
         ///         "Role": "user"
@@ -242,11 +246,16 @@ namespace MSGorilla.WebAPI
         /// <param name="groupID">group id</param>
         /// <returns></returns>
         [HttpGet]
-        public List<Membership> GetAllGroupMember(string groupID)
+        public List<MembershipView> GetAllGroupMember(string groupID)
         {
             string me = whoami();
             MembershipHelper.CheckMembership(groupID, me);
-            return _groupManager.GetAllGroupMember(groupID, whoami());
+            List<MembershipView> result = new List<MembershipView>();
+            foreach(Membership member in _groupManager.GetAllGroupMember(groupID, whoami()))
+            {
+                result.Add(member);
+            }
+            return result;
         }
 
         /// <summary>
@@ -325,7 +334,7 @@ namespace MSGorilla.WebAPI
         /// <param name="description">robot description</param>
         /// <returns></returns>
         [HttpGet, HttpPost]
-        public UserProfile CreateGroupRobotAccount(string groupID, string userid, string password, string displayname = null, string description = null)
+        public DisplayUserProfile CreateGroupRobotAccount(string groupID, string userid, string password, string displayname = null, string description = null)
         {
             string me = whoami();
             MembershipHelper.CheckAdmin(groupID, me);
@@ -340,7 +349,7 @@ namespace MSGorilla.WebAPI
             robot.IsRobot = true;
             robot.Password = Utils.MD5Encoding(password);
 
-            return _groupManager.CreateGroupRobotAccount(groupID, me, robot);
+            return new DisplayUserProfile(_groupManager.CreateGroupRobotAccount(groupID, me, robot), 0);
         }
     }
 }

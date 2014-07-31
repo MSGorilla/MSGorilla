@@ -68,6 +68,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Spatial, Version=5.6.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\System.Spatial.5.6.1\lib\net40\System.Spatial.dll</HintPath>
@@ -84,31 +85,9 @@
     <Compile Include="AccountManager.cs" />
     <Compile Include="AttachmentManager.cs" />
     <Compile Include="Azure\AzureFactory.cs" />
-    <Compile Include="DAL\MSGorillaContext.cs" />
     <Compile Include="GroupManager.cs" />
     <Compile Include="MetricManager.cs" />
     <Compile Include="MException\MException.cs" />
-    <Compile Include="Migrations\201405190317263_initialCreate.cs" />
-    <Compile Include="Migrations\201405190317263_initialCreate.Designer.cs">
-      <DependentUpon>201405190317263_initialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201405210816592_addMessageCountPostedByUser.cs" />
-    <Compile Include="Migrations\201405210816592_addMessageCountPostedByUser.Designer.cs">
-      <DependentUpon>201405210816592_addMessageCountPostedByUser.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201406050724557_AddNotifAndTopic.cs" />
-    <Compile Include="Migrations\201406050724557_AddNotifAndTopic.Designer.cs">
-      <DependentUpon>201406050724557_AddNotifAndTopic.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201406160753225_AddFavourateTopic.cs" />
-    <Compile Include="Migrations\201406160753225_AddFavourateTopic.Designer.cs">
-      <DependentUpon>201406160753225_AddFavourateTopic.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201407030519350_add_important_msg_count.cs" />
-    <Compile Include="Migrations\201407030519350_add_important_msg_count.Designer.cs">
-      <DependentUpon>201407030519350_add_important_msg_count.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActionResult.cs" />
     <Compile Include="Models\Attachment.cs" />
     <Compile Include="Models\AzureModels\Entity\AtLineEntity.cs" />
@@ -129,19 +108,55 @@
     <Compile Include="Models\AzureModels\Entity\UserLineEntity.cs" />
     <Compile Include="Models\AzureModels\Queue\QueueMessage.cs" />
     <Compile Include="Models\Reply.cs" />
-    <Compile Include="Models\SqlModels\FavouriteTopic.cs" />
-    <Compile Include="Models\SqlModels\Group.cs" />
-    <Compile Include="Models\SqlModels\Membership.cs" />
-    <Compile Include="Models\SqlModels\MetricDataSet.cs" />
-    <Compile Include="Models\SqlModels\NotificationCount.cs" />
-    <Compile Include="Models\SqlModels\Schema.cs" />
-    <Compile Include="Models\SqlModels\Subscription.cs" />
-    <Compile Include="Models\SqlModels\Topic.cs" />
-    <Compile Include="Models\SqlModels\UserProfile.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\MessageDetail.cs" />
+    <Compile Include="Models\SqlModels\FavouriteTopic.cs">
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SqlModels\Group.cs">
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SqlModels\Membership.cs">
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SqlModels\MetricDataSet.cs">
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SqlModels\MSGorillaDbModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MSGorillaDbModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SqlModels\MSGorillaDbModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SqlModels\MSGorillaDbModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MSGorillaDbModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SqlModels\NotificationCount.cs">
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SqlModels\Schema.cs">
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SqlModels\Subscription.cs">
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SqlModels\Topic.cs">
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SqlModels\UserProfile.cs">
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ViewModels\DisplayFavouriteTopic.cs" />
+    <Compile Include="Models\ViewModels\DisplayGroup.cs" />
     <Compile Include="Models\ViewModels\DisplayMembership.cs" />
+    <Compile Include="Models\ViewModels\DisplayNotificationCount.cs" />
+    <Compile Include="Models\ViewModels\MembershipView.cs" />
     <Compile Include="Models\ViewModels\MessageModels.cs" />
     <Compile Include="Models\ViewModels\ReplyModels.cs" />
     <Compile Include="Models\ViewModels\DisplayUserProfile.cs" />
@@ -161,25 +176,30 @@
     <Content Include="3rd-Party-Lib\Newtonsoft.Json.dll" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <EntityDeploy Include="Models\SqlModels\MSGorillaDbModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>MSGorillaDbModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="Models\SqlModels\MSGorillaDbModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>MSGorillaDbModel.edmx</DependentUpon>
+      <LastGenOutput>MSGorillaDbModel.Context.cs</LastGenOutput>
+    </None>
+    <None Include="Models\SqlModels\MSGorillaDbModel.edmx.diagram">
+      <DependentUpon>MSGorillaDbModel.edmx</DependentUpon>
+    </None>
+    <None Include="Models\SqlModels\MSGorillaDbModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>MSGorillaDbModel.edmx</DependentUpon>
+      <LastGenOutput>MSGorillaDbModel.cs</LastGenOutput>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201405190317263_initialCreate.resx">
-      <DependentUpon>201405190317263_initialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201405210816592_addMessageCountPostedByUser.resx">
-      <DependentUpon>201405210816592_addMessageCountPostedByUser.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201406050724557_AddNotifAndTopic.resx">
-      <DependentUpon>201406050724557_AddNotifAndTopic.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201406160753225_AddFavourateTopic.resx">
-      <DependentUpon>201406160753225_AddFavourateTopic.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201407030519350_add_important_msg_count.resx">
-      <DependentUpon>201407030519350_add_important_msg_count.cs</DependentUpon>
-    </EmbeddedResource>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
