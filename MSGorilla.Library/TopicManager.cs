@@ -72,6 +72,23 @@ namespace MSGorilla.Library
             }
         }
 
+        public Topic FindTopicByName(string name, string groupID)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                Topic ret = null;
+                try
+                {
+                    ret = _gorillaCtx.Topics.Where(topic => topic.Name == name && groupID == topic.GroupID).Single();
+                }
+                catch
+                {
+
+                }
+                return ret;
+            }
+        }
+
         public Topic FindTopicByName(string name, string[] groupIDs)
         {
             if (groupIDs == null || groupIDs.Length == 0)
