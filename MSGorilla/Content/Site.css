@@ -267,8 +267,7 @@ input[type="checkbox"].input-validation-error {
 }
 
 .pd-10 {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 10px;
 }
 
 .bold {

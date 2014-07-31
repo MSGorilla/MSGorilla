@@ -3,13 +3,16 @@
         <li id="loading_message" class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
         @*autofill by js*@
     </ul>
+    <input id="hd_feed_category" type="hidden" value="@ViewBag.FeedCategory" />
+    <input id="hd_feed_id" type="hidden" value="@ViewBag.FeedId" />
+    <input id="hd_token" type="hidden" value="" />
+    <input id="hd_filter" type="hidden" value="all" />
+    <input id="hd_newcount" type="hidden" value="0" />
+    <input id="hd_current_group" type="hidden" value="" />
 </div>
 
 <div class="txtaln-c">
     <span id="lbl_seemore" class="help-block">Loading more...</span>
-    <input id="hd_token" type="hidden" value="" />
-    <input id="hd_filter" type="hidden" value="" />
-    <input id="hd_newcount" type="hidden" value="0" />
 
     <script type="text/javascript">
         $(window).scroll(function () {
@@ -17,13 +20,14 @@
             var windowHeight = $(window).height();
             var documentHeight = $(document).height();
             if (documentTop >= (documentHeight - windowHeight)) {
-                LoadFeeds('@ViewBag.FeedCategory', '@ViewBag.FeedId');
+                LoadFeeds(false);
             }
         })
     </script>
 </div>
 
 <script>
-    $(LoadFeeds("@ViewBag.FeedCategory", "@ViewBag.FeedId"));
+    $(LoadMyGroupNavbar());
+    $(LoadFeeds(true));
 </script>
 
