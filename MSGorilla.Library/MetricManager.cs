@@ -115,7 +115,7 @@ namespace MSGorilla.Library
             _metricData = AzureFactory.GetTable(AzureFactory.MSGorillaTable.MetricDataSet);
         }
 
-        public MetricDataSet GetDateSet(int id)
+        public MetricDataSet GetDataSet(int id)
         {
             using(var _gorillaCtx = new MSGorillaEntities())
             {
@@ -124,6 +124,13 @@ namespace MSGorilla.Library
             }
         }
 
+        public List<MetricDataSet> GetAllDataSetByGroup(string groupID)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                return _gorillaCtx.MetricDataSets.Where(d => d.GroupID == groupID).ToList();
+            }
+        }
         public MetricDataSet CreateDataSet(string creater, string name, string groupID, string description = null)
         {
             using (var _gorillaCtx = new MSGorillaEntities())
