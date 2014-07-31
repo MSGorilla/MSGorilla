@@ -379,11 +379,11 @@ input[type="checkbox"].input-validation-error {
     border-right: 1px solid #dddddd;
 }
 
-.userlist-group {
+.userlist-group, .grouplist-group {
     padding-left: 0;
 }
 
-.userlist-group-item {
+.userlist-group-item, .grouplist-group-item {
     position: relative;
     display: inline-block;
     width: 176px;
@@ -396,7 +396,7 @@ input[type="checkbox"].input-validation-error {
     border: 1px solid #dddddd;
 }
 
-.user-card {
+.user-card, .group-card {
     float: left;
     width: 178px;
     margin: 10px 10px 20px 10px;
@@ -408,17 +408,17 @@ input[type="checkbox"].input-validation-error {
     border: 1px solid #dddddd;
 }
 
-.user-card-info {
+.user-card-info, .group-card-info {
     padding: 15px;
     color: #8899a6;
 }
 
-    .user-card-info a {
+    .user-card-info a, .group-card-info a {
         color: #292f33;
         font-weight: 700;
     }
 
-.user-card-postinfo {
+.user-card-postinfo, .group-card-postinfo {
 }
 
 .user-popover-info {
@@ -552,6 +552,16 @@ input[type="checkbox"].input-validation-error {
     background-repeat: no-repeat;
     background-position-x: left;
     background-position-y: top;
+}
+
+.group-btn {
+    display: inline-block;
+    min-width: 80px;
+    vertical-align: baseline;
+    white-space: nowrap;
+    text-align: center;
+    float: right;
+    margin-right: 10px;
 }
 
 .like-btn {
