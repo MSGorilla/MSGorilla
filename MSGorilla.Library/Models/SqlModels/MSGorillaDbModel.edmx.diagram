@@ -23,6 +23,12 @@
         <AssociationConnector Association="MSGorillaModel.FK_NOTIFCOUNT_USERID" ManuallyRouted="false" />
         <AssociationConnector Association="MSGorillaModel.FK_dbo_Subscription_dbo_UserProfile_Userid" ManuallyRouted="false" />
         <AssociationConnector Association="MSGorillaModel.FK_UserProfile_DefaultGroup" />
+        <AssociationConnector Association="MSGorillaModel.FK_MetricDataSet_0" />
+        <EntityTypeShape EntityType="MSGorillaModel.Chart_DataSet" Width="1.5" PointX="3.125" PointY="0.5" />
+        <EntityTypeShape EntityType="MSGorillaModel.MetricChart" Width="1.5" PointX="0.5" PointY="0.625" />
+        <AssociationConnector Association="MSGorillaModel.FK_Chart_DataSet_0" />
+        <AssociationConnector Association="MSGorillaModel.FK_Chart_DataSet_1" />
+        <AssociationConnector Association="MSGorillaModel.FK_MatricChart_0" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

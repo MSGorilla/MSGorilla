@@ -5,8 +5,10 @@ using System.Web;
 using System.Web.Http;
 using MSGorilla.Library;
 using MSGorilla.Library.Models.SqlModels;
+using MSGorilla.Library.Models.ViewModels;
 using MSGorilla.Utility;
 using MSGorilla.Library.Models;
+using MSGorilla.Library.Exceptions;
 
 namespace MSGorilla.WebAPI
 {
@@ -15,19 +17,19 @@ namespace MSGorilla.WebAPI
         MetricManager _metricManager = new MetricManager();
 
         [HttpGet]
-        public MetricDataSet GetDataSet(int id)
+        public DisplayMetricDataSet GetDataSet(int id)
         {
             string me = whoami();
             return _metricManager.GetDateSet(id);
         }
 
         [HttpGet, HttpPost]
-        public MetricDataSet AddDataSet(string name, string group, string description = null)
+        public DisplayMetricDataSet AddDataSet(string name, string group, string description = null)
         {
             string me = whoami();
             MembershipHelper.CheckMembership(group, me);
 
-            return _metricManager.AddDataSet(me, name, group, description);
+            return _metricManager.CreateDataSet(me, name, group, description);
         }
 
         [HttpGet, HttpPost, HttpDelete]
@@ -41,7 +43,7 @@ namespace MSGorilla.WebAPI
                 MembershipHelper.CheckAdmin(dataset.GroupID, me);
             }
 
-            _metricManager.RemoveDataSet(id);
+            _metricManager.DeleteDataSet(id);
             return new ActionResult();
         }
 
@@ -71,6 +73,60 @@ namespace MSGorilla.WebAPI
             MembershipHelper.CheckMembership(dataset.GroupID, whoami());
 
             return _metricManager.RetriveDataRecord(dataset.Id, startIndex, endIndex);
+        }
+
+        [HttpGet, HttpPost, HttpPut]
+        public DisplayMetricChart CreateChart(string chartName, string group, string title, string subtitle = null)
+        {
+            string me = whoami();
+            MembershipHelper.CheckMembership(group, me);
+            return _metricManager.CreateChart(me, group, title, subtitle);
+        }
+
+        [HttpGet]
+        public DisplayMetricChart GetChart(string chartName)
+        {
+            string me = whoami();
+            DisplayMetricChart chart = _metricManager.GetChart(chartName);
+            MembershipHelper.CheckMembership(chart.GroupID, me);
+            return chart;
+        }
+
+        [HttpGet, HttpPost, HttpPut]
+        public DisplayMetricChart AddDataSet(string chartName, int dataSetID, string legend, string type)
+        {
+            string me = whoami();
+            DisplayMetricDataSet dataset = GetDataSet(dataSetID);
+            if (dataset == null)
+            {
+                throw new MetricDataSetNotFoundException();
+            }
+
+            MembershipHelper.CheckMembership(dataset.GroupID, me);
+            return _metricManager.AddDataSet(chartName, dataSetID, legend, type);
+        }
+
+        [HttpGet, HttpDelete]
+        public DisplayMetricChart RemoveDataSet(string chartName, int dataSetID)
+        {
+            string me = whoami();
+            DisplayMetricDataSet dataset = GetDataSet(dataSetID);
+            if (dataset == null)
+            {
+                throw new MetricDataSetNotFoundException();
+            }
+
+            MembershipHelper.CheckMembership(dataset.GroupID, me);
+
+            return _metricManager.RemoveDataSet(chartName, dataSetID);
+        }
+
+        [HttpGet]
+        public List<DisplayMetricChart> GetChartsByGroup(string group)
+        {
+            string me = whoami();
+            MembershipHelper.CheckMembership(group, me);
+            return _metricManager.GetAllChartByGroup(group);
         }
     }
 }

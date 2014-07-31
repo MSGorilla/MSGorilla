@@ -20,6 +20,7 @@ namespace MSGorilla.Library.Models.SqlModels
             this.MetricDataSets = new HashSet<MetricDataSet>();
             this.Topics = new HashSet<Topic>();
             this.UserProfiles = new HashSet<UserProfile>();
+            this.MetricCharts = new HashSet<MetricChart>();
         }
     
         public string GroupID { get; set; }
@@ -31,5 +32,6 @@ namespace MSGorilla.Library.Models.SqlModels
         public virtual ICollection<MetricDataSet> MetricDataSets { get; set; }
         public virtual ICollection<Topic> Topics { get; set; }
         public virtual ICollection<UserProfile> UserProfiles { get; set; }
+        public virtual ICollection<MetricChart> MetricCharts { get; set; }
     }
 }

@@ -110,6 +110,9 @@
     <Compile Include="Models\Reply.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\MessageDetail.cs" />
+    <Compile Include="Models\SqlModels\Chart_DataSet.cs">
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\SqlModels\FavouriteTopic.cs">
       <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
     </Compile>
@@ -117,6 +120,9 @@
       <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\SqlModels\Membership.cs">
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SqlModels\MetricChart.cs">
       <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\SqlModels\MetricDataSet.cs">
@@ -155,6 +161,8 @@
     <Compile Include="Models\ViewModels\DisplayFavouriteTopic.cs" />
     <Compile Include="Models\ViewModels\DisplayGroup.cs" />
     <Compile Include="Models\ViewModels\DisplayMembership.cs" />
+    <Compile Include="Models\ViewModels\DisplayMetricChart.cs" />
+    <Compile Include="Models\ViewModels\DisplayMetricDataSet.cs" />
     <Compile Include="Models\ViewModels\DisplayNotificationCount.cs" />
     <Compile Include="Models\ViewModels\MembershipView.cs" />
     <Compile Include="Models\ViewModels\MessageModels.cs" />

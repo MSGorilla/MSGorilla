@@ -41,6 +41,7 @@ namespace MSGorilla.WebAPI
             CacheHelper.Add<SimpleUserProfile>(key, userprofile);
             return userprofile;
         }
+
         private DisplayMessagePagination CreateDisplayMsgPag(MessagePagination msgPag)
         {
             DisplayMessagePagination dmp = new DisplayMessagePagination();

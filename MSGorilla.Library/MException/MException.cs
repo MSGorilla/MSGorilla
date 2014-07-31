@@ -249,4 +249,21 @@ namespace MSGorilla.Library.Exceptions
             Code = 8002;
         }
     }
+
+    public class MetricChartNotFoundException : MSGorillaBaseException
+    {
+        public MetricChartNotFoundException()
+        {
+            Description = "The specified metric chart not found.";
+            Code = 8003;
+        }
+    }
+
+    public class MetricGroupDismatchException : MSGorillaBaseException
+    {
+        public MetricGroupDismatchException(){
+            Description = "The groups of metric chart and metric dataset are not the same.";
+            Code = 8004;
+        }
+    }
 }

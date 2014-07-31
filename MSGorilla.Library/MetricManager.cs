@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 
 using MSGorilla.Library.Models.SqlModels;
-
+using MSGorilla.Library.Models.ViewModels;
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Azure;
 using Newtonsoft.Json;
@@ -124,7 +124,7 @@ namespace MSGorilla.Library
             }
         }
 
-        public MetricDataSet AddDataSet(string creater, string name, string groupID, string description = null)
+        public MetricDataSet CreateDataSet(string creater, string name, string groupID, string description = null)
         {
             using (var _gorillaCtx = new MSGorillaEntities())
             {
@@ -154,7 +154,7 @@ namespace MSGorilla.Library
             }
         }
 
-        public void RemoveDataSet(int id)
+        public void DeleteDataSet(int id)
         {
             using (var _gorillaCtx = new MSGorillaEntities())
             {
@@ -272,6 +272,90 @@ namespace MSGorilla.Library
             }
 
             return RetriveDataRecord(dataset.Id, startIndex, endIndex);
+        }
+
+        public DisplayMetricChart CreateChart(string name, string group, string title, string subtitle = null)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                MetricChart chart = new MetricChart();
+                chart.Name = name;
+                chart.GroupID = group;
+                chart.Title = title;
+                chart.SubTitle = subtitle;
+
+                _gorillaCtx.MetricCharts.Add(chart);
+                _gorillaCtx.SaveChanges();
+
+                return chart;
+            }
+        }
+
+        public DisplayMetricChart GetChart(string name)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                return _gorillaCtx.MetricCharts.Find(name);
+            }
+        }
+
+        public DisplayMetricChart AddDataSet(string name, int datasetID, string legend, string type)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                MetricChart chart = _gorillaCtx.MetricCharts.Find(name);
+                if (chart == null)
+                {
+                    throw new MetricChartNotFoundException();
+                }
+
+                MetricDataSet data = _gorillaCtx.MetricDataSets.Find(datasetID);
+                if (data == null)
+                {
+                    throw new MetricDataSetNotFoundException();
+                }
+
+                if (!chart.GroupID.Equals(data.GroupID, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    throw new MetricGroupDismatchException();
+                }
+                Chart_DataSet dataset = new Chart_DataSet();
+                dataset.MetricChartName = name;
+                dataset.MetricDataSetID = datasetID;
+                dataset.Legend = legend;
+                dataset.Type = type;
+
+                _gorillaCtx.Chart_DataSet.Add(dataset);
+                _gorillaCtx.SaveChanges();
+                return dataset.MetricChart;
+            }
+        }
+
+        public DisplayMetricChart RemoveDataSet(string name, int datasetID)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                Chart_DataSet dataset = _gorillaCtx.Chart_DataSet.Where(
+                    c => c.MetricChartName == name && c.MetricDataSetID == datasetID
+                    ).FirstOrDefault();
+
+                _gorillaCtx.Chart_DataSet.Remove(dataset);
+                _gorillaCtx.SaveChanges();
+                return _gorillaCtx.MetricCharts.Find(name);
+            }
+        }
+
+        public List<DisplayMetricChart> GetAllChartByGroup(string groupID)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                List<DisplayMetricChart> charts = new List<DisplayMetricChart>();
+                foreach (var chart in _gorillaCtx.MetricCharts.Where(c => c.GroupID == groupID))
+                {
+                    charts.Add(chart);
+                }
+                return charts;
+            }
         }
     }
 }
