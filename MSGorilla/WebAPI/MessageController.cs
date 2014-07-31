@@ -806,7 +806,7 @@ namespace MSGorilla.WebAPI
         }
 
         [HttpGet]
-        public string SearchMessage(string keyword, [FromUri]string[] group = null)
+        public SearchResult SearchMessage(string keyword, [FromUri]string[] group = null)
         {
             string me = whoami();
             return _searchManager.SearchMessage(keyword);

@@ -25,7 +25,7 @@ namespace MSGorilla.SearchTest
             CloudQueue _queue = AzureFactory.GetQueue(AzureFactory.MSGorillaQueue.SearchEngineSpider);
             SearchManager _manager = new SearchManager();
 
-            _manager.SearchMessage("woss user1");
+            var result = _manager.SearchMessage("woss user1");
 
             while (true)
             {

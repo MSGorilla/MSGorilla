@@ -11,13 +11,19 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 {
     class SearchHistoryEntity : TableEntity
     {
+        public string ResultId { get; set; }
         public DateTime LastSearchDateUTC { get; set; }
+        public double TakenTime { get; set; }
+        public int ResultsCount { get; set; }
 
         public SearchHistoryEntity() { }
 
-        public SearchHistoryEntity(string resultId, DateTime searchDateUTC)
+        public SearchHistoryEntity(string resultId, DateTime searchDateUTC, double takenTime, int resultsCount)
         {
+            ResultId = resultId;
             LastSearchDateUTC = searchDateUTC;
+            TakenTime = takenTime;
+            ResultsCount = resultsCount;
 
             this.PartitionKey = resultId;
             this.RowKey = resultId;

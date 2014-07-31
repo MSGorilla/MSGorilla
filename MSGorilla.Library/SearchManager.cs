@@ -46,7 +46,7 @@ namespace MSGorilla.Library
         private IGoWord _goWord = new ListGoWord();
 
         /// <summary>Display string: time the search too</summary>
-        private TimeSpan _searchTime;
+        private TimeSpan _searchTime = TimeSpan.Zero;
         #endregion
 
         public SearchManager()
@@ -73,18 +73,18 @@ namespace MSGorilla.Library
             SaveWordsIndex(wordsIndex);
         }
 
-        public string SearchMessage(string keywords)
+        public SearchResult SearchMessage(string keywords)
         {
             if (string.IsNullOrEmpty(keywords.Trim()))
             {
-                return string.Empty;
+                return null;
             }
 
             // segment keywords
             string[] keywordsArray = SplitWords(keywords);
             if (keywordsArray == null || keywordsArray.Count() == 0)
             {
-                return string.Empty;
+                return null;
             }
 
             // get search id
@@ -95,20 +95,25 @@ namespace MSGorilla.Library
             DateTime lastSearchDate = GetSearchHistory(searchId);
             if (now.Subtract(lastSearchDate).TotalSeconds < SearchDelaySeconds)
             {   // do not search, use last search result
-                return searchId;
+                return new SearchResult(searchId, now, 0, 0);
             }
 
             // search every keyword
+            DateTime start = DateTime.Now;  // to show 'time taken' to perform search
             var searchResults = SearchKeywords(keywordsArray, lastSearchDate);
+
+            // Time taken calculation
+            Int64 ticks = DateTime.Now.Ticks - start.Ticks;
+            _searchTime = new TimeSpan(ticks);
 
             // save results into table
             SaveSearchResults(searchId, searchResults);
 
             // update search history
-            UpdateSearchHistory(searchId, now);
+            UpdateSearchHistory(searchId, now, _searchTime.TotalSeconds, searchResults.Count());
 
             // return search id
-            return searchId;
+            return new SearchResult(searchId, now, _searchTime.TotalSeconds, searchResults.Count());
         }
 
         public MessagePagination GetSearchResults(string resultId, int count = 25, TableContinuationToken continuationToken = null)
@@ -335,7 +340,6 @@ namespace MSGorilla.Library
             Dictionary<string, List<int>>[] searchResultsArrayArray = new Dictionary<string, List<int>>[keywordsArray.Length];
             // finalResultsArray is populated with pages that *match* either of the search criteria
             Dictionary<string, int[]> finalResultsArray = new Dictionary<string, int[]>();
-            DateTime start = DateTime.Now;  // to show 'time taken' to perform search
 
             // ##### THE SEARCH #####
             for (int i = 0; i < keywordsArray.Length; i++)
@@ -370,10 +374,6 @@ namespace MSGorilla.Library
                     }
                 }
             }
-
-            // Time taken calculation
-            Int64 ticks = DateTime.Now.Ticks - start.Ticks;
-            _searchTime = new TimeSpan(ticks);
 
             // Format the results
             if (finalResultsArray.Count > 0)
@@ -453,9 +453,9 @@ namespace MSGorilla.Library
             }
         }
 
-        private void UpdateSearchHistory(string searchId, DateTime searchDate)
+        private void UpdateSearchHistory(string searchId, DateTime searchDate, double takenTime, int resultsCount)
         {
-            SearchHistoryEntity entity = new SearchHistoryEntity(searchId, searchDate);
+            SearchHistoryEntity entity = new SearchHistoryEntity(searchId, searchDate, takenTime, resultsCount);
             TableResult result = _searchHistoryTable.Execute(TableOperation.InsertOrReplace(entity));
         }
 
