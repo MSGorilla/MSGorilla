@@ -190,7 +190,7 @@ namespace MSGorilla.WebAPI
         /// <param name="portraitUrl">portrait url of the user</param>
         /// <returns></returns>
         [HttpGet]
-        public UserProfile Update(string DisplayName, string Description, string portraitUrl)
+        public DisplayUserProfile Update(string DisplayName, string Description, string portraitUrl)
         {
             string userid = whoami();
             UserProfile user = _accountManager.FindUser(userid);
@@ -198,7 +198,7 @@ namespace MSGorilla.WebAPI
             user.Description = Description;
             user.PortraitUrl = portraitUrl;
             _accountManager.UpdateUser(user);
-            return user;
+            return new DisplayUserProfile(user, IsFollowing(userid, userid));
         }
 
         /// <summary>
@@ -510,7 +510,7 @@ namespace MSGorilla.WebAPI
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public NotificationCount GetNotificationCount()
+        public DisplayNotificationCount GetNotificationCount()
         {
             string me = whoami();
             return _notifManager.FindUserNotif(me);
@@ -531,7 +531,7 @@ namespace MSGorilla.WebAPI
         /// <param name="userid">user id</param>
         /// <returns></returns>
         [HttpGet]
-        public NotificationCount GetNotificationCount(string userid)
+        public DisplayNotificationCount GetNotificationCount(string userid)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))

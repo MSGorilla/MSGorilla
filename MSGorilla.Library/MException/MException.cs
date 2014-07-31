@@ -204,12 +204,21 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
-    public class HandleRobotMembershipException : MSGorillaBaseException
+    public class UpdateRobotMembershipException : MSGorillaBaseException
     {
-        public HandleRobotMembershipException()
+        public UpdateRobotMembershipException()
         {
-            Description = "You can't update a robot's membership.";
+            Description = "You can't change a robot's membership.";
             Code = 6004;
+        }
+    }
+
+    public class UpdateRobotDefaultGroupException : MSGorillaBaseException
+    {
+        public UpdateRobotDefaultGroupException()
+        {
+            Description = "You can't change a robot's default group.";
+            Code = 6005;
         }
     }
 
@@ -228,6 +237,16 @@ namespace MSGorilla.Library.Exceptions
         {
             Description = "The specified metric data not found.";
             Code = 8001;
+        }
+    }
+
+    public class MetricRecordKeyTooLongException : MSGorillaBaseException
+    {
+        public const int MaxKeyLengthInByte = 2048;
+        public MetricRecordKeyTooLongException()
+        {
+            Description = string.Format("Metric record key length should be no long than {0} bytes.", MaxKeyLengthInByte);
+            Code = 8002;
         }
     }
 }

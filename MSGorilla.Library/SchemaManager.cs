@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using MSGorilla.Library.DAL;
+
 using MSGorilla.Library.Models.SqlModels;
 using MSGorilla.Library.Exceptions;
 
@@ -12,17 +12,19 @@ namespace MSGorilla.Library
 {
     public class SchemaManager
     {
-        private MSGorillaContext _gorillaCtx;
+        private MSGorillaEntities _gorillaCtx;
 
         public SchemaManager()
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                Schema defaultSchema = _gorillaCtx.Schemas.Find("none");
+                Schema defaultSchema = _gorillaCtx.Schemata.Find("none");
                 if (defaultSchema == null)
                 {
-                    defaultSchema = new Schema("none", "");
-                    _gorillaCtx.Schemas.Add(defaultSchema);
+                    defaultSchema = new Schema();
+                    defaultSchema.SchemaID = "none";
+                    defaultSchema.SchemaContent = "";
+                    _gorillaCtx.Schemata.Add(defaultSchema);
                     _gorillaCtx.SaveChanges();
                 }
             }            
@@ -30,25 +32,25 @@ namespace MSGorilla.Library
 
         public bool Contain(string schemaID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                return !(_gorillaCtx.Schemas.Find(schemaID) == null);
+                return !(_gorillaCtx.Schemata.Find(schemaID) == null);
             }
         }
 
         public List<Schema> GetSchema()
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                return _gorillaCtx.Schemas.ToList();
+                return _gorillaCtx.Schemata.ToList();
             }            
         }
 
         public Schema GetSchema(string schemaID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                Schema schema = _gorillaCtx.Schemas.Find(schemaID);
+                Schema schema = _gorillaCtx.Schemata.Find(schemaID);
                 if (schema == null)
                 {
                     throw new SchemaNotFoundException();
@@ -60,13 +62,13 @@ namespace MSGorilla.Library
 
         public void PostSchema(Schema schema)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 if (Contain(schema.SchemaID))
                 {
                     throw new SchemaAlreadyExistException();
                 }
-                _gorillaCtx.Schemas.Add(schema);
+                _gorillaCtx.Schemata.Add(schema);
                 _gorillaCtx.SaveChanges();
             }            
         }
