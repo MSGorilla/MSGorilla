@@ -30,10 +30,12 @@ namespace MSGorilla.Library.Models.SqlModels
         public string Password { get; set; }
         public int MessageCount { get; set; }
         public bool IsRobot { get; set; }
+        public string DefaultGroup { get; set; }
     
         public virtual ICollection<FavouriteTopic> FavouriteTopics { get; set; }
         public virtual ICollection<Membership> Memberships { get; set; }
         public virtual NotificationCount NotificationCount { get; set; }
         public virtual ICollection<Subscription> Subscriptions { get; set; }
+        public virtual Group Group { get; set; }
     }
 }

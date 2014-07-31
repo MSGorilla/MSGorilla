@@ -75,10 +75,26 @@ namespace MSGorilla.Utility
             }
             else
             {
-                session[_defaultGroup] = "microsoft";
-                return "microsoft";
+                session[_defaultGroup] = profile.DefaultGroup;
+                return profile.DefaultGroup;
             }
         }
+
+        public static void SetDefaultGroup(string userid, string groupID)
+        {
+            UserProfile user = _accountManager.FindUser(userid);
+            if (user.IsRobot)
+            {
+                throw new UpdateRobotDefaultGroupException();
+            }
+
+            MembershipHelper.CheckMembership(groupID, userid);
+            _groupManager.SetDefaultGroup(groupID, userid);
+
+            var session = HttpContext.Current.Session;
+            session[_defaultGroup] = groupID;
+        }
+
         public static string[] JoinedGroup(string userid)
         {
             string key = CacheHelper.JoinedGroupPrefix + userid;
@@ -88,9 +104,15 @@ namespace MSGorilla.Utility
             }
             List<DisplayMembership> groups = _groupManager.GetJoinedGroup(userid);
             List<string> groupIDs = new List<string>();
+            string defaultGroup = DefaultGroup(userid);
+
+            groupIDs.Add(defaultGroup);
             foreach (DisplayMembership member in groups)
             {
-                groupIDs.Add(member.GroupID);
+                if (!member.GroupID.Equals(defaultGroup, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    groupIDs.Add(member.GroupID);
+                }
             }
 
             CacheHelper.Add<string[]>(key, groupIDs.ToArray());

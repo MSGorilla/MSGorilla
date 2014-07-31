@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="MSGorillaModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="MSGorillaModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="FavouriteTopic">
           <Key>
             <PropertyRef Name="Id" />
@@ -93,6 +93,7 @@
           <Property Name="Password" Type="nvarchar" MaxLength="128" />
           <Property Name="MessageCount" Type="int" Nullable="false" />
           <Property Name="IsRobot" Type="bit" Nullable="false" />
+          <Property Name="DefaultGroup" Type="nvarchar" MaxLength="128" Nullable="false" />
         </EntityType>
         <Association Name="FK_dbo_Subscription_dbo_UserProfile_Userid">
           <End Role="UserProfile" Type="Self.UserProfile" Multiplicity="0..1" />
@@ -204,6 +205,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_UserProfile_DefaultGroup">
+          <End Role="Group" Type="Self.Group" Multiplicity="1" />
+          <End Role="UserProfile" Type="Self.UserProfile" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="GroupID" />
+            </Principal>
+            <Dependent Role="UserProfile">
+              <PropertyRef Name="DefaultGroup" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="MSGorillaModelStoreContainer">
           <EntitySet Name="FavouriteTopic" EntityType="Self.FavouriteTopic" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Group" EntityType="Self.Group" Schema="dbo" store:Type="Tables" />
@@ -246,9 +259,12 @@
             <End Role="Group" EntitySet="Group" />
             <End Role="Topic" EntitySet="Topic" />
           </AssociationSet>
+          <AssociationSet Name="FK_UserProfile_DefaultGroup" Association="Self.FK_UserProfile_DefaultGroup">
+            <End Role="Group" EntitySet="Group" />
+            <End Role="UserProfile" EntitySet="UserProfile" />
+          </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="MSGorillaModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -274,6 +290,7 @@
           <NavigationProperty Name="Memberships" Relationship="Self.FK_MEMBERSHIP_GROUPID" FromRole="Group" ToRole="Membership" />
           <NavigationProperty Name="MetricDataSets" Relationship="Self.FK_METRICDATASET_GROUPID" FromRole="Group" ToRole="MetricDataSet" />
           <NavigationProperty Name="Topics" Relationship="Self.FK_TOPIC_GROUPID" FromRole="Group" ToRole="Topic" />
+          <NavigationProperty Name="UserProfiles" Relationship="MSGorillaModel.FK_UserProfile_DefaultGroup" FromRole="Group" ToRole="UserProfile" />
         </EntityType>
         <EntityType Name="Membership">
           <Key>
@@ -356,6 +373,8 @@
           <NavigationProperty Name="Memberships" Relationship="Self.FK_MEMBERSHIP_MEMBERID" FromRole="UserProfile" ToRole="Membership" />
           <NavigationProperty Name="NotificationCount" Relationship="Self.FK_NOTIFCOUNT_USERID" FromRole="UserProfile" ToRole="NotificationCount" />
           <NavigationProperty Name="Subscriptions" Relationship="Self.FK_dbo_Subscription_dbo_UserProfile_Userid" FromRole="UserProfile" ToRole="Subscription" />
+          <Property Name="DefaultGroup" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Group" Relationship="MSGorillaModel.FK_UserProfile_DefaultGroup" FromRole="UserProfile" ToRole="Group" />
         </EntityType>
         <Association Name="FK_FAVOURITETOPIC_TOPICID">
           <End Role="Topic" Type="Self.Topic" Multiplicity="1">
@@ -509,7 +528,23 @@
             <End Role="UserProfile" EntitySet="UserProfiles" />
             <End Role="Subscription" EntitySet="Subscriptions" />
           </AssociationSet>
+          <AssociationSet Name="FK_UserProfile_DefaultGroup" Association="MSGorillaModel.FK_UserProfile_DefaultGroup">
+            <End Role="Group" EntitySet="Groups" />
+            <End Role="UserProfile" EntitySet="UserProfiles" />
+          </AssociationSet>
         </EntityContainer>
+        <Association Name="FK_UserProfile_DefaultGroup">
+          <End Type="MSGorillaModel.Group" Role="Group" Multiplicity="1" />
+          <End Type="MSGorillaModel.UserProfile" Role="UserProfile" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="GroupID" />
+            </Principal>
+            <Dependent Role="UserProfile">
+              <PropertyRef Name="DefaultGroup" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -602,6 +637,7 @@
           <EntitySetMapping Name="UserProfiles">
             <EntityTypeMapping TypeName="MSGorillaModel.UserProfile">
               <MappingFragment StoreEntitySet="UserProfile">
+                <ScalarProperty Name="DefaultGroup" ColumnName="DefaultGroup" />
                 <ScalarProperty Name="Userid" ColumnName="Userid" />
                 <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
                 <ScalarProperty Name="PortraitUrl" ColumnName="PortraitUrl" />

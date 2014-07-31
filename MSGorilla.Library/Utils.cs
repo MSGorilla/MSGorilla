@@ -166,6 +166,7 @@ namespace MSGorilla.Library
             userprofile.Password = null;
             userprofile.FollowersCount = userprofile.FollowingsCount = 0;
             userprofile.IsRobot = false;
+            userprofile.DefaultGroup = "microsoft";
             return userprofile;
         }
 

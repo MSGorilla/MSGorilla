@@ -103,7 +103,7 @@ namespace MSGorilla.Library
 
                 if (user.IsRobot)
                 {
-                    throw new HandleRobotMembershipException();
+                    throw new UpdateRobotMembershipException();
                 }
 
                 Membership member = _gorillaCtx.Memberships.SqlQuery(
@@ -189,7 +189,7 @@ namespace MSGorilla.Library
 
                 if (user.IsRobot == true)
                 {
-                    throw new HandleRobotMembershipException();
+                    throw new UpdateRobotMembershipException();
                 }
 
                 Membership member = _gorillaCtx.Memberships.Where(m => m.GroupID == groupID && m.MemberID == userid).FirstOrDefault();
@@ -231,7 +231,7 @@ namespace MSGorilla.Library
                 Membership member = CheckMembership(groupID, userid, _gorillaCtx);
                 if ("robot".Equals(member.Role))
                 {
-                    throw new HandleRobotMembershipException();
+                    throw new UpdateRobotMembershipException();
                 }
                 member.Role = role;
                 _gorillaCtx.SaveChanges();
@@ -268,6 +268,35 @@ namespace MSGorilla.Library
                         from membership m join [group] g on m.groupid = g.groupid where memberid={0} and role='admin'",
                     userid
                     ).ToList();
+            }
+        }
+
+        public void SetDefaultGroup(string groupID, string userid)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
+                if (user == null)
+                {
+                    throw new UserNotFoundException(userid);
+                }
+
+                user.DefaultGroup = groupID;
+                _gorillaCtx.SaveChanges();
+            }
+        }
+
+        public Group GetDefaultGroup(string userid)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
+                if (user == null)
+                {
+                    throw new UserNotFoundException(userid);
+                }
+
+                return user.Group;
             }
         }
 

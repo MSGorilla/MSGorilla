@@ -312,6 +312,19 @@ namespace MSGorilla.WebAPI
             return _groupManager.GetOwnedGroup(whoami());
         }
 
+        [HttpGet, HttpPost]
+        public ActionResult SetDefaultGroup(string group)
+        {
+            string me = whoami();
+            MembershipHelper.SetDefaultGroup(me, group);
+            return new ActionResult();
+        }
+
+        public string GetDefaultGroup()
+        {
+            return MembershipHelper.DefaultGroup(whoami());
+        }
+
         /// <summary>
         /// Admin create a robot account for his group.
         /// 
@@ -348,6 +361,7 @@ namespace MSGorilla.WebAPI
             robot.MessageCount = 0;
             robot.IsRobot = true;
             robot.Password = Utils.MD5Encoding(password);
+            robot.DefaultGroup = groupID;
 
             return new DisplayUserProfile(_groupManager.CreateGroupRobotAccount(groupID, me, robot), 0);
         }

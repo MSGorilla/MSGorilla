@@ -204,12 +204,21 @@ namespace MSGorilla.Library.Exceptions
         }
     }
 
-    public class HandleRobotMembershipException : MSGorillaBaseException
+    public class UpdateRobotMembershipException : MSGorillaBaseException
     {
-        public HandleRobotMembershipException()
+        public UpdateRobotMembershipException()
         {
-            Description = "You can't update a robot's membership.";
+            Description = "You can't change a robot's membership.";
             Code = 6004;
+        }
+    }
+
+    public class UpdateRobotDefaultGroupException : MSGorillaBaseException
+    {
+        public UpdateRobotDefaultGroupException()
+        {
+            Description = "You can't change a robot's default group.";
+            Code = 6005;
         }
     }
 

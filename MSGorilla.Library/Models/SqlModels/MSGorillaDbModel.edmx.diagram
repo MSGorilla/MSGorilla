@@ -5,15 +5,15 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="619e3222b74b4bdd9fd98ae8213fcf3c" Name="Diagram1">
-        <EntityTypeShape EntityType="MSGorillaModel.FavouriteTopic" Width="1.5" PointX="3" PointY="5.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="MSGorillaModel.Group" Width="1.5" PointX="0.75" PointY="1.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="MSGorillaModel.Membership" Width="1.5" PointX="3" PointY="2.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="MSGorillaModel.MetricDataSet" Width="1.5" PointX="3" PointY="16.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="MSGorillaModel.NotificationCount" Width="1.5" PointX="3" PointY="10.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="MSGorillaModel.Schema" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="MSGorillaModel.Subscription" Width="1.5" PointX="3" PointY="13.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="MSGorillaModel.Topic" Width="1.5" PointX="0.75" PointY="9.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="MSGorillaModel.UserProfile" Width="1.5" PointX="0.75" PointY="5.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="MSGorillaModel.FavouriteTopic" Width="1.5" PointX="4.375" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="MSGorillaModel.Group" Width="1.5" PointX="3.875" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="MSGorillaModel.Membership" Width="1.5" PointX="4" PointY="3" IsExpanded="true" />
+        <EntityTypeShape EntityType="MSGorillaModel.MetricDataSet" Width="1.5" PointX="1.375" PointY="3.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="MSGorillaModel.NotificationCount" Width="1.5" PointX="7.875" PointY="6.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="MSGorillaModel.Schema" Width="1.5" PointX="7.5" PointY="2.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="MSGorillaModel.Subscription" Width="1.5" PointX="7.875" PointY="4.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="MSGorillaModel.Topic" Width="1.5" PointX="1.75" PointY="5.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="MSGorillaModel.UserProfile" Width="1.5" PointX="6.125" PointY="4.375" IsExpanded="true" />
         <AssociationConnector Association="MSGorillaModel.FK_FAVOURITETOPIC_TOPICID" ManuallyRouted="false" />
         <AssociationConnector Association="MSGorillaModel.FK_FAVOURITETOPIC_USERID" ManuallyRouted="false" />
         <AssociationConnector Association="MSGorillaModel.FK_MEMBERSHIP_GROUPID" ManuallyRouted="false" />
@@ -22,6 +22,7 @@
         <AssociationConnector Association="MSGorillaModel.FK_MEMBERSHIP_MEMBERID" ManuallyRouted="false" />
         <AssociationConnector Association="MSGorillaModel.FK_NOTIFCOUNT_USERID" ManuallyRouted="false" />
         <AssociationConnector Association="MSGorillaModel.FK_dbo_Subscription_dbo_UserProfile_Userid" ManuallyRouted="false" />
+        <AssociationConnector Association="MSGorillaModel.FK_UserProfile_DefaultGroup" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
