@@ -1,31 +1,42 @@
 ﻿<div class="nav-container">
-    <div id="home_nav_list" class="pd-10"></div>
-    <ul class="nav nav-pills">
-        @if (ViewBag.FeedCategory == "atline")
-        {
-            <li class="active"><a href="/Notification/index?category=atline">Mentions <span id="home_atline_count" class="badge"></span></a></li>
-        }
-        else
-        {
-            <li><a href="/Notification/index?category=atline">Mentions <span id="home_atline_count" class="badge"></span></a></li>
-        }
-        @if (ViewBag.FeedCategory == "ownerline")
-        {
-            <li class="active"><a href="/Notification/index?category=ownerline">My owns <span id="home_ownerline_count" class="badge"></span></a></li>
-        }
-        else
-        {
-            <li><a href="/Notification/index?category=ownerline">My owns <span id="home_ownerline_count" class="badge"></span></a></li>
-        }
-        @if (ViewBag.FeedCategory == "replyline")
-        {
-            <li class="active"><a href="/Notification/index?category=replyline">Replies <span id="home_reply_count" class="badge"></span></a></li>
-        }
-        else
-        {
-            <li><a href="/Notification/index?category=replyline">Replies <span id="home_reply_count" class="badge"></span></a></li>
-        }
-    </ul>
+    @if(ViewBag.Title == "Notifications")
+    {
+        <div id="home_nav_list" class="pd-10"></div>
+        <ul class="nav nav-pills">
+            @if (ViewBag.FeedCategory == "atline")
+            {
+                <li class="active"><a href="/Notification/index?category=atline">Mentions <span id="home_atline_count" class="badge"></span></a></li>
+            }
+            else
+            {
+                <li><a href="/Notification/index?category=atline">Mentions <span id="home_atline_count" class="badge"></span></a></li>
+            }
+            @if (ViewBag.FeedCategory == "ownerline")
+            {
+                <li class="active"><a href="/Notification/index?category=ownerline">My owns <span id="home_ownerline_count" class="badge"></span></a></li>
+            }
+            else
+            {
+                <li><a href="/Notification/index?category=ownerline">My owns <span id="home_ownerline_count" class="badge"></span></a></li>
+            }
+            @if (ViewBag.FeedCategory == "replyline")
+            {
+                <li class="active"><a href="/Notification/index?category=replyline">Replies <span id="home_reply_count" class="badge"></span></a></li>
+            }
+            else
+            {
+                <li><a href="/Notification/index?category=replyline">Replies <span id="home_reply_count" class="badge"></span></a></li>
+            }
+        </ul>
+    }
+    else{
+        <div class="pd-10">
+            <a class='btn btn-link btn-xs' href='/Notification/index?category=atline'>Mentions <span id="home_atline_count" class="badge"></span></a>
+            <a class='btn btn-link btn-xs' href="/Notification/index?category=ownerline">My owns <span id="home_ownerline_count" class="badge"></span></a>
+            <a class='btn btn-link btn-xs' href="/Notification/index?category=replyline">Replies <span id="home_reply_count" class="badge"></span></a>
+            <span id="home_nav_list"></span>
+        </div>
+    }
 </div>
 
 

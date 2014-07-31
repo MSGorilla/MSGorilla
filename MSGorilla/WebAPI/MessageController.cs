@@ -27,6 +27,7 @@ namespace MSGorilla.WebAPI
         RichMsgManager _richMsgManager = new RichMsgManager();
         AccountManager _accManager = new AccountManager();
         AttachmentManager _attManager = new AttachmentManager();
+        SearchManager _searchManager = new SearchManager();
 
         private SimpleUserProfile GetSimpleUserProfile(string userid)
         {
@@ -178,7 +179,7 @@ namespace MSGorilla.WebAPI
                 group = MembershipHelper.DefaultGroup(userid);
             }
             MembershipHelper.CheckMembership(group, me);
-            
+
             TableContinuationToken tok = Utils.String2Token(token);
             return CreateDisplayMsgPag(_messageManager.UserLine(userid, group, start, end, count, tok));
         }
@@ -802,6 +803,22 @@ namespace MSGorilla.WebAPI
         public string GetRichMessage(string richMsgID)
         {
             return _richMsgManager.GetRichMessage(richMsgID);
+        }
+
+        [HttpGet]
+        public SearchResult SearchMessage(string keyword, [FromUri]string[] group = null)
+        {
+            string me = whoami();
+            return _searchManager.SearchMessage(keyword);
+        }
+
+        [HttpGet]
+        public DisplayMessagePagination SearchMessageResults(string searchId, int count = 25, string token = null)
+        {
+            string me = whoami();
+
+            TableContinuationToken tok = Utils.String2Token(token);
+            return CreateDisplayMsgPag(_searchManager.GetSearchResults(searchId, count, tok));
         }
 
         /// <summary>

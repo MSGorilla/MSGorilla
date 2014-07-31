@@ -16,9 +16,9 @@ namespace MSGorilla.Library.Models.SqlModels
     {
         public UserProfile()
         {
-            this.Subscriptions = new HashSet<Subscription>();
             this.FavouriteTopics = new HashSet<FavouriteTopic>();
             this.Memberships = new HashSet<Membership>();
+            this.Subscriptions = new HashSet<Subscription>();
         }
     
         public string Userid { get; set; }
@@ -31,9 +31,9 @@ namespace MSGorilla.Library.Models.SqlModels
         public int MessageCount { get; set; }
         public bool IsRobot { get; set; }
     
-        public virtual ICollection<Subscription> Subscriptions { get; set; }
-        public virtual NotificationCount NotificationCount { get; set; }
         public virtual ICollection<FavouriteTopic> FavouriteTopics { get; set; }
         public virtual ICollection<Membership> Memberships { get; set; }
+        public virtual NotificationCount NotificationCount { get; set; }
+        public virtual ICollection<Subscription> Subscriptions { get; set; }
     }
 }

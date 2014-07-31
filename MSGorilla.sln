@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.SearchEngine", "M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.Spider", "MSGorilla.Spider\MSGorilla.Spider.csproj", "{937FBB53-0920-4E15-B201-394699879A87}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.SearchTest", "MSGorilla.SearchTest\MSGorilla.SearchTest.csproj", "{62B2758F-4100-46F2-A669-7B9D056C64DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -163,6 +165,16 @@ Global
 		{937FBB53-0920-4E15-B201-394699879A87}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{937FBB53-0920-4E15-B201-394699879A87}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{937FBB53-0920-4E15-B201-394699879A87}.Release|Win32.ActiveCfg = Release|Any CPU
+		{62B2758F-4100-46F2-A669-7B9D056C64DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62B2758F-4100-46F2-A669-7B9D056C64DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62B2758F-4100-46F2-A669-7B9D056C64DF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{62B2758F-4100-46F2-A669-7B9D056C64DF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{62B2758F-4100-46F2-A669-7B9D056C64DF}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{62B2758F-4100-46F2-A669-7B9D056C64DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62B2758F-4100-46F2-A669-7B9D056C64DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62B2758F-4100-46F2-A669-7B9D056C64DF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{62B2758F-4100-46F2-A669-7B9D056C64DF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{62B2758F-4100-46F2-A669-7B9D056C64DF}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -176,8 +188,5 @@ Global
 		{1C1B176A-EA93-4840-B658-9B1B8FB0C483} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
 		{CD53861C-C74A-48B6-8349-63314CFC26B1} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
 		{E6E93222-7D5F-422F-8DFE-D0FDBA190AE8} = {94440E61-6FD0-4124-AE55-02DE73EF2613}
-	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

@@ -171,6 +171,10 @@
     <Compile Include="StatisticsManager.cs" />
     <Compile Include="TopicManager.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="Models\SearchResult.cs" />
+    <Compile Include="Models\AzureModels\Entity\WordIndexEntity.cs" />
+    <Compile Include="Models\AzureModels\Entity\SearchHistoryEntity.cs" />
+    <Compile Include="Models\AzureModels\Entity\SearchResultEntity.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="3rd-Party-Lib\Newtonsoft.Json.dll" />
@@ -200,6 +204,12 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MSGorilla.SearchEngine\MSGorilla.SearchEngine.csproj">
+      <Project>{e6e93222-7d5f-422f-8dfe-d0fdba190ae8}</Project>
+      <Name>MSGorilla.SearchEngine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

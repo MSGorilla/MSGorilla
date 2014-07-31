@@ -1818,6 +1818,9 @@ function SearchUser(keyword) {
     );
 }
 
+function SearchMessage(keyword) {
+
+}
 
 // notification count function and short cut function
 function getNotificationCount(category, id) {
@@ -2640,3 +2643,8 @@ function refreshWelcomeFeeds(listdiv, apiurl, apidata, msgLength) {
     );
 }
 
+
+// Group
+function LoadMyGroup() {
+
+}

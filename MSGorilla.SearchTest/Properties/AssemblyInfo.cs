@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MSGorilla.SearchEngineSpider")]
+[assembly: AssemblyTitle("MSGorilla.SearchTest")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MSGorilla.SearchEngineSpider")]
+[assembly: AssemblyProduct("MSGorilla.SearchTest")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("c7f95e00-b0aa-4aea-9359-46a22a712b5a")]
+[assembly: Guid("31e92c2e-9bf6-45b3-b24d-5592e13b4d04")]
 
 // Version information for an assembly consists of the following four values:
 //
