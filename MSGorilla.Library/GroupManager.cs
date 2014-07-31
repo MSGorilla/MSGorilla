@@ -251,11 +251,24 @@ namespace MSGorilla.Library
         {
             using (var _gorillaCtx = new MSGorillaEntities())
             {
-                return _gorillaCtx.Database.SqlQuery<DisplayMembership>(
+                List<DisplayMembership> result =  _gorillaCtx.Database.SqlQuery<DisplayMembership>(
                     @"select g.GroupID, g.DisplayName, g.Description, g.IsOpen, m.MemberID, m.Role 
                         from membership m join [group] g on m.groupid = g.groupid where memberid={0}",
                     userid
                     ).ToList();
+                UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
+
+                for (int i = 0; i < result.Count; i++ )
+                {
+                    if (result[i].GroupID.Equals(user.DefaultGroup, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        DisplayMembership temp = result[i];
+                        result[i] = result[0];
+                        result[0] = temp;
+                        break;
+                    }
+                }
+                return result;
             }
         }
 
