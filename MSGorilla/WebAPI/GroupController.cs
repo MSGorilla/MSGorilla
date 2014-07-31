@@ -45,7 +45,7 @@ namespace MSGorilla.WebAPI
             Group group =  _groupManager.AddGroup(me, groupID, displayName, description, isOpen);
 
             MembershipHelper.RefreshJoinedGroup(me);
-            return group;
+            return new DisplayGroup(group, me, new MSGorillaEntities());
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace MSGorilla.WebAPI
             {
                 throw new GroupNotExistException();
             }
-            return group;
+            return new DisplayGroup(group, me, new MSGorillaEntities()); ;
         }
 
         /// <summary>
@@ -99,11 +99,14 @@ namespace MSGorilla.WebAPI
         {
             string me = whoami();
             List<DisplayGroup> result = new List<DisplayGroup>();
-            foreach (Group g in _groupManager.GetAllGroup())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                result.Add(g);
-            }
-            return result;
+                foreach (Group g in _groupManager.GetAllGroup(_gorillaCtx))
+                {
+                    result.Add(new DisplayGroup(g, me, _gorillaCtx));
+                }
+                return result;
+            }            
         }
 
         /// <summary>
@@ -133,7 +136,7 @@ namespace MSGorilla.WebAPI
             group.DisplayName = displayname;
             group.Description = description;
             group.IsOpen = isOpen;
-            return _groupManager.UpdateGroup(me, group);
+            return new DisplayGroup(_groupManager.UpdateGroup(me, group), me, new MSGorillaEntities()); 
         }
 
         /// <summary>
@@ -287,6 +290,18 @@ namespace MSGorilla.WebAPI
         public List<DisplayMembership> GetJoinedGroup()
         {
             return _groupManager.GetJoinedGroup(whoami());
+        }
+
+        /// <summary>
+        /// Leave a group
+        /// </summary>
+        /// <param name="groupID">group id</param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult LeaveGroup(string groupID)
+        {
+            _groupManager.LeaveGroup(whoami(), groupID);
+            return new ActionResult();
         }
 
         /// <summary>

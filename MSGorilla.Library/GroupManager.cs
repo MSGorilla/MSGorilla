@@ -29,8 +29,13 @@ namespace MSGorilla.Library
         {
             using (var _gorillaCtx = new MSGorillaEntities())
             {
-                return _gorillaCtx.Groups.ToList();
+                return GetAllGroup(_gorillaCtx);
             }
+        }
+
+        public List<Group> GetAllGroup(MSGorillaEntities _gorillaCtx)
+        {
+            return _gorillaCtx.Groups.ToList();
         }
 
         public Group AddGroup(string creater, string groupID, string displayName, string description, bool isOpen)
@@ -129,6 +134,18 @@ namespace MSGorilla.Library
                 _gorillaCtx.SaveChanges();
 
                 return member;
+            }
+        }
+
+        public void LeaveGroup(string userid, string groupID)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                foreach (var member in _gorillaCtx.Memberships.Where(f => f.MemberID == userid && f.GroupID == groupID))
+                {
+                    _gorillaCtx.Memberships.Remove(member);
+                }
+                _gorillaCtx.SaveChanges();
             }
         }
 

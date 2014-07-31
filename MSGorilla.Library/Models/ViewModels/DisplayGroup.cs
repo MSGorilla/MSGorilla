@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using MSGorilla.Library.Models.SqlModels;
+using MSGorilla.Library.Models.SqlModels;
 namespace MSGorilla.Library.Models.ViewModels
 {
     public class DisplayGroup
@@ -12,15 +13,43 @@ namespace MSGorilla.Library.Models.ViewModels
         public string DisplayName { get; set; }
         public string Description { get; set; }
         public bool IsOpen { get; set; }
+        public bool IsJoined { get; set; }
 
-        public static implicit operator DisplayGroup(MSGorilla.Library.Models.SqlModels.Group group)
+        public static implicit operator DisplayGroup(Group group)
         {
             DisplayGroup dgroup = new DisplayGroup();
             dgroup.GroupID = group.GroupID;
             dgroup.DisplayName = group.DisplayName;
             dgroup.Description = group.Description;
             dgroup.IsOpen = group.IsOpen;
+            dgroup.IsJoined = false;
             return dgroup;
+        }
+
+        public DisplayGroup() { }
+
+        public DisplayGroup(Group group, string userid, MSGorillaEntities _gorillaCtx)
+        {
+            this.GroupID = group.GroupID;
+            this.DisplayName = group.DisplayName;
+            this.Description = group.Description;
+            this.IsOpen = group.IsOpen;
+
+            if (_gorillaCtx == null)
+            {
+                using (_gorillaCtx = new MSGorillaEntities())
+                {
+                    this.IsJoined = _gorillaCtx.Memberships.Where(
+                                        m => m.GroupID == group.GroupID && m.MemberID == userid
+                                    ).FirstOrDefault() != null;
+                }
+            }
+            else
+            {
+                this.IsJoined = _gorillaCtx.Memberships.Where(
+                            m => m.GroupID == group.GroupID && m.MemberID == userid
+                        ).FirstOrDefault() != null;
+            }
         }
     }
 }
