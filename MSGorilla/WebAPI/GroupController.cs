@@ -312,6 +312,18 @@ namespace MSGorilla.WebAPI
             return _groupManager.GetOwnedGroup(whoami());
         }
 
+        /// <summary>
+        /// Set default group for the current user.
+        /// Robot cannot change default group
+        /// 
+        /// example output:
+        /// {
+        ///     "ActionResultCode": 0,
+        ///     "Message": "success"
+        /// }
+        /// </summary>
+        /// <param name="group">group id</param>
+        /// <returns></returns>
         [HttpGet, HttpPost]
         public ActionResult SetDefaultGroup(string group)
         {
@@ -320,6 +332,13 @@ namespace MSGorilla.WebAPI
             return new ActionResult();
         }
 
+        /// <summary>
+        /// Get the default group for the current user.
+        /// 
+        /// example output:
+        /// "microsoft"
+        /// </summary>
+        /// <returns></returns>
         public string GetDefaultGroup()
         {
             return MembershipHelper.DefaultGroup(whoami());
