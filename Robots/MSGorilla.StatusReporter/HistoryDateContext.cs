@@ -5,10 +5,10 @@ using System.Text;
 using System.Data.Entity;
 using System.Threading.Tasks;
 using System.Data.Entity.ModelConfiguration.Conventions;
-using MSGorilla.Library.DAL;
+using MSGorilla.Library.Models.SqlModels;
 namespace MSGorilla.StatusReporter
 {
-    public class HistoryDataContext : MSGorillaContext
+    public class HistoryDataContext : MSGorillaEntities
     {
         public DbSet<HistoryData> HistoryMonitoringData { get; set; }
 

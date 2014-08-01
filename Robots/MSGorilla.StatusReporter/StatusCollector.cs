@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 
 using MSGorilla.Library;
-using MSGorilla.Library.DAL;
 using MSGorilla.Library.Azure;
 
 namespace MSGorilla.StatusReporter
@@ -17,9 +16,9 @@ namespace MSGorilla.StatusReporter
         public int GetCurrentUserCount()
         {
             int count = 0;
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new HistoryDataContext())
             {
-                count = _gorillaCtx.Database.SqlQuery<int>("select count(*) from userprofile where password is null").First();
+                count = _gorillaCtx.Database.SqlQuery<int>("select count(*) from userprofile where isrobot=0").First();
             }
             Logger.Info(string.Format("{0} common user exist.", count));
             return count;
@@ -35,7 +34,7 @@ namespace MSGorilla.StatusReporter
         {
             int count = 0;
 
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new HistoryDataContext())
             {
                 count = _gorillaCtx.Database.SqlQuery<int>("select count(*) from topic").First();
             }
@@ -47,19 +46,10 @@ namespace MSGorilla.StatusReporter
         {
             List<string> userid = new List<string>();
 
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new HistoryDataContext())
             {
-                userid = _gorillaCtx.Database.SqlQuery<string>("select userid from userprofile where password is not null").ToList();
+                userid = _gorillaCtx.Database.SqlQuery<string>("select userid from userprofile where isrobot=1").ToList();
             }
-
-            userid.Remove("user1");
-            userid.Remove("user2");
-            userid.Remove("user3");
-            userid.Remove("user4");
-            userid.Remove("fdy");
-            userid.Remove("bin");
-            userid.Remove("ShareAccount");
-            userid.Remove("tanmayw");
             return userid;
         }
 
