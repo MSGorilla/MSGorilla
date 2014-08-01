@@ -17,6 +17,7 @@ namespace MSGorilla.Library.Models.ViewModels
         public string topicName { get; set; }
         public string topicDescription { get; set; }
         public int topicMsgCount { get; set; }
+        public string GroupID { get; set; }
 
         public DisplayFavouriteTopic(FavouriteTopic ftopic, MSGorillaEntities _gorillaCtx)
         {
@@ -34,6 +35,7 @@ namespace MSGorilla.Library.Models.ViewModels
                 topicName = topic.Name;
                 topicDescription = topic.Description;
                 topicMsgCount = topic.MsgCount;
+                GroupID = topic.GroupID;
             }
         }
     }

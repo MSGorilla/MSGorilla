@@ -169,13 +169,13 @@ function cutCount(count) {
     return count;
 }
 
-function cutHtml(code, length, atusers, topics) {
+function cutHtml(code, length, atusers, topics, group) {
     if (isNullOrEmpty(code)) {
         return "";
     }
 
     if (code.length <= length) {
-        return encodeHtml(code, atusers, topics);
+        return encodeHtml(code, atusers, topics, group);
     }
     else {
         return txt2Html(code.substr(0, length - 3) + "...");
@@ -188,7 +188,7 @@ function encodeId(code) {
     return code;
 }
 
-function encodeHtml(code, atusers, topics) {
+function encodeHtml(code, atusers, topics, group) {
     code = txt2Html(code);
 
     // autolink http[s]
@@ -226,7 +226,7 @@ function encodeHtml(code, atusers, topics) {
         for (var i = 0; i < topics.length; i++) {
             var topic = topics[i];
             var htmltopic = txt2Html(topic);
-            code = code.replace(new RegExp("#" + htmltopic + "#", "gm"), ('<a href="/topic/index?topic=' + encodeTxt(topic) + '">#' + htmltopic + '#</a>'));
+            code = code.replace(new RegExp("#" + htmltopic + "#", "gm"), ('<a href="/topic/index?topic=' + encodeTxt(topic) + "&group=" + encodeTxt(group) + '">#' + htmltopic + '#</a>'));
         }
 
         //strRegex = "#(([\\w \\-]+(#{2,})?)*[\\w \\-]+)#(\\s|$)";
@@ -1298,6 +1298,8 @@ function createFeed(data, hideOpenBtn) {
     var topics = data.TopicName;
     var attach = data.Attachment;
     var importence = data.Importance;
+    var group = data.Group;
+
     if (type == "reply") {
         var mid = data.MessageID;
         var muser = data.MessageUser;
@@ -1345,7 +1347,7 @@ function createFeed(data, hideOpenBtn) {
 
     // message
     if (!isNullOrEmpty(msg)) {
-        output += "    <div id='message_" + id + "' class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
+        output += "    <div id='message_" + id + "' class='newpost-input'>" + encodeHtml(msg, atusers, topics, group) + "</div>";
     }
 
     // richmsg
@@ -1677,6 +1679,7 @@ function createReply(data) {
     var topics = data.TopicName;
     var attach = data.Attachment;
     var importence = data.Importance;
+    var group = data.Group;
     var mid = data.MessageID;
     var muser = data.MessageUser;
     if (isNullOrEmpty(picurl)) {
@@ -1718,7 +1721,7 @@ function createReply(data) {
 
     // message
     if (!isNullOrEmpty(msg)) {
-        output += "  <div id='message_" + id + "' class='reply-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
+        output += "  <div id='message_" + id + "' class='reply-input'>" + encodeHtml(msg, atusers, topics, group) + "</div>";
     }
 
     // richmsg
@@ -1802,8 +1805,9 @@ function SearchTopic(keyword) {
                     var topicdesp = item.Description;
                     var topiccount = item.MsgCount;
                     var isliked = item.IsLiked;
+                    var group = item.GroupID;
 
-                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount));
+                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount, group));
                     setTopicLikeBtn("btn_topic_like_" + topicid, topicid, isliked);
                 })
             }
@@ -2022,11 +2026,12 @@ function LoadHotTopics() {
                 var topicdesp = item.Description;
                 var topiccount = item.MsgCount;
                 var isliked = item.IsLiked;
+                var group = item.GroupID;
 
                 output = "<li class='sub-list-group-item'>"
                         + "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
                         + "  <span class='badge'>" + topiccount + "</span>"
-                        + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>"
+                        + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>"
                         + "</li>"
                 listdiv.append(output);
                 setTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid, isliked);
@@ -2064,11 +2069,12 @@ function LoadMyFavoriteTopics() {
                 var topicname = item.topicName;
                 var topicdesp = item.topicDescription;
                 var topiccount = item.topicMsgCount;
+                var group = item.GroupID;
 
                 // shortcut panel
                 output += "<li class='sub-list-group-item'>";
                 output += "  <span class='badge'>" + unreadcount + "</span>";
-                output += "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>";
+                output += "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>";
                 output += "</li>";
                 listdiv.append(output);
 
@@ -2185,8 +2191,9 @@ function LoadUserFavoriteTopics(user) {
                     var topicdesp = item.topicDescription;
                     var topiccount = item.topicMsgCount;
                     var isliked = item.IsLiked;
+                    var group = item.GroupID;
 
-                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount));
+                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount, group));
                     setTopicLikeBtn("btn_topic_like_" + topicid, topicid, isliked);
                 })
             }
@@ -2317,13 +2324,13 @@ function unlike(btnid, topicid) {
     );
 }
 
-function createTopic(topicid, topicname, topicdesp, topiccount) {
+function createTopic(topicid, topicname, topicdesp, topiccount, group) {
     var output = "";
 
     output = "<li class='list-group-item'>"
            + "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
            + "  <span class='badge'>" + topiccount + "</span>"
-           + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>"
+           + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>"
            + "</li>"
 
     return output;
@@ -2445,11 +2452,12 @@ function refreshWelcomeNew() {
                     var topicname = item.topicName;
                     var topicdesp = item.topicDescription;
                     var topiccount = item.topicMsgCount;
+                    var group = item.GroupID;
 
                     if (unreadcount > 0) {
                         output = "<li class='list-group-item'>"
                                + "  <span class='badge'>" + unreadcount + "</span>"
-                               + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>"
+                               + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>"
                                + "</li>";
                         listdiv.append(output);
                     }
@@ -2497,8 +2505,9 @@ function refreshWelcomeHotTopics() {
                     var topicdesp = item.Description;
                     var topiccount = item.MsgCount;
                     var isliked = item.IsLiked;
+                    var group = item.GroupID;
 
-                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount));
+                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount, group));
                     setTopicLikeBtn("btn_topic_like_" + topicid, topicid, isliked);
                 })
             }
@@ -2650,6 +2659,8 @@ function refreshWelcomeFeeds(listdiv, apiurl, apidata, msgLength) {
                     var topics = item.TopicName;
                     var attach = item.Attachment;
                     var importence = item.Importance;
+                    var group = item.Group;
+
                     if (type == "reply") {
                         var mid = item.MessageID;
                         var muser = item.MessageUser;
@@ -2662,7 +2673,7 @@ function refreshWelcomeFeeds(listdiv, apiurl, apidata, msgLength) {
                            + "  <a class='fr' target='_blank' href='/Message/Index?user=" + encodeTxt(muser) + "&msgID=" + encodeTxt(mid) + "'>Open</a>"
                            + "  <a class='fullname' href='/profile/index?user=" + encodeTxt(user) + "'>" + username + "</a>"
                            + "  <span class='username'> - " + Time2Now(posttime) + "</span>"
-                           + "  <p class='break-word'>" + cutHtml(msg, msgLength, atusers, topics) + "</p>"
+                           + "  <p class='break-word'>" + cutHtml(msg, msgLength, atusers, topics, group) + "</p>"
                            + "</li>";
 
                     listdiv.append(output);
@@ -2684,6 +2695,7 @@ function LoadMyGroupNavbar() {
         return;
     }
     var setdefaultbtn = $("#btn_set_default_group");
+    var curgroup = $("#hd_current_group").val();
 
     var apiurl = "/api/group/getjoinedgroup";
     var apidata = "";
@@ -2709,20 +2721,31 @@ function LoadMyGroupNavbar() {
                     var isopen = item.IsOpen;
                     var memberid = item.MemberID;
                     var role = item.Role;
+                    var curgroup = $("#hd_current_group").val();
 
                     if (index == 0) {   // first is default
-                        $("#hd_current_group").val(groupid);
                         $("#hd_default_group").val(groupid);
-                        output = "<li id='group_navbar_" + encodeId(groupid) + "' class='active'>";
+                        if (isNullOrEmpty(curgroup)) {
+                            $("#hd_current_group").val(groupid);
+                        }
                     }
-                    else {
-                        output = "<li id='group_navbar_" + encodeId(groupid) + "'>";
-                    }
-                    output += "  <a href= 'javascript:void(0);' onclick='switchCurrentGroup(\"" + groupid + "\");'>" + displayname + "</a>"
+
+                    output = "<li id='group_navbar_" + encodeId(groupid) + "'>"
+                           + "  <a href= 'javascript:void(0);' onclick='switchCurrentGroup(\"" + groupid + "\");'>" + displayname + "</a>"
                            + "</li>";
 
                     listdiv.append(output);
                 });
+
+                // active current group tab
+                curgroup = $("#hd_current_group").val();
+                var curtab = $("#group_navbar_" + encodeId(curgroup));
+                if (curtab.length > 0) {
+                    curtab.addClass("active");
+                }
+                else {
+                    listdiv.children[0].addClass("active");
+                }
             }
         },
         null,
@@ -2871,7 +2894,7 @@ function LoadGroups(category, group) {
                 // create list
                 $.each(data, function (index, item) {
                     listdiv.append(createGroupCard(item));
-                    //setGroupFollowBtn("btn_group_follow_" + encodeId(item.Groupid), item.Groupid, item.IsFollowing);
+                    setGroupJoinBtn("btn_group_join_" + encodeId(item.GroupID), item.GroupID, (item.IsOpen ? (item.IsJoined) : -1));
                 })
             }
         }
@@ -2885,7 +2908,7 @@ function createGroupCard(data) {
     var picurl = "";
     var desp = data.Description;
     var isopen = data.IsOpen;
-    var isjoined = false;
+    var isjoined = data.IsJoined;
 
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";
@@ -2893,24 +2916,153 @@ function createGroupCard(data) {
 
     output = "  <li class='grouplist-group-item'>"
            + "    <div class='group-card-info'>"
-           + "      <div class='ma-btm-10'>"
-           + "        <img class='img-rounded' id='group_pic_" + encodeId(groupid) + "' src='" + picurl + "' width='100' height='100' />"
-           + "      </div>"
+           //+ "      <div class='ma-btm-10'>"
+           //+ "        <img class='img-rounded' id='group_pic_" + encodeId(groupid) + "' src='" + picurl + "' width='100' height='100' />"
+           //+ "      </div>"
            + "      <div>"
-           + "        <a class='fullname' id='group_name_" + encodeId(groupid) + "' href='/profile/index?group=" + encodeTxt(groupid) + "'>" + groupname + "</a>"
+           + "        <a class='fullname' id='group_name_" + encodeId(groupid) + "' href='javascript:void(0);'>" + groupname + "</a>"
            + "      </div>"
-           + "      <div>"
-           + "        <span class='groupname' id='group_id_" + encodeId(groupid) + "'>@" + groupid + "</span>"
+           + "      <div class='group-card-desp'>"
+           + "        <span class='username' id='group_id_" + encodeId(groupid) + "'>" + desp + "</span>"
            + "      </div>"
            + "    </div>"
            + "    <div class='group-card-postinfo'>"
            + "      <div class='btn-group btn-group-justified'>"
-           + "        <a class='btn btn-default follow-btn' id='btn_group_follow_" + encodeId(groupid) + "'>&nbsp;</a>"
+           + "        <a class='btn btn-default join-btn' id='btn_group_join_" + encodeId(groupid) + "'>&nbsp;</a>"
            + "      </div>"
            + "    </div>"
            + "  </li>";
 
     return output;
+}
+
+function setGroupJoinBtn(btnid, group, isJoined) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    if (isJoined == 0) {
+        setJoinBtn(btnid, group, true);
+    } else if (isJoined == 1) {
+        setLeaveBtn(btnid, group, true);
+    } else {  // -1: myself
+        setCloseBtn(btnid, group);
+    }
+}
+
+function setCloseBtn(btnid, group) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Not open");
+    btn.attr("class", "btn btn-info join-btn");
+    btn.attr("href", "javascript:void(0)");
+    btn.show();
+}
+
+function setLeaveBtn(btnid, group, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Joined");
+    btn.attr("class", "btn btn-success join-btn");
+    if (enabled) {
+        btn.attr("onclick", "leave('" + btnid + "', '" + group + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "leaveBtnMouseOver('" + btnid + "');")
+    btn.attr("onmouseout", "leaveBtnMouseOut('" + btnid + "');")
+    btn.show();
+}
+
+function leaveBtnMouseOver(btnid) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-danger join-btn");
+    btn.text("- Leave");
+}
+
+function leaveBtnMouseOut(btnid) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-success join-btn");
+    btn.text("Joined");
+}
+
+function setJoinBtn(btnid, group, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("+ Join");
+    btn.attr("class", "btn btn-primary join-btn");
+    if (enabled) {
+        btn.attr("onclick", "join('" + btnid + "', '" + group + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
+    btn.show();
+}
+
+function join(btnid, group) {
+    setLeaveBtn(btnid, group, false);
+
+    var apiurl = "/api/group/joingroup";
+    var apidata = "groupid=" + encodeTxt(group);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            var code = data.ActionResultCode;
+            var msg = data.Message;
+            if (code == "0") {
+                setLeaveBtn(btnid, group, true);
+            }
+            else {
+                showError(msg);
+            }
+        }
+    );
+}
+
+function leave(btnid, group) {
+    setJoinBtn(btnid, group, false);
+
+    var apiurl = "/api/group/leavegroup";
+    var apidata = "groupid=" + encodeTxt(group);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            var code = data.ActionResultCode;
+            var msg = data.Message;
+            if (code == "0") {
+                setJoinBtn(btnid, group, true);
+            }
+            else {
+                showError(msg);
+            }
+        }
+    );
 }
 
 

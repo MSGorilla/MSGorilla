@@ -29,6 +29,7 @@ namespace MSGorilla.WebAPI
             Description = topic.Description;
             MsgCount = topic.MsgCount;
             IsLiked = isliked;
+            GroupID = topic.GroupID;
         }
     }
 
@@ -320,7 +321,7 @@ namespace MSGorilla.WebAPI
         [HttpGet]
         public int GetUserFavouriteTopicUnreadCount(string userid, string topic, string groupID)
         {
-            var t = _topicManager.FindTopicByName(topic, new string[]{groupID});
+            var t = _topicManager.FindTopicByName(topic, groupID);
             if (t == null)
             {
                 return 0;
