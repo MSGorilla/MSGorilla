@@ -164,6 +164,7 @@
     <Compile Include="Models\ViewModels\DisplayMetricChart.cs" />
     <Compile Include="Models\ViewModels\DisplayMetricDataSet.cs" />
     <Compile Include="Models\ViewModels\DisplayNotificationCount.cs" />
+    <Compile Include="Models\ViewModels\DisplayTopic.cs" />
     <Compile Include="Models\ViewModels\MembershipView.cs" />
     <Compile Include="Models\ViewModels\MessageModels.cs" />
     <Compile Include="Models\ViewModels\ReplyModels.cs" />
