@@ -2005,7 +2005,7 @@ function LoadSearchMessageResults(isReload) {
         function (data) {
             var nexttoken = null;
             if (isNullOrEmpty(data) || data.message.length == 0) {
-                showMessage("No content.");
+                showMessage("No content.", "loading_message_searchpost");
             }
             else {
                 nexttoken = data.continuationToken;
@@ -2048,7 +2048,9 @@ function LoadSearchMessageResults(isReload) {
             $("#hd_token").val("nomore");
 
             isLoadFeeds = false;
-        }
+        },
+        null,
+        "loading_message_searchpost"
     );
 }
 
