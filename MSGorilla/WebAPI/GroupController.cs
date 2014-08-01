@@ -258,7 +258,7 @@ namespace MSGorilla.WebAPI
             string me = whoami();
             MembershipHelper.CheckMembership(groupID, me);
             List<MembershipView> result = new List<MembershipView>();
-            foreach(Membership member in _groupManager.GetAllGroupMember(groupID, whoami()))
+            foreach(Membership member in _groupManager.GetAllGroupMember(groupID))
             {
                 result.Add(member);
             }

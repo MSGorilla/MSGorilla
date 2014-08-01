@@ -174,16 +174,11 @@ namespace MSGorilla.WebAPI
         [HttpGet]
         public List<DisplayTopic> HotTopics(int count = 5, [FromUri]string[] group = null)
         {
-            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(whoami(), group);
+            string me = whoami();
+            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(me, group);
             var topiclist = _topicManager.GetHotTopics(joinedGroup, count);
-            var disptopiclist = new List<DisplayTopic>();
-
-            foreach (var t in topiclist)
-            {
-                disptopiclist.Add(new DisplayTopic(t, IsFavouriteTopic(t.Id)));
-            }
-
-            return disptopiclist;
+            
+            return _topicManager.ToDisplayTopicList(topiclist, me);
         }
 
         /// <summary>
