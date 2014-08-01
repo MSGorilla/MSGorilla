@@ -18,6 +18,16 @@ namespace MSGorilla.WebAPI
 
         /// <summary>
         /// Get dataset info by ID
+        /// 
+        /// example output:
+        /// {
+        ///     "Id": 2,
+        ///     "Name": "test",
+        ///     "Description": "for dev test",
+        ///     "GroupID": "msgorilladev",
+        ///     "Creater": "user1",
+        ///     "RecordCount": 7
+        /// }
         /// </summary>
         /// <param name="id">Dataset ID</param>
         /// <returns></returns>
@@ -30,6 +40,19 @@ namespace MSGorilla.WebAPI
 
         /// <summary>
         /// Get all dataset infos in a group 
+        /// 
+        /// example output:
+        /// [
+        ///     {
+        ///         "Id": 2,
+        ///         "Name": "test",
+        ///         "Description": "for dev test",
+        ///         "GroupID": "msgorilladev",
+        ///         "Creater": "user1",
+        ///         "RecordCount": 7
+        ///     },
+        /// 	......
+        /// ]
         /// </summary>
         /// <param name="group">group id</param>
         /// <returns></returns>
@@ -48,6 +71,16 @@ namespace MSGorilla.WebAPI
 
         /// <summary>
         /// Create a new dataset
+        /// 
+        /// example output:
+        /// {
+        ///     "Id": 2,
+        ///     "Name": "test",
+        ///     "Description": "for dev test",
+        ///     "GroupID": "msgorilladev",
+        ///     "Creater": "user1",
+        ///     "RecordCount": 7
+        /// }
         /// </summary>
         /// <param name="name">dataset name</param>
         /// <param name="group">group id</param>
@@ -64,6 +97,12 @@ namespace MSGorilla.WebAPI
 
         /// <summary>
         /// Delete a dataset by id. You must be either group admin or the dataset creater
+        /// 
+        /// example output:
+        /// {
+        ///     "ActionResultCode": 0,
+        ///     "Message": "success"
+        /// }
         /// </summary>
         /// <param name="id">dataset id</param>
         /// <returns></returns>
@@ -85,6 +124,12 @@ namespace MSGorilla.WebAPI
         /// <summary>
         /// Add a record in a dataset.
         /// Record is a key value pair and the value should be a double type
+        /// 
+        /// example output:
+        /// {
+        ///     "ActionResultCode": 0,
+        ///     "Message": "success"
+        /// }
         /// </summary>
         /// <param name="id">dataset id</param>
         /// <param name="key">key is string</param>
@@ -102,6 +147,21 @@ namespace MSGorilla.WebAPI
 
         /// <summary>
         /// Retrive the lastest inserted records in a data set.
+        /// 
+        /// example output:
+        /// [
+        ///     {
+        ///         "Timestamp": "2014-07-29T07:47:12.0774239Z",
+        ///         "Key": "k001",
+        ///         "Value": "v001"
+        ///     },
+        ///     ......
+        ///     {
+        ///         "Timestamp": "2014-08-01T01:22:36.6441027Z",
+        ///         "Key": "key09",
+        ///         "Value": "9"
+        ///     }
+        /// ]
         /// </summary>
         /// <param name="id">dataset id</param>
         /// <param name="count">count</param>
@@ -117,6 +177,21 @@ namespace MSGorilla.WebAPI
 
         /// <summary>
         /// Retrive records from a dataset. 
+        /// 
+        /// example output:
+        /// [
+        ///     {
+        ///         "Timestamp": "2014-07-29T07:47:12.0774239Z",
+        ///         "Key": "k001",
+        ///         "Value": "v001"
+        ///     },
+        ///     ......
+        ///     {
+        ///         "Timestamp": "2014-08-01T01:22:36.6441027Z",
+        ///         "Key": "key09",
+        ///         "Value": "9"
+        ///     }
+        /// ]
         /// </summary>
         /// <param name="id">dataset id</param>
         /// <param name="startIndex">start index</param>
@@ -133,6 +208,16 @@ namespace MSGorilla.WebAPI
 
         /// <summary>
         /// create a new chart
+        /// 
+        /// example output:
+        /// {
+        ///     "Name": "user1",
+        ///     "Title": "test",
+        ///     "SubTitle": "just for test",
+        ///     "GroupID": "msgorilladev",
+        ///     "DataSet": null
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="chartName">chart name</param>
         /// <param name="group">group id</param>
@@ -149,6 +234,24 @@ namespace MSGorilla.WebAPI
 
         /// <summary>
         /// get chart by name. You should belong to the group of the chart.
+        /// 
+        /// example output:
+        /// {
+        ///     "Name": "user1",
+        ///     "Title": "test",
+        ///     "SubTitle": "just for test",
+        ///     "GroupID": "msgorilladev",
+        ///     "DataSet": [
+        ///         {
+        ///             "Id": 2,
+        ///             "Name": "test",
+        ///             "Description": "for dev test",
+        ///             "GroupID": "msgorilladev",
+        ///             "Creater": "user1",
+        ///             "RecordCount": 9
+        ///         }
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="chartName">chart name.</param>
         /// <returns></returns>
@@ -163,6 +266,24 @@ namespace MSGorilla.WebAPI
 
         /// <summary>
         /// Add a dataset into a chart. Chart and dataset should belong to the same group
+        /// 
+        /// example output:
+        /// {
+        ///     "Name": "user1",
+        ///     "Title": "test",
+        ///     "SubTitle": "just for test",
+        ///     "GroupID": "msgorilladev",
+        ///     "DataSet": [
+        ///         {
+        ///             "Id": 2,
+        ///             "Name": "test",
+        ///             "Description": "for dev test",
+        ///             "GroupID": "msgorilladev",
+        ///             "Creater": "user1",
+        ///             "RecordCount": 9
+        ///         }
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="chartName">chart name</param>
         /// <param name="dataSetID">dataset id</param>
@@ -185,6 +306,24 @@ namespace MSGorilla.WebAPI
 
         /// <summary>
         /// Remove a dataset from a chart
+        /// 
+        /// example output:
+        /// {
+        ///     "Name": "user1",
+        ///     "Title": "test",
+        ///     "SubTitle": "just for test",
+        ///     "GroupID": "msgorilladev",
+        ///     "DataSet": [
+        ///         {
+        ///             "Id": 2,
+        ///             "Name": "test",
+        ///             "Description": "for dev test",
+        ///             "GroupID": "msgorilladev",
+        ///             "Creater": "user1",
+        ///             "RecordCount": 9
+        ///         }
+        ///     ]
+        /// }
         /// </summary>
         /// <param name="chartName">chart name</param>
         /// <param name="dataSetID">dataset id</param>
@@ -206,6 +345,26 @@ namespace MSGorilla.WebAPI
 
         /// <summary>
         /// Get all charts in a group
+        /// 
+        /// example output:
+        /// [
+        ///     {
+        ///         "Name": "user1",
+        ///         "Title": "test",
+        ///         "SubTitle": "just for test",
+        ///         "GroupID": "msgorilladev",
+        ///         "DataSet": [
+        ///             {
+        ///                 "Id": 2,
+        ///                 "Name": "test",
+        ///                 "Description": "for dev test",
+        ///                 "GroupID": "msgorilladev",
+        ///                 "Creater": "user1",
+        ///                 "RecordCount": 9
+        ///             }
+        ///         ]
+        ///     }
+        /// ]
         /// </summary>
         /// <param name="group">group id</param>
         /// <returns></returns>

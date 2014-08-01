@@ -26,7 +26,8 @@ namespace MSGorilla.WebAPI
         ///     "GroupID": "microsoft",
         ///     "DisplayName": "Microsoft",
         ///     "Description": "default group for all active users",
-        ///     "IsOpen": true
+        ///     "IsOpen": true,
+        ///     "IsJoined":true
         /// }
         /// </summary>
         /// <param name="groupID">group id</param>
@@ -56,7 +57,8 @@ namespace MSGorilla.WebAPI
         ///     "GroupID": "microsoft",
         ///     "DisplayName": "Microsoft",
         ///     "Description": "default group for all active users",
-        ///     "IsOpen": true
+        ///     "IsOpen": true,
+        ///     "IsJoined":true
         /// }
         /// </summary>
         /// <param name="groupID">group id</param>
@@ -82,14 +84,16 @@ namespace MSGorilla.WebAPI
         ///         "GroupID": "microsoft",
         ///         "DisplayName": "MicrosoftALL",
         ///         "Description": "default group for all user",
-        ///         "IsOpen": true
+        ///         "IsOpen": true,
+        ///         "IsJoined":true
         ///     },
         ///     ......
         ///     {
         ///         "GroupID": "woss",
         ///         "DisplayName": "WOSS",
         ///         "Description": "Woss Team",
-        ///         "IsOpen": false
+        ///         "IsOpen": false,
+        ///         "IsJoined":true
         ///     }
         /// ]
         /// </summary>
@@ -117,7 +121,8 @@ namespace MSGorilla.WebAPI
         ///     "GroupID": "msgorilladev",
         ///     "DisplayName": "MSGorilla Dev",
         ///     "Description": "MSgorilla Devs and Testers",
-        ///     "IsOpen": false
+        ///     "IsOpen": false,
+        ///     "IsJoined":true
         /// }
         /// </summary>
         /// <param name="groupID">group id</param>
