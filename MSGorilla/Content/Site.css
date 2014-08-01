@@ -291,7 +291,7 @@ input[type="checkbox"].input-validation-error {
 }
 
 .search-bar {
-    max-width: 300px;
+    min-width: 300px;
 }
 
 .post-btn {
@@ -383,7 +383,7 @@ input[type="checkbox"].input-validation-error {
     padding-left: 0;
 }
 
-.userlist-group-item, .grouplist-group-item {
+.userlist-group-item {
     position: relative;
     display: inline-block;
     width: 176px;
@@ -396,14 +396,12 @@ input[type="checkbox"].input-validation-error {
     border: 1px solid #dddddd;
 }
 
-.user-card, .group-card {
-    float: left;
-    width: 178px;
+.grouplist-group-item {
+    position: relative;
+    display: inline-block;
+    width: 176px;
     margin: 10px 10px 20px 10px;
     padding: 0px 0px 20px 0px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
     background-color: #f4f8f9;
     border: 1px solid #dddddd;
 }

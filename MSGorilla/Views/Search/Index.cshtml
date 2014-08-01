@@ -14,36 +14,13 @@
             </div>
         </div>
 
-        <div class="block-container">
-            <div>
-                <span class="help-block">People for "@@<span class="bold">@ViewBag.SearchKeyword</span>"</span>
-            </div>
-            <div>
-                <ul id="userlist" class="userlist-group">
-                    <li id="loading_message_searchuser" class="center-block txtaln-c"><span class="spinner-loading"></span> Loading...</li>
-                    @*autofill by js*@
-                </ul>
-            </div>
-            <div class="clearfix"></div>
-        </div>
+        @Html.Partial("_SearchUserPartial")
 
-        <div class="title-container">
-            <span class="help-block">Topics for "#<span class="bold">@ViewBag.SearchKeyword</span>#"</span>
-        </div>
+        @Html.Partial("_SearchTopicPartial")
 
-        <div class="posts-feeds">
-            <ul id="topiclist" class='list-group'>
-                <li id="loading_message" class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
-                @*autofill by js*@
-            </ul>
-        </div>
+        @Html.Partial("_SearchPostPartial")
 
     </div>
-
-    <script>
-        $(SearchUser('@ViewBag.SearchKeyword'));
-        $(SearchTopic('@ViewBag.SearchKeyword'));
-    </script>
 
     <div class="tools-container">
         @Html.Partial("_MePartial")

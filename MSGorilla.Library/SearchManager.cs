@@ -92,10 +92,19 @@ namespace MSGorilla.Library
 
             // check whether we have to search again
             DateTime now = DateTime.UtcNow;
-            DateTime lastSearchDate = GetSearchHistory(searchId);
+            DateTime lastSearchDate = DateTime.MinValue;
+            int lastSearchCount = 0;
+
+            SearchResult lastSearchResult = GetSearchHistory(searchId);
+            if (lastSearchResult != null)
+            {
+                lastSearchDate = lastSearchResult.SearchDate;
+                lastSearchCount = lastSearchResult.ResultsCount;
+            }
+
             if (now.Subtract(lastSearchDate).TotalSeconds < SearchDelaySeconds)
             {   // do not search, use last search result
-                return new SearchResult(searchId, now, 0, 0);
+                return lastSearchResult;
             }
 
             // search every keyword
@@ -110,10 +119,10 @@ namespace MSGorilla.Library
             SaveSearchResults(searchId, searchResults);
 
             // update search history
-            UpdateSearchHistory(searchId, now, _searchTime.TotalSeconds, searchResults.Count());
+            var currentSearchResult = UpdateSearchHistory(searchId, now, _searchTime.TotalSeconds, searchResults.Count() + lastSearchCount);
 
-            // return search id
-            return new SearchResult(searchId, now, _searchTime.TotalSeconds, searchResults.Count());
+            // return search result
+            return currentSearchResult;
         }
 
         public MessagePagination GetSearchResults(string resultId, int count = 25, TableContinuationToken continuationToken = null)
@@ -199,11 +208,23 @@ namespace MSGorilla.Library
             {
                 RichMsgManager rmm = new RichMsgManager();
                 string rich = rmm.GetRichMessage(message.RichMessageID);
-                HTMLDocumentClass doc = new HTMLDocumentClass();
-                doc.designMode = "on";
-                doc.IHTMLDocument2_write(rich);
-                string richmsg = doc.body.innerText;
-                sb.Append(richmsg + Separator);
+                try
+                {   // assume rich message is html code
+                    HTMLDocumentClass doc = new HTMLDocumentClass();
+                    doc.designMode = "on";
+                    doc.IHTMLDocument2_write(rich);
+                    string richmsg = doc.body.innerText;
+                    sb.Append(richmsg + Separator);
+                }
+                catch
+                {
+                    try
+                    {
+                        // TODO: read the rich message in another way
+                        sb.Append(StripHtml(rich) + Separator);
+                    }
+                    catch { }
+                }
             }
 
             // add attached filename
@@ -439,24 +460,26 @@ namespace MSGorilla.Library
             }
         }
 
-        private DateTime GetSearchHistory(string searchId)
+        private SearchResult GetSearchHistory(string searchId)
         {
             TableResult result = _searchHistoryTable.Execute(TableOperation.Retrieve<SearchHistoryEntity>(searchId, searchId));
             SearchHistoryEntity entity = result.Result as SearchHistoryEntity;
             if (entity != null)
             {
-                return entity.LastSearchDateUTC;
+                return new SearchResult(entity.ResultId, entity.LastSearchDateUTC, entity.TakenTime, entity.ResultsCount);
             }
             else
             {
-                return DateTime.MinValue;
+                return null;
             }
         }
 
-        private void UpdateSearchHistory(string searchId, DateTime searchDate, double takenTime, int resultsCount)
+        private SearchResult UpdateSearchHistory(string searchId, DateTime searchDate, double takenTime, int resultsCount)
         {
             SearchHistoryEntity entity = new SearchHistoryEntity(searchId, searchDate, takenTime, resultsCount);
             TableResult result = _searchHistoryTable.Execute(TableOperation.InsertOrReplace(entity));
+
+            return new SearchResult(searchId, searchDate, takenTime, resultsCount);
         }
 
         private string GenerateWordIndexConditionQuery(string word, DateTime fromDate)
@@ -534,6 +557,67 @@ namespace MSGorilla.Library
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Stripping HTML
+        /// http://www.4guysfromrolla.com/webtech/042501-1.shtml
+        /// </summary>
+        /// <remarks>
+        /// Using regex to find tags without a trailing slash
+        /// http://concepts.waetech.com/unclosed_tags/index.cfm
+        ///
+        /// http://msdn.microsoft.com/library/en-us/script56/html/js56jsgrpregexpsyntax.asp
+        ///
+        /// Replace html comment tags
+        /// http://www.faqts.com/knowledge_base/view.phtml/aid/21761/fid/53
+        /// </remarks>
+        private string StripHtml(string Html)
+        {
+            //Strips the <script> tags from the Html
+            string scriptregex = @"<scr" + @"ipt[^>.]*>[\s\S]*?</sc" + @"ript>";
+            System.Text.RegularExpressions.Regex scripts = new System.Text.RegularExpressions.Regex(scriptregex, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.ExplicitCapture);
+            string scriptless = scripts.Replace(Html, " ");
+
+            //Strips the <style> tags from the Html
+            string styleregex = @"<style[^>.]*>[\s\S]*?</style>";
+            System.Text.RegularExpressions.Regex styles = new System.Text.RegularExpressions.Regex(styleregex, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.ExplicitCapture);
+            string styleless = styles.Replace(scriptless, " ");
+
+            //Strips the <NOSEARCH> tags from the Html (where NOSEARCH is set in the web.config/Preferences class)
+            //TODO: NOTE: this only applies to INDEXING the text - links are parsed before now, so they aren't "excluded" by the region!! (yet)
+            string ignoreless = string.Empty;
+            //if (Preferences.IgnoreRegions)
+            //{
+            //    string noSearchStartTag = "<!--" + Preferences.IgnoreRegionTagNoIndex + "-->";
+            //    string noSearchEndTag = "<!--/" + Preferences.IgnoreRegionTagNoIndex + "-->";
+            //    string ignoreregex = noSearchStartTag + @"[\s\S]*?" + noSearchEndTag;
+            //    System.Text.RegularExpressions.Regex ignores = new System.Text.RegularExpressions.Regex(ignoreregex, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.ExplicitCapture);
+            //    ignoreless = ignores.Replace(styleless, " ");
+            //}
+            //else
+            {
+                ignoreless = styleless;
+            }
+
+            //Strips the <!--comment--> tags from the Html	
+            //string commentregex = @"<!\-\-.*?\-\->";		// alternate suggestion from antonello franzil 
+            string commentregex = @"<!(?:--[\s\S]*?--\s*)?>";
+            System.Text.RegularExpressions.Regex comments = new System.Text.RegularExpressions.Regex(commentregex, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.ExplicitCapture);
+            string commentless = comments.Replace(ignoreless, " ");
+
+            //Strips the HTML tags from the Html
+            System.Text.RegularExpressions.Regex objRegExp = new System.Text.RegularExpressions.Regex("<(.|\n)+?>", RegexOptions.IgnoreCase);
+
+            //Replace all HTML tag matches with the empty string
+            string output = objRegExp.Replace(commentless, " ");
+
+            //Replace all _remaining_ < and > with &lt; and &gt;
+            output = output.Replace("<", "&lt;");
+            output = output.Replace(">", "&gt;");
+
+            objRegExp = null;
+            return output;
         }
     }
 

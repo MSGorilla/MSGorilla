@@ -807,14 +807,14 @@ namespace MSGorilla.WebAPI
         }
 
         [HttpGet]
-        public SearchResult SearchMessage(string keyword, [FromUri]string[] group = null)
+        public SearchResult SearchMessage(string keyword)
         {
             string me = whoami();
             return _searchManager.SearchMessage(keyword);
         }
 
         [HttpGet]
-        public DisplayMessagePagination SearchMessageResults(string searchId, int count = 25, string token = null)
+        public DisplayMessagePagination SearchMessageResults(string searchId, int count = 25, [FromUri]string[] group = null, string token = null)
         {
             string me = whoami();
 

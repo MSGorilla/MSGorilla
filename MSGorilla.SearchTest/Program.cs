@@ -44,7 +44,7 @@ namespace MSGorilla.SearchTest
                     Message msg = JsonConvert.DeserializeObject<Message>(message.AsString);
 
                     _manager.SpideMessage(msg);
-                    _queue.DeleteMessage(message);
+                    //_queue.DeleteMessage(message);
                 }
                 catch (Exception e)
                 {

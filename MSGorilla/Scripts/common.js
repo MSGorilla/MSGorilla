@@ -1780,8 +1780,11 @@ function SearchTopic(keyword) {
     var apiurl = "";
     var apidata = "";
 
-    if (isNullOrEmpty(keyword))
-        apiurl = "/api/topic/getalltopic";
+    if (isNullOrEmpty(keyword)) {
+        showMessage("No keyword.", "loading_message_searchtopic");
+        return;
+        //apiurl = "/api/topic/getalltopic";
+    }
     else {
         apiurl = "/api/topic/searchtopic";
         apidata = "keyword=" + encodeTxt(keyword);
@@ -1792,7 +1795,7 @@ function SearchTopic(keyword) {
         apidata,
         function (data) {
             if (isNullOrEmpty(data) || data.length == 0) {
-                showMessage("No content.");
+                showMessage("No content.", "loading_message_searchtopic");
             }
             else {
                 // clear list
@@ -1811,7 +1814,10 @@ function SearchTopic(keyword) {
                     setTopicLikeBtn("btn_topic_like_" + topicid, topicid, isliked);
                 })
             }
-        }
+        },
+        null,
+        null,
+        "loading_message_searchtopic"
     );
 }
 
@@ -1824,8 +1830,11 @@ function SearchUser(keyword) {
     var apiurl = "";
     var apidata = "";
 
-    if (isNullOrEmpty(keyword))
-        apiurl = "/api/account/user";
+    if (isNullOrEmpty(keyword)) {
+        showMessage("No keyword.", "loading_message_searchuser");
+        return;
+        //apiurl = "/api/account/user";
+    }
     else {
         apiurl = "/api/account/searchuser";
         apidata = "keyword=" + encodeTxt(keyword);
@@ -1856,8 +1865,193 @@ function SearchUser(keyword) {
 }
 
 function SearchMessage(keyword) {
+    var searchid_ele = $("#hd_result_id");
+    if (searchid_ele.length == 0) {
+        return;
+    }
 
+    var apiurl = "";
+    var apidata = "";
+
+    if (isNullOrEmpty(keyword)) {
+        showMessage("No keyword.", "loading_message_searchpost");
+        return;
+        //apiurl = "/api/topic/getalltopic";
+    }
+    else if (keyword.length < 4) {
+        showMessage("Too short keyword.", "loading_message_searchpost");
+        return;
+    }
+    else {
+        apiurl = "/api/message/searchmessage";
+        apidata = "keyword=" + encodeTxt(keyword);
+    }
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                searchid_ele.val("");
+                $("#hd_token").val("");
+                $("#searchpost_message").html("");
+
+                showMessage("No content.", "loading_message_searchpost");
+            }
+            else {
+                var resultid = data.ResultId;
+                var searchdate = data.SearchDate;
+                var searchtime = data.TakenTime;
+                var resultcount = data.ResultsCount;
+
+                searchid_ele.val(resultid);
+                $("#hd_token").val("");
+                $("#searchpost_message").html("- found " + resultcount + " results in " + searchtime + " second(s) at " + DateFormat(searchdate));
+
+                LoadSearchMessageResults(true);
+            }
+        },
+        null,
+        null,
+        "loading_message_searchpost"
+    );
 }
+
+function LoadSearchMessageResults(isReload) {
+    if (isLoadFeeds) return;    // if it is loading, skip this time.
+    isLoadFeeds = true;
+
+    var listdiv = $("#feedlist");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var apiurl = "";
+    var apidata = "";
+    var resultid = "";
+    var token = "";
+    var group = "";
+    var filter = "";
+
+    // get paras from page
+    if ($("#hd_result_id").length > 0) {
+        resultid = $("#hd_result_id").val();
+    }
+    if ($("#hd_current_group").length > 0) {
+        group = $("#hd_current_group").val();
+    }
+    if ($("#hd_filter").length > 0) {
+        filter = $("#hd_filter").val();
+    }
+    if ($("#hd_token").length > 0) {
+        token = $("#hd_token").val();
+    }
+
+    // no result id , than do nothing.
+    if (isNullOrEmpty(resultid)) {
+        isLoadFeeds = false;
+        return;
+    }
+
+    if (isReload == true) { // reload
+        token = "";
+        $("#hd_token").val(token);
+
+        listdiv.empty();
+        listdiv.append("<li id='loading_message' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
+    }
+    else { // load more
+        if (token == "nomore") {
+            // already no more feeds, don't load any more
+            isLoadFeeds = false;
+            return;
+        }
+    }
+
+    // get
+    apiurl = "/api/message/searchmessageresults";
+    apidata = "searchId=" + encodeTxt(resultid);
+
+    if (!isNullOrEmpty(group)) {   // set group value
+        if (isNullOrEmpty(apidata)) {
+            apidata = "group=" + group;
+        }
+        else {
+            apidata += "&group=" + group;
+        }
+    }
+
+    if (!isNullOrEmpty(filter)) {   // set filter value
+        if (isNullOrEmpty(apidata)) {
+            apidata = "filter=" + filter;
+        }
+        else {
+            apidata += "&filter=" + filter;
+        }
+    }
+
+    if (!isNullOrEmpty(token)) { // set token value
+        if (isNullOrEmpty(apidata)) {
+            apidata = "token=" + token;
+        }
+        else {
+            apidata += "&token=" + token;
+        }
+    }
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            var nexttoken = null;
+            if (isNullOrEmpty(data) || data.message.length == 0) {
+                showMessage("No content.");
+            }
+            else {
+                nexttoken = data.continuationToken;
+                data = data.message
+
+                // clear feed list
+                if (isNullOrEmpty(token)) {
+                    // clear loading message at the first time 
+                    listdiv.empty();
+                }
+
+                // create feed list
+                $.each(data, function (index, item) {
+                    listdiv.append(createFeed(item));
+
+                    // render feed
+                    initUserPopover("user_pic_" + item.ID, item.User.Userid);
+                    enhanceMessage(item.SchemaID, item.ID, item.MessageContent);
+                    // if msg is empty, show richmsg instead
+                    if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
+                        $("#rich_message_" + item.ID).collapse('show');
+                        showRichMsg(item.RichMessageID, item.ID);
+                    }
+                })
+            }
+
+            if (isNullOrEmpty(nexttoken)) {
+                $("#lbl_seemore").html("");
+                $("#hd_token").val("nomore");
+            }
+            else {
+                $("#lbl_seemore").html("<span class='spinner-loading'></span> Loading more...");
+                $("#hd_token").val(nexttoken);
+            }
+
+            isLoadFeeds = false;
+        },
+        function (XMLHttpRequest, textStatus, errorThrown) {
+            $("#lbl_seemore").html("");
+            $("#hd_token").val("nomore");
+
+            isLoadFeeds = false;
+        }
+    );
+}
+
 
 // notification count function and short cut function
 function getNotificationCount(category, id, group) {

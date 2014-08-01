@@ -1,0 +1,17 @@
+﻿<div class="block-container">
+    <div>
+        <span class="help-block">People for "@@<span class="bold">@ViewBag.SearchKeyword</span>"</span>
+    </div>
+    <div>
+        <ul id="userlist" class="userlist-group">
+            <li id="loading_message_searchuser" class="center-block txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+            @*autofill by js*@
+        </ul>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+<script>
+        $(SearchUser('@ViewBag.SearchKeyword'));
+</script>
+
