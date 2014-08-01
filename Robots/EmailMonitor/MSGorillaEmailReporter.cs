@@ -212,7 +212,7 @@ namespace MSGorilla.EmailMonitor
             string htmlBody = GetCompleteMailBodyHtml(email);
             htmlBody = CreateMailRichMessage(htmlBody, email);
 
-            string result = _client.PostMessage("none", "none", email.ConversationId, null, null, null, htmlBody, null);
+            string result = _client.PostMessage("none", null, "none", email.ConversationId, null, null, null, htmlBody, null);
             DisplayMessage displayMessage = JsonConvert.DeserializeObject<DisplayMessage>(result);
 
             Sql.Conversation conv = new Sql.Conversation();
