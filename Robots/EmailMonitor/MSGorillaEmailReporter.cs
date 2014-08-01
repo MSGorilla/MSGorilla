@@ -230,7 +230,7 @@ namespace MSGorilla.EmailMonitor
             string htmlBody = GetReplyMailBodyHtml(email);
             htmlBody = CreateMailRichMessage(htmlBody, email);
 
-            _client.PostReply(null, "", conv.MessageUser, conv.MessageID, htmlBody, null);
+            _client.PostReply(null, "", conv.MessageID, htmlBody, null);
         }
 
         private static Sql.Conversation GetConversationByID(ConversationId id)
