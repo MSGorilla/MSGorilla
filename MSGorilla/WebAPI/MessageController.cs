@@ -389,6 +389,7 @@ namespace MSGorilla.WebAPI
         /// <param name="userid">user id</param>
         /// <param name="count">count of messages int the list</param>
         /// <param name="token">continuous token</param>
+        /// <param name="keepUnread">if false, gorilla will clear unreadhomelinemessage count</param>
         /// <returns></returns>
         [HttpGet]
         public DisplayMessagePagination AtLine(string userid, int count = 25, string token = null, bool keepUnread = false)
@@ -869,7 +870,7 @@ namespace MSGorilla.WebAPI
         /// userid, such as @user1, the userid will be added into atUser list. If a single word starts with and ends with #,
         /// such as #world cup#, it will be recognized as a topic name and be added into topicName list.
         /// </param>
-        /// <param name="group">group id</param>
+        /// <param name="group">group id. The group will be set to default group if the group id is null</param>
         /// <param name="schemaID">schema id</param>
         /// <param name="eventID">event id</param>
         /// <param name="owner">user id of the owner. Can be a list.</param>

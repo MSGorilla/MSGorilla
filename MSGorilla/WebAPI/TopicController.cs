@@ -17,22 +17,6 @@ using MSGorilla.Utility;
 
 namespace MSGorilla.WebAPI
 {
-    public class DisplayTopic : Topic
-    {
-        [DataMember]
-        public bool IsLiked { get; private set; }
-
-        public DisplayTopic(Topic topic, bool isliked)
-        {
-            Id = topic.Id;
-            Name =topic.Name;
-            Description = topic.Description;
-            MsgCount = topic.MsgCount;
-            IsLiked = isliked;
-            GroupID = topic.GroupID;
-        }
-    }
-
     public class TopicController : BaseController
     {
         TopicManager _topicManager = new TopicManager();
@@ -89,16 +73,17 @@ namespace MSGorilla.WebAPI
         [HttpGet]
         public List<DisplayTopic> SearchTopic(string keyword, [FromUri]string[] group = null)
         {
-            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(whoami(), group);
+            string me = whoami();
+            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(me, group);
             var topiclist = _topicManager.SearchTopic(keyword, joinedGroup);
-            var disptopiclist = new List<DisplayTopic>();
+            //var disptopiclist = new List<DisplayTopic>();
 
-            foreach (var t in topiclist)
-            {
-                disptopiclist.Add(new DisplayTopic(t, IsFavouriteTopic(t.Id)));
-            }
+            //foreach (var t in topiclist)
+            //{
+            //    disptopiclist.Add(new DisplayTopic(t, IsFavouriteTopic(t.Id)));
+            //}
 
-            return disptopiclist;
+            return _topicManager.ToDisplayTopicList(topiclist, me);
         }
 
         /// <summary>
@@ -152,16 +137,11 @@ namespace MSGorilla.WebAPI
         [HttpGet]
         public List<DisplayTopic> GetAllTopic([FromUri]string[] group = null)
         {
-            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(whoami(), group);
+            string me = whoami();
+            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(me, group);
             var topiclist = _topicManager.GetAllTopics(joinedGroup);
-            var disptopiclist = new List<DisplayTopic>();
 
-            foreach (var t in topiclist)
-            {
-                disptopiclist.Add(new DisplayTopic(t, IsFavouriteTopic(t.Id)));
-            }
-
-            return disptopiclist;
+            return _topicManager.ToDisplayTopicList(topiclist, me);
         }
 
         /// <summary>
@@ -194,16 +174,11 @@ namespace MSGorilla.WebAPI
         [HttpGet]
         public List<DisplayTopic> HotTopics(int count = 5, [FromUri]string[] group = null)
         {
-            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(whoami(), group);
+            string me = whoami();
+            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(me, group);
             var topiclist = _topicManager.GetHotTopics(joinedGroup, count);
-            var disptopiclist = new List<DisplayTopic>();
-
-            foreach (var t in topiclist)
-            {
-                disptopiclist.Add(new DisplayTopic(t, IsFavouriteTopic(t.Id)));
-            }
-
-            return disptopiclist;
+            
+            return _topicManager.ToDisplayTopicList(topiclist, me);
         }
 
         /// <summary>

@@ -639,12 +639,23 @@ namespace MSGorilla.Library
             }
 
 
+            //insert into homeline
+            HashSet<string> groupMember = new HashSet<string>();
+            foreach (var member in _groupManager.GetAllGroupMember(message.Group))
+            {
+                groupMember.Add(member.MemberID.ToLower());
+            }
+
 
             List<UserProfile> followers = _accManager.Followers(message.User);
             //followers.Add(_accManager.FindUser(message.User));
             //speed tweet to followers
             foreach (UserProfile user in followers)
             {
+                if (!groupMember.Contains(user.Userid.ToLower()))
+                {
+                    continue;
+                }
                 HomeLineEntity entity = new HomeLineEntity(user.Userid, message);
                 insertOperation = TableOperation.InsertOrReplace(entity);
                 _homeline.Execute(insertOperation);

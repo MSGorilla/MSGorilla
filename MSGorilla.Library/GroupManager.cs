@@ -256,7 +256,7 @@ namespace MSGorilla.Library
             }
         }
 
-        public List<Membership> GetAllGroupMember(string groupID, string userid)
+        public List<Membership> GetAllGroupMember(string groupID)
         {
             using (var _gorillaCtx = new MSGorillaEntities())
             {

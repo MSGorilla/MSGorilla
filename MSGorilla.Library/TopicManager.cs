@@ -212,12 +212,35 @@ namespace MSGorilla.Library
         {
             using (var _gorillaCtx = new MSGorillaEntities())
             {
-                FavouriteTopic ftopic = _gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).FirstOrDefault();
-                if (ftopic != null)
+                return IsFavouriteTopic(userid, topicID, _gorillaCtx);
+            }
+        }
+
+        public bool IsFavouriteTopic(string userid, int topicID, MSGorillaEntities _gorillaCtx)
+        {
+            FavouriteTopic ftopic = _gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).FirstOrDefault();
+            if (ftopic != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public List<DisplayTopic> ToDisplayTopicList(IEnumerable<Topic> topics, string userid)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                HashSet<int> likedTopicID = new HashSet<int>();
+                foreach(var fa in _gorillaCtx.UserProfiles.Find(userid).FavouriteTopics.ToArray())
                 {
-                    return true;
+                    likedTopicID.Add(fa.TopicID);
                 }
-                return false;
+                List<DisplayTopic> list = new List<DisplayTopic>();
+                foreach (Topic topic in topics)
+                {
+                    list.Add(new DisplayTopic(topic, likedTopicID.Contains(topic.Id)));
+                }
+                return list;
             }
         }
     }

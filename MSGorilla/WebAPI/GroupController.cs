@@ -157,12 +157,12 @@ namespace MSGorilla.WebAPI
         /// <param name="groupID">group id</param>
         /// <returns></returns>
         [HttpGet, HttpPost]
-        public MembershipView JoinGroup(string groupID)
+        public ActionResult JoinGroup(string groupID)
         {
             string me = whoami();
             Membership member = _groupManager.JoinGroup(whoami(), groupID);
             MembershipHelper.RefreshJoinedGroup(me);
-            return member;
+            return new ActionResult();
         }
 
         /// <summary>
@@ -170,9 +170,8 @@ namespace MSGorilla.WebAPI
         /// 
         /// example output:
         /// {
-        ///     "GroupID": "woss",
-        ///     "MemberID": "yidguo2",
-        ///     "Role": "user"
+        ///     "ActionResultCode": 0,
+        ///     "Message": "Success."
         /// }
         /// </summary>
         /// <param name="userid">user id</param>
@@ -259,7 +258,7 @@ namespace MSGorilla.WebAPI
             string me = whoami();
             MembershipHelper.CheckMembership(groupID, me);
             List<MembershipView> result = new List<MembershipView>();
-            foreach(Membership member in _groupManager.GetAllGroupMember(groupID, whoami()))
+            foreach(Membership member in _groupManager.GetAllGroupMember(groupID))
             {
                 result.Add(member);
             }
