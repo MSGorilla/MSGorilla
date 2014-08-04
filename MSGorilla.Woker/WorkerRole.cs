@@ -40,7 +40,7 @@ namespace MSGorilla.Woker
                         message = _queue.GetMessage();
                     }
                     _queue.UpdateMessage(message,
-                        TimeSpan.FromSeconds(60.0),  // Make it visible immediately.
+                        TimeSpan.FromSeconds(60.0*5),  // Make it in five minutes
                         MessageUpdateFields.Visibility);
 
                     Message msg = JsonConvert.DeserializeObject<Message>(message.AsString);
