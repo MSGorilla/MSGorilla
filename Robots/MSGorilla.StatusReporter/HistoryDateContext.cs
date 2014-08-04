@@ -8,7 +8,7 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 using MSGorilla.Library.Models.SqlModels;
 namespace MSGorilla.StatusReporter
 {
-    public class HistoryDataContext : MSGorillaEntities
+    public class HistoryDataContext : DbContext
     {
         public DbSet<HistoryData> HistoryMonitoringData { get; set; }
 
