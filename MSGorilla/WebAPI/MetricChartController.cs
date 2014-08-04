@@ -82,7 +82,9 @@ namespace MSGorilla.WebAPI
         ///     "RecordCount": 7
         /// }
         /// </summary>
-        /// <param name="name">dataset name</param>
+        /// <param name="instance">instance name</param>
+        /// <param name="counter">counter name</param>
+        /// <param name="category">category name</param>
         /// <param name="group">group id</param>
         /// <param name="description">description</param>
         /// <returns></returns>
