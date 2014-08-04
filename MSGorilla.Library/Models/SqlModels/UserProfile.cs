@@ -20,6 +20,7 @@ namespace MSGorilla.Library.Models.SqlModels
             this.Memberships = new HashSet<Membership>();
             this.Subscriptions = new HashSet<Subscription>();
             this.MetricDataSets = new HashSet<MetricDataSet>();
+            this.Categories = new HashSet<Category>();
         }
     
         public string Userid { get; set; }
@@ -39,5 +40,6 @@ namespace MSGorilla.Library.Models.SqlModels
         public virtual ICollection<Subscription> Subscriptions { get; set; }
         public virtual Group Group { get; set; }
         public virtual ICollection<MetricDataSet> MetricDataSets { get; set; }
+        public virtual ICollection<Category> Categories { get; set; }
     }
 }

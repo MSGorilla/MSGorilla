@@ -19,6 +19,11 @@ namespace MSGorilla.Library.Models.ViewModels
 
         public static implicit operator DisplayMetricDataSet(MSGorilla.Library.Models.SqlModels.MetricDataSet dataset)
         {
+            if (dataset == null)
+            {
+                return null;
+            }
+
             DisplayMetricDataSet temp = new DisplayMetricDataSet();
             temp.Id = dataset.Id;
             temp.Instance = dataset.Instance;

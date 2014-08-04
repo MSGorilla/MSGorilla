@@ -17,6 +17,11 @@ namespace MSGorilla.Library.Models.ViewModels
 
         public static implicit operator DisplayGroup(Group group)
         {
+            if (group == null)
+            {
+                return null;
+            }
+
             DisplayGroup dgroup = new DisplayGroup();
             dgroup.GroupID = group.GroupID;
             dgroup.DisplayName = group.DisplayName;

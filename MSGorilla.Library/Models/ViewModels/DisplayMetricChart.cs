@@ -17,6 +17,11 @@ namespace MSGorilla.Library.Models.ViewModels
 
         public static implicit operator DisplayMetricChart(MSGorilla.Library.Models.SqlModels.MetricChart chart)
         {
+            if (chart == null)
+            {
+                return null;
+            }
+
             DisplayMetricChart temp = new DisplayMetricChart();
             temp.Name = chart.Name;
             temp.Title = chart.Title;

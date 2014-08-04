@@ -14,6 +14,10 @@ namespace MSGorilla.Library.Models.ViewModels
 
         public static implicit operator MembershipView(MSGorilla.Library.Models.SqlModels.Membership member)
         {
+            if (member == null)
+            {
+                return null;
+            }
             MembershipView view = new MembershipView();
             view.GroupID = member.GroupID;
             view.MemberID = member.MemberID;

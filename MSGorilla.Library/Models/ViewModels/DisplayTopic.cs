@@ -17,6 +17,10 @@ namespace MSGorilla.Library.Models.ViewModels
         public bool IsLiked { get; private set; }
         public DisplayTopic(Topic topic, bool isliked)
         {
+            if (topic == null)
+            {
+                return null;
+            }
             Id = topic.Id;
             Name = topic.Name;
             Description = topic.Description;

@@ -29,6 +29,9 @@
         <AssociationConnector Association="MSGorillaModel.FK_Chart_DataSet_0" />
         <AssociationConnector Association="MSGorillaModel.FK_Chart_DataSet_1" />
         <AssociationConnector Association="MSGorillaModel.FK_MatricChart_0" />
+        <EntityTypeShape EntityType="MSGorillaModel.Category" Width="1.5" PointX="7.75" PointY="9.375" />
+        <AssociationConnector Association="MSGorillaModel.FK_Category_0" />
+        <AssociationConnector Association="MSGorillaModel.FK_Category_1" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

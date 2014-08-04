@@ -36,5 +36,6 @@ namespace MSGorilla.Library.Models.SqlModels
         public virtual DbSet<UserProfile> UserProfiles { get; set; }
         public virtual DbSet<Chart_DataSet> Chart_DataSet { get; set; }
         public virtual DbSet<MetricChart> MetricCharts { get; set; }
+        public virtual DbSet<Category> Categories { get; set; }
     }
 }

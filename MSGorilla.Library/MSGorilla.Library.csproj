@@ -86,6 +86,7 @@
     <Compile Include="AccountManager.cs" />
     <Compile Include="AttachmentManager.cs" />
     <Compile Include="Azure\AzureFactory.cs" />
+    <Compile Include="CategoryManager.cs" />
     <Compile Include="GroupManager.cs" />
     <Compile Include="MetricManager.cs" />
     <Compile Include="MException\MException.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Models\AzureModels\Entity\AtLineEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\AttachmentEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\BaseReplyEntity.cs" />
+    <Compile Include="Models\AzureModels\Entity\CategoryMessageEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\EventLineEntity.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -108,9 +110,13 @@
     <Compile Include="Models\AzureModels\Entity\TopicLine.cs" />
     <Compile Include="Models\AzureModels\Entity\UserLineEntity.cs" />
     <Compile Include="Models\AzureModels\Queue\QueueMessage.cs" />
+    <Compile Include="Models\CategoryMessage.cs" />
     <Compile Include="Models\Reply.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\MessageDetail.cs" />
+    <Compile Include="Models\SqlModels\Category.cs">
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\SqlModels\Chart_DataSet.cs">
       <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
     </Compile>
@@ -159,6 +165,7 @@
     <Compile Include="Models\SqlModels\UserProfile.cs">
       <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ViewModels\DisplayCategory.cs" />
     <Compile Include="Models\ViewModels\DisplayFavouriteTopic.cs" />
     <Compile Include="Models\ViewModels\DisplayGroup.cs" />
     <Compile Include="Models\ViewModels\DisplayMembership.cs" />

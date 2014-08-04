@@ -37,6 +37,12 @@ namespace MSGorilla.Library.Exceptions
             Description = string.Format("Invalid {0} ID. Please refer to http://msdn.microsoft.com/library/azure/dd179338.aspx", type);
             Code = 1001;
         }
+
+        public InvalidIDException(string id, string type)
+        {
+            Description = string.Format("{0} is not a valid {1} type. Only [0-9a-zAA-Z] is recommended.");
+            Code = 1001;
+        }
     }
 
     public class UserNotFoundException : MSGorillaBaseException
@@ -261,9 +267,27 @@ namespace MSGorilla.Library.Exceptions
 
     public class MetricGroupDismatchException : MSGorillaBaseException
     {
-        public MetricGroupDismatchException(){
+        public MetricGroupDismatchException()
+        {
             Description = "The groups of metric chart and metric dataset are not the same.";
             Code = 8004;
+        }
+    }
+
+    public class CategoryNotFoundException : MSGorillaBaseException
+    {
+        public CategoryNotFoundException()
+        {
+            Description = "The specified category doesn't exist.";
+            Code = 9001;
+        }
+    }
+    public class CategoryAlreadyExistException : MSGorillaBaseException
+    {
+        public CategoryAlreadyExistException(string name, string group)
+        {
+            Description = string.Format("A category named {0} already exist in group {1}", name, group);
+            Code = 9002;
         }
     }
 }

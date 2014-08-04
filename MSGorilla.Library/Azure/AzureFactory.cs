@@ -30,6 +30,7 @@ namespace MSGorilla.Library.Azure
             Attachment,
             RichMessage,
             MetricDataSet,
+            CategoryMessage,
             Statistics,
             WordsIndex,
             SearchResults,
@@ -77,6 +78,7 @@ namespace MSGorilla.Library.Azure
             _tableDict.Add(MSGorillaTable.Attachment, "Attachment");
             _tableDict.Add(MSGorillaTable.RichMessage, "RichMessage");
             _tableDict.Add(MSGorillaTable.MetricDataSet, "MetricDataSet");
+            _tableDict.Add(MSGorillaTable.CategoryMessage, "CategoryMessage");
             _tableDict.Add(MSGorillaTable.Statistics, "Statistics");
             _tableDict.Add(MSGorillaTable.WordsIndex, "WordsIndex");
             _tableDict.Add(MSGorillaTable.SearchResults, "SearchResults");

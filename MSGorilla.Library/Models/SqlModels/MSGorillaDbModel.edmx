@@ -5,6 +5,17 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="MSGorillaModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="GroupID" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="Creater" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="CreateTimestamp" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
         <EntityType Name="Chart_DataSet">
           <Key>
             <PropertyRef Name="ID" />
@@ -96,7 +107,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Name" Type="nvarchar(max)" />
+          <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="Description" Type="nvarchar(max)" />
           <Property Name="MsgCount" Type="int" Nullable="false" />
           <Property Name="GroupID" Type="nvarchar" MaxLength="128" />
@@ -116,6 +127,32 @@
           <Property Name="IsRobot" Type="bit" Nullable="false" />
           <Property Name="DefaultGroup" Type="nvarchar" MaxLength="128" Nullable="false" />
         </EntityType>
+        <Association Name="FK_Category_0">
+          <End Role="UserProfile" Type="Self.UserProfile" Multiplicity="1" />
+          <End Role="Category" Type="Self.Category" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserProfile">
+              <PropertyRef Name="Userid" />
+            </Principal>
+            <Dependent Role="Category">
+              <PropertyRef Name="Creater" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Category_1">
+          <End Role="Group" Type="Self.Group" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Category" Type="Self.Category" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="GroupID" />
+            </Principal>
+            <Dependent Role="Category">
+              <PropertyRef Name="GroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Chart_DataSet_0">
           <End Role="MetricDataSet" Type="Self.MetricDataSet" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -291,6 +328,7 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="MSGorillaModelStoreContainer">
+          <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Chart_DataSet" EntityType="Self.Chart_DataSet" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FavouriteTopic" EntityType="Self.FavouriteTopic" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Group" EntityType="Self.Group" Schema="dbo" store:Type="Tables" />
@@ -302,6 +340,14 @@
           <EntitySet Name="Subscription" EntityType="Self.Subscription" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Topic" EntityType="Self.Topic" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserProfile" EntityType="Self.UserProfile" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Category_0" Association="Self.FK_Category_0">
+            <End Role="UserProfile" EntitySet="UserProfile" />
+            <End Role="Category" EntitySet="Category" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Category_1" Association="Self.FK_Category_1">
+            <End Role="Group" EntitySet="Group" />
+            <End Role="Category" EntitySet="Category" />
+          </AssociationSet>
           <AssociationSet Name="FK_Chart_DataSet_0" Association="Self.FK_Chart_DataSet_0">
             <End Role="MetricDataSet" EntitySet="MetricDataSet" />
             <End Role="Chart_DataSet" EntitySet="Chart_DataSet" />
@@ -383,6 +429,7 @@
           <NavigationProperty Name="Topics" Relationship="Self.FK_TOPIC_GROUPID" FromRole="Group" ToRole="Topic" />
           <NavigationProperty Name="UserProfiles" Relationship="MSGorillaModel.FK_UserProfile_DefaultGroup" FromRole="Group" ToRole="UserProfile" />
           <NavigationProperty Name="MetricCharts" Relationship="MSGorillaModel.FK_MatricChart_0" FromRole="Group" ToRole="MetricChart" />
+          <NavigationProperty Name="Categories" Relationship="MSGorillaModel.FK_Category_1" FromRole="Group" ToRole="Category" />
         </EntityType>
         <EntityType Name="Membership">
           <Key>
@@ -445,7 +492,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="MsgCount" Type="Int32" Nullable="false" />
           <Property Name="GroupID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
@@ -472,6 +519,7 @@
           <Property Name="DefaultGroup" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Group" Relationship="MSGorillaModel.FK_UserProfile_DefaultGroup" FromRole="UserProfile" ToRole="Group" />
           <NavigationProperty Name="MetricDataSets" Relationship="MSGorillaModel.FK_MetricDataSet_0" FromRole="UserProfile" ToRole="MetricDataSet" />
+          <NavigationProperty Name="Categories" Relationship="MSGorillaModel.FK_Category_0" FromRole="UserProfile" ToRole="Category" />
         </EntityType>
         <Association Name="FK_FAVOURITETOPIC_TOPICID">
           <End Role="Topic" Type="Self.Topic" Multiplicity="1">
@@ -647,6 +695,15 @@
             <End Role="Group" EntitySet="Groups" />
             <End Role="MetricChart" EntitySet="MetricCharts" />
           </AssociationSet>
+          <EntitySet Name="Categories" EntityType="MSGorillaModel.Category" />
+          <AssociationSet Name="FK_Category_0" Association="MSGorillaModel.FK_Category_0">
+            <End Role="UserProfile" EntitySet="UserProfiles" />
+            <End Role="Category" EntitySet="Categories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Category_1" Association="MSGorillaModel.FK_Category_1">
+            <End Role="Group" EntitySet="Groups" />
+            <End Role="Category" EntitySet="Categories" />
+          </AssociationSet>
         </EntityContainer>
         <Association Name="FK_UserProfile_DefaultGroup">
           <End Type="MSGorillaModel.Group" Role="Group" Multiplicity="1" />
@@ -731,6 +788,45 @@
               <PropertyRef Name="GroupID" />
             </Principal>
             <Dependent Role="MetricChart">
+              <PropertyRef Name="GroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="GroupID" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Creater" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="CreateTimestamp" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="UserProfile" Relationship="MSGorillaModel.FK_Category_0" FromRole="Category" ToRole="UserProfile" />
+          <NavigationProperty Name="Group" Relationship="MSGorillaModel.FK_Category_1" FromRole="Category" ToRole="Group" />
+        </EntityType>
+        <Association Name="FK_Category_0">
+          <End Type="MSGorillaModel.UserProfile" Role="UserProfile" Multiplicity="1" />
+          <End Type="MSGorillaModel.Category" Role="Category" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserProfile">
+              <PropertyRef Name="Userid" />
+            </Principal>
+            <Dependent Role="Category">
+              <PropertyRef Name="Creater" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Category_1">
+          <End Type="MSGorillaModel.Group" Role="Group" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="MSGorillaModel.Category" Role="Category" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="GroupID" />
+            </Principal>
+            <Dependent Role="Category">
               <PropertyRef Name="GroupID" />
             </Dependent>
           </ReferentialConstraint>
@@ -860,6 +956,18 @@
                 <ScalarProperty Name="SubTitle" ColumnName="SubTitle" />
                 <ScalarProperty Name="Title" ColumnName="Title" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Categories">
+            <EntityTypeMapping TypeName="MSGorillaModel.Category">
+              <MappingFragment StoreEntitySet="Category">
+                <ScalarProperty Name="CreateTimestamp" ColumnName="CreateTimestamp" />
+                <ScalarProperty Name="Creater" ColumnName="Creater" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="GroupID" ColumnName="GroupID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

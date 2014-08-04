@@ -17,6 +17,10 @@ namespace MSGorilla.Library.Models.ViewModels
 
         public static implicit operator DisplayNotificationCount(MSGorilla.Library.Models.SqlModels.NotificationCount notif)
         {
+            if (notif == null)
+            {
+                return null;
+            }
             DisplayNotificationCount dnotif = new DisplayNotificationCount();
             dnotif.Userid = notif.Userid;
             dnotif.UnreadAtlineMsgCount = notif.UnreadAtlineMsgCount;
