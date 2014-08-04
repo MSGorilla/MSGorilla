@@ -20,6 +20,7 @@ namespace MSGorilla.WebAPI.Client
         public static string UriGetMyReply = "/Reply/GetMyReply?count={0}&token={1}";
 
         public static string UriCreateMetricDataset = "/MetricChart/CreateDataSet?instance={0}&counter={1}&category={2}&group={3}&description={4}";
+        public static string UriQueryMetricDataset = "/MetricChart/GetDataSet?instance={0}&counter={1}&category={2}&group={3}";
         public static string UriInserRecord = "/MetricChart/InsertRecord?id={0}&key={1}&value={2}";
     }
 

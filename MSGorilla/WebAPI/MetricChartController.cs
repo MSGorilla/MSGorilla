@@ -38,6 +38,26 @@ namespace MSGorilla.WebAPI
             return _metricManager.GetDataSet(id);
         }
 
+        public DisplayMetricDataSet GetDataSet(string instance, string counter, string category, string group = null)
+        {
+            string me = whoami();
+            if (string.IsNullOrEmpty(group))
+            {
+                group = MembershipHelper.DefaultGroup(me);
+            }
+            else
+            {
+                MembershipHelper.CheckMembership(group, me);
+            }
+
+            DisplayMetricDataSet dataset = _metricManager.GetDataSet(instance, counter, category, group);
+            if (dataset == null)
+            {
+                throw new MetricDataSetNotFoundException();
+            }
+            return dataset;
+        }
+
         /// <summary>
         /// Get all dataset infos in a group 
         /// 

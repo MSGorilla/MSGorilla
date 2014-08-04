@@ -124,6 +124,17 @@ namespace MSGorilla.Library
             }
         }
 
+        public MetricDataSet GetDataSet(string instance, string counter, string category, string group)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                MetricDataSet dataset = _gorillaCtx.MetricDataSets.Where(
+                    d => d.Instance == instance && d.Counter == counter && d.Category == category && d.GroupID == group
+                    ).FirstOrDefault();
+                return dataset;
+            }
+        }
+
         public List<MetricDataSet> GetAllDataSetByGroup(string groupID)
         {
             using (var _gorillaCtx = new MSGorillaEntities())

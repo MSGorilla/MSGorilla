@@ -277,5 +277,19 @@ namespace MSGorilla.WebAPI.Client
         {
             return InsertMetricRecord(dataset.Id, key, value);
         }
+
+        public DisplayMetricDataSet QueryMetricDataSet(string instance, string counter, string category, string group = null)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri +
+                string.Format(Constant.UriQueryMetricDataset, 
+                    Uri.EscapeDataString(instance), 
+                    Uri.EscapeDataString(counter), 
+                    Uri.EscapeDataString(category), 
+                    group)
+                );
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            return JsonConvert.DeserializeObject<DisplayMetricDataSet>(_readResponseContent(response));
+        }
     }
 }

@@ -58,6 +58,11 @@ namespace MSGorilla.Utility
             return JoinedGroup(userid).Intersect(groups).ToArray();
         }
 
+        /// <summary>
+        /// return the default of current user
+        /// </summary>
+        /// <param name="userid">Can only be current user!!! User whoami() to get the current user</param>
+        /// <returns></returns>
         public static string DefaultGroup(string userid)
         {
             var session = HttpContext.Current.Session;
