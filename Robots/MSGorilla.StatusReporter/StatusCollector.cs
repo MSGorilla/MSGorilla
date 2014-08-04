@@ -16,7 +16,7 @@ namespace MSGorilla.StatusReporter
         public int GetCurrentUserCount()
         {
             int count = 0;
-            using (var _gorillaCtx = new HistoryDataContext())
+            using (var _gorillaCtx = new MSGorillaMetricCtx())
             {
                 count = _gorillaCtx.Database.SqlQuery<int>("select count(*) from userprofile where isrobot=0").First();
             }
@@ -34,7 +34,7 @@ namespace MSGorilla.StatusReporter
         {
             int count = 0;
 
-            using (var _gorillaCtx = new HistoryDataContext())
+            using (var _gorillaCtx = new MSGorillaMetricCtx())
             {
                 count = _gorillaCtx.Database.SqlQuery<int>("select count(*) from topic").First();
             }
@@ -46,7 +46,7 @@ namespace MSGorilla.StatusReporter
         {
             List<string> userid = new List<string>();
 
-            using (var _gorillaCtx = new HistoryDataContext())
+            using (var _gorillaCtx = new MSGorillaMetricCtx())
             {
                 userid = _gorillaCtx.Database.SqlQuery<string>("select userid from userprofile where isrobot=1").ToList();
             }
@@ -91,7 +91,7 @@ namespace MSGorilla.StatusReporter
             return count;
         }
 
-        public HistoryData LoadDataByDateUtc(DateTime date, HistoryDataContext ctx = null)
+        public HistoryData LoadDataByDateUtc(DateTime date, MSGorillaMetricCtx ctx = null)
         {
             string sql = "select * from HistoryData where Date >= {0} and Date < {1}";
             date = date.ToUniversalTime();
@@ -100,14 +100,14 @@ namespace MSGorilla.StatusReporter
             HistoryData data = null;
 
             if(ctx == null){
-                using (ctx = new HistoryDataContext())
+                using (ctx = new MSGorillaMetricCtx())
                 {
-                    data = ctx.HistoryMonitoringData.
+                    data = ctx.HistoryDatas.
                         SqlQuery(sql, date, date.AddDays(1)).
                         FirstOrDefault();
                 }
             }else{
-                data = ctx.HistoryMonitoringData.
+                data = ctx.HistoryDatas.
                         SqlQuery(sql, date, date.AddDays(1)).
                         FirstOrDefault();
             }
@@ -115,44 +115,47 @@ namespace MSGorilla.StatusReporter
             return data;
         }
 
-        public HistoryData GetLatestData(HistoryDataContext ctx = null)
+        public HistoryData GetLatestData(MSGorillaMetricCtx ctx = null)
         {
             string sql = "select top 1 * from HistoryData order by Date desc";
             if (ctx == null)
             {
-                using (ctx = new HistoryDataContext())
+                using (ctx = new MSGorillaMetricCtx())
                 {
-                    return ctx.HistoryMonitoringData.SqlQuery(sql).FirstOrDefault();
+                    return ctx.HistoryDatas.SqlQuery(sql).FirstOrDefault();
                 }
             }
             else
             {
-                return ctx.HistoryMonitoringData.SqlQuery(sql).FirstOrDefault();
+                return ctx.HistoryDatas.SqlQuery(sql).FirstOrDefault();
             }
         }
 
-        public List<HistoryData> LoadDataByDateUtc(DateTime start, DateTime end, HistoryDataContext ctx = null)
+        public List<HistoryData> LoadDataByDateUtc(DateTime start, DateTime end, MSGorillaMetricCtx ctx = null)
         {
             start = start.ToUniversalTime();
             end = end.ToUniversalTime();
             string sql = "select * from HistoryData where Date >= {0} and Date < {1}";
 
+            string s = string.Format(sql, start, end);
+
             if (ctx == null)
             {
-                using (ctx = new HistoryDataContext())
+                using (ctx = new MSGorillaMetricCtx())
                 {
-                    return ctx.HistoryMonitoringData.SqlQuery(sql, start, end).ToList();
+                    List<HistoryData> datas = ctx.HistoryDatas.ToList();
+                    return ctx.HistoryDatas.SqlQuery(sql, start, end).ToList();
                 }
             }
             else
             {
-                return ctx.HistoryMonitoringData.SqlQuery(sql, start, end).ToList();
+                return ctx.HistoryDatas.SqlQuery(sql, start, end).ToList();
             }
         }
 
         public void UpdateStatusAndSave()
         {
-            using (HistoryDataContext ctx = new HistoryDataContext())
+            using (MSGorillaMetricCtx ctx = new MSGorillaMetricCtx())
             {
                 DateTime current = DateTime.UtcNow;
                 DateTime today = current;// DateTime.Parse(string.Format("{0:yyyy-MM-ddZ}", DateTime.UtcNow));
@@ -169,7 +172,7 @@ namespace MSGorilla.StatusReporter
                     HistoryData data = new HistoryData();
                     data.Date = yesterday;
                     data.CountOfMsgPostedByRobot = GetTotalRobotMessageCountByDateUtc(yesterday);
-                    ctx.HistoryMonitoringData.Add(data);
+                    ctx.HistoryDatas.Add(data);
                     ctx.SaveChanges();
                 }
 
@@ -183,7 +186,7 @@ namespace MSGorilla.StatusReporter
                     data.TopicCount = this.GetCurrentTopicCount();
                     data.CountOfMsgPostedByRobot = 0;
 
-                    ctx.HistoryMonitoringData.Add(data);
+                    ctx.HistoryDatas.Add(data);
                     ctx.SaveChanges();
                 }                
             }

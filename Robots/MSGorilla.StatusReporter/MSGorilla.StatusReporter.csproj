@@ -62,6 +62,8 @@
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Spatial, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Spatial.5.6.0\lib\net40\System.Spatial.dll</HintPath>
@@ -74,8 +76,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HistoryData.cs" />
-    <Compile Include="HistoryDateContext.cs" />
+    <Compile Include="HistoryData.cs">
+      <DependentUpon>HistoryDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="HistoryDataModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HistoryDataModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="HistoryDataModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HistoryDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="HistoryDataModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HistoryDataModel.edmx</DependentUpon>
+    </Compile>
     <Compile Include="Logger.cs" />
     <Compile Include="MSGorillaStatusReporter.cs" />
     <Compile Include="Program.cs" />
@@ -97,6 +115,23 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <EntityDeploy Include="HistoryDataModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>HistoryDataModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="HistoryDataModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>HistoryDataModel.edmx</DependentUpon>
+      <LastGenOutput>HistoryDataModel.Context.cs</LastGenOutput>
+    </None>
+    <None Include="HistoryDataModel.edmx.diagram">
+      <DependentUpon>HistoryDataModel.edmx</DependentUpon>
+    </None>
+    <None Include="HistoryDataModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>HistoryDataModel.edmx</DependentUpon>
+      <LastGenOutput>HistoryDataModel.cs</LastGenOutput>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -113,6 +148,9 @@
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

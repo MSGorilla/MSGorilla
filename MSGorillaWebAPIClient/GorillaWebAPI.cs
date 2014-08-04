@@ -110,8 +110,8 @@ namespace MSGorilla.WebAPI.Client
                 }
 
                 string msg = string.Format("Message={0}&group={1}&SchemaID={2}&EventID={3}{4}{5}{6}{7}{8}&importance={9}", 
-                                            Uri.EscapeDataString(groupID),
-                                            Uri.EscapeDataString(message), 
+                                            Uri.EscapeDataString(message),
+                                            groupID,
                                             Uri.EscapeDataString(schemaID), 
                                             Uri.EscapeDataString(eventID), 
                                             topicNameStr, 
