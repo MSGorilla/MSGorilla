@@ -21,12 +21,14 @@ namespace MSGorilla.WebAPI
         /// 
         /// example output:
         /// {
-        ///     "Id": 2,
-        ///     "Name": "test",
-        ///     "Description": "for dev test",
+        ///     "Id": 6,
+        ///     "Description": "non-description",
         ///     "GroupID": "msgorilladev",
         ///     "Creater": "user1",
-        ///     "RecordCount": 7
+        ///     "RecordCount": 1,
+        ///     "Category": "test",
+        ///     "Counter": "test",
+        ///     "Instance": "test"
         /// }
         /// </summary>
         /// <param name="id">Dataset ID</param>
@@ -38,6 +40,26 @@ namespace MSGorilla.WebAPI
             return _metricManager.GetDataSet(id);
         }
 
+        /// <summary>
+        /// Get dataset info by properties
+        /// 
+        /// example output:
+        /// {
+        ///     "Id": 6,
+        ///     "Description": "non-description",
+        ///     "GroupID": "msgorilladev",
+        ///     "Creater": "user1",
+        ///     "RecordCount": 1,
+        ///     "Category": "test",
+        ///     "Counter": "test",
+        ///     "Instance": "test"
+        /// }
+        /// </summary>
+        /// <param name="instance">instance name</param>
+        /// <param name="counter">counter name</param>
+        /// <param name="category">category name</param>
+        /// <param name="group">group id</param>
+        /// <returns></returns>
         public DisplayMetricDataSet GetDataSet(string instance, string counter, string category, string group = null)
         {
             string me = whoami();
@@ -298,18 +320,17 @@ namespace MSGorilla.WebAPI
         /// 
         /// example output:
         /// {
-        ///     "Name": "user1",
+        ///     "Name": "test",
         ///     "Title": "test",
         ///     "SubTitle": "just for test",
         ///     "GroupID": "msgorilladev",
         ///     "DataSet": [
         ///         {
-        ///             "Id": 2,
-        ///             "Name": "test",
-        ///             "Description": "for dev test",
-        ///             "GroupID": "msgorilladev",
-        ///             "Creater": "user1",
-        ///             "RecordCount": 9
+        ///             "ID": 2,
+        ///             "Legend": "testYAxis",
+        ///             "Type": "line",
+        ///             "MetricDataSetID": 6,
+        ///             "MetricChartName": "user1"
         ///         }
         ///     ]
         /// }
@@ -377,22 +398,22 @@ namespace MSGorilla.WebAPI
         /// 
         /// example output:
         /// [
-        ///     {
-        ///         "Name": "user1",
-        ///         "Title": "test",
-        ///         "SubTitle": "just for test",
-        ///         "GroupID": "msgorilladev",
-        ///         "DataSet": [
-        ///             {
-        ///                 "Id": 2,
-        ///                 "Name": "test",
-        ///                 "Description": "for dev test",
-        ///                 "GroupID": "msgorilladev",
-        ///                 "Creater": "user1",
-        ///                 "RecordCount": 9
-        ///             }
-        ///         ]
-        ///     }
+        /// 	{
+        /// 	    "Name": "user1",
+        /// 	    "Title": "test",
+        /// 	    "SubTitle": "just for test",
+        /// 	    "GroupID": "msgorilladev",
+        /// 	    "DataSet": [
+        /// 	        {
+        /// 	            "ID": 2,
+        /// 	            "Legend": "testYAxis",
+        /// 	            "Type": "line",
+        /// 	            "MetricDataSetID": 6,
+        /// 	            "MetricChartName": "user1"
+        /// 	        }
+        /// 	    ]
+        /// 	},
+        /// 	......
         /// ]
         /// </summary>
         /// <param name="group">group id</param>
