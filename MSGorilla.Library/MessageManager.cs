@@ -612,6 +612,7 @@ namespace MSGorilla.Library
                         topic = new Topic();
                         topic.Name = topicName;
                         topic.MsgCount = 0;
+                        topic.GroupID = message.Group;
                         _topicManager.AddTopic(topic);
                         topic = _topicManager.FindTopicByName(topicName, new string[] { message.Group });
                     }

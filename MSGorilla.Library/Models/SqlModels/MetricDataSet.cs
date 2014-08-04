@@ -20,11 +20,13 @@ namespace MSGorilla.Library.Models.SqlModels
         }
     
         public int Id { get; set; }
-        public string Name { get; set; }
         public string Description { get; set; }
         public string GroupID { get; set; }
         public string Creater { get; set; }
         public int RecordCount { get; set; }
+        public string Category { get; set; }
+        public string Counter { get; set; }
+        public string Instance { get; set; }
     
         public virtual Group Group { get; set; }
         public virtual UserProfile UserProfile { get; set; }

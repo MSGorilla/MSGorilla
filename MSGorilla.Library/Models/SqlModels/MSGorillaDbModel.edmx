@@ -56,11 +56,13 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="256" Nullable="false" />
           <Property Name="Description" Type="nvarchar" MaxLength="256" />
           <Property Name="GroupID" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="Creater" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="RecordCount" Type="int" Nullable="false" />
+          <Property Name="Category" Type="nvarchar" MaxLength="128" />
+          <Property Name="Counter" Type="nvarchar" MaxLength="128" />
+          <Property Name="Instance" Type="nvarchar" MaxLength="128" />
         </EntityType>
         <EntityType Name="NotificationCount">
           <Key>
@@ -398,7 +400,6 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <Property Name="GroupID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Creater" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
@@ -406,6 +407,9 @@
           <NavigationProperty Name="Group" Relationship="Self.FK_METRICDATASET_GROUPID" FromRole="MetricDataSet" ToRole="Group" />
           <NavigationProperty Name="UserProfile" Relationship="MSGorillaModel.FK_MetricDataSet_0" FromRole="MetricDataSet" ToRole="UserProfile" />
           <NavigationProperty Name="Chart_DataSet" Relationship="MSGorillaModel.FK_Chart_DataSet_0" FromRole="MetricDataSet" ToRole="Chart_DataSet" />
+          <Property Name="Category" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Counter" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Instance" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="NotificationCount">
           <Key>
@@ -770,8 +774,10 @@
           <EntitySetMapping Name="MetricDataSets">
             <EntityTypeMapping TypeName="MSGorillaModel.MetricDataSet">
               <MappingFragment StoreEntitySet="MetricDataSet">
+                <ScalarProperty Name="Instance" ColumnName="Instance" />
+                <ScalarProperty Name="Counter" ColumnName="Counter" />
+                <ScalarProperty Name="Category" ColumnName="Category" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="GroupID" ColumnName="GroupID" />
                 <ScalarProperty Name="Creater" ColumnName="Creater" />

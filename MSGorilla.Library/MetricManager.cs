@@ -131,7 +131,7 @@ namespace MSGorilla.Library
                 return _gorillaCtx.MetricDataSets.Where(d => d.GroupID == groupID).ToList();
             }
         }
-        public MetricDataSet CreateDataSet(string creater, string name, string groupID, string description = null)
+        public MetricDataSet CreateDataSet(string creater, string instance, string counter, string category, string groupID, string description = null)
         {
             using (var _gorillaCtx = new MSGorillaEntities())
             {
@@ -148,7 +148,9 @@ namespace MSGorilla.Library
                 }
 
                 MetricDataSet data = new MetricDataSet();
-                data.Name = name;
+                data.Instance = instance;
+                data.Counter = counter;
+                data.Category = category;
                 data.GroupID = group.GroupID;
                 data.Description = description;
                 data.Creater = creater;
