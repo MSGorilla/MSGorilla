@@ -252,5 +252,30 @@ namespace MSGorilla.WebAPI.Client
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return JsonConvert.DeserializeObject<NotificationCount>(_readResponseContent(response));
         }
+
+        public DisplayMetricDataSet CreateMetricDataset(string instance, string counter, string category, string group = null, string description = null)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + 
+                string.Format(Constant.UriCreateMetricDataset, instance, counter, category, group, description)
+                );
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            return JsonConvert.DeserializeObject<DisplayMetricDataSet>(_readResponseContent(response));
+        }
+
+        public string InsertMetricRecord(int datasetID, string key, double value)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri +
+                string.Format(Constant.UriInserRecord, datasetID, key, value)
+                );
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            return _readResponseContent(response);
+        }
+
+        public string InsertMetricRecord(DisplayMetricDataSet dataset, string key, double value)
+        {
+            return InsertMetricRecord(dataset.Id, key, value);
+        }
     }
 }

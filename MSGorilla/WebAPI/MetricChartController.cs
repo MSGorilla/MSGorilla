@@ -87,10 +87,17 @@ namespace MSGorilla.WebAPI
         /// <param name="description">description</param>
         /// <returns></returns>
         [HttpGet, HttpPost]
-        public DisplayMetricDataSet CreateDataSet(string instance, string counter, string category,  string group, string description = null)
+        public DisplayMetricDataSet CreateDataSet(string instance, string counter, string category,  string group = null, string description = null)
         {
             string me = whoami();
-            MembershipHelper.CheckMembership(group, me);
+            if (string.IsNullOrEmpty(group))
+            {
+                group = MembershipHelper.DefaultGroup(me);
+            }
+            else
+            {
+                MembershipHelper.CheckMembership(group, me);
+            }            
 
             return _metricManager.CreateDataSet(me, instance, counter, category, group, description);
         }
