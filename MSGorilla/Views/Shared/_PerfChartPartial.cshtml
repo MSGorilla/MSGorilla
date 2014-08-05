@@ -1,0 +1,10 @@
+﻿@if (!string.IsNullOrEmpty(ViewBag.PerfChartName))
+{
+    <div id="perf_chart_div" class="block-container perf-chart" style="display:none;">
+    </div>
+
+    <script>
+        $(drawPerfChart('@ViewBag.PerfChartName', 'perf_chart_div'));
+        //$(addfakedata());
+    </script>
+}

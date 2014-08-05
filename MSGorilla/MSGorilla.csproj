@@ -363,6 +363,7 @@
     <Content Include="Views\Shared\_SearchUserPartial.cshtml" />
     <Content Include="Views\Shared\_SearchTopicPartial.cshtml" />
     <Content Include="Views\Shared\_SearchPostPartial.cshtml" />
+    <Content Include="Views\Shared\_PerfChartPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

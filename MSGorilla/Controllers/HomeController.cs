@@ -34,6 +34,8 @@ namespace MSGorilla.Controllers
             }
             ViewBag.Group = group;
 
+            ViewBag.PerfChartName = "perf_chart_test";
+
             return View();
         }
     }
