@@ -27,7 +27,7 @@ namespace MSGorilla.Library
 
             using(var _gorillaCtx = new MSGorillaEntities())
             {
-                Category category = GetCategory(name, groupID);
+                Category category = GetCategory(name, groupID, _gorillaCtx);
                 if(category != null){
                     throw new CategoryAlreadyExistException(name, groupID);
                 }
@@ -67,7 +67,15 @@ namespace MSGorilla.Library
         {
             using(var _gorillaCtx = new MSGorillaEntities())
             {
-                return GetCategory(name, groupID);
+                return GetCategory(name, groupID, _gorillaCtx);
+            }
+        }
+
+        public List<Category> GetCategoryByGroup(string groupID)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                return _gorillaCtx.Groups.Find(groupID).Categories.ToList();
             }
         }
 

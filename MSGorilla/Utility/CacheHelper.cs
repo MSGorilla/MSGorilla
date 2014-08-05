@@ -10,6 +10,7 @@ namespace MSGorilla.Utility
         public const string MembershipPrefix = "membership#";
         public const string JoinedGroupPrefix = "joinedGroup#";
         public const string SimpleUserprofilePrefix = "simpleUserprofile#";
+        public const string CategoryPrefix = "category#";
 
 
         private const int DefaultCacheTimeSpanMin = 15;
