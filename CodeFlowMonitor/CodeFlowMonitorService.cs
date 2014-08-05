@@ -230,7 +230,7 @@ namespace CodeFlowMonitor
                                         pkg.IterationComment, pkg.SourceInfo.SourceName, link);
                                     Logger.WriteInfo(message);
 
-                                    webapi.PostMessage(message, "none", r.Key, new string[] { "WOSS Codeflow" }, new string[] { pkg.Author.Substring(pkg.Author.IndexOf('\\') + 1) },
+                                    webapi.PostMessage(message, null, "none", r.Key, new string[] { "WOSS Codeflow" }, new string[] { pkg.Author.Substring(pkg.Author.IndexOf('\\') + 1) },
                                         new string[] { }, richMessage);
                                 }
                                 _MonitoredReviewDict[username][r.Key] = r.codePackages.Length;
@@ -260,7 +260,7 @@ namespace CodeFlowMonitor
                     {
                         var winner =  _cfTrendStatus.ReviewCountPeople.OrderByDescending(p=>p.Value).First();
                         string winnerThisWeek = string.Format("This Week's CodeFlow winner is @{0}, who submitted {1} CodeReviews!!!", winner.Key, winner.Value);
-                        webapi.PostMessage(winnerThisWeek, "none", "none", new string[] { "WOSS CodeFlow" });
+                        webapi.PostMessage(winnerThisWeek, null, "none", "none", new string[] { "WOSS CodeFlow" });
                     }
 
                     StringBuilder dailyTrendValue = new StringBuilder();
@@ -279,7 +279,7 @@ namespace CodeFlowMonitor
 
                     string dailyTrend = string.Format("{{title:'WOSS Daily New CodeReview Number',legend:['New CodeRview Number'],xAxis:[{0}],yAxis:[{{name:'New CodeRview Number',type:'line',data:[{1}]}}]}}", dTrendDate, dTrendValue);
 
-                    webapi.PostMessage(dailyTrend, "chart-axis-singleaxis", "none", new string[] { "WOSS CodeFlow" });
+                    webapi.PostMessage(dailyTrend, null, "chart-axis-singleaxis", "none", new string[] { "WOSS CodeFlow" });
 
                     _isTrendStatusSend = true;
                 }
