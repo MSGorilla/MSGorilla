@@ -42,7 +42,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             entity.NotifyTo = msg.NotifyTo;
             entity.Message = msg.Message;
 
-            entity.PartitionKey = ToPartitionKey(entity.Group, entity.CategoryName, entity.NotifyTo);
+            entity.PartitionKey = ToPartitionKey(entity.NotifyTo, entity.Group, entity.CategoryName);
             entity.RowKey = msg.ID;
 
             return entity;

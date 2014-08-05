@@ -73,16 +73,8 @@ namespace MSGorilla.Utility
             }
 
             UserProfile profile = _accountManager.FindUser(userid);
-            if (profile.IsRobot)
-            {
-                session[_defaultGroup] = _groupManager.GetJoinedGroup(profile.Userid)[0].GroupID;
-                return session[_defaultGroup].ToString();
-            }
-            else
-            {
-                session[_defaultGroup] = profile.DefaultGroup;
-                return profile.DefaultGroup;
-            }
+            session[_defaultGroup] = profile.DefaultGroup;
+            return profile.DefaultGroup;
         }
 
         public static void SetDefaultGroup(string userid, string groupID)
