@@ -54,8 +54,6 @@ namespace MSGorilla.WebAPI
             return _categoryManager.CreateCategory(name, group, me, description);
         }
 
-
-        [HttpGet]
         private Category GetCategoryModel(string name, string group = null)
         {
             string me = whoami();
@@ -229,15 +227,6 @@ namespace MSGorilla.WebAPI
         public CategoryMessage UpdateCategoryMessage(string message, string to, string categoryName, string group = null)
         {
             string me = whoami();
-            if (string.IsNullOrEmpty(group))
-            {
-                group = MembershipHelper.DefaultGroup(me);
-            }
-            else
-            {
-                MembershipHelper.CheckMembership(group, me);
-            }
-
             Category category = GetCategoryModel(categoryName, group);
             return _categoryManager.UpdateCategoryMessage(message, me, to, category, DateTime.UtcNow);
         }
