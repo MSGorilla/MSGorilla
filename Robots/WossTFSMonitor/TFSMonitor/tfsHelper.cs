@@ -166,7 +166,7 @@ namespace TFSMonitor
                             try
                             {
                                 GorillaWebAPI webAPI = new GorillaWebAPI("WossTFSMonitor", "User@123");                                
-                                webAPI.PostMessage(message, "none", id.ToString(), new string[] { "WOSS TFS" }, new string[] { owner }, new string[] { assignTo, resolveBy, closeBy, changeBy }, fieldChangeTemplate.Replace("fieldChangeRows", richMessage.ToString()));
+                                webAPI.PostMessage(message, null, "none", id.ToString(), new string[] { "WOSS TFS" }, new string[] { owner }, new string[] { assignTo, resolveBy, closeBy, changeBy }, fieldChangeTemplate.Replace("fieldChangeRows", richMessage.ToString()));
                             }
                             catch (Exception e)
                             {
