@@ -511,12 +511,18 @@ input[type="checkbox"].input-validation-error {
 }
 
 .post-counter {
-    margin-right: 5px;
     color: #8899a6;
     display: inline-block;
-    padding-left: 3px;
-    padding-right: 3px;
+    padding-left: 1px;
+    padding-right: 1px;
     text-align: right;
+}
+
+.post-groupselect {
+    color: #8899a6;
+    display: inline-block;
+    border: 1px solid #ccc;
+    width: 110px;
 }
 
 .spinner-loading {
@@ -618,4 +624,7 @@ input[type="checkbox"].input-validation-error {
 
 .hidden {
     display: none;
+}
+
+.perf-chart {
 }

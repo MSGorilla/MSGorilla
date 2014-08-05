@@ -7,28 +7,33 @@ function AjaxCall(type, async, apiurl, apidata, successCallback, errorCallback, 
         apidata = "";
     }
 
-    $.ajax({
-        type: type,
-        url: apiurl,
-        data: apidata,
-        dataType: "json",
-        async: async,
-        success: function (data) {
-            if (!isNullOrEmpty(successCallback)) {
-                successCallback(data);
+    try {
+        $.ajax({
+            type: type,
+            url: apiurl,
+            data: apidata,
+            dataType: "json",
+            async: async,
+            success: function (data) {
+                if (!isNullOrEmpty(successCallback)) {
+                    successCallback(data);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message, msgboxid);
+                if (!isNullOrEmpty(errorCallback)) {
+                    errorCallback(XMLHttpRequest, textStatus, errorThrown);
+                }
             }
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message, msgboxid);
-            if (!isNullOrEmpty(errorCallback)) {
-                errorCallback(XMLHttpRequest, textStatus, errorThrown);
+        }).always(function () {
+            if (!isNullOrEmpty(alwaysCallback)) {
+                alwaysCallback();
             }
-        }
-    }).always(function () {
-        if (!isNullOrEmpty(alwaysCallback)) {
-            alwaysCallback();
-        }
-    });
+        });
+    }
+    catch (ex) {
+        showError(ex);
+    }
 }
 
 function AjaxGetAsync(apiurl, apidata, successCallback, errorCallback, alwaysCallback, msgboxid) {
@@ -258,6 +263,7 @@ var chart_axis_template = {
     },
     toolbox: {
         show: true,
+        y: 'center',
         orient: 'vertical',
         feature: {
             mark: {
@@ -328,6 +334,7 @@ var chart_scatter_template = {
     },
     toolbox: {
         show: true,
+        y: 'center',
         orient: 'vertical',
         feature: {
             mark: {
@@ -396,6 +403,7 @@ var chart_pie_template = {
     },
     toolbox: {
         show: true,
+        y: 'center',
         orient: 'vertical',
         feature: {
             mark: {
@@ -431,7 +439,7 @@ var chart_pie_template = {
     legend: {
         orient: 'vertical',
         x: 'left',
-        y: 'top',
+        y: 'center',
         data: []
     },
     series: []
@@ -3262,3 +3270,206 @@ function leave(btnid, group) {
 }
 
 
+// performance chart
+var chart_axis_perf_template = {
+    tooltip: {
+        trigger: 'axis'
+    },
+    toolbox: {
+        show: true,
+        y: 'center',
+        orient: 'vertical',
+        feature: {
+            mark: {
+                show: true,
+                title: {
+                    mark: 'New markline',
+                    markUndo: 'Erase markline',
+                    markClear: 'Clear all marklines'
+                },
+            },
+            magicType: {
+                show: true,
+                title: {
+                    line: 'Line view',
+                    bar: 'Bar view',
+                    stack: 'Stack view',
+                    tiled: 'Tiled view'
+                },
+                type: ['line', 'bar', 'stack', 'tiled']
+            },
+            dataZoom: {
+                show: true,
+                title: {
+                    dataZoom: 'Data zoom',
+                    dataZoomReset: 'Data zoom reset'
+                }
+            },
+            dataView: {
+                show: true,
+                title: 'Data view',
+                readOnly: false
+            },
+            restore: {
+                show: true,
+                title: 'Restore'
+            },
+            saveAsImage: {
+                show: true,
+                title: 'Save as image',
+                lang: ['Right click and save']
+            }
+        }
+    },
+    dataZoom: {
+        show: true,
+        realtime: true,
+        start: 50,
+        end: 100
+    },
+    calculable: true,
+    backgroundColor: '#fff',
+    title: {
+        text: '',
+        subtext: '',
+        x: 'center'
+    },
+    legend: {
+        x: 'left',
+        y: 'top',
+        data: []
+    },
+    xAxis: [
+        {
+            type: 'category',
+            data: []
+        }
+    ],
+    yAxis: [
+        {
+            type: 'value',
+        },
+        {
+            type: 'value',
+        }
+    ],
+    series: []
+};
+
+function drawPerfChart(chartname, chartdivid) {
+    var chartdiv = $("#" + chartdivid);
+    if (chartdiv.length == 0 || isNullOrEmpty(chartname)) {
+        return;
+    }
+
+    var apiurl = "/api/metricchart/getchart";
+    var apidata = "chartName=" + encodeTxt(chartname);
+    var option = chart_axis_perf_template;
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.DataSet.length == 0) {
+                // no chart
+                chartdiv.hide();
+                return;
+            }
+            else {
+                var name = data.Name;
+                var title = data.Title;
+                var subtitle = data.SubTitle;
+                var groupid = data.GroupID;
+                var dataset = data.DataSet;
+
+                // set title
+                option.title.text = title;
+                option.title.subtext = subtitle;
+
+                // get dataset
+                $.each(dataset, function (index, item) {
+                    var id = item.ID;
+                    var legend = item.Legend;
+                    var type = item.Type;
+                    var mid = item.MetricDataSetID;
+
+                    apiurl = "/api/metricchart/retrivelastestdatarecord";
+                    apidata = "id=" + encodeTxt(mid) + "&count=365";
+                    var xdata = [];
+                    var ydata = [];
+
+                    // get data of dataset
+                    AjaxGetSync(
+                        apiurl,
+                        apidata,
+                        function (data) {
+                            if (isNullOrEmpty(data) || data.length == 0) {
+                                // no data
+                                return;
+                            }
+                            else {
+                                $.each(data, function (index, item) {
+                                    var key = item.Key;
+                                    var value = item.Value;
+
+                                    xdata.push(key);
+                                    ydata.push(value);
+                                });
+
+                                // set legend
+                                option.legend.data.push(legend);
+
+                                // set data
+                                option.xAxis[0].data = xdata;
+                                option.series.push({
+                                    name: legend,
+                                    type: type,
+                                    data: ydata
+                                });
+                            }
+                        },
+                        null,
+                        null,
+                        "no_message_box"
+                    );
+                });
+
+                // draw chart
+                try {
+                    if (chartdiv.height() < 400)
+                        chartdiv.height(400);
+                    chartdiv.show();
+
+                    var chart = echarts.init(chartdiv[0]);
+                    chart.setOption(option);
+                }
+                catch (ex) {
+                    chartdiv.hide();
+                    showError(ex);
+                }
+            }
+        },
+        function () {
+            chartdiv.hide();
+        },
+        null,
+        "no_message_box"
+    );
+}
+
+function addfakedata() {
+    for (var i = 0; i < 30; i++) {
+        AjaxGetSync(
+            "/api/metricchart/insertrecord",
+            "id=7&key=" + i + "&value=" + (Math.random() * 100)
+        );
+        AjaxGetSync(
+            "/api/metricchart/insertrecord",
+            "id=8&key=" + i + "&value=" + (Math.random() * 100)
+        );
+        AjaxGetSync(
+            "/api/metricchart/insertrecord",
+            "id=9&key=" + i + "&value=" + (Math.random() * 100)
+        );
+    }
+}
