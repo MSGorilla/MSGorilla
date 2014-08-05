@@ -19,7 +19,7 @@ namespace MSGorilla.WebAPI
         private GroupManager _groupManager = new GroupManager();
 
         /// <summary>
-        /// Add a new Group. You'll be the default admin of the group
+        /// Create a new Group. You'll be the default admin of the group
         /// 
         /// Example output:
         /// {
@@ -36,14 +36,14 @@ namespace MSGorilla.WebAPI
         /// <param name="isOpen">If the group is open, userid do not need admin's permission to join the group</param>
         /// <returns></returns>
         [HttpGet, HttpPost]
-        public DisplayGroup AddGroup(string groupID, string displayName = null, string description = null, bool isOpen = false)
+        public DisplayGroup CreateGroup(string groupID, string displayName = null, string description = null, bool isOpen = false)
         {
             string me = whoami();
 
             if(string.IsNullOrEmpty(displayName)){
                 displayName = groupID;
             }
-            Group group =  _groupManager.AddGroup(me, groupID, displayName, description, isOpen);
+            Group group =  _groupManager.CreateGroup(me, groupID, displayName, description, isOpen);
 
             MembershipHelper.RefreshJoinedGroup(me);
             return new DisplayGroup(group, me, new MSGorillaEntities());

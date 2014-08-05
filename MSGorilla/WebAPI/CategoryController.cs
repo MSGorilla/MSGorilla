@@ -137,6 +137,94 @@ namespace MSGorilla.WebAPI
         }
 
         /// <summary>
+        /// Get my category in all my groups
+        /// 
+        /// example output:
+        /// [
+        ///     {
+        ///         "ID": 1,
+        ///         "Name": "testcategory",
+        ///         "GroupID": "msgorilladev",
+        ///         "Description": null,
+        ///         "Creater": "user1",
+        ///         "CreateTimestamp": "2014-08-05T01:09:54.3483546Z"
+        ///     },
+        ///     ......
+        ///     {
+        ///         "ID": 3,
+        ///         "Name": "testcategory",
+        ///         "GroupID": "woss",
+        ///         "Description": null,
+        ///         "Creater": "user1",
+        ///         "CreateTimestamp": "2014-08-05T05:31:43.5123168Z"
+        ///     }
+        /// ]
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public List<DisplayCategory> GetMyCategory()
+        {
+            string me = whoami();
+            string[] groups = MembershipHelper.JoinedGroup(me);
+
+            List<DisplayCategory> list = new List<DisplayCategory>();
+            foreach (string group in groups)
+            {
+                foreach (var category in _categoryManager.GetCategoryByGroup(group))
+                {
+                    list.Add(category);
+                }
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// Get category message with the same category name in all my groups
+        /// 
+        /// example output:
+        /// [
+        ///     {
+        ///         "User": "user1",
+        ///         "ID": "251995093104893",
+        ///         "PostTime": "2014-08-05T03:01:35.1069164Z",
+        ///         "Group": "msgorilladev",
+        ///         "CategoryName": "testcategory",
+        ///         "CategoryID": 1,
+        ///         "NotifyTo": "user1",
+        ///         "Message": "category message from SDK API"
+        ///     },
+        ///     ......
+        ///     {
+        ///         "User": "user1",
+        ///         "ID": "251995084062643",
+        ///         "PostTime": "2014-08-05T05:32:17.3562676Z",
+        ///         "Group": "woss",
+        ///         "CategoryName": "testcategory",
+        ///         "CategoryID": 3,
+        ///         "NotifyTo": "user1",
+        ///         "Message": "message in woss category"
+        ///     }
+        /// ]
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public List<CategoryMessage> RetriveCategoryMessageByName(string name)
+        {
+            string me = whoami();
+            string[] groups = MembershipHelper.JoinedGroup(me);
+            List<CategoryMessage> list = new List<CategoryMessage>();
+
+            foreach (var category in _categoryManager.GetCategoryByName(name, groups))
+            {
+                list.Add(_categoryManager.RetriveCategoryMessage(me, category));
+            }
+
+            return list;
+        }
+
+        /// <summary>
         /// Retrive the top message in the category.
         /// 
         /// example output:

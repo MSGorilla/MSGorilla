@@ -38,7 +38,7 @@ namespace MSGorilla.Library
             return _gorillaCtx.Groups.ToList();
         }
 
-        public Group AddGroup(string creater, string groupID, string displayName, string description, bool isOpen)
+        public Group CreateGroup(string creater, string groupID, string displayName, string description, bool isOpen)
         {
             if (!Utils.IsValidID(groupID))
             {

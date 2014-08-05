@@ -79,6 +79,22 @@ namespace MSGorilla.Library
             }
         }
 
+        public List<Category> GetCategoryByName(string categoryName, string[] groups)
+        {
+            if (string.IsNullOrEmpty(categoryName) || groups == null || groups.Length == 0)
+            {
+                return new List<Category>();
+            }
+
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                var matches = from category in _gorillaCtx.Categories
+                              where groups.Contains(category.GroupID) && category.Name == categoryName
+                              select category;
+                return matches.ToList();
+            }
+        }
+
         public CategoryMessage UpdateCategoryMessage(string msg, string from, string to, Category category, DateTime timestamp)
         {
             CategoryMessage message = new CategoryMessage(msg, from, to, category, timestamp);
