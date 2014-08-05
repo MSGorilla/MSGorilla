@@ -217,6 +217,18 @@ namespace MSGorilla.WebAPI
 
         /// <summary>
         /// Update the message in category
+        /// 
+        /// example output:
+        /// {
+        ///     "User": "user1",
+        ///     "ID": "251995098518041",
+        ///     "PostTime": "2014-08-05T01:31:21.9587913Z",
+        ///     "Group": "msgorilladev",
+        ///     "CategoryName": "testcategory",
+        ///     "CategoryID": 1,
+        ///     "NotifyTo": "user1",
+        ///     "Message": "second category message"
+        /// }
         /// </summary>
         /// <param name="message">message content</param>
         /// <param name="to">notify to whom</param>
@@ -229,6 +241,36 @@ namespace MSGorilla.WebAPI
             string me = whoami();
             Category category = GetCategoryModel(categoryName, group);
             return _categoryManager.UpdateCategoryMessage(message, me, to, category, DateTime.UtcNow);
+        }
+
+        public class MessageModel
+        {
+            public string Message { get; set; }
+            public string To { get; set; }
+            public string CategoryName { get; set; }
+            public string Group { get; set; }
+        };
+        /// <summary>
+        /// Update the message in category. Same as the HttpGet API
+        /// 
+        /// example output:
+        /// {
+        ///     "User": "user1",
+        ///     "ID": "251995098518041",
+        ///     "PostTime": "2014-08-05T01:31:21.9587913Z",
+        ///     "Group": "msgorilladev",
+        ///     "CategoryName": "testcategory",
+        ///     "CategoryID": 1,
+        ///     "NotifyTo": "user1",
+        ///     "Message": "second category message"
+        /// }
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public CategoryMessage UpdateCategoryMessage(MessageModel msg)
+        {
+            return UpdateCategoryMessage(msg.Message, msg.To, msg.CategoryName, msg.Group);
         }
     }
 }

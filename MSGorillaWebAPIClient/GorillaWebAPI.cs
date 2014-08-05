@@ -126,6 +126,27 @@ namespace MSGorilla.WebAPI.Client
             return _readResponseContent(response);
         }
 
+        public string UpdateCategoryMessage(string message, string notifyTo, string categoryName, string groupID = null)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + Constant.UriUpdateCategoryMessage);
+            request.Method = "POST";
+            request.Headers["Authorization"] = _authHeader;
+            request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
+
+            using (var writer = new StreamWriter(request.GetRequestStream()))
+            {
+                string msg = string.Format("message={0}&to={1}&categoryName={2}&group={3}",
+                                                Uri.EscapeDataString(message),
+                                                notifyTo,
+                                                categoryName,
+                                                groupID);
+                writer.Write(msg);
+            }
+
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            return _readResponseContent(response);
+        }
+
         private string EscapeString(string longStr)
         {
             int limit = 2000;
