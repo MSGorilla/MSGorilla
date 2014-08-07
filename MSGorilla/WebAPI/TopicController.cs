@@ -69,6 +69,7 @@ namespace MSGorilla.WebAPI
         /// ]
         /// </summary>
         /// <param name="keyword">key word</param>
+        /// <param name="group">group id list</param>
         /// <returns></returns>
         [HttpGet]
         public List<DisplayTopic> SearchTopic(string keyword, [FromUri]string[] group = null)
@@ -170,6 +171,7 @@ namespace MSGorilla.WebAPI
         /// ]
         /// </summary>
         /// <param name="count">count of topic in the list</param>
+        /// <param name="group">group id list</param>
         /// <returns></returns>
         [HttpGet]
         public List<DisplayTopic> HotTopics(int count = 5, [FromUri]string[] group = null)
@@ -326,6 +328,7 @@ namespace MSGorilla.WebAPI
         /// true
         /// </summary>
         /// <param name="topic">name of the topic, case insensitive</param>
+        /// <param name="group">group id list</param>
         /// <returns></returns>
         [HttpGet]
         public bool IsFavouriteTopic(string topic, [FromUri]string[] group)

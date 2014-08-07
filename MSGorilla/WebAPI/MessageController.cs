@@ -151,6 +151,7 @@ namespace MSGorilla.WebAPI
         /// <param name="userid">user id</param>
         /// <param name="group">group id</param>
         /// <param name="start">start timestamp</param>
+        /// <param name="start">end timestamp</param>
         /// <param name="count">count of messages in the list</param>
         /// <param name="token">continuous token</param>
         /// <returns></returns>
@@ -722,7 +723,6 @@ namespace MSGorilla.WebAPI
         ///     "Importance": 2
         /// }
         /// </summary>
-        /// <param name="msgUser">user id of whom posted the message</param>
         /// <param name="msgID">message id</param>
         /// <returns></returns>
         [HttpGet]

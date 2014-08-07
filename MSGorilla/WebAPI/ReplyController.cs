@@ -147,7 +147,6 @@ namespace MSGorilla.WebAPI
         /// </summary>
         /// <param name="to">to user id</param>
         /// <param name="message">reply content</param>
-        /// <param name="messageUser">user id of whom posted the origin message</param>
         /// <param name="messageID">origin message id</param>
         /// <param name="richMessage">rich message</param>
         /// <param name="attachmentID">origin message id</param>
