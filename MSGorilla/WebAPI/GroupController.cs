@@ -18,6 +18,30 @@ namespace MSGorilla.WebAPI
     {
         private GroupManager _groupManager = new GroupManager();
 
+        public static DisplayGroup GetDisplayGroup(string groupID, string userid, bool? isJoined = null)
+        {
+            string key = CacheHelper.DisplayGroupPrefix + userid;
+            if (CacheHelper.Contains(key))
+            {
+                return CacheHelper.Get<DisplayGroup>(key);
+            }
+
+            DisplayGroup result = null;
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                Group group = new GroupManager().GetGroupByID(groupID, _gorillaCtx);
+                if (isJoined != null)
+                {
+                    result = new DisplayGroup(group, isJoined.Value);
+                }
+                else
+                {
+                    result = new DisplayGroup(group, userid, _gorillaCtx);
+                }
+            }
+            return result;
+        }
+
         /// <summary>
         /// Create a new Group. You'll be the default admin of the group
         /// 
@@ -46,7 +70,7 @@ namespace MSGorilla.WebAPI
             Group group =  _groupManager.CreateGroup(me, groupID, displayName, description, isOpen);
 
             MembershipHelper.RefreshJoinedGroup(me);
-            return new DisplayGroup(group, me, new MSGorillaEntities());
+            return GetDisplayGroup(groupID, me, true);
         }
 
         /// <summary>
@@ -67,12 +91,12 @@ namespace MSGorilla.WebAPI
         public DisplayGroup GetGroup(string groupID)
         {
             string me = whoami();
-            Group group = _groupManager.GetGroupByID(groupID);
-            if (group == null)
-            {
-                throw new GroupNotExistException();
-            }
-            return new DisplayGroup(group, me, new MSGorillaEntities()); ;
+            //Group group = _groupManager.GetGroupByID(groupID);
+            //if (group == null)
+            //{
+            //    throw new GroupNotExistException();
+            //}
+            return GetDisplayGroup(groupID, me); 
         }
 
         /// <summary>

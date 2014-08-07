@@ -611,5 +611,18 @@ namespace MSGorilla.WebAPI
 
             return dispusers;
         }
+
+        public static SimpleUserProfile GetSimpleUserProfile(string userid)
+        {
+            string key = CacheHelper.SimpleUserprofilePrefix + userid;
+            if (CacheHelper.Contains(key))
+            {
+                return CacheHelper.Get<SimpleUserProfile>(key);
+            }
+
+            SimpleUserProfile userprofile = new SimpleUserProfile(new AccountManager().FindUser(userid));
+            CacheHelper.Add<SimpleUserProfile>(key, userprofile);
+            return userprofile;
+        }
     }
 }

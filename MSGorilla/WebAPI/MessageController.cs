@@ -29,19 +29,6 @@ namespace MSGorilla.WebAPI
         AttachmentManager _attManager = new AttachmentManager();
         SearchManager _searchManager = new SearchManager();
 
-        private SimpleUserProfile GetSimpleUserProfile(string userid)
-        {
-            string key = CacheHelper.SimpleUserprofilePrefix + userid;
-            if (CacheHelper.Contains(key))
-            {
-                return CacheHelper.Get<SimpleUserProfile>(key);
-            }
-
-            SimpleUserProfile userprofile = new SimpleUserProfile(_accManager.FindUser(userid));
-            CacheHelper.Add<SimpleUserProfile>(key, userprofile);
-            return userprofile;
-        }
-
         private DisplayMessagePagination CreateDisplayMsgPag(MessagePagination msgPag)
         {
             DisplayMessagePagination dmp = new DisplayMessagePagination();
@@ -52,7 +39,7 @@ namespace MSGorilla.WebAPI
             foreach (Message msg in msgPag.message)
             {
                 DisplayMessage dmsg = new DisplayMessage(msg, _attManager, null);
-                dmsg.User = GetSimpleUserProfile(msg.User);
+                dmsg.User = AccountController.GetSimpleUserProfile(msg.User);
                 msgs.Add(dmsg);
             }
             return dmp;

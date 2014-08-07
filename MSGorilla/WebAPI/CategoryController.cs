@@ -19,6 +19,21 @@ namespace MSGorilla.WebAPI
     {
         private CategoryManager _categoryManager = new CategoryManager();
 
+        private DisplayCategoryMessage ToDisplayCategoryMessage(CategoryMessage msg, string userid)
+        {
+            DisplayCategoryMessage displayMsg = new DisplayCategoryMessage();
+            displayMsg.User = msg.User;
+            displayMsg.ID = msg.ID;
+            displayMsg.PostTime = msg.PostTime;
+            displayMsg.CategoryID = msg.CategoryID;
+            displayMsg.CategoryName = msg.CategoryName;
+            displayMsg.Message = msg.Message;
+
+            displayMsg.NotifyTo = AccountController.GetSimpleUserProfile(msg.NotifyTo);
+            displayMsg.Group = GroupController.GetDisplayGroup(msg.Group, userid);
+            return displayMsg;
+        }
+
         private static string CreateCacheCategoryKey(string name, string group)
         {
             return CacheHelper.CategoryPrefix + name + "@" + group;
@@ -210,15 +225,15 @@ namespace MSGorilla.WebAPI
         /// <param name="name"></param>
         /// <returns></returns>
         [HttpGet]
-        public List<CategoryMessage> RetriveCategoryMessageByName(string name)
+        public List<DisplayCategoryMessage> RetriveCategoryMessageByName(string name)
         {
             string me = whoami();
             string[] groups = MembershipHelper.JoinedGroup(me);
-            List<CategoryMessage> list = new List<CategoryMessage>();
+            List<DisplayCategoryMessage> list = new List<DisplayCategoryMessage>();
 
             foreach (var category in _categoryManager.GetCategoryByName(name, groups))
             {
-                list.Add(_categoryManager.RetriveCategoryMessage(me, category));
+                list.Add(ToDisplayCategoryMessage(_categoryManager.RetriveCategoryMessage(me, category), me));
             }
 
             return list;
@@ -228,28 +243,41 @@ namespace MSGorilla.WebAPI
         /// Retrive the top message in the category.
         /// 
         /// example output:
-        /// {
-        ///     "User": "user1",
-        ///     "ID": "251995098518041",
-        ///     "PostTime": "2014-08-05T01:31:21.9587913Z",
-        ///     "Group": "msgorilladev",
-        ///     "CategoryName": "testcategory",
-        ///     "CategoryID": 1,
-        ///     "NotifyTo": "user1",
-        ///     "Message": "second category message"
-        /// }
+        /// [
+        ///     {
+        ///         "User": "user1",
+        ///         "ID": "251995093104893",
+        ///         "PostTime": "2014-08-05T03:01:35.1069164Z",
+        ///         "Group": {
+        ///             "GroupID": "msgorilladev",
+        ///             "DisplayName": "MSGorilla Dev",
+        ///             "Description": "MSgorilla Devs and Testers",
+        ///             "IsOpen": false,
+        ///             "IsJoined": true
+        ///         },
+        ///         "CategoryName": "testcategory",
+        ///         "CategoryID": 1,
+        ///         "NotifyTo": {
+        ///             "Userid": "user1",
+        ///             "DisplayName": "User1",
+        ///             "PortraitUrl": null,
+        ///             "Description": "user for test"
+        ///         },
+        ///         "Message": "category message from SDK API"
+        ///     }
+        /// ]
         /// </summary>
         /// <param name="name">category name</param>
         /// <param name="group">group id</param>
         /// <returns></returns>
         [HttpGet]
-        public List<CategoryMessage> RetriveCategoryMessage(string name, string group = null)
+        public List<DisplayCategoryMessage> RetriveCategoryMessage(string name, string group = null)
         {
             string me = whoami();
-            List<CategoryMessage> list = new List<CategoryMessage>();
+            List<DisplayCategoryMessage> list = new List<DisplayCategoryMessage>();
 
             Category category = GetCategoryModel(name, group);
-            list.Add(_categoryManager.RetriveCategoryMessage(me, category));
+            list.Add(ToDisplayCategoryMessage(_categoryManager.RetriveCategoryMessage(me, category), me));
 
             return list;
         }
@@ -261,23 +289,45 @@ namespace MSGorilla.WebAPI
         /// [
         ///     {
         ///         "User": "user1",
-        ///         "ID": "251995098518041",
-        ///         "PostTime": "2014-08-05T01:31:21.9587913Z",
-        ///         "Group": "msgorilladev",
+        ///         "ID": "251995093104893",
+        ///         "PostTime": "2014-08-05T03:01:35.1069164Z",
+        ///         "Group": {
+        ///             "GroupID": "msgorilladev",
+        ///             "DisplayName": "MSGorilla Dev",
+        ///             "Description": "MSgorilla Devs and Testers",
+        ///             "IsOpen": false,
+        ///             "IsJoined": true
+        ///         },
         ///         "CategoryName": "testcategory",
         ///         "CategoryID": 1,
-        ///         "NotifyTo": "user1",
-        ///         "Message": "second category message"
+        ///         "NotifyTo": {
+        ///             "Userid": "user1",
+        ///             "DisplayName": "User1",
+        ///             "PortraitUrl": null,
+        ///             "Description": "user for test"
+        ///         },
+        ///         "Message": "category message from SDK API"
         ///     },
         ///     ......
         ///     {
         ///         "User": "user1",
         ///         "ID": "251995097347218",
         ///         "PostTime": "2014-08-05T01:50:52.7815261Z",
-        ///         "Group": "msgorilladev",
+        ///         "Group": {
+        ///             "GroupID": "msgorilladev",
+        ///             "DisplayName": "MSGorilla Dev",
+        ///             "Description": "MSgorilla Devs and Testers",
+        ///             "IsOpen": false,
+        ///             "IsJoined": true
+        ///         },
         ///         "CategoryName": "testcategory2",
         ///         "CategoryID": 2,
-        ///         "NotifyTo": "user1",
+        ///         "NotifyTo": {
+        ///             "Userid": "user1",
+        ///             "DisplayName": "User1",
+        ///             "PortraitUrl": null,
+        ///             "Description": "user for test"
+        ///         },
         ///         "Message": "first  message in category2"
         ///     }
         /// ]
@@ -285,7 +335,7 @@ namespace MSGorilla.WebAPI
         /// <param name="group"></param>
         /// <returns></returns>
         [HttpGet]
-        public List<CategoryMessage> RetriveAllCategoryMessage(string group = null)
+        public List<DisplayCategoryMessage> RetriveAllCategoryMessage(string group = null)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(group))
@@ -297,11 +347,11 @@ namespace MSGorilla.WebAPI
                 MembershipHelper.CheckMembership(group, me);
             }
 
-            List<CategoryMessage> msgs = new List<CategoryMessage>();
+            List<DisplayCategoryMessage> msgs = new List<DisplayCategoryMessage>();
             List<Category> categories = _categoryManager.GetCategoryByGroup(group);
             foreach (var category in categories)
             {
-                msgs.Add(_categoryManager.RetriveCategoryMessage(me, category));
+                msgs.Add(ToDisplayCategoryMessage(_categoryManager.RetriveCategoryMessage(me, category), me));
             }
 
             return msgs;

@@ -56,5 +56,14 @@ namespace MSGorilla.Library.Models.ViewModels
                         ).FirstOrDefault() != null;
             }
         }
+
+        public DisplayGroup(Group group, bool isJoined = false)
+        {
+            this.GroupID = group.GroupID;
+            this.DisplayName = group.DisplayName;
+            this.Description = group.Description;
+            this.IsOpen = group.IsOpen;
+            this.IsJoined = isJoined;
+        }
     }
 }
