@@ -14,13 +14,11 @@
     <Sites>
       <Site name="Web">
         <Bindings>
-          <Binding name="Endpoint1" endpointName="Endpoint1" />
           <Binding name="Endpoint2" endpointName="Endpoint2" />
         </Bindings>
       </Site>
     </Sites>
     <Endpoints>
-      <InputEndpoint name="Endpoint1" protocol="http" port="80" />
       <InputEndpoint name="Endpoint2" protocol="https" port="443" certificate="Msgorilla" />
     </Endpoints>
     <Imports>
