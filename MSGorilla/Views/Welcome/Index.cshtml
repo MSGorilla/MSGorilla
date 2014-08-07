@@ -3,7 +3,7 @@
     Layout = "~/Views/Shared/_LayoutInverse.cshtml";
 }
 
-<script src="~/Scripts/echarts-plain.js"></script>
+@*<script src="~/Scripts/echarts-plain.js"></script>*@
 <div class="main-container">
     @Html.Partial("_AlertBoxPartial")
 
@@ -16,6 +16,27 @@
                     </h4>
                 </div>
                 <ul id="welcome_new_list" class='list-group'>
+                    <li class="list-group-item">
+                        <span id="welcome_new_atline_count" class="badge">0</span>
+                        <a href="/Notification/index?category=atline">Mentions</a>
+                    </li>
+                    <li class="list-group-item">
+                        <span id="welcome_new_ownerline_count" class="badge">0</span>
+                        <a href="/Notification/index?category=ownerline">My owns</a>
+                    </li>
+                    <li class="list-group-item">
+                        <span id="welcome_new_reply_count" class="badge">0</span>
+                        <a href="/Notification/index?category=replyline">Replies</a>
+                    </li>
+                    <div id="welcome_new_categories_list"></div>
+                </ul>
+            </div>
+
+            <div>
+                <div class="title-container">
+                    <h4>My favorites</h4>
+                </div>
+                <ul id="welcome_new_favorites_list" class='list-group'>
                     @*autofill by js*@
                 </ul>
             </div>

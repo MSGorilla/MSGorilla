@@ -1,31 +1,28 @@
 ﻿@{
-    ViewBag.Title = "Square";
+    ViewBag.Title = "Category";
 }
 
-<script src="~/Scripts/echarts-plain.js"></script>
+@*<script src="~/Scripts/echarts-plain.js"></script>*@
 <div class="main-container">
+
+
     <div class="contents-container">
         @Html.Partial("_AlertBoxPartial")
 
         <div class="title-container">
             <h4>
-                @ViewBag.Title
-                @Html.Partial("_FeedFilterDropdownPartial")
+                @ViewBag.Title - <span class="bold">@ViewBag.FeedId</span>
             </h4>
-            <span class="help-block">What's happening now, tailored for you.</span>
         </div>
 
         @Html.Partial("_NotificationNavbarPartial")
 
-        @Html.Partial("_GroupNavbarPartial")
-
-        @Html.Partial("_LoadFeedListPartial")
+        @Html.Partial("_LoadCategoryFeedListPartial")
 
     </div>
 
     <div class="tools-container">
         @Html.Partial("_MePartial")
-        @Html.Partial("_FeedFilterPartial")
         @Html.Partial("_ShortcutPartial")
     </div>
 

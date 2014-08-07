@@ -1,40 +1,44 @@
 ﻿<div class="nav-container">
     @if(ViewBag.Title == "Notifications")
     {
-        <div id="notification_navabar" class="pd-10"></div>
+        <div class="pd-10">
+            <span id="notification_category_navbar"></span>
+            <span id="notification_favorite_navbar"></span>
+        </div>
         <ul class="nav nav-pills">
             @if (ViewBag.FeedCategory == "atline")
             {
-                <li class="active"><a href="/Notification/index?category=atline">Mentions <span id="notification_navabar_atline_count" class="badge"></span></a></li>
+                <li class="active"><a href="/Notification/index?category=atline">Mentions <span id="notification_navbar_atline_count" class="badge"></span></a></li>
             }
             else
             {
-                <li><a href="/Notification/index?category=atline">Mentions <span id="notification_navabar_atline_count" class="badge"></span></a></li>
+                <li><a href="/Notification/index?category=atline">Mentions <span id="notification_navbar_atline_count" class="badge"></span></a></li>
             }
             @if (ViewBag.FeedCategory == "ownerline")
             {
-                <li class="active"><a href="/Notification/index?category=ownerline">My owns <span id="notification_navabar_ownerline_count" class="badge"></span></a></li>
+                <li class="active"><a href="/Notification/index?category=ownerline">My owns <span id="notification_navbar_ownerline_count" class="badge"></span></a></li>
             }
             else
             {
-                <li><a href="/Notification/index?category=ownerline">My owns <span id="notification_navabar_ownerline_count" class="badge"></span></a></li>
+                <li><a href="/Notification/index?category=ownerline">My owns <span id="notification_navbar_ownerline_count" class="badge"></span></a></li>
             }
             @if (ViewBag.FeedCategory == "replyline")
             {
-                <li class="active"><a href="/Notification/index?category=replyline">Replies <span id="notification_navabar_reply_count" class="badge"></span></a></li>
+                <li class="active"><a href="/Notification/index?category=replyline">Replies <span id="notification_navbar_reply_count" class="badge"></span></a></li>
             }
             else
             {
-                <li><a href="/Notification/index?category=replyline">Replies <span id="notification_navabar_reply_count" class="badge"></span></a></li>
+                <li><a href="/Notification/index?category=replyline">Replies <span id="notification_navbar_reply_count" class="badge"></span></a></li>
             }
         </ul>
     }
     else{
         <div class="pd-10">
-            <a class='btn btn-link btn-xs' href='/Notification/index?category=atline'>Mentions <span id="notification_navabar_atline_count" class="badge"></span></a>
-            <a class='btn btn-link btn-xs' href="/Notification/index?category=ownerline">My owns <span id="notification_navabar_ownerline_count" class="badge"></span></a>
-            <a class='btn btn-link btn-xs' href="/Notification/index?category=replyline">Replies <span id="notification_navabar_reply_count" class="badge"></span></a>
-            <span id="notification_navabar"></span>
+            <a class='btn btn-link btn-xs' href='/Notification/index?category=atline'>Mentions <span id="notification_navbar_atline_count" class="badge"></span></a>
+            <a class='btn btn-link btn-xs' href="/Notification/index?category=ownerline">My owns <span id="notification_navbar_ownerline_count" class="badge"></span></a>
+            <a class='btn btn-link btn-xs' href="/Notification/index?category=replyline">Replies <span id="notification_navbar_reply_count" class="badge"></span></a>
+            <span id="notification_category_navbar"></span>
+            <span id="notification_favorite_navbar"></span>
         </div>
     }
 </div>
