@@ -21,6 +21,10 @@ namespace MSGorilla.WebAPI
 
         private DisplayCategoryMessage ToDisplayCategoryMessage(CategoryMessage msg, string userid)
         {
+            if (msg == null)
+            {
+                return null;
+            }
             DisplayCategoryMessage displayMsg = new DisplayCategoryMessage();
             displayMsg.User = msg.User;
             displayMsg.ID = msg.ID;
@@ -233,7 +237,12 @@ namespace MSGorilla.WebAPI
 
             foreach (var category in _categoryManager.GetCategoryByName(name, groups))
             {
-                list.Add(ToDisplayCategoryMessage(_categoryManager.RetriveCategoryMessage(me, category), me));
+                CategoryMessage msg = _categoryManager.RetriveCategoryMessage(me, category);
+                if(msg != null)
+                {
+                    list.Add(ToDisplayCategoryMessage(msg, me));
+                }
+                
             }
 
             return list;
@@ -277,7 +286,11 @@ namespace MSGorilla.WebAPI
             List<DisplayCategoryMessage> list = new List<DisplayCategoryMessage>();
 
             Category category = GetCategoryModel(name, group);
-            list.Add(ToDisplayCategoryMessage(_categoryManager.RetriveCategoryMessage(me, category), me));
+            CategoryMessage msg = _categoryManager.RetriveCategoryMessage(me, category);
+            if (msg != null)
+            {
+                list.Add(ToDisplayCategoryMessage(msg, me));
+            }
 
             return list;
         }
@@ -351,7 +364,11 @@ namespace MSGorilla.WebAPI
             List<Category> categories = _categoryManager.GetCategoryByGroup(group);
             foreach (var category in categories)
             {
-                msgs.Add(ToDisplayCategoryMessage(_categoryManager.RetriveCategoryMessage(me, category), me));
+                CategoryMessage msg = _categoryManager.RetriveCategoryMessage(me, category);
+                if (msg != null)
+                {
+                    msgs.Add(ToDisplayCategoryMessage(msg, me));
+                }
             }
 
             return msgs;
