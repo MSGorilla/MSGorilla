@@ -7,33 +7,43 @@ function AjaxCall(type, async, apiurl, apidata, successCallback, errorCallback, 
         apidata = "";
     }
 
-    try {
-        $.ajax({
-            type: type,
-            url: apiurl,
-            data: apidata,
-            dataType: "json",
-            async: async,
-            success: function (data) {
+    $.ajax({
+        type: type,
+        url: apiurl,
+        data: apidata,
+        dataType: "json",
+        async: async,
+        success: function (data) {
+            try {
                 if (!isNullOrEmpty(successCallback)) {
                     successCallback(data);
                 }
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
+            }
+            catch (ex) {
+                showError(ex);
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            try {
                 showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message, msgboxid);
                 if (!isNullOrEmpty(errorCallback)) {
                     errorCallback(XMLHttpRequest, textStatus, errorThrown);
                 }
             }
-        }).always(function () {
+            catch (ex) {
+                showError(ex);
+            }
+        }
+    }).always(function () {
+        try {
             if (!isNullOrEmpty(alwaysCallback)) {
                 alwaysCallback();
             }
-        });
-    }
-    catch (ex) {
-        showError(ex);
-    }
+        }
+        catch (ex) {
+            showError(ex);
+        }
+    });
 }
 
 function AjaxGetAsync(apiurl, apidata, successCallback, errorCallback, alwaysCallback, msgboxid) {
@@ -2365,6 +2375,7 @@ function LoadMyCategories() {
                 navlist.empty();
 
                 var categories = {};
+                var categorycount = 0;
 
                 $.each(data, function (index, item) {
                     var id = item.ID;
@@ -2398,7 +2409,11 @@ function LoadMyCategories() {
                         output = "<a class='btn btn-link btn-xs' href='/category/index?category=" + encodeTxt(name) + "'>" + name + " <span class='badge'>" + categories[name] + "</span></a> ";
                         navlist.append(output);
                     }
+
+                    categorycount += categories[name];
                 }
+
+                $("#shortcut_category_count").html(categorycount);
             }
         },
         null,
@@ -3698,7 +3713,7 @@ function LoadCategoryFeeds() {
         apiurl = "/api/category/RetriveAllCategoryMessage";
         if (!isNullOrEmpty(group)) {   // set group value
             apidata = "group=" + group;
-        } 
+        }
     }
     else {
         if (!isNullOrEmpty(group)) {   // set group value
@@ -3726,6 +3741,7 @@ function LoadCategoryFeeds() {
                 // create feed list
                 $.each(data, function (index, item) {
                     listdiv.append(createCategoryFeed(item));
+                    initUserPopover("user_pic_" + item.ID, item.NotifyTo.Userid);
                 })
             }
         }
@@ -3735,38 +3751,51 @@ function LoadCategoryFeeds() {
 function createCategoryFeed(data) {
     var output = "";
     var id = data.ID;
-    var user = data.User;
+    var fromuser = data.User;
+    var user = data.NotifyTo.Userid;
+    var username = data.NotifyTo.DisplayName;
+    var picurl = data.NotifyTo.PortraitUrl;
+    var userdesp = data.NotifyTo.Description;
     var posttime = data.PostTime;
-    var group = data.Group;
+    var group = data.Group.GroupID;
+    var groupname = data.Group.DisplayName;
     var cid = data.CategoryID;
     var cname = data.CategoryName;
-    var touser = data.NotifyTo;
     var msg = data.Message;
+
+    if (isNullOrEmpty(picurl)) {
+        picurl = "/Content/Images/default_avatar.jpg";
+    }
 
     output += "  <li id='feed_" + id + "' class='list-group-item'>";
     output += "    <div>"
 
     // user pic
     output += "      <div class='feed-pic'>";
-    output += "        <a class='fullname' href='/category/index?category=" + encodeTxt(cname) + "&group=" + group + "'>" + cname + "</a>";
+    output += "        <button class='btn btn-img' type='button' id='user_pic_" + id + "' href='javascript:void(0);'>";
+    output += "          <img class='img-rounded' src='" + picurl + "' width='100' height='100'/>";
+    output += "        </button>";
     output += "      </div>";
 
     output += "      <div class='feed-content'>";
 
     // user name and post time
     output += "        <div class='newpost-header'>";
-    output += "          <a class='fullname' href='/category/index?category=" + encodeTxt(cname) + "&group=" + group + "'>" + cname + "</a>&nbsp;";
-    output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
+    output += "          <a id='username_" + id + "' class='fullname' href='/profile/index?user=" + encodeTxt(user) + "'>" + username + "</a>&nbsp;";
+    output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>&nbsp;-&nbsp;";
+    output += "          <a href='/category/index?category=" + encodeTxt(cname) + "&group=" + group + "'>" + cname + " (" + groupname + ")</a>&nbsp;";
     output += "        </div>";
 
     // message
     if (!isNullOrEmpty(msg)) {
         output += "    <div id='message_" + id + "' class='newpost-input'>" + msg + "</div>";
     }
-    output += "      </div>";
-    output += "    </div>";
 
+    output += "      </div>";
+
+    output += "    </div>";
     output += "  </li>";
 
     return output;
 }
+

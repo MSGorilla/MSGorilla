@@ -25,6 +25,7 @@ namespace MSGorilla.Views
 
             ViewBag.FeedCategory = "search";
 
+            keyword = keyword.Trim();
             if (string.IsNullOrEmpty(keyword))
             {
                 keyword = "";
