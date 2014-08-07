@@ -226,6 +226,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\DocumentController.cs" />
     <Compile Include="Controllers\GroupController.cs" />
+    <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\WelcomeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
@@ -365,6 +366,8 @@
     <Content Include="Views\Shared\_SearchTopicPartial.cshtml" />
     <Content Include="Views\Shared\_SearchPostPartial.cshtml" />
     <Content Include="Views\Shared\_PerfChartPartial.cshtml" />
+    <Content Include="Views\Category\Index.cshtml" />
+    <Content Include="Views\Shared\_LoadCategoryFeedListPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

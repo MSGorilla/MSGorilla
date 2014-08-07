@@ -579,14 +579,19 @@ function PostMessage() {
         apiurl,
         apidata,
         function (data) {
-            msgbox.val("");
+            if (isNullOrEmpty(data)) {
+                showError("Failed to post message.");
+            }
+            else {
+                msgbox.val("");
 
-            if (group == curgroup) {
-                // insert the new posted message
-                $("#feedlist").prepend(createFeed(data));
-                // render feed
-                initUserPopover("user_pic_" + data.ID, data.User.Userid);
-                // enhanceMessage(data.SchemaID, data.ID, data.MessageContent);  // user can not post schema data from webpage.
+                if (group == curgroup) {
+                    // insert the new posted message
+                    $("#feedlist").prepend(createFeed(data));
+                    // render feed
+                    initUserPopover("user_pic_" + data.ID, data.User.Userid);
+                    // enhanceMessage(data.SchemaID, data.ID, data.MessageContent);  // user can not post schema data from webpage.
+                }
             }
         },
         null,
@@ -624,10 +629,15 @@ function PostReply(user, mid) {
         apiurl,
         apidata,
         function (data) {
-            replybox.val("");
-            $("#replylist_" + mid).prepend(createReply(data));
-            // render feed
-            initUserPopover("user_pic_" + data.ID, data.User.Userid);
+            if (isNullOrEmpty(data)) {
+                showError("Failed to post reply.");
+            }
+            else {
+                replybox.val("");
+                $("#replylist_" + mid).prepend(createReply(data));
+                // render feed
+                initUserPopover("user_pic_" + data.ID, data.User.Userid);
+            }
         },
         null,
         function () {
@@ -649,23 +659,28 @@ function LoadMyInfo() {
         apiurl,
         "",
         function (data) {
-            var userid = data.Userid;
-            var username = data.DisplayName;
-            var picurl = data.PortraitUrl;
-            var desp = data.Description;
-            var postscount = data.MessageCount;
-            var followingcount = data.FollowingsCount;
-            var followerscount = data.FollowersCount;
-            if (isNullOrEmpty(picurl)) {
-                picurl = "/Content/Images/default_avatar.jpg";
+            if (isNullOrEmpty(data)) {
+                showError("Failed to load my info.");
             }
+            else {
+                var userid = data.Userid;
+                var username = data.DisplayName;
+                var picurl = data.PortraitUrl;
+                var desp = data.Description;
+                var postscount = data.MessageCount;
+                var followingcount = data.FollowingsCount;
+                var followerscount = data.FollowersCount;
+                if (isNullOrEmpty(picurl)) {
+                    picurl = "/Content/Images/default_avatar.jpg";
+                }
 
-            $("#my_id").html("@" + userid);
-            $("#my_name").html(username);
-            $("#my_pic").attr("src", picurl);
-            $("#my_posts").html(postscount);
-            $("#my_following").html(followingcount);
-            $("#my_followers").html(followerscount);
+                $("#my_id").html("@" + userid);
+                $("#my_name").html(username);
+                $("#my_pic").attr("src", picurl);
+                $("#my_posts").html(postscount);
+                $("#my_following").html(followingcount);
+                $("#my_followers").html(followerscount);
+            }
         }
     );
 }
@@ -696,28 +711,33 @@ function LoadUserInfo(user) {
         apiurl,
         apidata,
         function (data) {
-            var userid = data.Userid;
-            var username = data.DisplayName;
-            var picurl = data.PortraitUrl;
-            var desp = data.Description;
-            var postscount = data.MessageCount;
-            var followingcount = data.FollowingsCount;
-            var followerscount = data.FollowersCount;
-            var isFollowimg = data.IsFollowing;
-            if (isNullOrEmpty(picurl)) {
-                picurl = "/Content/Images/default_avatar.jpg";
+            if (isNullOrEmpty(data)) {
+                showError("Failed to load user info.");
             }
+            else {
+                var userid = data.Userid;
+                var username = data.DisplayName;
+                var picurl = data.PortraitUrl;
+                var desp = data.Description;
+                var postscount = data.MessageCount;
+                var followingcount = data.FollowingsCount;
+                var followerscount = data.FollowersCount;
+                var isFollowimg = data.IsFollowing;
+                if (isNullOrEmpty(picurl)) {
+                    picurl = "/Content/Images/default_avatar.jpg";
+                }
 
-            $("#user_id").html("@" + userid);
-            $("#user_name").html(username);
-            $("#user_name").attr("href", "/profile/index?user=" + userid);
-            $("#user_pic").attr("src", picurl);
-            $("#user_desp").html(desp);
-            $("#user_posts").html(postscount);
-            $("#user_following").html(followingcount);
-            $("#user_followers").html(followerscount);
+                $("#user_id").html("@" + userid);
+                $("#user_name").html(username);
+                $("#user_name").attr("href", "/profile/index?user=" + userid);
+                $("#user_pic").attr("src", picurl);
+                $("#user_desp").html(desp);
+                $("#user_posts").html(postscount);
+                $("#user_following").html(followingcount);
+                $("#user_followers").html(followerscount);
 
-            setUserFollowBtn("btn_userprofile_follow_" + encodeId(userid), userid, isFollowimg);
+                setUserFollowBtn("btn_userprofile_follow_" + encodeId(userid), userid, isFollowimg);
+            }
         }
     );
 }
@@ -817,16 +837,21 @@ function follow(btnid, user) {
         apiurl,
         apidata,
         function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                setUnfollowBtn(btnid, user, true);
-                // refresh user info 
-                LoadUserInfo();
-                LoadMyInfo();
+            if (isNullOrEmpty(data)) {
+                showError("Failed to follow user.");
             }
             else {
-                showError(msg);
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setUnfollowBtn(btnid, user, true);
+                    // refresh user info 
+                    LoadUserInfo();
+                    LoadMyInfo();
+                }
+                else {
+                    showError(msg);
+                }
             }
         }
     );
@@ -842,16 +867,21 @@ function unfollow(btnid, user) {
         apiurl,
         apidata,
         function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                setFollowBtn(btnid, user, true);
-                // refresh user info 
-                LoadUserInfo();
-                LoadMyInfo();
+            if (isNullOrEmpty(data)) {
+                showError("Failed to unfollow user.");
             }
             else {
-                showError(msg);
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setFollowBtn(btnid, user, true);
+                    // refresh user info 
+                    LoadUserInfo();
+                    LoadMyInfo();
+                }
+                else {
+                    showError(msg);
+                }
             }
         }
     );
@@ -953,7 +983,11 @@ function initUserPopover(eid, user) {
                 apiurl,
                 apidata,
                 function (data) {
-                    output = createUserPopover(data);
+                    if (isNullOrEmpty(data)) {
+                    }
+                    else {
+                        output = createUserPopover(data);
+                    }
                 }
             );
 
@@ -1622,32 +1656,36 @@ function LoadReplies(mid) {
             // clear list
             replydiv.empty();
 
-            // create reply list
-            $.each(data, function (index, item) {
-                if (index < newcount) {
-                    replydiv.append(createReply(item));
-                }
-                else {
-                    replyolderdiv.append(createReply(item));
-                }
-                totlecount++;
+            if (isNullOrEmpty(data) || data.length == 0) {
+            }
+            else {
+                // create reply list
+                $.each(data, function (index, item) {
+                    if (index < newcount) {
+                        replydiv.append(createReply(item));
+                    }
+                    else {
+                        replyolderdiv.append(createReply(item));
+                    }
+                    totlecount++;
 
-                // render feed
-                initUserPopover("user_pic_" + item.ID, item.User.Userid);
-                // if msg is empty, show richmsg instead
-                if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
-                    $("#rich_message_" + item.ID).collapse('show');
-                    showRichMsg(item.RichMessageID, item.ID);
-                }
-            })
+                    // render feed
+                    initUserPopover("user_pic_" + item.ID, item.User.Userid);
+                    // if msg is empty, show richmsg instead
+                    if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
+                        $("#rich_message_" + item.ID).collapse('show');
+                        showRichMsg(item.RichMessageID, item.ID);
+                    }
+                })
 
-            if (totlecount > newcount) {
-                var morecount = totlecount - newcount;
-                if (morecount > 1)
-                    showmorebtn.text("Show " + morecount + " older replies.");
-                else
-                    showmorebtn.text("Show " + morecount + " older reply.");
-                showmorebtn.show();
+                if (totlecount > newcount) {
+                    var morecount = totlecount - newcount;
+                    if (morecount > 1)
+                        showmorebtn.text("Show " + morecount + " older replies.");
+                    else
+                        showmorebtn.text("Show " + morecount + " older reply.");
+                    showmorebtn.show();
+                }
             }
         },
         function (XMLHttpRequest, textStatus, errorThrown) {
@@ -2063,7 +2101,7 @@ function LoadSearchMessageResults(isReload) {
 }
 
 
-// notification count function and short cut function
+// notification count function and shortcut function
 function getNotificationCount(category, id, group) {
     if (category != "atline"
         && category != "ownerline"
@@ -2150,7 +2188,7 @@ function UpdateNotificationCountTimer() {
 
 function UpdateNotificationCount() {
     if ($("#shortcut_homeline_count").length == 0
-        && $("#notification_navabar_reply_count").length == 0
+        && $("#notification_navbar_reply_count").length == 0
         && $("#nav_home_count").length == 0) {
         return;
     }
@@ -2181,9 +2219,9 @@ function UpdateNotificationCount() {
                 $("#shortcut_notification_count").html(notificationCount);
 
                 // notification navbar count
-                $("#notification_navabar_reply_count").html(replyCount);
-                $("#notification_navabar_atline_count").html(atlineCount);
-                $("#notification_navabar_ownerline_count").html(ownerlineCount);
+                $("#notification_navbar_reply_count").html(replyCount);
+                $("#notification_navbar_atline_count").html(atlineCount);
+                $("#notification_navbar_ownerline_count").html(ownerlineCount);
 
                 // menu navbar count
                 if (homelineCount > 0)
@@ -2219,27 +2257,31 @@ function LoadHotTopics() {
         apiurl,
         apidata,
         function (data) {
-            // clear list
-            listdiv.empty();
+            if (isNullOrEmpty(data) || data.length == 0) {
+            }
+            else {
+                // clear list
+                listdiv.empty();
 
-            // create list
-            $.each(data, function (index, item) {
-                var output = "";
-                var topicid = item.Id;
-                var topicname = item.Name;
-                var topicdesp = item.Description;
-                var topiccount = item.MsgCount;
-                var isliked = item.IsLiked;
-                var group = item.GroupID;
+                // create list
+                $.each(data, function (index, item) {
+                    var output = "";
+                    var topicid = item.Id;
+                    var topicname = item.Name;
+                    var topicdesp = item.Description;
+                    var topiccount = item.MsgCount;
+                    var isliked = item.IsLiked;
+                    var group = item.GroupID;
 
-                output = "<li class='sub-list-group-item'>"
-                        + "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
-                        + "  <span class='badge'>" + topiccount + "</span>"
-                        + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>"
-                        + "</li>"
-                listdiv.append(output);
-                setTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid, isliked);
-            })
+                    output = "<li class='sub-list-group-item'>"
+                            + "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
+                            + "  <span class='badge'>" + topiccount + "</span>"
+                            + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>"
+                            + "</li>"
+                    listdiv.append(output);
+                    setTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid, isliked);
+                })
+            }
         },
         null,
         null,
@@ -2249,7 +2291,8 @@ function LoadHotTopics() {
 
 function LoadMyFavoriteTopics() {
     var listdiv = $("#favorite_collapse");
-    if (listdiv.length == 0) {
+    var navlist = $("#notification_favorite_navbar");
+    if (listdiv.length == 0 && navlist.length == 0) {
         return;
     }
 
@@ -2260,34 +2303,103 @@ function LoadMyFavoriteTopics() {
         apiurl,
         apidata,
         function (data) {
-            // clear list
-            listdiv.empty();
-            var navlist = $("#notification_navabar");
-            navlist.empty();
+            if (isNullOrEmpty(data) || data.length == 0) {
+            }
+            else {
+                // clear list
+                listdiv.empty();
+                navlist.empty();
 
-            $.each(data, function (index, item) {
-                var output = "";
-                var userid = item.userid;
-                var topicid = item.topicID;
-                var unreadcount = item.UnreadMsgCount;
-                var topicname = item.topicName;
-                var topicdesp = item.topicDescription;
-                var topiccount = item.topicMsgCount;
-                var group = item.GroupID;
+                $.each(data, function (index, item) {
+                    var output = "";
+                    var userid = item.userid;
+                    var topicid = item.topicID;
+                    var unreadcount = item.UnreadMsgCount;
+                    var topicname = item.topicName;
+                    var topicdesp = item.topicDescription;
+                    var topiccount = item.topicMsgCount;
+                    var group = item.GroupID;
 
-                // shortcut panel
-                output += "<li class='sub-list-group-item'>";
-                output += "  <span class='badge'>" + unreadcount + "</span>";
-                output += "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>";
-                output += "</li>";
-                listdiv.append(output);
+                    // shortcut panel
+                    if (listdiv.length > 0) {
+                        output += "<li class='sub-list-group-item'>";
+                        output += "  <span class='badge'>" + unreadcount + "</span>";
+                        output += "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>";
+                        output += "</li>";
+                        listdiv.append(output);
+                    }
 
-                // homepage 
-                if (unreadcount > 0 && navlist.length > 0) {
-                    output = "<a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a> ";
-                    navlist.append(output);
+                    // notification navbar 
+                    if (unreadcount > 0 && navlist.length > 0) {
+                        output = "<a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a> ";
+                        navlist.append(output);
+                    }
+                })
+            }
+        },
+        null,
+        null,
+        "no_message_box"
+    );
+}
+
+function LoadMyCategories() {
+    var listdiv = $("#category_collapse");
+    var navlist = $("#notification_category_navbar");
+    if (listdiv.length == 0 && navlist.length == 0) {
+        return;
+    }
+
+    var apiurl = "/api/category/getmycategory";
+    var apidata = "";
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+            }
+            else {
+                // clear list
+                listdiv.empty();
+                navlist.empty();
+
+                var categories = {};
+
+                $.each(data, function (index, item) {
+                    var id = item.ID;
+                    var name = item.Name;
+                    var groupid = item.GroupID;
+                    var description = item.Description;
+                    var creater = item.Creater;
+                    var createtimestamp = item.CreateTimestamp;
+
+                    if (isNullOrEmpty(categories[name])) {
+                        categories[name] = 1;
+                    }
+                    else {
+                        categories[name]++;
+                    }
+                })
+
+                for (var name in categories) {
+                    var output = "";
+                    // shortcut panel
+                    if (listdiv.length > 0) {
+                        output += "<li class='sub-list-group-item'>";
+                        output += "  <span class='badge'>" + categories[name] + "</span>";
+                        output += "  <a href='/category/index?category=" + encodeTxt(name) + "'>" + name + "</a>";
+                        output += "</li>";
+                        listdiv.append(output);
+                    }
+
+                    // notification navbar 
+                    if (navlist.length > 0) {
+                        output = "<a class='btn btn-link btn-xs' href='/category/index?category=" + encodeTxt(name) + "'>" + name + " <span class='badge'>" + categories[name] + "</span></a> ";
+                        navlist.append(output);
+                    }
                 }
-            })
+            }
         },
         null,
         null,
@@ -2490,15 +2602,20 @@ function like(btnid, topicid) {
         apiurl,
         apidata,
         function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                setUnlikeBtn(btnid, topicid, true);
-                // refresh topic info
-                LoadMyFavoriteTopics();
+            if (isNullOrEmpty(data)) {
+                showError("Failed to like topic.");
             }
             else {
-                showError(msg);
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setUnlikeBtn(btnid, topicid, true);
+                    // refresh topic info
+                    LoadMyFavoriteTopics();
+                }
+                else {
+                    showError(msg);
+                }
             }
         }
     );
@@ -2514,15 +2631,20 @@ function unlike(btnid, topicid) {
         apiurl,
         apidata,
         function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                setLikeBtn(btnid, topicid, true);
-                // refresh topic info
-                LoadMyFavoriteTopics();
+            if (isNullOrEmpty(data)) {
+                showError("Failed to unlike topic.");
             }
             else {
-                showError(msg);
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setLikeBtn(btnid, topicid, true);
+                    // refresh topic info
+                    LoadMyFavoriteTopics();
+                }
+                else {
+                    showError(msg);
+                }
             }
         }
     );
@@ -2550,6 +2672,14 @@ function RefreshWelcomePageTimer() {
 function RefreshWelcomePage() {
     // load new
     refreshWelcomeNew();
+    refreshWelcomeCategories();
+
+    // load my favorites
+    refreshWelcomeFavorites();
+    // load hot topics
+    refreshWelcomeHotTopics();
+    // load active users
+    refreshWelcomeActiveUsers();
 
     // load notifications
     refreshWelcomeMentionsFeeds();
@@ -2558,12 +2688,6 @@ function RefreshWelcomePage() {
 
     // load latest feeds
     refreshWelcomeLatestFeeds();
-
-    // load hot topics
-    refreshWelcomeHotTopics();
-
-    // load active users
-    refreshWelcomeActiveUsers();
 }
 
 function refreshWelcomeNew() {
@@ -2572,20 +2696,14 @@ function refreshWelcomeNew() {
         return;
     }
 
-    listdiv.empty();
-    listdiv.append("<li id='loading_message_new' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
-
     // notifications
     var apiurl = "/api/account/getnotificationcount";
     var apidata = "";
 
-    AjaxGetSync(
+    AjaxGetAsync(
         apiurl,
         apidata,
         function (data) {
-            // clear list
-            listdiv.empty();
-
             if (isNullOrEmpty(data)) {
                 // do nothing
             }
@@ -2598,23 +2716,9 @@ function refreshWelcomeNew() {
                 var userid = data.Userid;
                 var notificationCount = ownerlineCount + replyCount + atlineCount;
 
-                output = "<li class='list-group-item'>"
-                       + "  <span class='badge'>" + replyCount + "</span>"
-                       + "  <a href='/Notification/index?category=replyline'>Replies</a>"
-                       + "</li>"
-                listdiv.prepend(output);
-
-                output = "<li class='list-group-item'>"
-                       + "  <span class='badge'>" + ownerlineCount + "</span>"
-                       + "  <a href='/Notification/index?category=ownerline'>My Owns</a>"
-                       + "</li>"
-                listdiv.prepend(output);
-
-                output = "<li class='list-group-item'>"
-                       + "  <span class='badge'>" + atlineCount + "</span>"
-                       + "  <a href='/Notification/index?category=atline'>Mentions</a>"
-                       + "</li>"
-                listdiv.prepend(output);
+                $("#welcome_new_reply_count").html(replyCount);
+                $("#welcome_new_atline_count").html(atlineCount);
+                $("#welcome_new_ownerline_count").html(ownerlineCount);
 
                 // menu navbar count
                 if (homelineCount > 0)
@@ -2630,23 +2734,93 @@ function refreshWelcomeNew() {
         },
         null,
         null,
-        "loading_message_new"
+        "no_message_box"
     );
+}
+
+function refreshWelcomeCategories() {
+    var listdiv = $("#welcome_new_categories_list");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var apiurl = "/api/category/getmycategory";
+    var apidata = "";
+
+    listdiv.empty();
+    listdiv.append("<li id='loading_message_categories' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            // clear list
+            listdiv.empty();
+
+            if (isNullOrEmpty(data) || data.length == 0) {
+            }
+            else {
+                var categories = {};
+
+                $.each(data, function (index, item) {
+                    var id = item.ID;
+                    var name = item.Name;
+                    var groupid = item.GroupID;
+                    var description = item.Description;
+                    var creater = item.Creater;
+                    var createtimestamp = item.CreateTimestamp;
+
+                    if (isNullOrEmpty(categories[name])) {
+                        categories[name] = 1;
+                    }
+                    else {
+                        categories[name]++;
+                    }
+                })
+
+                for (var name in categories) {
+                    var output = "";
+
+                    output += "<li class='list-group-item'>";
+                    output += "  <span class='badge'>" + categories[name] + "</span>";
+                    output += "  <a href='/category/index?category=" + encodeTxt(name) + "'>" + name + "</a>";
+                    output += "</li>";
+                    listdiv.append(output);
+                }
+            }
+        },
+        null,
+        null,
+        "loading_message_categories"
+    );
+}
+
+function refreshWelcomeFavorites() {
+    var listdiv = $("#welcome_new_favorites_list");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var apiurl = "/api/topic/getmyfavouritetopic";
+    var apidata = "";
+
+    listdiv.empty();
+    listdiv.append("<li id='loading_message_favorites' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
 
     // my topics
-    var maxcount = 15;
-
-    apiurl = "/api/topic/getmyfavouritetopic";
-    apidata = "";
+    var maxcount = 99;
 
     AjaxGetAsync(
         apiurl,
         apidata,
         function (data) {
             if (isNullOrEmpty(data) || data.length == 0) {
-                // do nothing
+                showMessage("No content.", "loading_message_favorites");
             }
             else {
+                // clear list
+                listdiv.empty();
+
                 // create my topic
                 $.each(data, function (index, item) {
                     var output = "";
@@ -2674,7 +2848,7 @@ function refreshWelcomeNew() {
         },
         null,
         null,
-        "loading_message_new"
+        "loading_message_favorites"
     );
 }
 
@@ -3049,14 +3223,19 @@ function SetDefaultGroup() {
         apiurl,
         apidata,
         function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                $("#hd_default_group").val(curgroup);
-                btn.hide();
+            if (isNullOrEmpty(data)) {
+                showError("Failed to set default group.");
             }
             else {
-                showError(msg);
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    $("#hd_default_group").val(curgroup);
+                    btn.hide();
+                }
+                else {
+                    showError(msg);
+                }
             }
         }
     );
@@ -3235,13 +3414,18 @@ function join(btnid, group) {
         apiurl,
         apidata,
         function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                setLeaveBtn(btnid, group, true);
+            if (isNullOrEmpty(data)) {
+                showError("Failed to join group.");
             }
             else {
-                showError(msg);
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setLeaveBtn(btnid, group, true);
+                }
+                else {
+                    showError(msg);
+                }
             }
         }
     );
@@ -3257,13 +3441,18 @@ function leave(btnid, group) {
         apiurl,
         apidata,
         function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                setJoinBtn(btnid, group, true);
+            if (isNullOrEmpty(data)) {
+                showError("Failed to leave group.");
             }
             else {
-                showError(msg);
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setJoinBtn(btnid, group, true);
+                }
+                else {
+                    showError(msg);
+                }
             }
         }
     );
@@ -3356,7 +3545,7 @@ var chart_axis_perf_template = {
     series: []
 };
 
-function drawPerfChart(chartname, chartdivid) {
+function LoadPerfChart(chartname, chartdivid) {
     var chartdiv = $("#" + chartdivid);
     if (chartdiv.length == 0 || isNullOrEmpty(chartname)) {
         return;
@@ -3373,7 +3562,6 @@ function drawPerfChart(chartname, chartdivid) {
             if (isNullOrEmpty(data) || data.DataSet.length == 0) {
                 // no chart
                 chartdiv.hide();
-                return;
             }
             else {
                 var name = data.Name;
@@ -3424,7 +3612,18 @@ function drawPerfChart(chartname, chartdivid) {
                                 option.series.push({
                                     name: legend,
                                     type: type,
-                                    data: ydata
+                                    data: ydata,
+                                    markPoint: {
+                                        data: [
+                                            { type: 'max', name: 'Max' },
+                                            { type: 'min', name: 'Min' }
+                                        ]
+                                    },
+                                    markLine: {
+                                        data: [
+                                            { type: 'average', name: 'Average' }
+                                        ]
+                                    }
                                 });
                             }
                         },
@@ -3472,4 +3671,102 @@ function addfakedata() {
             "id=9&key=" + i + "&value=" + (Math.random() * 100)
         );
     }
+}
+
+// category function
+function LoadCategoryFeeds() {
+    var listdiv = $("#feedlist");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var apiurl = "";
+    var apidata = "";
+    var category = "";
+    var group = "";
+
+    // get paras from page
+    if ($("#hd_category_name").length > 0) {
+        category = $("#hd_category_name").val();
+    }
+    if ($("#hd_current_group").length > 0) {
+        group = $("#hd_current_group").val();
+    }
+
+    // get
+    if (isNullOrEmpty(category)) {
+        apiurl = "/api/category/RetriveAllCategoryMessage";
+        if (!isNullOrEmpty(group)) {   // set group value
+            apidata = "group=" + group;
+        } 
+    }
+    else {
+        if (!isNullOrEmpty(group)) {   // set group value
+            apiurl = "/api/category/retrivecategorymessage";
+            apidata = "name=" + encodeTxt(category);
+            apidata += "&group=" + group;
+        }
+        else {
+            apiurl = "/api/category/retrivecategorymessagebyname";
+            apidata = "name=" + encodeTxt(category);
+        }
+    }
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+                showMessage("No content.");
+            }
+            else {
+                // clear feed list
+                listdiv.empty();
+
+                // create feed list
+                $.each(data, function (index, item) {
+                    listdiv.append(createCategoryFeed(item));
+                })
+            }
+        }
+    );
+}
+
+function createCategoryFeed(data) {
+    var output = "";
+    var id = data.ID;
+    var user = data.User;
+    var posttime = data.PostTime;
+    var group = data.Group;
+    var cid = data.CategoryID;
+    var cname = data.CategoryName;
+    var touser = data.NotifyTo;
+    var msg = data.Message;
+
+    output += "  <li id='feed_" + id + "' class='list-group-item'>";
+    output += "    <div>"
+
+    // user pic
+    output += "      <div class='feed-pic'>";
+    output += "        <a class='fullname' href='/category/index?category=" + encodeTxt(cname) + "&group=" + group + "'>" + cname + "</a>";
+    output += "      </div>";
+
+    output += "      <div class='feed-content'>";
+
+    // user name and post time
+    output += "        <div class='newpost-header'>";
+    output += "          <a class='fullname' href='/category/index?category=" + encodeTxt(cname) + "&group=" + group + "'>" + cname + "</a>&nbsp;";
+    output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>";
+    output += "        </div>";
+
+    // message
+    if (!isNullOrEmpty(msg)) {
+        output += "    <div id='message_" + id + "' class='newpost-input'>" + msg + "</div>";
+    }
+    output += "      </div>";
+    output += "    </div>";
+
+    output += "  </li>";
+
+    return output;
 }

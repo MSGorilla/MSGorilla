@@ -243,11 +243,15 @@ namespace MSGorilla.WebAPI
         /// <param name="group">group id</param>
         /// <returns></returns>
         [HttpGet]
-        public CategoryMessage RetriveCategoryMessage(string name, string group = null)
+        public List<CategoryMessage> RetriveCategoryMessage(string name, string group = null)
         {
-            string me = whoami();            
+            string me = whoami();
+            List<CategoryMessage> list = new List<CategoryMessage>();
+
             Category category = GetCategoryModel(name, group);
-            return _categoryManager.RetriveCategoryMessage(me, category);
+            list.Add(_categoryManager.RetriveCategoryMessage(me, category));
+
+            return list;
         }
 
         /// <summary>

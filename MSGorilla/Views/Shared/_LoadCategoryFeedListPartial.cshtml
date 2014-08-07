@@ -1,0 +1,13 @@
+﻿<div class="posts-feeds">
+    <ul id="feedlist" class='list-group'>
+        <li id="loading_message" class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+        @*autofill by js*@
+    </ul>
+    <input id="hd_category_name" type="hidden" value="@ViewBag.FeedId" />
+    <input id="hd_current_group" type="hidden" value="@ViewBag.Group" />
+</div>
+
+<script>
+    $(LoadCategoryFeeds(true));
+</script>
+
