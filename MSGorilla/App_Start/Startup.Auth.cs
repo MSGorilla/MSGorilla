@@ -4,7 +4,6 @@ using Microsoft.Owin.Security.Cookies;
 
 using Owin;
 using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
 using System.Configuration;
 using System.Globalization;

@@ -11,7 +11,6 @@ using MSGorilla.Library.Models;
 using Microsoft.IdentityModel.Claims;
 using System.Web.Http;
 using MSGorilla.Library.Models.ViewModels;
-using MSGorilla.Library.Models.SqlModels;
 
 namespace MSGorilla.Utility
 {
@@ -183,7 +182,7 @@ namespace MSGorilla.Utility
                             _accountManager.UpdateUser(profile);
                         }
                     }
-                    catch (Exception e)
+                    catch
                     {
                     }
 
