@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Web;
 using MSGorilla.Library.Models;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -18,7 +18,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
         public string CategoryName { get; set; }
         public int CategoryID { get; set; }
         public string NotifyTo { get; set; }
-        public string Message { get; set; }
+        public string EventIDs { get; set; }
 
         public static string ToPartitionKey(string notifyTo, string groupID, string categeryName)
         {
@@ -40,7 +40,9 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             entity.CategoryName = msg.CategoryName;
             entity.CategoryID = msg.CategoryID;
             entity.NotifyTo = msg.NotifyTo;
-            entity.Message = msg.Message;
+
+            string[] ids = (from id in msg.EventIDs select HttpUtility.UrlEncode(id)).ToArray();
+            entity.EventIDs = Utils.Array2String(ids);
 
             entity.PartitionKey = ToPartitionKey(entity.NotifyTo, entity.Group, entity.CategoryName);
             entity.RowKey = msg.ID;

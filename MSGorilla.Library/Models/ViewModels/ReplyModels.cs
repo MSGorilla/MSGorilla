@@ -34,7 +34,7 @@ namespace MSGorilla.Library.Models.ViewModels
 
     public class DisplayReply : DisplayMessage
     {
-        public string Type
+        public new string Type
         {
             get
             {

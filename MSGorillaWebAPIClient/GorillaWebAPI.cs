@@ -126,7 +126,7 @@ namespace MSGorilla.WebAPI.Client
             return _readResponseContent(response);
         }
 
-        public string UpdateCategoryMessage(string message, string notifyTo, string categoryName, string groupID = null)
+        public string UpdateCategoryMessage(string[] eventIDs, string notifyTo, string categoryName, string groupID = null)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + Constant.UriUpdateCategoryMessage);
             request.Method = "POST";
@@ -135,8 +135,9 @@ namespace MSGorilla.WebAPI.Client
 
             using (var writer = new StreamWriter(request.GetRequestStream()))
             {
-                string msg = string.Format("message={0}&to={1}&categoryName={2}&group={3}",
-                                                Uri.EscapeDataString(message),
+                string idString = "eventid=" + string.Join("&eventid=", eventIDs); 
+                string msg = string.Format("{0}&to={1}&categoryName={2}&group={3}",
+                                                idString,
                                                 notifyTo,
                                                 categoryName,
                                                 groupID);

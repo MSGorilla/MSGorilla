@@ -15,6 +15,6 @@ namespace MSGorilla.Library.Models.ViewModels
         public string CategoryName { get; set; }
         public int CategoryID { get; set; }
         public SimpleUserProfile NotifyTo { get; set; }
-        public string Message { get; set; }
+        public List<string> EventIDs { get; set; }
     }
 }

@@ -14,6 +14,7 @@ namespace MSGorilla.Library.Models.ViewModels
         public string Description { get; set; }
         public string Creater { get; set; }
         public DateTime CreateTimestamp { get; set; }
+        public int EventCount { get; set; }
 
         public static implicit operator DisplayCategory(MSGorilla.Library.Models.SqlModels.Category category)
         {
@@ -29,6 +30,7 @@ namespace MSGorilla.Library.Models.ViewModels
             dCat.Description = category.Description;
             dCat.Creater = category.Creater;
             dCat.CreateTimestamp = category.CreateTimestamp;
+            dCat.EventCount = 0;
             return dCat;
         }
     }

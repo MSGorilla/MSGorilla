@@ -12,8 +12,6 @@ namespace MSGorilla.Library
 {
     public class SchemaManager
     {
-        private MSGorillaEntities _gorillaCtx;
-
         public SchemaManager()
         {
             using (var _gorillaCtx = new MSGorillaEntities())

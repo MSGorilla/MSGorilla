@@ -31,11 +31,22 @@ namespace MSGorilla.WebAPI
             displayMsg.PostTime = msg.PostTime;
             displayMsg.CategoryID = msg.CategoryID;
             displayMsg.CategoryName = msg.CategoryName;
-            displayMsg.Message = msg.Message;
+            displayMsg.EventIDs = msg.EventIDs;
 
             displayMsg.NotifyTo = AccountController.GetSimpleUserProfile(msg.NotifyTo);
             displayMsg.Group = GroupController.GetDisplayGroup(msg.Group, userid);
             return displayMsg;
+        }
+
+        public DisplayCategory ToDisplayCategory(Category category, string userid)
+        {
+            DisplayCategory dcat = category;
+            CategoryMessage msg = _categoryManager.RetriveCategoryMessage(userid, category);
+            if (msg != null && msg.EventIDs != null)
+            {
+                dcat.EventCount = msg.EventIDs.Count;
+            }
+            return dcat;
         }
 
         private static string CreateCacheCategoryKey(string name, string group)
@@ -53,7 +64,8 @@ namespace MSGorilla.WebAPI
         ///     "GroupID": "msgorilladev",
         ///     "Description": null,
         ///     "Creater": "user1",
-        ///     "CreateTimestamp": "2014-08-05T01:09:54.3483546Z"
+        ///     "CreateTimestamp": "2014-08-05T01:09:54.3483546Z",
+        ///     "EventCount": 0
         /// }
         /// </summary>
         /// <param name="name">category name</param>
@@ -110,7 +122,8 @@ namespace MSGorilla.WebAPI
         ///     "GroupID": "msgorilladev",
         ///     "Description": null,
         ///     "Creater": "user1",
-        ///     "CreateTimestamp": "2014-08-05T01:09:54.3483546Z"
+        ///     "CreateTimestamp": "2014-08-05T01:09:54.3483546Z",
+        ///     "EventCount": 2
         /// }
         /// </summary>
         /// <param name="name">category name</param>
@@ -119,7 +132,8 @@ namespace MSGorilla.WebAPI
         [HttpGet]
         public DisplayCategory GetCategory(string name, string group = null)
         {
-            return GetCategoryModel(name, group);
+            string me = whoami();
+            return ToDisplayCategory(GetCategoryModel(name, group), me);
         }
 
         /// <summary>
@@ -132,7 +146,8 @@ namespace MSGorilla.WebAPI
         ///     "GroupID": "msgorilladev",
         ///     "Description": null,
         ///     "Creater": "user1",
-        ///     "CreateTimestamp": "2014-08-05T01:09:54.3483546Z"
+        ///     "CreateTimestamp": "2014-08-05T01:09:54.3483546Z",
+        ///     "EventCount": 2
         /// }
         /// </summary>
         /// <param name="id">category id</param>
@@ -141,7 +156,7 @@ namespace MSGorilla.WebAPI
         public DisplayCategory GetCategory(int id)
         {
             string me = whoami();
-            DisplayCategory category = _categoryManager.GetCategory(id);
+            Category category = _categoryManager.GetCategory(id);
             if (category == null)
             {
                 throw new CategoryNotFoundException();
@@ -152,7 +167,7 @@ namespace MSGorilla.WebAPI
                 throw new UnauthroizedActionException();
             }
 
-            return category;
+            return ToDisplayCategory(category, me);
         }
 
         /// <summary>
@@ -166,7 +181,8 @@ namespace MSGorilla.WebAPI
         ///         "GroupID": "msgorilladev",
         ///         "Description": null,
         ///         "Creater": "user1",
-        ///         "CreateTimestamp": "2014-08-05T01:09:54.3483546Z"
+        ///         "CreateTimestamp": "2014-08-05T01:09:54.3483546Z",
+        ///         "EventCount": 2
         ///     },
         ///     ......
         ///     {
@@ -175,7 +191,8 @@ namespace MSGorilla.WebAPI
         ///         "GroupID": "woss",
         ///         "Description": null,
         ///         "Creater": "user1",
-        ///         "CreateTimestamp": "2014-08-05T05:31:43.5123168Z"
+        ///         "CreateTimestamp": "2014-08-05T05:31:43.5123168Z",
+        ///         "EventCount": 0
         ///     }
         /// ]
         /// </summary>
@@ -191,7 +208,7 @@ namespace MSGorilla.WebAPI
             {
                 foreach (var category in _categoryManager.GetCategoryByGroup(group))
                 {
-                    list.Add(category);
+                    list.Add(ToDisplayCategory(category, me));
                 }
             }
 
@@ -205,25 +222,29 @@ namespace MSGorilla.WebAPI
         /// [
         ///     {
         ///         "User": "user1",
-        ///         "ID": "251995093104893",
-        ///         "PostTime": "2014-08-05T03:01:35.1069164Z",
-        ///         "Group": "msgorilladev",
+        ///         "ID": "251994817405379",
+        ///         "PostTime": "2014-08-08T07:36:34.6200627Z",
+        ///         "Group": {
+        ///             "GroupID": "msgorilladev",
+        ///             "DisplayName": "MSGorilla Dev",
+        ///             "Description": "MSgorilla Devs and Testers",
+        ///             "IsOpen": false,
+        ///             "IsJoined": true
+        ///         },
         ///         "CategoryName": "testcategory",
         ///         "CategoryID": 1,
-        ///         "NotifyTo": "user1",
-        ///         "Message": "category message from SDK API"
+        ///         "NotifyTo": {
+        ///             "Userid": "user1",
+        ///             "DisplayName": "User1",
+        ///             "PortraitUrl": null,
+        ///             "Description": "user for test"
+        ///         },
+        ///         "EventIDs": [
+        ///             "1|3",
+        ///             "2"
+        ///         ]
         ///     },
         ///     ......
-        ///     {
-        ///         "User": "user1",
-        ///         "ID": "251995084062643",
-        ///         "PostTime": "2014-08-05T05:32:17.3562676Z",
-        ///         "Group": "woss",
-        ///         "CategoryName": "testcategory",
-        ///         "CategoryID": 3,
-        ///         "NotifyTo": "user1",
-        ///         "Message": "message in woss category"
-        ///     }
         /// ]
         /// </summary>
         /// <param name="name"></param>
@@ -255,8 +276,8 @@ namespace MSGorilla.WebAPI
         /// [
         ///     {
         ///         "User": "user1",
-        ///         "ID": "251995093104893",
-        ///         "PostTime": "2014-08-05T03:01:35.1069164Z",
+        ///         "ID": "251994817405379",
+        ///         "PostTime": "2014-08-08T07:36:34.6200627Z",
         ///         "Group": {
         ///             "GroupID": "msgorilladev",
         ///             "DisplayName": "MSGorilla Dev",
@@ -272,7 +293,10 @@ namespace MSGorilla.WebAPI
         ///             "PortraitUrl": null,
         ///             "Description": "user for test"
         ///         },
-        ///         "Message": "category message from SDK API"
+        ///         "EventIDs": [
+        ///             "1|3",
+        ///             "2"
+        ///         ]
         ///     }
         /// ]
         /// </summary>
@@ -302,8 +326,8 @@ namespace MSGorilla.WebAPI
         /// [
         ///     {
         ///         "User": "user1",
-        ///         "ID": "251995093104893",
-        ///         "PostTime": "2014-08-05T03:01:35.1069164Z",
+        ///         "ID": "251994817405379",
+        ///         "PostTime": "2014-08-08T07:36:34.6200627Z",
         ///         "Group": {
         ///             "GroupID": "msgorilladev",
         ///             "DisplayName": "MSGorilla Dev",
@@ -319,33 +343,15 @@ namespace MSGorilla.WebAPI
         ///             "PortraitUrl": null,
         ///             "Description": "user for test"
         ///         },
-        ///         "Message": "category message from SDK API"
+        ///         "EventIDs": [
+        ///             "1|3",
+        ///             "2"
+        ///         ]
         ///     },
         ///     ......
-        ///     {
-        ///         "User": "user1",
-        ///         "ID": "251995097347218",
-        ///         "PostTime": "2014-08-05T01:50:52.7815261Z",
-        ///         "Group": {
-        ///             "GroupID": "msgorilladev",
-        ///             "DisplayName": "MSGorilla Dev",
-        ///             "Description": "MSgorilla Devs and Testers",
-        ///             "IsOpen": false,
-        ///             "IsJoined": true
-        ///         },
-        ///         "CategoryName": "testcategory2",
-        ///         "CategoryID": 2,
-        ///         "NotifyTo": {
-        ///             "Userid": "user1",
-        ///             "DisplayName": "User1",
-        ///             "PortraitUrl": null,
-        ///             "Description": "user for test"
-        ///         },
-        ///         "Message": "first  message in category2"
-        ///     }
         /// ]
         /// </summary>
-        /// <param name="group"></param>
+        /// <param name="group">group id</param>
         /// <returns></returns>
         [HttpGet]
         public List<DisplayCategoryMessage> RetriveAllCategoryMessage(string group = null)
@@ -386,25 +392,28 @@ namespace MSGorilla.WebAPI
         ///     "CategoryName": "testcategory",
         ///     "CategoryID": 1,
         ///     "NotifyTo": "user1",
-        ///     "Message": "second category message"
+        ///     "EventIDs": [
+        ///         "1|3",
+        ///         "2"
+        ///     ]
         /// }
         /// </summary>
-        /// <param name="message">message content</param>
+        /// <param name="eventID">event id list</param>
         /// <param name="to">notify to whom</param>
         /// <param name="categoryName">category name</param>
         /// <param name="group">group id</param>
         /// <returns></returns>
         [HttpGet, HttpPost]
-        public CategoryMessage UpdateCategoryMessage(string message, string to, string categoryName, string group = null)
+        public CategoryMessage UpdateCategoryMessage([FromUri]string[] eventID, string to, string categoryName, string group = null)
         {
             string me = whoami();
             Category category = GetCategoryModel(categoryName, group);
-            return _categoryManager.UpdateCategoryMessage(message, me, to, category, DateTime.UtcNow);
+            return _categoryManager.UpdateCategoryMessage(eventID, me, to, category, DateTime.UtcNow);
         }
 
         public class MessageModel
         {
-            public string Message { get; set; }
+            public string[] EventID { get; set; }
             public string To { get; set; }
             public string CategoryName { get; set; }
             public string Group { get; set; }
@@ -421,7 +430,10 @@ namespace MSGorilla.WebAPI
         ///     "CategoryName": "testcategory",
         ///     "CategoryID": 1,
         ///     "NotifyTo": "user1",
-        ///     "Message": "second category message"
+        ///     "EventIDs": [
+        ///         "1|3",
+        ///         "2"
+        ///     ]
         /// }
         /// </summary>
         /// <param name="msg"></param>
@@ -429,7 +441,7 @@ namespace MSGorilla.WebAPI
         [HttpPost]
         public CategoryMessage UpdateCategoryMessage(MessageModel msg)
         {
-            return UpdateCategoryMessage(msg.Message, msg.To, msg.CategoryName, msg.Group);
+            return UpdateCategoryMessage(msg.EventID, msg.To, msg.CategoryName, msg.Group);
         }
     }
 }

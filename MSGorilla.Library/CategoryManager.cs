@@ -95,9 +95,9 @@ namespace MSGorilla.Library
             }
         }
 
-        public CategoryMessage UpdateCategoryMessage(string msg, string from, string to, Category category, DateTime timestamp)
+        public CategoryMessage UpdateCategoryMessage(string[] eventIDs, string from, string to, Category category, DateTime timestamp)
         {
-            CategoryMessage message = new CategoryMessage(msg, from, to, category, timestamp);
+            CategoryMessage message = new CategoryMessage(eventIDs, from, to, category, timestamp);
             TableOperation insertOper = TableOperation.InsertOrReplace((CategoryMessageEntity)message);
             _categoryMsgTable.Execute(insertOper);
             return message;

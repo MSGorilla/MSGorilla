@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MSGorilla.Library.Models.SqlModels;
-using MSGorilla.Library.Models.SqlModels;
+
 namespace MSGorilla.Library.Models.ViewModels
 {
     public class DisplayGroup
