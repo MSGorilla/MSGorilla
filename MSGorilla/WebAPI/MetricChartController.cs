@@ -316,6 +316,46 @@ namespace MSGorilla.WebAPI
         }
 
         /// <summary>
+        /// Get a chart by name. The chart name should be in format: {group}_{category}_{counter}_{instance}
+        /// If the chart do not exist, try to create the chart and add the dataset.
+        /// 
+        /// </summary>
+        /// <param name="chartName">chart name in format {group}_{category}_{counter}_{instance}</param>
+        /// <returns></returns>
+        [HttpGet]
+        public DisplayMetricChart TryGetSingleDataSetChart(string chartName)
+        {
+            string me = whoami();
+
+            if(string.IsNullOrEmpty(chartName) || chartName.Split('_').Length != 4)
+            {
+                return null;
+            }
+            string[] split = chartName.Split('_');
+            string group = split[0];
+            string category = split[1];
+            string counter = split[2];
+            string instance = split[3];
+
+            MembershipHelper.CheckMembership(group, me);
+            DisplayMetricChart chart = _metricManager.GetChart(chartName);
+            if (chart == null)
+            {
+                //Try create chart if not exist
+                MetricDataSet dataset = _metricManager.GetDataSet(instance, counter, category, group);
+                if (dataset == null)
+                {
+                    return null;
+                }
+                
+                chart = _metricManager.CreateChart(chartName, group, counter);
+                _metricManager.AddDataSet(chartName, dataset.Id, counter, "line");
+                chart = _metricManager.GetChart(chartName);
+            }
+            return chart;
+        }
+
+        /// <summary>
         /// Add a dataset into a chart. Chart and dataset should belong to the same group
         /// 
         /// example output:
