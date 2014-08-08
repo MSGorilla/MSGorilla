@@ -43,6 +43,7 @@ namespace MSGorilla.Controllers
                 ViewBag.IsLiked = false;
                 ViewBag.Group = "";
                 ViewBag.GroupName = "";
+                ViewBag.PerfChartName = "";
             }
             else
             {
@@ -53,6 +54,9 @@ namespace MSGorilla.Controllers
                 ViewBag.IsLiked = _topicManager.IsFavouriteTopic(me.Userid, t.Id) ? 1 : 0;
                 ViewBag.Group = group;
                 ViewBag.GroupName = g.DisplayName;
+                ViewBag.PerfChartName = t.Name;
+                //ViewBag.PerfChartName = "perf_chart_test";
+
             }
 
             return View();

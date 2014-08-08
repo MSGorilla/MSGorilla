@@ -2785,13 +2785,14 @@ function refreshWelcomeCategories() {
                     var description = item.Description;
                     var creater = item.Creater;
                     var createtimestamp = item.CreateTimestamp;
+                    var eventcount = item.EventCount;
 
                     if (isNullOrEmpty(categories[name])) {
-                        categories[name] = 1;
+                        categories[name]= eventcount;
                     }
                     else {
-                        categories[name]++;
-                    }
+                        categories[name]+= eventcount;
+                        }
                 })
 
                 for (var name in categories) {
