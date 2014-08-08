@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 using MSGorilla.Library.Models.ViewModels;
-using MSGorilla.Library.Models.SqlModels;
 
 namespace MSGorilla.WebAPI.Client
 {
