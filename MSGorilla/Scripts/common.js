@@ -2375,7 +2375,7 @@ function LoadMyCategories() {
                 navlist.empty();
 
                 var categories = {};
-                var categorycount = 0;
+                var totalcategorycount = 0;
 
                 $.each(data, function (index, item) {
                     var id = item.ID;
@@ -2384,12 +2384,13 @@ function LoadMyCategories() {
                     var description = item.Description;
                     var creater = item.Creater;
                     var createtimestamp = item.CreateTimestamp;
+                    var eventcount = item.EventCount;
 
                     if (isNullOrEmpty(categories[name])) {
-                        categories[name] = 1;
+                        categories[name] = eventcount;
                     }
                     else {
-                        categories[name]++;
+                        categories[name] += eventcount;
                     }
                 })
 
@@ -2410,10 +2411,10 @@ function LoadMyCategories() {
                         navlist.append(output);
                     }
 
-                    categorycount += categories[name];
+                    totalcategorycount += categories[name];
                 }
 
-                $("#shortcut_category_count").html(categorycount);
+                $("#shortcut_category_count").html(totalcategorycount);
             }
         },
         null,
@@ -3761,10 +3762,22 @@ function createCategoryFeed(data) {
     var groupname = data.Group.DisplayName;
     var cid = data.CategoryID;
     var cname = data.CategoryName;
-    var msg = data.Message;
+    var events = data.EventIDs;
+    var msg = "";
 
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";
+    }
+
+    // create msg
+    if (!isNullOrEmpty(events)) {
+        msg = "You got " + events.count + " to-do events.";
+        for (var e in events) {
+            msg += "<a class='btn btn-link' href='/Event/index?eventid=" + encodeTxt(e) + "'>" + e + "</a>";
+        }
+    }
+    else {
+        msg = "You have no to-do event now.";
     }
 
     output += "  <li id='feed_" + id + "' class='list-group-item'>";
