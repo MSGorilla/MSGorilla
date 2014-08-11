@@ -3568,7 +3568,7 @@ function LoadPerfChart(chartname, chartdivid) {
         return;
     }
 
-    var apiurl = "/api/metricchart/trygetsingledatasetchart";
+    var apiurl = "/api/metricchart/trygetchart";
     //var apiurl = "/api/metricchart/getchart";
     var apidata = "chartName=" + encodeTxt(chartname);
     var option = chart_axis_perf_template;
