@@ -316,31 +316,38 @@ namespace MSGorilla.WebAPI
         }
 
         /// <summary>
-        /// Get a chart by name. The chart name should be in format: {group}_{category}_{counter}_{instance}
-        /// If the chart do not exist, try to create the chart and add the dataset.
+        /// Get a chart by name. 
+        /// If the chart do not exist and the chart name is in format: {group}_{category}_{counter}_{instance},
+        /// it will create the chart and add the dataset.
         /// 
         /// </summary>
-        /// <param name="chartName">chart name in format {group}_{category}_{counter}_{instance}</param>
+        /// <param name="chartName">chart name can be in format {group}_{category}_{counter}_{instance}</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayMetricChart TryGetSingleDataSetChart(string chartName)
+        public DisplayMetricChart TryGetChart(string chartName)
         {
             string me = whoami();
 
-            if(string.IsNullOrEmpty(chartName) || chartName.Split('_').Length != 4)
-            {
-                return null;
-            }
-            string[] split = chartName.Split('_');
-            string group = split[0];
-            string category = split[1];
-            string counter = split[2];
-            string instance = split[3];
-
-            MembershipHelper.CheckMembership(group, me);
             DisplayMetricChart chart = _metricManager.GetChart(chartName);
-            if (chart == null)
+            if (chart != null)
             {
+                MembershipHelper.CheckMembership(chart.GroupID, me);
+                return chart;
+            }
+            else
+            {
+                //check chart name format
+                if(string.IsNullOrEmpty(chartName) || chartName.Split('_').Length != 4)
+                {
+                    return null;
+                }
+                string[] split = chartName.Split('_');
+                string group = split[0];
+                string category = split[1];
+                string counter = split[2];
+                string instance = split[3];
+                MembershipHelper.CheckMembership(group, me);
+
                 //Try create chart if not exist
                 MetricDataSet dataset = _metricManager.GetDataSet(instance, counter, category, group);
                 if (dataset == null)
