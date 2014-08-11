@@ -3568,7 +3568,8 @@ function LoadPerfChart(chartname, chartdivid) {
         return;
     }
 
-    var apiurl = "/api/metricchart/getchart";
+    var apiurl = "/api/metricchart/trygetsingledatasetchart";
+    //var apiurl = "/api/metricchart/getchart";
     var apidata = "chartName=" + encodeTxt(chartname);
     var option = chart_axis_perf_template;
 
@@ -3589,7 +3590,9 @@ function LoadPerfChart(chartname, chartdivid) {
 
                 // set title
                 option.title.text = title;
-                option.title.subtext = subtitle;
+                if (!isNullOrEmpty(subtitle)) {
+                    option.title.subtext = subtitle;
+                }
 
                 // get dataset
                 $.each(dataset, function (index, item) {
@@ -3630,17 +3633,17 @@ function LoadPerfChart(chartname, chartdivid) {
                                     name: legend,
                                     type: type,
                                     data: ydata,
-                                    markPoint: {
-                                        data: [
-                                            { type: 'max', name: 'Max' },
-                                            { type: 'min', name: 'Min' }
-                                        ]
-                                    },
-                                    markLine: {
-                                        data: [
-                                            { type: 'average', name: 'Average' }
-                                        ]
-                                    }
+                                    //markPoint: {
+                                    //    data: [
+                                    //        { type: 'max', name: 'Max' },
+                                    //        { type: 'min', name: 'Min' }
+                                    //    ]
+                                    //},
+                                    //markLine: {
+                                    //    data: [
+                                    //        { type: 'average', name: 'Average' }
+                                    //    ]
+                                    //}
                                 });
                             }
                         },

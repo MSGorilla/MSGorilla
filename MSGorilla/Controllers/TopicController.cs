@@ -54,7 +54,7 @@ namespace MSGorilla.Controllers
                 ViewBag.IsLiked = _topicManager.IsFavouriteTopic(me.Userid, t.Id) ? 1 : 0;
                 ViewBag.Group = group;
                 ViewBag.GroupName = g.DisplayName;
-                ViewBag.PerfChartName = t.Name;
+                ViewBag.PerfChartName = group + "_" + t.Name;
                 //ViewBag.PerfChartName = "perf_chart_test";
 
             }
