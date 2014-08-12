@@ -121,15 +121,10 @@ namespace MSGorilla.Library
                     return member;
                 }
 
-                if (group.IsOpen == false)
-                {
-                    throw new UnauthroizedActionException();
-                }
-
                 member = new Membership();
                 member.GroupID = groupID;
                 member.MemberID = userid;
-                member.Role = "user";
+                member.Role = group.IsOpen ? "user" : "pending";
                 _gorillaCtx.Memberships.Add(member);
                 _gorillaCtx.SaveChanges();
 
@@ -170,7 +165,7 @@ namespace MSGorilla.Library
                 groupID,
                 userid).FirstOrDefault();
 
-            if (member == null)
+            if (member == null || "pending".Equals(member.Role))
             {
                 throw new UnauthroizedActionException();
             }
@@ -220,6 +215,11 @@ namespace MSGorilla.Library
 
                     _gorillaCtx.SaveChanges();
                 }
+                else
+                {
+                    member.Role = "user";
+                    _gorillaCtx.SaveChanges();
+                }
                 
                 return member;
             }
@@ -260,7 +260,57 @@ namespace MSGorilla.Library
         {
             using (var _gorillaCtx = new MSGorillaEntities())
             {
-                return _gorillaCtx.Memberships.SqlQuery("select * from membership where groupid={0}", groupID).ToList<Membership>();
+                return GetAllGroupMember(groupID, _gorillaCtx);
+            }
+        }
+
+        public List<Membership> GetAllGroupMember(string groupID, MSGorillaEntities _gorillaCtx)
+        {
+            return _gorillaCtx.Memberships.SqlQuery("select * from membership where groupid={0}", groupID).ToList<Membership>();
+        }
+
+        public List<MembershipView> GetGroupMembershipView(string groupID, string userid)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
+                if (user == null)
+                {
+                    throw new UserNotFoundException(userid);
+                }
+
+                HashSet<string> followings = new HashSet<string>();
+                foreach (var u in user.Subscriptions)
+                {
+                    followings.Add(u.FollowingUserid);
+                }
+
+                List<Membership> members = GetAllGroupMember(groupID, _gorillaCtx);
+                List<string> users = new List<string>();
+                foreach(var mem in members){
+                    users.Add(mem.MemberID);
+                }
+
+                Dictionary<string, UserProfile> map = new Dictionary<string, UserProfile>();
+                foreach(var userprofile in _gorillaCtx.UserProfiles.Where(u => users.Contains(u.Userid)))
+                {
+                    map.Add(userprofile.Userid, userprofile);
+                }
+
+                List<MembershipView> memberViews = new List<MembershipView>();
+                foreach (var m in members)
+                {
+                    user = map[m.MemberID];
+                    int isfollowing = userid.Equals(user.Userid) ? 0 : (followings.Contains(user.Userid) ? 1 : -1);
+                    DisplayUserProfile dup = new DisplayUserProfile(user, isfollowing);
+                    MembershipView mv = new MembershipView();
+                    mv.GroupID = groupID;
+                    mv.Role = m.Role;
+                    mv.User = dup;
+
+                    memberViews.Add(mv);
+                }
+                return memberViews;
             }
         }
 

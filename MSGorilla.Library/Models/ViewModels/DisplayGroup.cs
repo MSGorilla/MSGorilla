@@ -13,7 +13,33 @@ namespace MSGorilla.Library.Models.ViewModels
         public string DisplayName { get; set; }
         public string Description { get; set; }
         public bool IsOpen { get; set; }
-        public bool IsJoined { get; set; }
+        public string Status { get; set; }
+
+
+        public const string NotJoinedStatus = "Not Joined";
+        public const string PendingStatus = "Pending";
+        public const string JoinedStatus = "Joined";
+        public const string AdminStatus = "Admin";
+
+        private static string Role2Status(string role)
+        {
+            if ("admin".Equals(role))
+            {
+                return AdminStatus;
+            }
+            else if ("user".Equals(role) || "robot".Equals(role))
+            {
+                return JoinedStatus;
+            }
+            else if ("pending".Equals(role))
+            {
+                return PendingStatus;
+            }
+            else
+            {
+                return NotJoinedStatus;
+            }
+        }
 
         public static implicit operator DisplayGroup(Group group)
         {
@@ -27,7 +53,7 @@ namespace MSGorilla.Library.Models.ViewModels
             dgroup.DisplayName = group.DisplayName;
             dgroup.Description = group.Description;
             dgroup.IsOpen = group.IsOpen;
-            dgroup.IsJoined = false;
+            dgroup.Status = "Not Joined";
             return dgroup;
         }
 
@@ -44,26 +70,42 @@ namespace MSGorilla.Library.Models.ViewModels
             {
                 using (_gorillaCtx = new MSGorillaEntities())
                 {
-                    this.IsJoined = _gorillaCtx.Memberships.Where(
+                    Membership membership = _gorillaCtx.Memberships.Where(
                                         m => m.GroupID == group.GroupID && m.MemberID == userid
-                                    ).FirstOrDefault() != null;
+                                    ).FirstOrDefault();
+                    if (membership == null)
+                    {
+                        this.Status = Role2Status(null);
+                    }
+                    else
+                    {
+                        this.Status = Role2Status(membership.Role);
+                    }
                 }
             }
             else
             {
-                this.IsJoined = _gorillaCtx.Memberships.Where(
+                Membership membership = _gorillaCtx.Memberships.Where(
                             m => m.GroupID == group.GroupID && m.MemberID == userid
-                        ).FirstOrDefault() != null;
+                        ).FirstOrDefault();
+                if (membership == null)
+                {
+                    this.Status = Role2Status(null);
+                }
+                else
+                {
+                    this.Status = Role2Status(membership.Role);
+                }
             }
         }
 
-        public DisplayGroup(Group group, bool isJoined = false)
+        public DisplayGroup(Group group, string status = null)
         {
             this.GroupID = group.GroupID;
             this.DisplayName = group.DisplayName;
             this.Description = group.Description;
             this.IsOpen = group.IsOpen;
-            this.IsJoined = isJoined;
+            this.Status = Role2Status(status);
         }
     }
 }

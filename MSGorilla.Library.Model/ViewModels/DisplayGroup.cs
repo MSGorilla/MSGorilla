@@ -12,7 +12,7 @@ namespace MSGorilla.Library.Models.ViewModels
         public string DisplayName { get; set; }
         public string Description { get; set; }
         public bool IsOpen { get; set; }
-        public bool IsJoined { get; set; }
+        public string Status { get; set; }
 
         public DisplayGroup() { }
     }

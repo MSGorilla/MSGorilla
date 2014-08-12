@@ -18,9 +18,9 @@ namespace MSGorilla.WebAPI
     {
         private GroupManager _groupManager = new GroupManager();
 
-        public static DisplayGroup GetDisplayGroup(string groupID, string userid, bool? isJoined = null)
+        public static DisplayGroup GetDisplayGroup(string groupID, string userid, string role = null)
         {
-            string key = CacheHelper.DisplayGroupPrefix + userid;
+            string key = CacheHelper.DisplayGroupPrefix + userid + "@" + groupID;
             if (CacheHelper.Contains(key))
             {
                 return CacheHelper.Get<DisplayGroup>(key);
@@ -30,15 +30,17 @@ namespace MSGorilla.WebAPI
             using (var _gorillaCtx = new MSGorillaEntities())
             {
                 Group group = new GroupManager().GetGroupByID(groupID, _gorillaCtx);
-                if (isJoined != null)
+                if (!string.IsNullOrEmpty(role))
                 {
-                    result = new DisplayGroup(group, isJoined.Value);
+                    result = new DisplayGroup(group, role);
                 }
                 else
                 {
                     result = new DisplayGroup(group, userid, _gorillaCtx);
                 }
             }
+
+            CacheHelper.Add(key, result);
             return result;
         }
 
@@ -51,7 +53,7 @@ namespace MSGorilla.WebAPI
         ///     "DisplayName": "Microsoft",
         ///     "Description": "default group for all active users",
         ///     "IsOpen": true,
-        ///     "IsJoined":true
+        ///     "Status":"Joined"
         /// }
         /// </summary>
         /// <param name="groupID">group id</param>
@@ -70,7 +72,7 @@ namespace MSGorilla.WebAPI
             Group group =  _groupManager.CreateGroup(me, groupID, displayName, description, isOpen);
 
             MembershipHelper.RefreshJoinedGroup(me);
-            return GetDisplayGroup(groupID, me, true);
+            return GetDisplayGroup(groupID, me, "admin");
         }
 
         /// <summary>
@@ -82,7 +84,7 @@ namespace MSGorilla.WebAPI
         ///     "DisplayName": "Microsoft",
         ///     "Description": "default group for all active users",
         ///     "IsOpen": true,
-        ///     "IsJoined":true
+        ///     "Status":"Joined"
         /// }
         /// </summary>
         /// <param name="groupID">group id</param>
@@ -109,7 +111,7 @@ namespace MSGorilla.WebAPI
         ///         "DisplayName": "MicrosoftALL",
         ///         "Description": "default group for all user",
         ///         "IsOpen": true,
-        ///         "IsJoined":true
+        ///         "Status":"Joined"
         ///     },
         ///     ......
         ///     {
@@ -117,7 +119,7 @@ namespace MSGorilla.WebAPI
         ///         "DisplayName": "WOSS",
         ///         "Description": "Woss Team",
         ///         "IsOpen": false,
-        ///         "IsJoined":true
+        ///         "Status":"Not Joined"
         ///     }
         /// ]
         /// </summary>
@@ -146,7 +148,7 @@ namespace MSGorilla.WebAPI
         ///     "DisplayName": "MSGorilla Dev",
         ///     "Description": "MSgorilla Devs and Testers",
         ///     "IsOpen": false,
-        ///     "IsJoined":true
+        ///     "Status":"Joined"
         /// }
         /// </summary>
         /// <param name="groupID">group id</param>
@@ -202,13 +204,13 @@ namespace MSGorilla.WebAPI
         /// <param name="groupID">group id</param>
         /// <returns></returns>
         [HttpGet, HttpPost, HttpPut]
-        public MembershipView AddMember(string userid, string groupID)
+        public ActionResult AddMember(string userid, string groupID)
         {
             string me = whoami();
             MembershipHelper.CheckAdmin(groupID, me);
             Membership member = _groupManager.AddMember(groupID, userid);
             MembershipHelper.RefreshJoinedGroup(userid);
-            return member;
+            return ActionResult.Success();
         }
 
         /// <summary>
@@ -239,9 +241,8 @@ namespace MSGorilla.WebAPI
         /// 
         /// example output:
         /// {
-        ///     "GroupID": "woss",
-        ///     "MemberID": "yidguo2",
-        ///     "Role": "user"
+        ///     "ActionResultCode": 0,
+        ///     "Message": "Success."
         /// }
         /// </summary>
         /// <param name="groupID">group id</param>
@@ -249,11 +250,13 @@ namespace MSGorilla.WebAPI
         /// <param name="role">Can be "admin" or "user"</param>
         /// <returns></returns>
         [HttpGet, HttpPost, HttpPut]
-        public MembershipView UpdateMembership(string groupID, string userid, string role)
+        public ActionResult UpdateMembership(string groupID, string userid, string role)
         {
             string me = whoami();
             MembershipHelper.CheckAdmin(groupID, me);
-            return _groupManager.UpdateMembership(groupID, whoami(), userid, role);
+            _groupManager.UpdateMembership(groupID, whoami(), userid, role);
+
+            return ActionResult.Success();
         }
 
         /// <summary>
@@ -262,14 +265,32 @@ namespace MSGorilla.WebAPI
         /// example output:
         /// [
         ///     {
-        ///         "GroupID": "msgorilladev",
-        ///         "MemberID": "t-yig",
+        ///         "GroupID": "woss",
+        ///         "User": {
+        ///             "Userid": "user1",
+        ///             "DisplayName": "User1",
+        ///             "PortraitUrl": null,
+        ///             "Description": "user for test",
+        ///             "FollowingsCount": 13,
+        ///             "FollowersCount": 6,
+        ///             "MessageCount": 211,
+        ///             "IsFollowing": 1
+        ///         },
         ///         "Role": "admin"
         ///     },
         ///     ......
         ///     {
-        ///         "GroupID": "msgorilladev",
-        ///         "MemberID": "bekimd",
+        ///         "GroupID": "woss",
+        ///         "User": {
+        ///             "Userid": "user3",
+        ///             "DisplayName": "User3",
+        ///             "PortraitUrl": null,
+        ///             "Description": "test user3",
+        ///             "FollowingsCount": 2,
+        ///             "FollowersCount": 2,
+        ///             "MessageCount": 6,
+        ///             "IsFollowing": 0
+        ///         },
         ///         "Role": "user"
         ///     }
         /// ]
@@ -281,12 +302,13 @@ namespace MSGorilla.WebAPI
         {
             string me = whoami();
             MembershipHelper.CheckMembership(groupID, me);
-            List<MembershipView> result = new List<MembershipView>();
-            foreach(Membership member in _groupManager.GetAllGroupMember(groupID))
-            {
-                result.Add(member);
-            }
-            return result;
+            //List<MembershipView> result = new List<MembershipView>();
+            //foreach(Membership member in _groupManager.GetAllGroupMember(groupID))
+            //{
+            //    result.Add(member);
+            //}
+            //return result;
+            return _groupManager.GetGroupMembershipView(groupID, me);
         }
 
         /// <summary>
