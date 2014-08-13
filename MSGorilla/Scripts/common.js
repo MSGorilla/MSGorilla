@@ -20,7 +20,7 @@ function AjaxCall(type, async, apiurl, apidata, successCallback, errorCallback, 
                 }
             }
             catch (ex) {
-                showError(ex);
+                showError(ex, msgboxid);
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -31,7 +31,7 @@ function AjaxCall(type, async, apiurl, apidata, successCallback, errorCallback, 
                 }
             }
             catch (ex) {
-                showError(ex);
+                showError(ex, msgboxid);
             }
         }
     }).always(function () {
@@ -41,7 +41,7 @@ function AjaxCall(type, async, apiurl, apidata, successCallback, errorCallback, 
             }
         }
         catch (ex) {
-            showError(ex);
+            showError(ex, msgboxid);
         }
     });
 }
@@ -897,7 +897,7 @@ function unfollow(btnid, user) {
     );
 }
 
-function LoadUsers(category, user) {
+function LoadUsers(category, id) {
     var listdiv = $("#userlist");
     if (listdiv.length == 0) {
         return;
@@ -905,18 +905,21 @@ function LoadUsers(category, user) {
 
     var apiurl = "";
     var apidata = "";
-    if (isNullOrEmpty(category))
-        apiurl = "/api/account/user";
-    else if (category == "following")
+    if (category == "following") {
         apiurl = "/api/account/followings";
-    else if (category == "followers")
-        apiurl = "/api/account/followers";
-    else {
-        showError("Illegal operation.");
-        return;
+        apidata = "userid=" + encodeTxt(id);
     }
-    if (!isNullOrEmpty(user)) {
-        apidata = "userid=" + encodeTxt(user);
+    else if (category == "followers") {
+        apiurl = "/api/account/followers";
+        apidata = "userid=" + encodeTxt(id);
+    }
+    else if (category == "viewgroup") {
+        apiurl = "/api/group/getallgroupmember"
+        apidata = "groupID=" + encodeTxt(id);
+    }
+    else {
+        showError("Illegal operation.", "loading_message_userlist");
+        return;
     }
 
     AjaxGetAsync(
@@ -924,7 +927,7 @@ function LoadUsers(category, user) {
         apidata,
         function (data) {
             if (isNullOrEmpty(data) || data.length == 0) {
-                showMessage("No content.");
+                showMessage("No content.", "loading_message_userlist");
             }
             else {
                 // clear list
@@ -932,11 +935,17 @@ function LoadUsers(category, user) {
 
                 // create list
                 $.each(data, function (index, item) {
+                    if (category == "viewgroup") {
+                        item = item.User;
+                    }
                     listdiv.append(createUserCard(item));
                     setUserFollowBtn("btn_user_follow_" + encodeId(item.Userid), item.Userid, item.IsFollowing);
                 })
             }
-        }
+        },
+        null,
+        null,
+        "loading_message_userlist"
     );
 }
 
@@ -2533,6 +2542,18 @@ function LoadUserFavoriteTopics(user) {
     );
 }
 
+function createTopic(topicid, topicname, topicdesp, topiccount, group) {
+    var output = "";
+
+    output = "<li class='list-group-item'>"
+           + "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
+           + "  <span class='badge'>" + topiccount + "</span>"
+           + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>"
+           + "</li>"
+
+    return output;
+}
+
 function setTopicLikeBtn(btnid, topicid, isLiked) {
     var btn = $("#" + btnid);
     if (btn.length == 0) {
@@ -2666,18 +2687,6 @@ function unlike(btnid, topicid) {
     );
 }
 
-function createTopic(topicid, topicname, topicdesp, topiccount, group) {
-    var output = "";
-
-    output = "<li class='list-group-item'>"
-           + "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
-           + "  <span class='badge'>" + topiccount + "</span>"
-           + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>"
-           + "</li>"
-
-    return output;
-}
-
 
 // Welcome
 function RefreshWelcomePageTimer() {
@@ -2788,11 +2797,11 @@ function refreshWelcomeCategories() {
                     var eventcount = item.EventCount;
 
                     if (isNullOrEmpty(categories[name])) {
-                        categories[name]= eventcount;
+                        categories[name] = eventcount;
                     }
                     else {
-                        categories[name]+= eventcount;
-                        }
+                        categories[name] += eventcount;
+                    }
                 })
 
                 for (var name in categories) {
@@ -3294,7 +3303,7 @@ function LoadGroups(category, group) {
                 // create list
                 $.each(data, function (index, item) {
                     listdiv.append(createGroupCard(item));
-                    setGroupJoinBtn("btn_group_join_" + encodeId(item.GroupID), item.GroupID, (item.IsOpen ? (item.IsJoined) : -1));
+                    setGroupJoinBtn("btn_group_join_" + encodeId(item.GroupID), item.GroupID, item.IsOpen, item.Status);
                 })
             }
         }
@@ -3308,7 +3317,7 @@ function createGroupCard(data) {
     var picurl = "";
     var desp = data.Description;
     var isopen = data.IsOpen;
-    var isjoined = data.IsJoined;
+    var status = data.Status;
 
     if (isNullOrEmpty(picurl)) {
         picurl = "/Content/Images/default_avatar.jpg";
@@ -3320,10 +3329,19 @@ function createGroupCard(data) {
            //+ "        <img class='img-rounded' id='group_pic_" + encodeId(groupid) + "' src='" + picurl + "' width='100' height='100' />"
            //+ "      </div>"
            + "      <div>"
-           + "        <a class='fullname' id='group_name_" + encodeId(groupid) + "' href='javascript:void(0);'>" + groupname + "</a>"
-           + "      </div>"
+           + "        <a class='fullname' id='group_name_" + encodeId(groupid) + "' href='/Group/View?group=" + encodeTxt(groupid) + "'>" + groupname + "</a>"
+           + "      </div>";
+
+    output += "     <div>"
+    if (isopen) {
+        output += "   <span>(Open group)</span>";
+    }
+    else {
+        output += "   <span>(Private group)</span>";
+    }
+    output += "     </div>"
            + "      <div class='group-card-desp'>"
-           + "        <span class='username' id='group_id_" + encodeId(groupid) + "'>" + desp + "</span>"
+           + "        <span id='group_id_" + encodeId(groupid) + "'>" + desp + "</span>"
            + "      </div>"
            + "    </div>"
            + "    <div class='group-card-postinfo'>"
@@ -3336,18 +3354,33 @@ function createGroupCard(data) {
     return output;
 }
 
-function setGroupJoinBtn(btnid, group, isJoined) {
+function setGroupJoinBtn(btnid, group, isopen, status) {
     var btn = $("#" + btnid);
     if (btn.length == 0) {
         return;
     }
 
-    if (isJoined == 0) {
-        setJoinBtn(btnid, group, true);
-    } else if (isJoined == 1) {
-        setLeaveBtn(btnid, group, true);
-    } else {  // -1: myself
-        setCloseBtn(btnid, group);
+    if (isopen) {
+        if (status == "Not Joined") {
+            setJoinBtn(btnid, group, true);
+        } else if (status == "Joined") {
+            setLeaveBtn(btnid, group, true);
+        } else if (status == "Pending") {
+            setPendingBtn(btnid, group, true);
+        } else if (status == "Admin") {
+            setAdminBtn(btnid, group, true);
+        }
+    }
+    else {  // not open
+        if (status == "Not Joined") {
+            setApplyBtn(btnid, group, true);
+        } else if (status == "Joined") {
+            setApplyLeaveBtn(btnid, group, true);
+        } else if (status == "Pending") {
+            setPendingBtn(btnid, group, true);
+        } else if (status == "Admin") {
+            setAdminBtn(btnid, group, true);
+        }
     }
 }
 
@@ -3360,6 +3393,37 @@ function setCloseBtn(btnid, group) {
     btn.text("Not open");
     btn.attr("class", "btn btn-info join-btn");
     btn.attr("href", "javascript:void(0)");
+    btn.show();
+}
+
+function setPendingBtn(btnid, group) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Waiting for approval");
+    btn.attr("class", "btn btn-info join-btn");
+    btn.attr("href", "javascript:void(0)");
+    btn.show();
+}
+
+function setAdminBtn(btnid, group, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Manage");
+    btn.attr("class", "btn btn-info join-btn");
+    if (enabled) {
+        btn.attr("onclick", "window.open('/group/manage?group=" + encodeTxt(group) + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
     btn.show();
 }
 
@@ -3421,6 +3485,44 @@ function setJoinBtn(btnid, group, enabled) {
     btn.show();
 }
 
+function setApplyBtn(btnid, group, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("+ Apply");
+    btn.attr("class", "btn btn-primary join-btn");
+    if (enabled) {
+        btn.attr("onclick", "apply('" + btnid + "', '" + group + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
+    btn.show();
+}
+
+function setApplyLeaveBtn(btnid, group, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Joined");
+    btn.attr("class", "btn btn-success join-btn");
+    if (enabled) {
+        btn.attr("onclick", "applyleave('" + btnid + "', '" + group + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "leaveBtnMouseOver('" + btnid + "');")
+    btn.attr("onmouseout", "leaveBtnMouseOut('" + btnid + "');")
+    btn.show();
+}
+
 function join(btnid, group) {
     setLeaveBtn(btnid, group, false);
 
@@ -3474,6 +3576,273 @@ function leave(btnid, group) {
         }
     );
 }
+
+function apply(btnid, group) {
+    setPendingBtn(btnid, group);
+
+    var apiurl = "/api/group/joingroup";
+    var apidata = "groupid=" + encodeTxt(group);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                showError("Failed to join group.");
+            }
+            else {
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setPendingBtn(btnid, group);
+                }
+                else {
+                    showError(msg);
+                }
+            }
+        }
+    );
+}
+
+function applyleave(btnid, group) {
+    setApplyBtn(btnid, group, false);
+
+    var apiurl = "/api/group/leavegroup";
+    var apidata = "groupid=" + encodeTxt(group);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                showError("Failed to leave group.");
+            }
+            else {
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setApplyBtn(btnid, group, true);
+                }
+                else {
+                    showError(msg);
+                }
+            }
+        }
+    );
+}
+
+function LoadGroupMembers(category, groupid) {
+    var listdiv = $("#userlist");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    if (isNullOrEmpty(category) || isNullOrEmpty(groupid)) {
+        showError("Illegal operation.", "loading_message_groupmembers");
+        return;
+    }
+
+    var apiurl = "/api/group/getallgroupmember"
+    var apidata = "groupID=" + encodeTxt(groupid);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+                showMessage("No content.", "loading_message_groupmembers");
+            }
+            else {
+                // clear list
+                listdiv.empty();
+
+                // create list
+                $.each(data, function (index, item) {
+                    var groupid = item.GroupID;
+                    var user = item.User;
+                    var role = item.Role;
+
+                    listdiv.append(createGroupMemberCard(user, groupid));
+                    setGroupMemberBtn("btn_member_manage_" + encodeId(user.Userid), user.Userid, groupid, role);
+                })
+            }
+        },
+        null,
+        null,
+        "loading_message_groupmembers"
+    );
+}
+
+function createGroupMemberCard(data, groupid) {
+    var output = "";
+    var userid = data.Userid;
+    var username = data.DisplayName;
+    var picurl = data.PortraitUrl;
+    var desp = data.Description;
+    var postscount = data.MessageCount;
+    var followingcount = data.FollowingsCount;
+    var followerscount = data.FollowersCount;
+    var isFollowing = data.IsFollowing;
+
+    if (isNullOrEmpty(picurl)) {
+        picurl = "/Content/Images/default_avatar.jpg";
+    }
+
+    output = "  <li class='userlist-group-item'>"
+           + "    <div class='user-card-info'>"
+           + "      <div class='ma-btm-10'>"
+           + "        <img class='img-rounded' id='user_pic_" + encodeId(userid) + "' src='" + picurl + "' width='100' height='100' />"
+           + "      </div>"
+           + "      <div>"
+           + "        <a class='fullname' id='user_name_" + encodeId(userid) + "' href='/profile/index?user=" + encodeTxt(userid) + "'>" + username + "</a>"
+           + "      </div>"
+           + "      <div>"
+           + "        <span class='username' id='user_id_" + encodeId(userid) + "'>@" + userid + "</span>"
+           + "      </div>"
+           + "    </div>"
+           + "    <div class='user-card-postinfo'>"
+           + "      <div class='btn-group btn-group-justified'>"
+           + "        <a class='btn btn-danger groupmember-btn' id='btn_member_manage_" + encodeId(userid) + "');'></a>"
+           + "      </div>"
+           + "    </div>"
+           + "  </li>";
+
+    return output;
+}
+
+function setGroupMemberBtn(btnid, userid, groupid, role) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    if (!isNullOrEmpty(role)) { // member
+        setRemoveMemberBtn(btnid, userid, groupid, role, true);
+    }
+    else {  // not a memeber
+        setAddMemberBtn(btnid, userid, groupid, "user", true);
+    }
+}
+
+function setRemoveMemberBtn(btnid, userid, groupid, role, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text(role.toUpperCase());
+    btn.attr("class", "btn btn-success groupmemeber-btn");
+    if (enabled) {
+        btn.attr("onclick", "removeMember('" + btnid + "', '" + userid + "', '" + groupid + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "removeMemberBtnMouseOver('" + btnid + "');")
+    btn.attr("onmouseout", "removeMemberBtnMouseOut('" + btnid + "', '" + role + "');")
+    btn.show();
+}
+
+function removeMemberBtnMouseOver(btnid) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-danger groupmember-btn");
+    btn.text("- Remove");
+}
+
+function removeMemberBtnMouseOut(btnid, role) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-success groupmember-btn");
+    btn.text(role.toUpperCase());
+}
+
+function setAddMemberBtn(btnid, userid, groupid, role, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("+ Add");
+    btn.attr("class", "btn btn-primary groupmember-btn");
+    if (enabled) {
+        btn.attr("onclick", "addMember('" + btnid + "', '" + userid + "', '" + groupid + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
+    btn.show();
+}
+
+function addMember(btnid, userid, groupid) {
+    setRemoveMemberBtn(btnid, userid, groupid, "user", false);
+
+    var apiurl = "/api/group/addmember";
+    var apidata = "userid=" + encodeTxt(userid) + "&groupID=" + encodeTxt(groupid);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                showError("Failed to add member to group.");
+            }
+            else {
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setRemoveMemberBtn(btnid, userid, groupid, "user", true);
+                }
+                else {
+                    showError(msg);
+                }
+            }
+        }
+    );
+}
+
+function removeMember(btnid, userid, groupid) {
+    setAddMemberBtn(btnid, userid, groupid, "user", false);
+
+    var apiurl = "/api/group/removemember";
+    var apidata = "userid=" + encodeTxt(userid) + "&groupID=" + encodeTxt(groupid);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                showError("Failed to remove member from group.");
+            }
+            else {
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setAddMemberBtn(btnid, userid, groupid, "user", true);
+                }
+                else {
+                    showError(msg);
+                }
+            }
+        }
+    );
+}
+
+
+
+
+
+
+
+
 
 
 // performance chart

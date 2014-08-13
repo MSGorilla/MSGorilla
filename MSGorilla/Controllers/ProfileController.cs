@@ -66,6 +66,7 @@ namespace MSGorilla.Controllers
             ViewBag.UserId = user;
 
             ViewBag.FeedCategory = "following";
+            ViewBag.FeedId = user;
 
             return View();
         }
@@ -91,6 +92,7 @@ namespace MSGorilla.Controllers
             ViewBag.UserId = user;
 
             ViewBag.FeedCategory = "followers";
+            ViewBag.FeedId = user;
 
             return View();
         }
@@ -116,6 +118,7 @@ namespace MSGorilla.Controllers
             ViewBag.UserId = user;
 
             ViewBag.FeedCategory = "favorites";
+            ViewBag.FeedId = user;
 
             return View();
         }

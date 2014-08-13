@@ -368,6 +368,9 @@
     <Content Include="Views\Shared\_PerfChartPartial.cshtml" />
     <Content Include="Views\Category\Index.cshtml" />
     <Content Include="Views\Shared\_LoadCategoryFeedListPartial.cshtml" />
+    <Content Include="Views\Group\Manage.cshtml" />
+    <Content Include="Views\Shared\_LoadGroupMemberCardListPartial.cshtml" />
+    <Content Include="Views\Group\View.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

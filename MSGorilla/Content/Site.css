@@ -417,6 +417,7 @@ input[type="checkbox"].input-validation-error {
     }
 
 .group-card-desp {
+    color: #333;
     word-wrap: break-word;
     height: 120px;
     overflow: hidden;

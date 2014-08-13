@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Groups";
+    ViewBag.Title = "Group";
 }
 
 <div class="main-container">
@@ -9,10 +9,10 @@
 
         <div class="block-container">
             <div>
-                <h4 class="help-block">Groups</h4>
+                <h4>Manage group (<span class="bold">@ViewBag.GroupName</span>)</h4>
             </div>
 
-            @Html.Partial("_LoadGroupCardListPartial")
+            @Html.Partial("_LoadGroupMemberCardListPartial")
 
             <div class="clearfix"></div>
         </div>
