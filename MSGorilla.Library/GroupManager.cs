@@ -301,7 +301,7 @@ namespace MSGorilla.Library
                 foreach (var m in members)
                 {
                     user = map[m.MemberID];
-                    int isfollowing = userid.Equals(user.Userid) ? 0 : (followings.Contains(user.Userid) ? 1 : -1);
+                    int isfollowing = userid.Equals(user.Userid) ? -1 : (followings.Contains(user.Userid) ? 1 : 0);
                     DisplayUserProfile dup = new DisplayUserProfile(user, isfollowing);
                     MembershipView mv = new MembershipView();
                     mv.GroupID = groupID;
