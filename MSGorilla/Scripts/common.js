@@ -31,7 +31,7 @@ function AjaxCall(type, async, apiurl, apidata, successCallback, errorCallback, 
                 }
             }
             catch (ex) {
-                showError(ex, msgboxid);
+                //showError(ex, msgboxid);
             }
         }
     }).always(function () {
@@ -3716,7 +3716,10 @@ function setGroupMemberBtn(btnid, userid, groupid, role) {
         return;
     }
 
-    if (!isNullOrEmpty(role)) { // member
+    if (role == "pending") {    // waiting for approval
+        setApproveMemberBtn(btnid, userid, groupid, role, true);
+    }
+    else if (!isNullOrEmpty(role)) { // member
         setRemoveMemberBtn(btnid, userid, groupid, role, true);
     }
     else {  // not a memeber
@@ -3770,6 +3773,25 @@ function setAddMemberBtn(btnid, userid, groupid, role, enabled) {
     }
 
     btn.text("+ Add");
+    btn.attr("class", "btn btn-primary groupmember-btn");
+    if (enabled) {
+        btn.attr("onclick", "addMember('" + btnid + "', '" + userid + "', '" + groupid + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
+    btn.show();
+}
+
+function setApproveMemberBtn(btnid, userid, groupid, role, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("+ Approve");
     btn.attr("class", "btn btn-primary groupmember-btn");
     if (enabled) {
         btn.attr("onclick", "addMember('" + btnid + "', '" + userid + "', '" + groupid + "');");
