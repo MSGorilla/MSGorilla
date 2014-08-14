@@ -140,6 +140,12 @@ namespace MSGorilla.Library
                 {
                     _gorillaCtx.Memberships.Remove(member);
                 }
+
+                UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
+                if (user.DefaultGroup.Equals(groupID, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    user.DefaultGroup = "microsoft";
+                }
                 _gorillaCtx.SaveChanges();
             }
         }
@@ -236,6 +242,8 @@ namespace MSGorilla.Library
                 if (member != null)
                 {
                     _gorillaCtx.Memberships.Remove(member);
+                    UserProfile removedUser = _gorillaCtx.UserProfiles.Find(userid);
+                    removedUser.DefaultGroup = "microsoft";
                 }
                 _gorillaCtx.SaveChanges();
             }
@@ -320,7 +328,7 @@ namespace MSGorilla.Library
             {
                 List<DisplayMembership> result =  _gorillaCtx.Database.SqlQuery<DisplayMembership>(
                     @"select g.GroupID, g.DisplayName, g.Description, g.IsOpen, m.MemberID, m.Role 
-                        from membership m join [group] g on m.groupid = g.groupid where memberid={0}",
+                        from membership m join [group] g on m.groupid = g.groupid where memberid={0} and role != 'pending'",
                     userid
                     ).ToList();
                 UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
