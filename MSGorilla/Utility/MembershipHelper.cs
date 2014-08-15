@@ -216,9 +216,17 @@ namespace MSGorilla.Utility
                 string[] userpass = cred.Split(':');
                 if (userpass.Length == 2)
                 {
+                    //if the username looks like ShareAccount_{userid}, it should be a delegation that userid is verified
                     string user = userpass[0];
                     string password = userpass[1];
-                    if (_accountManager.AuthenticateUser(user, password))
+                    if (user.Split('_').Length == 2 
+                        && user.Split('_')[0].Equals("ShareAccount")
+                        && _accountManager.AuthenticateUser("ShareAccount", password))
+                    {
+                        //delegation
+                        return _accountManager.FindUser(user.Split('_')[1]).Userid;
+                    }
+                    else if (_accountManager.AuthenticateUser(user, password))
                     {
                         return _accountManager.FindUser(user).Userid;
                     }
