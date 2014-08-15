@@ -3978,6 +3978,10 @@ function LoadPerfChart(chartname, chartdivid) {
                 var subtitle = data.SubTitle;
                 var groupid = data.GroupID;
                 var dataset = data.DataSet;
+                var alldata = {
+                    xAxis: [],
+                    series: []
+                };
 
                 // set title
                 option.title.text = title;
@@ -3991,13 +3995,13 @@ function LoadPerfChart(chartname, chartdivid) {
                     var legend = item.Legend;
                     var type = item.Type;
                     var mid = item.MetricDataSetID;
+                    var xdata = [];
+                    var xydata = {};
 
                     apiurl = "/api/metricchart/retrivelastestdatarecord";
                     apidata = "id=" + encodeTxt(mid) + "&count=365";
-                    var xdata = [];
-                    var ydata = [];
 
-                    // get data of dataset
+                    // get xydata of dataset
                     AjaxGetSync(
                         apiurl,
                         apidata,
@@ -4008,33 +4012,8 @@ function LoadPerfChart(chartname, chartdivid) {
                             }
                             else {
                                 $.each(data, function (index, item) {
-                                    var key = item.Key;
-                                    var value = item.Value;
-
-                                    xdata.push(key);
-                                    ydata.push(value);
-                                });
-
-                                // set legend
-                                option.legend.data.push(legend);
-
-                                // set data
-                                option.xAxis[0].data = xdata;
-                                option.series.push({
-                                    name: legend,
-                                    type: type,
-                                    data: ydata,
-                                    //markPoint: {
-                                    //    data: [
-                                    //        { type: 'max', name: 'Max' },
-                                    //        { type: 'min', name: 'Min' }
-                                    //    ]
-                                    //},
-                                    //markLine: {
-                                    //    data: [
-                                    //        { type: 'average', name: 'Average' }
-                                    //    ]
-                                    //}
+                                    xdata.push(item.Key);
+                                    xydata[item.Key] = item.Value;
                                 });
                             }
                         },
@@ -4042,7 +4021,59 @@ function LoadPerfChart(chartname, chartdivid) {
                         null,
                         "no_message_box"
                     );
+
+                    // set legend
+                    option.legend.data.push(legend);
+
+                    // add data to alldata
+                    alldata.xAxis = alldata.xAxis.concat(xdata);
+                    alldata.series.push({
+                        legend: legend,
+                        type: type,
+                        xydata: xydata
+                    });
+
                 });
+
+                // merge xAxis data
+                option.xAxis[0].data = uniqueArray(alldata.xAxis);
+                option.xAxis[0].data.sort(dateSortFunc);
+
+                // merge series data
+                for (var i in alldata.series) {
+                    var serie = alldata.series[i];
+                    var l = serie.legend;
+                    var t = serie.type;
+                    var d = serie.xydata;
+                    var y = [];
+
+                    for (var j in option.xAxis[0].data) {
+                        var x = option.xAxis[0].data[j];
+                        if (isNullOrEmpty(d[x])) {
+                            y.push(0);
+                        }
+                        else {
+                            y.push(d[x]);
+                        }
+                    }
+
+                    option.series.push({
+                        name: l,
+                        type: t,
+                        data: y,
+                        //markPoint: {
+                        //    data: [
+                        //        { type: 'max', name: 'Max' },
+                        //        { type: 'min', name: 'Min' }
+                        //    ]
+                        //},
+                        //markLine: {
+                        //    data: [
+                        //        { type: 'average', name: 'Average' }
+                        //    ]
+                        //}
+                    });
+                }
 
                 // draw chart
                 try {
@@ -4065,6 +4096,37 @@ function LoadPerfChart(chartname, chartdivid) {
         null,
         "no_message_box"
     );
+}
+
+function dateSortFunc(str1, str2) {
+    var date1 = new Date(str1);
+    var date2 = new Date(str2);
+
+    if (date1 > date2) {
+        return 1;
+    }
+    else if (date1 < date2) {
+        return -1;
+    }
+    else {
+        return 0;
+    }
+}
+
+function uniqueArray(data) {
+    data = data || [];
+    var a = {};
+    for (var i = 0; i < data.length; i++) {
+        var v = data[i];
+        if (typeof (a[v]) == 'undefined') {
+            a[v] = 1;
+        }
+    };
+    data.length = 0;
+    for (var i in a) {
+        data[data.length] = i;
+    }
+    return data;
 }
 
 function addfakedata() {
