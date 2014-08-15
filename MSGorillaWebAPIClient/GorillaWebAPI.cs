@@ -177,7 +177,7 @@ namespace MSGorilla.WebAPI.Client
 
         public DisplayMessagePagination HomeLine(string userid, string group = null, int count = 25, string token = "")
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriHomeLine, userid, count, token));
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriHomeLine, userid, group, count, token));
             request.Headers["Authorization"] = _authHeader;
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return JsonConvert.DeserializeObject<DisplayMessagePagination>(_readResponseContent(response));            
