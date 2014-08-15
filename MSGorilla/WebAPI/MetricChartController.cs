@@ -337,26 +337,29 @@ namespace MSGorilla.WebAPI
             else
             {
                 //check chart name format
-                if(string.IsNullOrEmpty(chartName) || chartName.Split('_').Length != 4)
+                if(string.IsNullOrEmpty(chartName))
                 {
                     return null;
                 }
                 string[] split = chartName.Split('_');
                 string group = split[0];
-                string category = split[1];
-                string counter = split[2];
-                string instance = split[3];
+                string category = split.Length > 1 ? split[1] : null;
+                string counter = split.Length > 2 ? split[2] : null;
+                string instance = split.Length > 3 ? split[3] : null;
                 MembershipHelper.CheckMembership(group, me);
 
                 //Try create chart if not exist
-                MetricDataSet dataset = _metricManager.GetDataSet(instance, counter, category, group);
-                if (dataset == null)
+                List<MetricDataSet> datasets = _metricManager.QueryDataSet(group, category, counter, instance);
+                if(datasets.Count == 0)
                 {
                     return null;
                 }
-                
-                chart = _metricManager.CreateChart(chartName, group, counter);
-                _metricManager.AddDataSet(chartName, dataset.Id, counter, "line");
+
+                chart = _metricManager.CreateChart(chartName, group, chartName);
+                foreach(var dataset in datasets)
+                {
+                    _metricManager.AddDataSet(chartName, dataset.Id, dataset.Instance, "line");
+                }
                 chart = _metricManager.GetChart(chartName);
             }
             return chart;

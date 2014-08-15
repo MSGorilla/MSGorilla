@@ -135,6 +135,41 @@ namespace MSGorilla.Library
             }
         }
 
+        public List<MetricDataSet> QueryDataSet(string group, string category = null, string counter = null, string instance = null)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                if (!string.IsNullOrEmpty(instance))
+                {
+                    return _gorillaCtx.MetricDataSets.Where(
+                        d => d.Instance == instance && d.Counter == counter && d.Category == category && d.GroupID == group
+                        ).ToList();
+                }
+                else if (!string.IsNullOrEmpty(counter))
+                {
+                    return _gorillaCtx.MetricDataSets.Where(
+                        d => d.Counter == counter && d.Category == category && d.GroupID == group
+                        ).ToList();
+                }
+                else if (!string.IsNullOrEmpty(category))
+                {
+                    return _gorillaCtx.MetricDataSets.Where(
+                        d => d.Category == category && d.GroupID == group
+                        ).ToList();
+                }
+                else if (!string.IsNullOrEmpty(group))
+                {
+                    return _gorillaCtx.MetricDataSets.Where(
+                        d => d.GroupID == group
+                        ).ToList();
+                }
+                else
+                {
+                    return _gorillaCtx.MetricDataSets.ToList();
+                }
+            }
+        }
+
         public List<MetricDataSet> GetAllDataSetByGroup(string groupID)
         {
             using (var _gorillaCtx = new MSGorillaEntities())
