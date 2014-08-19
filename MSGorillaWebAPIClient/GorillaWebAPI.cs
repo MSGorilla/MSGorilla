@@ -183,6 +183,33 @@ namespace MSGorilla.WebAPI.Client
             return JsonConvert.DeserializeObject<DisplayMessagePagination>(_readResponseContent(response));            
         }
 
+        public DisplayMessagePagination OwnerLine(string userid, int count = 25, string token = "", bool keepUnread = false)
+        {
+            string reqUri = _rootUri + string.Format(Constant.UriOwnerLine, userid, count, token, keepUnread ? "true" : "false");
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(reqUri);
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            return JsonConvert.DeserializeObject<DisplayMessagePagination>(_readResponseContent(response));
+        }
+
+        public DisplayMessagePagination AtLine(string userid, int count = 25, string token = "", bool keepUnread = false)
+        {
+            string reqUri = _rootUri + string.Format(Constant.UriAtLine, userid, count, token, keepUnread ? "true" : "false");
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(reqUri);
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            return JsonConvert.DeserializeObject<DisplayMessagePagination>(_readResponseContent(response));
+        }
+
+        public DisplayMessagePagination TopicLine(string topic, int count = 25, string group = "", string token = "")
+        {
+            string reqUri = _rootUri + string.Format(Constant.UriTopicLine, topic, count, group, token);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(reqUri);
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            return JsonConvert.DeserializeObject<DisplayMessagePagination>(_readResponseContent(response));
+        }
+
         public List<Message> EventLine(string eventID)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriEventLine, eventID));
@@ -311,6 +338,26 @@ namespace MSGorilla.WebAPI.Client
             request.Headers["Authorization"] = _authHeader;
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             return JsonConvert.DeserializeObject<DisplayMetricDataSet>(_readResponseContent(response));
+        }
+
+        public List<DisplayMembership> GetJoinedGroup()
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri +
+                Constant.UrlGetJoinedGroup
+                );
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            return JsonConvert.DeserializeObject<List<DisplayMembership>>(_readResponseContent(response));
+        }
+
+        public List<DisplayFavouriteTopic> GetMyFavouriteTopic()
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri +
+                Constant.UriGetMyFavouriteTopic
+                );
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            return JsonConvert.DeserializeObject<List<DisplayFavouriteTopic>>(_readResponseContent(response));
         }
     }
 }
