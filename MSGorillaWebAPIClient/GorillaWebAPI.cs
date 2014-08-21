@@ -293,6 +293,21 @@ namespace MSGorilla.WebAPI.Client
             return JsonConvert.DeserializeObject<List<Attachment>>(ret)[0];
         }
 
+        public void DownloadAttachment(string attachmentID, string filePath)
+        {
+            string url = string.Format(_rootUri + Constant.UriDownloadAttachment, attachmentID);
+            WebClient myWebClient = new WebClient();
+            myWebClient.Headers.Add("Authorization:" + _authHeader);
+
+            using (var stream = myWebClient.OpenRead(url))
+            {
+                using (var fileStream = File.Create(filePath))
+                {
+                    stream.CopyTo(fileStream);
+                }
+            }
+        }
+
         public NotificationCount GetNotificationCount(string userid = "")
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriNotificationCount, userid));

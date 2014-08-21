@@ -20,6 +20,7 @@ namespace MSGorilla.WebAPI.Client
         public static string UriEventLine = "/Message/EventLine?eventId={0}";
 
         public static string UriUploadAttachment = "/attachment/upload";
+        public static string UriDownloadAttachment = "/attachment/download?attachmentID={0}";
         public static string UriNotificationCount = "/Account/GetNotificationCount?userid={0}";
 
         public static string UriPostReply = "/Reply/PostReply";
