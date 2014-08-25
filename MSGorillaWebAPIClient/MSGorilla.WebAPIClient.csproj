@@ -47,6 +47,7 @@
     <Compile Include="GorillaWebAPI.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MSGorillaException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
