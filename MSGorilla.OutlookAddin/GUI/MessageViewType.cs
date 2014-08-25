@@ -12,6 +12,7 @@ namespace MSGorilla.OutlookAddin.GUI
         Owner,
         Mention,
         Topic,
-        Category
+        Category,
+        User
     };
 }

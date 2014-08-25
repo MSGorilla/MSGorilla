@@ -28,8 +28,8 @@ namespace MSGorilla.OutlookAddin.GUI
     public partial class MessageView : UserControl
     {
         public MessageViewType Type;
-        public object Argument;
-        public string GroupID;
+
+        public Dictionary<string, object> Argument;
 
         string token = null;
         public MessageView()
@@ -54,84 +54,81 @@ namespace MSGorilla.OutlookAddin.GUI
             messageList.Items.Clear();
         }
 
-
-
-        private void SetTitle(string title)
-        {
-            //this.Dispatcher.Invoke((Action)(() =>
-            //{
-            //    this.Title = title;
-            //}));
-        }
-
-        DisplayMessagePagination LoadMessage()
+        DisplayMessagePagination LoadMessageFromGorilla()
         {
             GorillaWebAPI client = Utils.GetGorillaClient();
             if (Type == MessageViewType.Home)
             {
-                SetTitle(string.Format("Home(Group {0})", this.GroupID));
-                return client.HomeLine(this.Argument as string, this.GroupID, 10, this.token);
+                return client.HomeLine(this.Argument["UserID"] as string, 
+                    this.Argument["GroupID"] as string, 
+                    10, 
+                    this.token);
             }
             else if (Type == MessageViewType.Owner)
             {
-                SetTitle("My Own");
-                return client.OwnerLine(this.Argument as string, 10, this.token);
+                return client.OwnerLine(this.Argument["UserID"] as string, 10, this.token);
             }
             else if (Type == MessageViewType.Mention)
             {
-                SetTitle("Mention me");
-                return client.AtLine(this.Argument as string, 10, this.token);
+                return client.AtLine(this.Argument["UserID"] as string, 10, this.token);
             }
             else if (Type == MessageViewType.Topic)
             {
-                SetTitle("Topic: " + this.Argument as string);
-                return client.TopicLine(this.Argument as string, 10, this.GroupID, this.token);
+                return client.TopicLine(this.Argument["TopicName"] as string, 
+                    10, 
+                    this.Argument["GroupID"] as string, 
+                    this.token);
+            }
+            else if (Type == MessageViewType.User)
+            {
+                return client.UserLine(this.Argument["UserID"] as string,
+                    "",
+                    10,
+                    this.token);
             }
 
             return new DisplayMessagePagination();
         }
 
-
-        public async void Load()
+        public async void LoadMessage(bool initialLoad = false)
         {
-            ClearMessage();
-            this.LoadMoreButton.Visibility = System.Windows.Visibility.Hidden;
-            this.loadingBar.Visibility = System.Windows.Visibility.Visible;
-            this.loadingBar.Value = 0;
-
-            Task<DisplayMessagePagination> task = 
-                new Task<DisplayMessagePagination>(() =>{
-                    return LoadMessage();
-                });
-            task.Start();
-
-            DisplayMessagePagination msgs = new DisplayMessagePagination();
-            try
+            if (initialLoad || !string.IsNullOrEmpty(token))
             {
-                msgs = await task;
-            }
-            catch (Exception e)
-            {
-                //this.Close();
-                MessageBox.Show(e.Message + "\r\n\r\n" + e.StackTrace, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                this.LoadMoreButton.Visibility = System.Windows.Visibility.Hidden;
+                this.loadingBar.Visibility = System.Windows.Visibility.Visible;
+                this.loadingBar.Value = 0;
 
-            if (msgs != null)
-            {
-                token = msgs.continuationToken;
+                Task<DisplayMessagePagination> task = new Task<DisplayMessagePagination>(() =>
+                {
+                    return LoadMessageFromGorilla();
+                }
+                );
+                task.Start();
+
+                DisplayMessagePagination msgs = new DisplayMessagePagination();
+                try
+                {
+                    msgs = await task;
+                }
+                catch (Exception exception)
+                {
+                    //this.Close();
+                    MessageBox.Show(exception.Message + "\r\n\r\n" + exception.StackTrace, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+
+
                 if (msgs.message != null)
                 {
-                    foreach (var msg in msgs.message)
+                    token = msgs.continuationToken;
+                    if (msgs.message != null)
                     {
-                        AppendMessage(msg);
+                        foreach (var msg in msgs.message)
+                        {
+                            AppendMessage(msg);
+                        }
                     }
                 }
             }
-            else
-            {
-                this.token = null;
-            }
-            
 
             this.loadingBar.Visibility = System.Windows.Visibility.Hidden;
             if (!string.IsNullOrEmpty(token))
@@ -140,49 +137,15 @@ namespace MSGorilla.OutlookAddin.GUI
             }
         }
 
-        public async void LoadMore(object sender, RoutedEventArgs e)
+        public void Load()
         {
-            if (string.IsNullOrEmpty(token))
-            {
-                return;
-            }
+            ClearMessage();
+            LoadMessage(true);
+        }
 
-            this.LoadMoreButton.Visibility = System.Windows.Visibility.Hidden;
-            this.loadingBar.Visibility = System.Windows.Visibility.Visible;
-            this.loadingBar.Value = 0;
-
-            Task<DisplayMessagePagination> task = new Task<DisplayMessagePagination>(() =>
-            {
-                return LoadMessage();
-            }
-            );
-            task.Start();
-
-            DisplayMessagePagination msgs = new DisplayMessagePagination();
-            try
-            {
-                msgs = await task;
-            }
-            catch (Exception exception)
-            {
-                //this.Close();
-                MessageBox.Show(exception.Message + "\r\n\r\n" + exception.StackTrace, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
-            token = msgs.continuationToken;
-            if (msgs.message != null)
-            {
-                foreach (var msg in msgs.message)
-                {
-                    AppendMessage(msg);
-                }
-            }
-
-            this.loadingBar.Visibility = System.Windows.Visibility.Hidden;
-            if (!string.IsNullOrEmpty(token))
-            {
-                this.LoadMoreButton.Visibility = System.Windows.Visibility.Visible;
-            }
+        public void LoadMore(object sender = null, RoutedEventArgs e = null)
+        {
+            LoadMessage(false);
         }
     }
 }

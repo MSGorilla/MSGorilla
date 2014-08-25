@@ -14,7 +14,7 @@ namespace MSGorilla.OutlookAddin
 {
     public class Utils
     {
-        static string GetCurrentUserID()
+        public static string GetCurrentUserID()
         {
             return "user1";
             string[] array = System.Security.Principal.WindowsIdentity.GetCurrent().Name.Split('\\');

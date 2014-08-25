@@ -14,6 +14,7 @@ namespace MSGorilla.WebAPI.Client
         public static string UriGetMessage = "/Message/GetMessage?userid={0}&messageId={1}";
         public static string UriGetRawMessage = "/Message/GetRawMessage?messageId={1}";
         public static string UriHomeLine = "/Message/HomeLine?userid={0}&group={1}&count={2}&token={3}";
+        public static string UriUserLine = "/Message/UserLine?userid={0}&group={1}&count={2}&token={3}";
         public static string UriOwnerLine = "/Message/OwnerLine?userid={0}&count={1}&token={2}&keepUnread={3}";
         public static string UriAtLine = "/Message/AtLine?userid={0}&count={1}&token={2}&keepUnread={3}";
         public static string UriTopicLine = "/Message/TopicLine?topic={0}&count={1}&group={2}&token={3}";
@@ -33,6 +34,8 @@ namespace MSGorilla.WebAPI.Client
         public static string UriQueryMetricDataset = "/MetricChart/GetDataSet?instance={0}&counter={1}&category={2}&group={3}";
         public static string UriInserRecord = "/MetricChart/InsertRecord?id={0}&key={1}&value={2}";
         public static string UriUpdateCategoryMessage = "/Category/UpdateCategoryMessage";
+
+        public static string UriFollowings = "/Account/Followings";
 
         public static string UriGetMyFavouriteTopic = "/Topic/GetMyFavouriteTopic";
     }

@@ -120,9 +120,10 @@ namespace MSGorilla.OutlookAddin.GUI
 
                         MessageViewWindow window = MessageViewWindow.CreateMessageViewWindow(
                                 MessageViewType.Topic,
-                                topicName,
-                                msg.Group
-                            );
+                                new Dictionary<string, object>(){
+                                    {"GroupID", msg.Group},
+                                    {"TopicName", topicName}
+                                });
                         window.Show();
                         window.Load();
                     }

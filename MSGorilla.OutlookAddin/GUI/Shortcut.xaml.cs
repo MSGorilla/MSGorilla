@@ -27,21 +27,19 @@ namespace MSGorilla.OutlookAddin.GUI
     public class MyTreeViewItem : TreeViewItem
     {
         public MessageViewType MessageType { get; set; }
-        public object Argument { get; set; }
+        public Dictionary<string, object> Argument { get; set; }
         public string Group { get; set; }
         public bool ShowMessageWindow { get; set; }
         public MyTreeViewItem() { }
         public MyTreeViewItem(string header,
             bool showMessageWindow = false,
             MessageViewType type = MessageViewType.Home,
-            string group = null,
-            object argument = null) : base()
+            Dictionary<string, object> argument = null) : base()
         {
             this.Header = header;
             this.MessageType = type;
             this.Argument = argument;
             this.ShowMessageWindow = showMessageWindow;
-            this.Group = group;
         }
     }
 
@@ -53,9 +51,16 @@ namespace MSGorilla.OutlookAddin.GUI
         GorillaWebAPI _client = Utils.GetGorillaClient();
 
         MyTreeViewItem _homeItem = new MyTreeViewItem("Home");
-        MyTreeViewItem _ownItem = new MyTreeViewItem("Own", true, MessageViewType.Owner);
-        MyTreeViewItem _mentionItem = new MyTreeViewItem("Mention", true, MessageViewType.Mention);
+        MyTreeViewItem _ownItem = new MyTreeViewItem("Own", 
+            true, 
+            MessageViewType.Owner, 
+            new Dictionary<string, object>() { {"UserID", Utils.GetCurrentUserID()}});
+        MyTreeViewItem _mentionItem = new MyTreeViewItem("Mention", 
+            true,
+            MessageViewType.Mention,
+            new Dictionary<string, object>() { { "UserID", Utils.GetCurrentUserID() } });
         MyTreeViewItem _topicItem = new MyTreeViewItem("Topic");
+        MyTreeViewItem _followingItem = new MyTreeViewItem("Followings");
 
         public Shortcut()
         {
@@ -64,6 +69,7 @@ namespace MSGorilla.OutlookAddin.GUI
             tree.Items.Add(_ownItem);
             tree.Items.Add(_mentionItem);
             tree.Items.Add(_topicItem);
+            tree.Items.Add(_followingItem);
             tree.Items.Add(_homeItem);
 
             Paragraph para = new Paragraph();
@@ -88,6 +94,7 @@ namespace MSGorilla.OutlookAddin.GUI
                     {
                         continue;
                     }
+                    //Fill home
                     List<DisplayMembership> members = _client.GetJoinedGroup();
                     this.Dispatcher.Invoke((Action)(() =>
                     {
@@ -97,11 +104,14 @@ namespace MSGorilla.OutlookAddin.GUI
                             MyTreeViewItem item = new MyTreeViewItem(member.DisplayName,
                                 true,
                                 MessageViewType.Home,
-                                member.GroupID);
+                                new Dictionary<string, object>() {
+                                    {"GroupID", member.GroupID},
+                                    {"UserID", Utils.GetCurrentUserID()}
+                                });
                             _homeItem.Items.Add(item);
                         }
                     }));
-
+                    //Fill topic
                     List<DisplayFavouriteTopic> topics = _client.GetMyFavouriteTopic();
                     this.Dispatcher.Invoke((Action)(() =>
                     {
@@ -112,12 +122,35 @@ namespace MSGorilla.OutlookAddin.GUI
                                 string.Format("{0}({1})", topic.topicName, topic.UnreadMsgCount),
                                 true,
                                 MessageViewType.Topic,
-                                topic.GroupID,
-                                topic.topicName);
+                                new Dictionary<string, object>(){
+                                    {"GroupID", topic.GroupID},
+                                    {"TopicName", topic.topicName}
+                                });
                             _topicItem.Items.Add(item);
                         }
                     }));
 
+                    //Fill Following
+                    List<DisplayUserProfile> followings = _client.GetFollowings();
+                    this.Dispatcher.Invoke((Action)(() =>
+                    {
+                        _followingItem.Items.Clear();
+                        foreach (var user in followings)
+                        {
+                            MyTreeViewItem item = new MyTreeViewItem(
+                                string.Format("{0}({1})", user.DisplayName, user.Userid),
+                                true,
+                                MessageViewType.User,
+                                new Dictionary<string, object>()
+                                {
+                                    {"DisplayName", user.DisplayName},
+                                    {"UserID", user.Userid}
+                                });
+                            _followingItem.Items.Add(item);
+                        }
+                    }));
+
+                    //Update Notification count
                     NotificationCount notif = _client.GetNotificationCount();
                     this.Dispatcher.Invoke((Action)(() =>
                     {
@@ -162,7 +195,7 @@ namespace MSGorilla.OutlookAddin.GUI
             if (item.ShowMessageWindow)
             {
                 MessageViewWindow window = 
-                    MessageViewWindow.CreateMessageViewWindow(item.MessageType, item.Argument, item.Group);
+                    MessageViewWindow.CreateMessageViewWindow(item.MessageType, item.Argument);
                 new Thread(new ThreadStart(() =>
                 {
                     this.Dispatcher.Invoke((Action)(() =>

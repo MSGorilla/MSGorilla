@@ -22,14 +22,11 @@ namespace MSGorilla.OutlookAddin.GUI
     {
         public static MessageViewWindow CreateMessageViewWindow(
             MessageViewType type,
-            object argument,
-            string GroupID)
+            Dictionary<string, object> argument)
         {
             MessageViewWindow viewWindow = new MessageViewWindow();
             viewWindow.messageView.Type = type;
             viewWindow.messageView.Argument = argument;
-            viewWindow.messageView.GroupID = GroupID;
-
             return viewWindow;
         }
 
@@ -44,7 +41,7 @@ namespace MSGorilla.OutlookAddin.GUI
             if (this.messageView.Type == MessageViewType.Home)
             {
                 this.TitleTB.Text = "Home";
-                this.SubTitleTB.Text = this.messageView.GroupID;
+                this.SubTitleTB.Text = this.messageView.Argument["GroupID"] as string;
                 this.Btn.Visibility = System.Windows.Visibility.Hidden;
             }
             else if (this.messageView.Type == MessageViewType.Mention)
@@ -62,8 +59,14 @@ namespace MSGorilla.OutlookAddin.GUI
             else if (this.messageView.Type == MessageViewType.Topic)
             {
                 this.TitleTB.Text = "Topic";
-                this.SubTitleTB.Text = 
-                    string.Format("{0}({1})", this.messageView.Argument, this.messageView.GroupID);
+                this.SubTitleTB.Text =
+                    string.Format("{0}({1})", this.messageView.Argument["TopicName"], this.messageView.Argument["GroupID"]);
+                this.Btn.Visibility = System.Windows.Visibility.Hidden;
+            }
+            else if (this.messageView.Type == MessageViewType.User)
+            {
+                this.TitleTB.Text = this.messageView.Argument["DisplayName"] as string;
+                this.SubTitleTB.Text = this.messageView.Argument["UserID"] as string;
                 this.Btn.Visibility = System.Windows.Visibility.Hidden;
             }
             this.messageView.Load();
