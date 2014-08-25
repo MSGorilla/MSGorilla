@@ -1074,7 +1074,7 @@ function createUserPopover(data) {
 
 // feed function
 function LoadMessage(mid) {
-    if (isNullOrEmpty(user) || isNullOrEmpty(mid)) {
+    if (isNullOrEmpty(mid)) {
         showError("Illegal operation.");
         return;
     }
