@@ -137,6 +137,18 @@ namespace MSGorilla.OutlookAddin.GUI
             }
         }
 
+        private void SearchMSGorilla(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(this.SearchTB.Text))
+            {
+                Process.Start("https://msgorilla.cloudapp.net/Search/index?keyword=" + this.SearchTB.Text);
+            }
+        }
+
+        private void SelectAll(object sender, RoutedEventArgs e)
+        {
+            ((TextBox)sender).SelectAll();
+        }
 
         private void load(object sender, RoutedEventArgs e)
         {
@@ -159,24 +171,6 @@ namespace MSGorilla.OutlookAddin.GUI
                     }));
                 })).Start();
                 window.Load();
-
-                //MessageView view = new MessageView();
-                //view.Type = item.MessageType;
-                //view.Argument = item.Argument;
-                //view.GroupID = item.Group;
-
-
-                //Have to create a new thread to show message view
-                //or the parent TreeViewItem will also be
-                //selected. Still have no idea why this happen?
-
-                //new Thread(new ThreadStart(() =>{
-                //    this.Dispatcher.Invoke((Action)(() =>
-                //    {
-                //        view.Show();
-                //    }));
-                //})).Start();
-                //view.Load();
             }            
         }
     }

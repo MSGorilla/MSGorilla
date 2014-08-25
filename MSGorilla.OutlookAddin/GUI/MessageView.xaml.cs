@@ -54,11 +54,7 @@ namespace MSGorilla.OutlookAddin.GUI
             messageList.Items.Clear();
         }
 
-        private void GotoMSGorilla(object sender, RoutedEventArgs e)
-        {
-            Process.Start("https://msgorilla.cloudapp.net/");
-            //wbSample.Navigate("https://msgorilla.cloudapp.net/");
-        }
+
 
         private void SetTitle(string title)
         {

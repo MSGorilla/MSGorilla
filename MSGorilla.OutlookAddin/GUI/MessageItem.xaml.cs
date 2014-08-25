@@ -28,6 +28,7 @@ namespace MSGorilla.OutlookAddin.GUI
     /// </summary>
     public partial class MessageItem : UserControl
     {
+        private string _messageID;
         public MessageItem()
         {
             InitializeComponent();
@@ -36,6 +37,12 @@ namespace MSGorilla.OutlookAddin.GUI
             this.ShowMoreBtn.Content = "See More";
             this.ShowMoreBtn.Visibility = System.Windows.Visibility.Hidden;
             this.loadingBar.Visibility = System.Windows.Visibility.Hidden;
+        }
+
+        private void GotoMSGorilla(object sender, RoutedEventArgs e)
+        {
+            Process.Start("https://msgorilla.cloudapp.net/Message/Index?msgID=" + this._messageID);
+            //wbSample.Navigate("https://msgorilla.cloudapp.net/");
         }
 
         private async void ShowRichMessage(object sender, RoutedEventArgs e)
@@ -76,6 +83,7 @@ namespace MSGorilla.OutlookAddin.GUI
 
         public void SetContent(DisplayMessage msg)
         {
+            this._messageID = msg.ID;
             this.UsernameTB.Text = msg.User.Userid;
             this.TimestampTB.Text = string.Format("{0:F}", msg.PostTime.ToLocalTime());
             this.Thumbnail.Source = 
@@ -117,13 +125,6 @@ namespace MSGorilla.OutlookAddin.GUI
                             );
                         window.Show();
                         window.Load();
-
-                        //MessageView view = new MessageView();
-                        //view.Type = MessageView.TypeEnum.Topic;
-                        //view.Argument = topicName;
-                        //view.GroupID = msg.Group;
-                        //view.Show();
-                        //view.Load();
                     }
                     else
                     {
