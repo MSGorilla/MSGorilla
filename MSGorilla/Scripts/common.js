@@ -1433,7 +1433,8 @@ function createFeed(data, hideOpenBtn) {
     output += "        <div class='newpost-footer'>";
     // open btn
     if (hideOpenBtn != true) {
-        output += "      <a id='btn_open_msg_" + id + "' class='btn btn-link btn-sm' target='_blank' href='/Message/Index?user=" + encodeTxt(muser) + "&msgID=" + encodeTxt(mid) + "'>Open</a>";
+        //output += "      <a id='btn_open_msg_" + id + "' class='btn btn-link btn-sm' target='_blank' href='/Message/Index?user=" + encodeTxt(muser) + "&msgID=" + encodeTxt(mid) + "'>Open</a>";
+        output += "      <a id='btn_open_msg_" + id + "' class='btn btn-link btn-sm' target='_blank' href='/Message/Index?msgID=" + encodeTxt(mid) + "'>Open</a>";
     }
     // richmsg btn
     if (!isNullOrEmpty(richmsgid)) {
