@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="MSGorilla.OutlookAddin.GUI.Shortcut"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:MSGorilla.OutlookAddin.GUI"
+             xmlns:util="clr-namespace:MSGorilla.OutlookAddin"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <StackPanel Orientation="Vertical">
+        <StackPanel.Resources>
+            <!--<Style TargetType="{x:Type TreeViewItem}">-->
+            <Style TargetType="{x:Type local:MyTreeViewItem}">
+                <EventSetter Event="Selected" Handler="load" />
+
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" />
+                    </Trigger>
+                </Style.Triggers>
+
+
+
+            </Style>
+
+        </StackPanel.Resources>
+
+
+        <RichTextBox Name="Link2MSGorilla" HorizontalAlignment="Left" IsReadOnly="True" MinWidth="200"
+                   IsDocumentEnabled="True" VerticalAlignment="Top" Foreground="#FF1364C4"
+                   FontFamily="Calibri" FontSize="14" BorderBrush="{x:Null}" SelectionBrush="{x:Null}">
+            <RichTextBox.Background>
+                <ImageBrush/>
+            </RichTextBox.Background>
+        </RichTextBox>
+
+        <TreeView Name="tree" HorizontalAlignment="Left" Margin="5,10,0,0" 
+                  VerticalAlignment="Top" BorderThickness="0" MaxWidth="320" MaxHeight="768"
+                  FontSize="14" FontFamily="Calibri Light" FontWeight="Bold">
+            <!--<TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type local:MyTreeViewItem}">
+                    <EventSetter Event="Selected" Handler="load"/>
+                </Style>
+            </TreeView.ItemContainerStyle>-->
+
+            <!--<TreeViewItem Header="Home" />
+            <TreeViewItem Header="Owner"/>
+            <TreeViewItem Header="Mention"/>
+            <TreeViewItem Header="Topic">
+                <TreeViewItem Header="Some Topic"/>
+            </TreeViewItem>
+            <TreeViewItem Header="Category">
+                <TreeViewItem Header="Still working on this"/>
+            </TreeViewItem>-->
+        </TreeView>
+    </StackPanel>
+</UserControl>

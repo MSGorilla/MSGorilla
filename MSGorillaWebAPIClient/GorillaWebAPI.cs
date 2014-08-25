@@ -218,13 +218,15 @@ namespace MSGorilla.WebAPI.Client
             return JsonConvert.DeserializeObject<List<Message>>(_readResponseContent(response));
         }
 
-        //public MessageDetail GetMessage(string userid, string messageID)
-        //{
-        //    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri + string.Format(Constant.UriGetMessage, userid, messageID));
-        //    request.Headers["Authorization"] = _authHeader;
-        //    HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-        //    return JsonConvert.DeserializeObject<MessageDetail>(_readResponseContent(response));
-        //}
+        public string GetRichMessage(string richMessageID)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(
+                _rootUri + string.Format(Constant.UriRichMessage, richMessageID)
+                );
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            return _readResponseContent(response);
+        }
 
         public Message GetRawMessage(string messageID)
         {

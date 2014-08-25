@@ -18,6 +18,7 @@ namespace MSGorilla.WebAPI.Client
         public static string UriAtLine = "/Message/AtLine?userid={0}&count={1}&token={2}&keepUnread={3}";
         public static string UriTopicLine = "/Message/TopicLine?topic={0}&count={1}&group={2}&token={3}";
         public static string UriEventLine = "/Message/EventLine?eventId={0}";
+        public static string UriRichMessage = "/Message/GetRichMessage?richMsgID={0}";
 
         public static string UriUploadAttachment = "/attachment/upload";
         public static string UriDownloadAttachment = "/attachment/download?attachmentID={0}";
