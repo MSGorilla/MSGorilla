@@ -1,0 +1,20 @@
+﻿<Window
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MSGorilla.OutlookAddin.GUI" x:Class="MSGorilla.OutlookAddin.GUI.MessageViewWindow" 
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="880" Height="760" Width="890">
+    <DockPanel Name="MainPanel" LastChildFill="True">
+        <StackPanel Name="TitlePanel" Height="80" DockPanel.Dock="Top">
+            <TextBlock Name="TitleTB" Text="Home" FontFamily="Calibri" FontSize="40"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Name="SubTitleTB" Text="MSgorilla Dev" FontFamily="Calibri" FontSize="20"/>
+                <Button Name="Btn" HorizontalAlignment="Right" Width="40" Margin="10,0,0,0" Content="hello"/>
+            </StackPanel>
+        </StackPanel>
+        
+        <local:MessageView x:Name="messageView" DockPanel.Dock="Bottom" Margin="0,0,0,0"/>
+    </DockPanel>
+</Window>

@@ -4,38 +4,35 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="800">
-    <StackPanel Orientation="Horizontal">
+             d:DesignHeight="300" d:DesignWidth="600">
+    <DockPanel LastChildFill="True">
         <Image Name="Thumbnail" Source="cache/avatar.jpg" Height="80" Width="80">
             <!--<Image Source="{Binding User.PortraitUrl,Converter={StaticResource thumbnailConverter}}" Height="80" Width="80">-->
             <Image.Clip>
                 <RectangleGeometry RadiusX="10" RadiusY="10" Rect="0,0,72,72"/>
             </Image.Clip>
         </Image>
-        <StackPanel Orientation="Vertical">
-            <TextBlock Name="UsernameTB" Text="Username" FontFamily="Calibri" FontSize="20"/>
-            <TextBlock Name="TimestampTB" Text="Post timestamp" FontSize="14"/>
+        <DockPanel LastChildFill="True">
+            <TextBlock Name="UsernameTB" DockPanel.Dock="Top" Text="Username" FontFamily="Calibri" FontSize="20"/>
+            <TextBlock Name="TimestampTB" DockPanel.Dock="Top" Text="Post timestamp" FontSize="14"/>
 
-            <Border CornerRadius="10,10,10,10">
-                <RichTextBox Name="MessageTB" IsReadOnly="True" Width="720" IsDocumentEnabled="True" Background="#CCE8CF" FontSize="14">
-                    <!--<RichTextBox.Resources>
-                        <Style TargetType="Hyperlink">
-                            <Setter Property="Cursor" Value="Hand" />
-                            <EventSetter Event="MouseLeftButtonDown" Handler="Hyperlink_MouseLeftButtonDown" />
-                        </Style>
-                    </RichTextBox.Resources>-->
-                </RichTextBox>
-            </Border>
-            <Grid Width="720" Margin="0,5,0,0">
-                <ProgressBar Name="loadingBar" HorizontalAlignment="Left"
-                             Width="600" Minimum="0" Maximum="100" IsIndeterminate="True">
-                    
-                </ProgressBar>
-                <Button Name="ShowMoreBtn" Height="24" Click="ShowRichMessage"
-                    Content="See More" Foreground="White" Margin="650,0,0,0"
+
+            <DockPanel DockPanel.Dock="Bottom" LastChildFill="True">
+                <Button Name="ShowMoreBtn" Width="80" Height="24" Click="ShowRichMessage"
+                    Content="See More" Foreground="White" DockPanel.Dock="Right"
                     Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" />
-            </Grid>
-            
-        </StackPanel>
-    </StackPanel>
+                
+                <ProgressBar Name="loadingBar" Minimum="0" Maximum="100" IsIndeterminate="True">
+                </ProgressBar>
+                
+            </DockPanel>
+
+            <RichTextBox Name="MessageTB"  MinWidth="720" Margin="0,0,0,0" IsReadOnly="True" IsDocumentEnabled="True" Background="#CCE8CF" FontSize="14"/>
+
+            <!--<Border CornerRadius="10,10,10,10">
+                
+            </Border>-->
+
+        </DockPanel>
+    </DockPanel>
 </UserControl>

@@ -110,17 +110,25 @@ namespace MSGorilla.OutlookAddin.GUI
                         topicName = topicName.Replace("topic=", "");
                         topicName = topicName.Replace("&", "");
 
-                        MessageView view = new MessageView();
-                        view.Type = MessageView.TypeEnum.Topic;
-                        view.Argument = topicName;
-                        view.GroupID = msg.Group;
-                        view.Show();
-                        view.Load();
+                        MessageViewWindow window = MessageViewWindow.CreateMessageViewWindow(
+                                MessageViewType.Topic,
+                                topicName,
+                                msg.Group
+                            );
+                        window.Show();
+                        window.Load();
+
+                        //MessageView view = new MessageView();
+                        //view.Type = MessageView.TypeEnum.Topic;
+                        //view.Argument = topicName;
+                        //view.GroupID = msg.Group;
+                        //view.Show();
+                        //view.Load();
                     }
                     else
                     {
                         Process.Start(url);
-                    }                    
+                    }
                 }
                 );
 

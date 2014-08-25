@@ -25,17 +25,9 @@ namespace MSGorilla.OutlookAddin.GUI
     /// <summary>
     /// Interaction logic for MessageView.xaml
     /// </summary>
-    public partial class MessageView : Window
+    public partial class MessageView : UserControl
     {
-        public enum TypeEnum{
-            Home,
-            Owner,
-            Mention,
-            Topic,
-            Category
-        };
-
-        public TypeEnum Type;
+        public MessageViewType Type;
         public object Argument;
         public string GroupID;
 
@@ -45,14 +37,15 @@ namespace MSGorilla.OutlookAddin.GUI
             InitializeComponent();
 
             //let this windows be the toppest for now
-            this.Topmost = true;
-            this.Topmost = false;
+            //this.Topmost = true;
+            //this.Topmost = false;
         }
 
         public void AppendMessage(DisplayMessage msg)
         {
             MessageItem item = new MessageItem();
             item.SetContent(msg);
+            item.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
             messageList.Items.Add(item);
         }
 
@@ -69,31 +62,31 @@ namespace MSGorilla.OutlookAddin.GUI
 
         private void SetTitle(string title)
         {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                this.Title = title;
-            }));
+            //this.Dispatcher.Invoke((Action)(() =>
+            //{
+            //    this.Title = title;
+            //}));
         }
 
         DisplayMessagePagination LoadMessage()
         {
             GorillaWebAPI client = Utils.GetGorillaClient();
-            if (Type == TypeEnum.Home)
+            if (Type == MessageViewType.Home)
             {
                 SetTitle(string.Format("Home(Group {0})", this.GroupID));
                 return client.HomeLine(this.Argument as string, this.GroupID, 10, this.token);
             }
-            else if (Type == TypeEnum.Owner)
+            else if (Type == MessageViewType.Owner)
             {
                 SetTitle("My Own");
                 return client.OwnerLine(this.Argument as string, 10, this.token);
             }
-            else if (Type == TypeEnum.Mention)
+            else if (Type == MessageViewType.Mention)
             {
                 SetTitle("Mention me");
                 return client.AtLine(this.Argument as string, 10, this.token);
             }
-            else if (Type == TypeEnum.Topic)
+            else if (Type == MessageViewType.Topic)
             {
                 SetTitle("Topic: " + this.Argument as string);
                 return client.TopicLine(this.Argument as string, 10, this.GroupID, this.token);
@@ -123,7 +116,7 @@ namespace MSGorilla.OutlookAddin.GUI
             }
             catch (Exception e)
             {
-                this.Close();
+                //this.Close();
                 MessageBox.Show(e.Message + "\r\n\r\n" + e.StackTrace, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
@@ -176,7 +169,7 @@ namespace MSGorilla.OutlookAddin.GUI
             }
             catch (Exception exception)
             {
-                this.Close();
+                //this.Close();
                 MessageBox.Show(exception.Message + "\r\n\r\n" + exception.StackTrace, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 

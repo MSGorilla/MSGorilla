@@ -26,14 +26,14 @@ namespace MSGorilla.OutlookAddin.GUI
     /// </summary>
     public class MyTreeViewItem : TreeViewItem
     {
-        public MessageView.TypeEnum MessageType { get; set; }
+        public MessageViewType MessageType { get; set; }
         public object Argument { get; set; }
         public string Group { get; set; }
         public bool ShowMessageWindow { get; set; }
         public MyTreeViewItem() { }
         public MyTreeViewItem(string header,
             bool showMessageWindow = false,
-            MessageView.TypeEnum type = MessageView.TypeEnum.Home,
+            MessageViewType type = MessageViewType.Home,
             string group = null,
             object argument = null) : base()
         {
@@ -53,8 +53,8 @@ namespace MSGorilla.OutlookAddin.GUI
         GorillaWebAPI _client = Utils.GetGorillaClient();
 
         MyTreeViewItem _homeItem = new MyTreeViewItem("Home");
-        MyTreeViewItem _ownItem = new MyTreeViewItem("Own", true, MessageView.TypeEnum.Owner);
-        MyTreeViewItem _mentionItem = new MyTreeViewItem("Mention", true, MessageView.TypeEnum.Mention);
+        MyTreeViewItem _ownItem = new MyTreeViewItem("Own", true, MessageViewType.Owner);
+        MyTreeViewItem _mentionItem = new MyTreeViewItem("Mention", true, MessageViewType.Mention);
         MyTreeViewItem _topicItem = new MyTreeViewItem("Topic");
 
         public Shortcut()
@@ -96,7 +96,7 @@ namespace MSGorilla.OutlookAddin.GUI
                         {
                             MyTreeViewItem item = new MyTreeViewItem(member.DisplayName,
                                 true,
-                                MessageView.TypeEnum.Home,
+                                MessageViewType.Home,
                                 member.GroupID);
                             _homeItem.Items.Add(item);
                         }
@@ -111,7 +111,7 @@ namespace MSGorilla.OutlookAddin.GUI
                             MyTreeViewItem item = new MyTreeViewItem(
                                 string.Format("{0}({1})", topic.topicName, topic.UnreadMsgCount),
                                 true,
-                                MessageView.TypeEnum.Topic,
+                                MessageViewType.Topic,
                                 topic.GroupID,
                                 topic.topicName);
                             _topicItem.Items.Add(item);
@@ -149,20 +149,34 @@ namespace MSGorilla.OutlookAddin.GUI
             MyTreeViewItem item = e.OriginalSource as MyTreeViewItem;
             if (item.ShowMessageWindow)
             {
-                MessageView view = new MessageView();
-                view.Type = item.MessageType;
-                view.Argument = item.Argument;
-                view.GroupID = item.Group;
+                MessageViewWindow window = 
+                    MessageViewWindow.CreateMessageViewWindow(item.MessageType, item.Argument, item.Group);
+                new Thread(new ThreadStart(() =>
+                {
+                    this.Dispatcher.Invoke((Action)(() =>
+                    {
+                        window.Show();
+                    }));
+                })).Start();
+                window.Load();
+
+                //MessageView view = new MessageView();
+                //view.Type = item.MessageType;
+                //view.Argument = item.Argument;
+                //view.GroupID = item.Group;
+
+
                 //Have to create a new thread to show message view
                 //or the parent TreeViewItem will also be
                 //selected. Still have no idea why this happen?
-                new Thread(new ThreadStart(() =>{
-                    this.Dispatcher.Invoke((Action)(() =>
-                    {
-                        view.Show();
-                    }));
-                })).Start();
-                view.Load();
+
+                //new Thread(new ThreadStart(() =>{
+                //    this.Dispatcher.Invoke((Action)(() =>
+                //    {
+                //        view.Show();
+                //    }));
+                //})).Start();
+                //view.Load();
             }            
         }
     }

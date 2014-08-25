@@ -199,6 +199,10 @@
     <Compile Include="GUI\MessageView.xaml.cs">
       <DependentUpon>MessageView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GUI\MessageViewType.cs" />
+    <Compile Include="GUI\MessageViewWindow.xaml.cs">
+      <DependentUpon>MessageViewWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GUI\ShortcutContainer.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -263,6 +267,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="GUI\MessageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\MessageViewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
