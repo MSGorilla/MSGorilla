@@ -23,18 +23,46 @@ namespace MSGorilla.OutlookAddin
             }
         }
 
-        public bool KeepUpdatingInfo { get; set; }
+        private string _currentUser;
+        public string CurrentUserID
+        {
+            get
+            {
+                return _currentUser;
+            }
+        }
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
-            KeepUpdatingInfo = true;
             Globals.Ribbons.Ribbon.keepUpdateBtn.Checked = true;
+            Globals.Ribbons.Ribbon.showTaskPaneBtn.Checked = true;
+
+            GetCurrentUser();
 
             ShortcutContainer shortcut = new ShortcutContainer();
-            _msgorillaTaskPane = this.CustomTaskPanes.Add(new ShortcutContainer(), "MSGorilla");
-            _msgorillaTaskPane.Visible = true;
-
+            _msgorillaTaskPane = this.CustomTaskPanes.Add(shortcut, "MSGorilla");
+            _msgorillaTaskPane.Visible = Globals.Ribbons.Ribbon.showTaskPaneBtn.Checked;
             _msgorillaTaskPane.VisibleChanged += taskPaneValue_VisibleChanged;
+        }
+
+        void GetCurrentUser()
+        {
+            try
+            {
+                string currentUser = Application.Session.CurrentUser.AddressEntry.GetExchangeUser().PrimarySmtpAddress;
+                string[] split = currentUser.Split('@');
+                if (split.Length != 2 || !split[1].Equals("microsoft.com"))
+                {
+                    throw new Exception("Unrecognized email account");
+                }
+                _currentUser = split[0];
+                _currentUser = "user1";
+            }
+            catch (Exception e)
+            {
+                Globals.Ribbons.Ribbon.showTaskPaneBtn.Checked = false;
+                Globals.Ribbons.Ribbon.keepUpdateBtn.Checked = false;
+            }            
         }
 
         private void taskPaneValue_VisibleChanged(object sender, System.EventArgs e)

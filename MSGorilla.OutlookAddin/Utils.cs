@@ -8,6 +8,8 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Navigation;
 
+using Outlook = Microsoft.Office.Interop.Outlook;
+
 using MSGorilla.WebAPI.Client;
 
 namespace MSGorilla.OutlookAddin
@@ -16,18 +18,12 @@ namespace MSGorilla.OutlookAddin
     {
         public static string GetCurrentUserID()
         {
-            return "user1";
-            string[] array = System.Security.Principal.WindowsIdentity.GetCurrent().Name.Split('\\');
-            if (array.Length > 1)
-            {
-                return array[1];
-            }
-            return array[0];
+            return Globals.ThisAddIn.CurrentUserID;
         }
 
         public static GorillaWebAPI GetGorillaClient()
         {
-            GorillaWebAPI client = new GorillaWebAPI("ShareAccount_" + GetCurrentUserID(), "!QAZxsw2#EDCvfr4");
+            GorillaWebAPI client = new GorillaWebAPI("ShareAccount_" + GetCurrentUserID(), "********");
             return client;
         }
 

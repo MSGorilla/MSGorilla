@@ -23,10 +23,5 @@ namespace MSGorilla.OutlookAddin
         {
             Globals.ThisAddIn.MSGorillaTaskPane.Visible = ((RibbonToggleButton)sender).Checked;
         }
-
-        private void keepUpdateBtn_Click(object sender, RibbonControlEventArgs e)
-        {
-            Globals.ThisAddIn.KeepUpdatingInfo = ((RibbonToggleButton)sender).Checked;
-        }
     }
 }

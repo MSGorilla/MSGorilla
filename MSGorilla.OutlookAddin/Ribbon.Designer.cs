@@ -73,7 +73,7 @@
             // 
             this.keepUpdateBtn.Label = "Updating Info";
             this.keepUpdateBtn.Name = "keepUpdate";
-            this.keepUpdateBtn.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.keepUpdateBtn_Click);
+            //this.keepUpdateBtn.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.keepUpdateBtn_Click);
             // 
             // Ribbon
             // 

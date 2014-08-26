@@ -39,10 +39,9 @@ namespace MSGorilla.OutlookAddin.GUI
             this.loadingBar.Visibility = System.Windows.Visibility.Hidden;
         }
 
-        private void GotoMSGorilla(object sender, RoutedEventArgs e)
+        private void SeeMsgOnMSGorilla(object sender, RoutedEventArgs e)
         {
             Process.Start("https://msgorilla.cloudapp.net/Message/Index?msgID=" + this._messageID);
-            //wbSample.Navigate("https://msgorilla.cloudapp.net/");
         }
 
         private async void ShowRichMessage(object sender, RoutedEventArgs e)

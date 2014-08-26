@@ -90,7 +90,7 @@ namespace MSGorilla.OutlookAddin.GUI
             {
                 try
                 {
-                    if (!Globals.ThisAddIn.KeepUpdatingInfo)
+                    if (!Globals.Ribbons.Ribbon.keepUpdateBtn.Checked)
                     {
                         continue;
                     }
@@ -165,7 +165,7 @@ namespace MSGorilla.OutlookAddin.GUI
                 }
                 finally
                 {
-                    Thread.Sleep(1000 * 10);
+                    Thread.Sleep(1000 * 120);
                 }
             }
         }
