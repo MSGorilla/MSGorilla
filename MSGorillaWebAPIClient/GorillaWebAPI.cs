@@ -454,5 +454,14 @@ namespace MSGorilla.WebAPI.Client
             HttpWebResponse response = GetResponseFromMSGorilla(request);
             string ret = _readResponseContent(response);
         }
+
+        public void RemoveFavouriteTopic(string topicName, string groupID = "")
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(
+                _rootUri + string.Format(Constant.UriRemoveFavouriteTopic, topicName, groupID));
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = GetResponseFromMSGorilla(request);
+            string ret = _readResponseContent(response);
+        }
     }
 }
