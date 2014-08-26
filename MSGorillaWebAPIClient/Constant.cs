@@ -38,6 +38,8 @@ namespace MSGorilla.WebAPI.Client
         public static string UriFollowings = "/Account/Followings";
 
         public static string UriGetMyFavouriteTopic = "/Topic/GetMyFavouriteTopic";
+        public static string UriIsFavouriteTopic = "/Topic/IsFavouriteTopic?topic={0}&group={1}";
+        public static string UriAddFavouriteTopic = "/Topic/AddFavouriteTopic?topicID={0}&group={1}";
     }
 
     public class MessageModel

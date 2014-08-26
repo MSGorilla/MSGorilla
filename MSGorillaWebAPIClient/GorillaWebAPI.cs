@@ -435,5 +435,24 @@ namespace MSGorilla.WebAPI.Client
             HttpWebResponse response = GetResponseFromMSGorilla(request);
             return JsonConvert.DeserializeObject<List<DisplayFavouriteTopic>>(_readResponseContent(response));
         }
+
+        public bool IsFavouriteTopic(string topicName, string groupID = "")
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_rootUri +
+                string.Format(Constant.UriIsFavouriteTopic, topicName, groupID));
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = GetResponseFromMSGorilla(request);
+            string ret = _readResponseContent(response);
+            return "true".Equals(ret);
+        }
+
+        public void AddFavouriteTopic(string topicName, string groupID = "")
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(
+                _rootUri + string.Format(Constant.UriAddFavouriteTopic, topicName, groupID));
+            request.Headers["Authorization"] = _authHeader;
+            HttpWebResponse response = GetResponseFromMSGorilla(request);
+            string ret = _readResponseContent(response);
+        }
     }
 }

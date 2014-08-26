@@ -194,7 +194,7 @@ namespace MSGorilla.WebAPI
         /// </summary>
         /// <param name="topicID">id of the topic</param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet, HttpPost]
         public ActionResult AddFavouriteTopic(int topicID)
         {
             string me = whoami();
@@ -206,6 +206,40 @@ namespace MSGorilla.WebAPI
             MembershipHelper.CheckMembership(topic.GroupID, me);
 
             _topicManager.AddFavouriteTopic(whoami(), topicID);
+            return new ActionResult();
+        }
+
+        /// <summary>
+        /// Add the topic into current user's favourite topic list 
+        /// 
+        /// Example output:
+        /// {
+        ///     "ActionResultCode": 0,
+        ///     "Message": "success"
+        /// }
+        /// </summary>
+        /// <param name="topic">topic name</param>
+        /// <param name="group">group id</param>
+        /// <returns></returns>
+        [HttpGet, HttpPost]
+        public ActionResult AddFavouriteTopic(string topic, string group = null)
+        {
+            string me = whoami();
+            Topic t = null;
+            if (string.IsNullOrEmpty(group))
+            {
+                t = _topicManager.FindTopicByName(topic, MembershipHelper.JoinedGroup(me));
+            }
+            else
+            {
+                t = _topicManager.FindTopicByName(topic, group);
+            }
+
+            if (t == null)
+            {
+                throw new TopicNotFoundException();
+            }
+            _topicManager.AddFavouriteTopic(whoami(), t.Id);
             return new ActionResult();
         }
 
