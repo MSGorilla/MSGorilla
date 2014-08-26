@@ -133,6 +133,17 @@ namespace MSGorilla.OutlookAddin.GUI
                 }
                 );
 
+            List<string> useridList = new List<string>();
+            if (msg.Owner != null && msg.Owner.Length > 0)
+            {
+                useridList.AddRange(msg.Owner);
+            }
+            if (msg.AtUser != null && msg.AtUser.Length > 0)
+            {
+                useridList.AddRange(msg.AtUser);
+            }            
+            helper.RelatedUserIDs = useridList;
+
             this.MessageTB.Document.Blocks.Remove(this.MessageTB.Document.Blocks.FirstBlock);
             this.MessageTB.Document.Blocks.Add(helper.ParseText(msg.MessageContent));
         }

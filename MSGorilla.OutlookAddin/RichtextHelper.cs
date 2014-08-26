@@ -23,7 +23,8 @@ namespace MSGorilla.OutlookAddin
             {
                 None,
                 Hyperlink,
-                InnerTopiclink
+                InnerTopiclink,
+                InnerUserlink
             }
 
             public RTBlock(string str, LinkType linktype = LinkType.None)
@@ -35,15 +36,20 @@ namespace MSGorilla.OutlookAddin
 
         private const string _urlRegex = @"(\s|^)(ht|f)tp(s?)\:\/\/(\S)+(?=\s|$)";
         private const string _topicRegex = @"(\s|^)#([\w][\w \-\.,:&\*\+]*)?[\w]#(?=\s|$)";
-        private const string _topicUri = "https://msgorilla.cloudapp.net/topic/index?topic={0}&group={1}";
 
-        public RequestNavigateEventHandler InnerLinkHandler;
+        private const string _userRegex = @"(\s|^)@[0-9a-zA-Z\-]+(?=\s|$)";
+        private const string _topicUri = "https://msgorilla.cloudapp.net/topic/index?topic={0}&group={1}";
+        private const string _userUri = "https://msgorilla.cloudapp.net/profile/index?user={0}";
+
+        public RequestNavigateEventHandler InnerTopicLinkHandler;
+        public RequestNavigateEventHandler InnerUserLinkHandler;
+        public List<string> RelatedUserIDs;
         public string Group;
 
         public RichtextHelper(string group, RequestNavigateEventHandler innerLinkHandler)
         {
             this.Group = group;
-            this.InnerLinkHandler = innerLinkHandler;
+            this.InnerTopicLinkHandler = innerLinkHandler;
         }
 
         public Paragraph ParseText(string text)
@@ -53,13 +59,24 @@ namespace MSGorilla.OutlookAddin
 
             foreach (var block in blocks)
             {
-                if (block.Linktype == RTBlock.LinkType.InnerTopiclink)
+                if (block.Linktype != RTBlock.LinkType.None)
                 {
                     ret.Add(block);
                     continue;
                 }
-
                 ret.AddRange(ParseHyperLink(block.Str));
+            }
+
+            blocks = ret;
+            ret = new List<RTBlock>();
+            foreach (var block in blocks)
+            {
+                if (block.Linktype != RTBlock.LinkType.None)
+                {
+                    ret.Add(block);
+                    continue;
+                }
+                ret.AddRange(ParseInnerUserLink(block.Str));
             }
 
             return ToParagraph(ret);
@@ -68,6 +85,17 @@ namespace MSGorilla.OutlookAddin
         private List<RTBlock> ParseHyperLink(string text)
         {
             return ParseLink(text, _urlRegex, RTBlock.LinkType.Hyperlink);
+        }
+
+        private List<RTBlock> ParseInnerUserLink(string text)
+        {
+            if(RelatedUserIDs == null || RelatedUserIDs.Count == 0){
+                return new List<RTBlock>() {new RTBlock(text)};
+            }
+
+            var temp = from userid in RelatedUserIDs select string.Format("({0})", userid);
+            string userRegex = string.Format("@({0})", string.Join("|", temp));
+            return ParseLink(text, userRegex, RTBlock.LinkType.InnerUserlink);
         }
 
         private List<RTBlock> ParseInnerTopicLink(string text)
@@ -124,8 +152,16 @@ namespace MSGorilla.OutlookAddin
                     para.Inlines.Add(
                         Utils.CreateLink(block.Str,
                                          string.Format(_topicUri, block.Str.Replace("#", ""), this.Group),
-                                         InnerLinkHandler)
+                                         InnerTopicLinkHandler)
                     );
+                }
+                else if (block.Linktype == RTBlock.LinkType.InnerUserlink)
+                {
+                    para.Inlines.Add(
+                        Utils.CreateLink(block.Str, 
+                                            string.Format(_userUri, block.Str.Replace("@", "")), 
+                                            InnerUserLinkHandler)
+                        );
                 }
                 else
                 {
@@ -134,16 +170,6 @@ namespace MSGorilla.OutlookAddin
                 para.Inlines.Add(" ");
             }
             return para;
-        }
-
-        private Hyperlink CreateInnerLink(string name, string uri)
-        {
-            Hyperlink link = new Hyperlink();
-            link.IsEnabled = true;
-            link.Inlines.Add(name);
-            link.NavigateUri = new Uri(uri);
-            link.RequestNavigate += InnerLinkHandler;
-            return link;
         }
     }
 }
