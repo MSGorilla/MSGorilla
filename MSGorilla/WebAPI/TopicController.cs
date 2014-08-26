@@ -232,6 +232,7 @@ namespace MSGorilla.WebAPI
             }
             else
             {
+                MembershipHelper.CheckMembership(group, me);
                 t = _topicManager.FindTopicByName(topic, group);
             }
 
@@ -258,6 +259,41 @@ namespace MSGorilla.WebAPI
         public ActionResult RemoveFavouriteTopic(int topicID)
         {
             _topicManager.Remove(whoami(), topicID);
+            return new ActionResult();
+        }
+
+        /// <summary>
+        /// Remove the topic from the favourite topic list of current User
+        /// 
+        /// Example output:
+        /// {
+        ///     "ActionResultCode": 0,
+        ///     "Message": "success"
+        /// }
+        /// </summary>
+        /// <param name="topic">topic name</param>
+        /// <param name="group">group id</param>
+        /// <returns></returns>
+        [HttpGet, HttpDelete]
+        public ActionResult RemoveFavouriteTopic(string topic, string group = null)
+        {
+            string me = whoami();
+            Topic t = null;
+            if (string.IsNullOrEmpty(group))
+            {
+                t = _topicManager.FindTopicByName(topic, MembershipHelper.JoinedGroup(me));
+            }
+            else
+            {
+                MembershipHelper.CheckMembership(group, me);
+                t = _topicManager.FindTopicByName(topic, group);
+            }
+
+            if (t == null)
+            {
+                throw new TopicNotFoundException();
+            }
+            _topicManager.Remove(me, t.Id);
             return new ActionResult();
         }
 
