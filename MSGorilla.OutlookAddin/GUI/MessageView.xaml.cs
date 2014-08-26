@@ -117,7 +117,7 @@ namespace MSGorilla.OutlookAddin.GUI
                 }
 
 
-                if (msgs.message != null)
+                if (msgs != null)
                 {
                     token = msgs.continuationToken;
                     if (msgs.message != null)

@@ -123,6 +123,7 @@ namespace MSGorilla.OutlookAddin.GUI
         public void Load()
         {
             this.ActionBtn.Visibility = System.Windows.Visibility.Hidden;
+            this.loadingBar.Visibility = System.Windows.Visibility.Hidden;
 
             if (this.messageView.Type == MessageViewType.Home)
             {
