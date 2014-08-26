@@ -68,12 +68,15 @@ namespace MSGorilla.WebAPI.Client
                         using (var reader = new StreamReader(data))
                         {
                             string text = reader.ReadToEnd();
-                            MSGorillaException gorillaException = new MSGorillaException(text);
+                            MSGorillaException gorillaException = new MSGorillaException(text, e);
                             throw gorillaException;
                         }
                     }
                     catch(Exception exp)
                     {
+                        //If the exception can be recognized as gorilla exception,
+                        //throw the MSGorillaException.
+                        //Else throw the origin exception.
                         if (exp is MSGorillaException)
                         {
                             throw exp;

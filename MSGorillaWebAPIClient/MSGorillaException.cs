@@ -27,8 +27,9 @@ namespace MSGorilla.WebAPI.Client
                 return _description;
             }
         }
-        public MSGorillaException(string text) : base(
-            JObject.Parse(text)["Message"].Value<string>()
+        public MSGorillaException(string text, Exception innerException) : base(
+            JObject.Parse(text)["Message"].Value<string>(),
+            innerException = null
             )
         {
             JObject obj = JObject.Parse(text);
