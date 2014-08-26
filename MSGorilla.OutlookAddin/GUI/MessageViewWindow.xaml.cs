@@ -38,35 +38,85 @@ namespace MSGorilla.OutlookAddin.GUI
             this.Title = "MSGorilla Outlook Addin";
         }
 
-        private void LikeTopic(object sender, RoutedEventArgs e)
+        private async void LikeTopic(object sender, RoutedEventArgs e)
         {
-            
+            this.loadingBar.Visibility = System.Windows.Visibility.Visible;
+
+            Task<bool> likeTopicTask = new Task<bool>(() =>
+            {
+                string topicName = this.messageView.Argument["TopicName"] as string;
+                string groupID = this.messageView.Argument["GroupID"] as string;
+                GorillaWebAPI client = Utils.GetGorillaClient();
+                client.AddFavouriteTopic(topicName, groupID);
+
+                bool isLiked = client.IsFavouriteTopic(topicName, groupID);
+                return isLiked;
+            });
+            likeTopicTask.Start();
+            bool isliked = await likeTopicTask;
+
+            if (isliked)
+            {
+                this.ActionBtn.Content = "Remove from Favourite";
+                this.ActionBtn.Click -= LikeTopic;
+                this.ActionBtn.Click += UnlikeTopic;
+            }
+
+            this.loadingBar.Visibility = System.Windows.Visibility.Hidden;
+        }
+
+        private async void UnlikeTopic(object sender, RoutedEventArgs e)
+        {
+            this.loadingBar.Visibility = System.Windows.Visibility.Visible;
+
+            Task<bool> likeTopicTask = new Task<bool>(() =>
+            {
+                string topicName = this.messageView.Argument["TopicName"] as string;
+                string groupID = this.messageView.Argument["GroupID"] as string;
+                GorillaWebAPI client = Utils.GetGorillaClient();
+                client.RemoveFavouriteTopic(topicName, groupID);
+
+                bool isLiked = client.IsFavouriteTopic(topicName, groupID);
+                return isLiked;
+            });
+            likeTopicTask.Start();
+            bool isliked = await likeTopicTask;
+
+            if (!isliked)
+            {
+                this.ActionBtn.Content = "Add to Favourite";
+                this.ActionBtn.Click += LikeTopic;
+                this.ActionBtn.Click -= UnlikeTopic;
+            }
+
+            this.loadingBar.Visibility = System.Windows.Visibility.Hidden;
         }
 
         void LoadTopicActionBtn()
         {
-            GorillaWebAPI client = Utils.GetGorillaClient();
-            string topicName = this.messageView.Argument["TopicName"] as string;
-            string groupID = this.messageView.Argument["GroupID"] as string;
-
-            bool isFavourite = client.IsFavouriteTopic(topicName, groupID);
-
             this.Dispatcher.Invoke((Action)(() =>
             {
+                this.loadingBar.Visibility = System.Windows.Visibility.Visible;
+
+                GorillaWebAPI client = Utils.GetGorillaClient();
+                string topicName = this.messageView.Argument["TopicName"] as string;
+                string groupID = this.messageView.Argument["GroupID"] as string;
+
+                bool isFavourite = client.IsFavouriteTopic(topicName, groupID);
+
                 if (isFavourite)
                 {
-                    this.ActionBtn.Content = "Liked";
-                    this.ActionBtn.Background = new SolidColorBrush(Color.FromRgb(63,182,24));
-                    this.ActionBtn.Foreground = new SolidColorBrush(Colors.White);
+                    this.ActionBtn.Content = "Remove from Favourite";
+                    this.ActionBtn.Click += UnlikeTopic;
                 }
                 else
                 {
-                    this.ActionBtn.Content = "+Like";
-                    this.ActionBtn.Background = SystemColors.MenuHighlightBrush;
-                    this.ActionBtn.Foreground = new SolidColorBrush(Colors.White);
+                    this.ActionBtn.Content = "Add to Favourite";
                     this.ActionBtn.Click += LikeTopic;
                 }
                 this.ActionBtn.Visibility = System.Windows.Visibility.Visible;
+
+                this.loadingBar.Visibility = System.Windows.Visibility.Hidden;
             }));
         }
 
@@ -97,7 +147,6 @@ namespace MSGorilla.OutlookAddin.GUI
 
                 Task loadBtnTask = new Task(LoadTopicActionBtn);
                 loadBtnTask.Start();
-                //LoadTopicActionBtn();
             }
             else if (this.messageView.Type == MessageViewType.User)
             {
