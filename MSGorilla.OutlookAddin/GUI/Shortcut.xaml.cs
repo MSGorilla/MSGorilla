@@ -204,7 +204,8 @@ namespace MSGorilla.OutlookAddin.GUI
                     }));
                 })).Start();
                 window.Load();
-            }            
+            }
+            item.IsSelected = false;
         }
     }
 }

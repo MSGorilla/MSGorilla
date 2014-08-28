@@ -85,7 +85,7 @@ namespace MSGorilla.OutlookAddin.GUI
             this._messageID = msg.ID;
             this.UsernameTB.Text = msg.User.Userid;
             this.TimestampTB.Text = string.Format("{0:F}", msg.PostTime.ToLocalTime());
-            this.Thumbnail.Source = 
+            this.Thumbnail.Source =
                 new ImageSourceConverter().ConvertFromString(
                     ThumbnailRetriever.GetThumbnail(msg.User.PortraitUrl)
                 ) as ImageSource;
