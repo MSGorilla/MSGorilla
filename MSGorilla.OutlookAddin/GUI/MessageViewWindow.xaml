@@ -8,9 +8,16 @@
              d:DesignHeight="800" d:DesignWidth="880" Height="760" Width="890">
     <DockPanel Name="MainPanel" LastChildFill="True">
         <DockPanel Name="TitlePanel" Height="80" DockPanel.Dock="Top">
-            <DockPanel>
+            <DockPanel Name="headDockPanel">
                 <TextBlock DockPanel.Dock="Top" Name="TitleTB" Text="Home" FontFamily="Calibri" FontSize="40"/>
                 <TextBlock Name="SubTitleTB" Text="MSgorilla Dev" FontFamily="Calibri" FontSize="20"/>
+                <StackPanel Name="ComboxBoxPanel" Orientation="Horizontal"  Margin="10,0,0,0">
+                    <TextBlock Text="Group:" FontFamily="Calibri" FontSize="20"/>
+                    <ComboBox Name="GroupComboBox" SelectionChanged="GroupComboBox_SelectionChanged" 
+                          SelectedValuePath="GroupID" DisplayMemberPath="DisplayName" 
+                          Width="200" Margin="10,0,0,0" FontSize="16" FontFamily="Times New Roman"/>
+                </StackPanel>
+                
             </DockPanel>
             <Grid DockPanel.Dock="Right" Width="180" Height="40" Margin="10,0,10,0" HorizontalAlignment="Right" >
                 <Button DockPanel.Dock="Right" Name="ActionBtn" HorizontalAlignment="Right" FontFamily="Calibri" FontSize="18"

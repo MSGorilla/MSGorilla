@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using MSGorilla.WebAPI.Client;
+using MSGorilla.Library.Models.ViewModels;
 
 namespace MSGorilla.OutlookAddin.GUI
 {
@@ -120,6 +121,21 @@ namespace MSGorilla.OutlookAddin.GUI
             }));
         }
 
+        void LoadJoinedGroup()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                this.loadingBar.Visibility = System.Windows.Visibility.Visible;
+                GorillaWebAPI client = Utils.GetGorillaClient();
+                List<DisplayMembership> groups = client.GetJoinedGroup();
+
+                GroupComboBox.ItemsSource = groups;
+                GroupComboBox.SelectedItem = groups[0];
+                ComboxBoxPanel.Visibility = System.Windows.Visibility.Visible;
+                this.loadingBar.Visibility = System.Windows.Visibility.Hidden;
+            }));
+        }
+
         public void Load()
         {
             this.ActionBtn.Visibility = System.Windows.Visibility.Hidden;
@@ -129,16 +145,22 @@ namespace MSGorilla.OutlookAddin.GUI
             {
                 this.TitleTB.Text = "Home";
                 this.SubTitleTB.Text = this.messageView.Argument["GroupID"] as string;
+                this.headDockPanel.Children.Remove(ComboxBoxPanel);
+                this.messageView.Load();
             }
             else if (this.messageView.Type == MessageViewType.Mention)
             {
                 this.TitleTB.Text = "Mention Me";
                 this.SubTitleTB.Visibility = System.Windows.Visibility.Hidden;
+                this.headDockPanel.Children.Remove(ComboxBoxPanel);
+                this.messageView.Load();
             }
             else if (this.messageView.Type == MessageViewType.Owner)
             {
                 this.TitleTB.Text = "Owned by me";
                 this.SubTitleTB.Visibility = System.Windows.Visibility.Hidden;
+                this.headDockPanel.Children.Remove(ComboxBoxPanel);
+                this.messageView.Load();
             }
             else if (this.messageView.Type == MessageViewType.Topic)
             {
@@ -148,12 +170,25 @@ namespace MSGorilla.OutlookAddin.GUI
 
                 Task loadBtnTask = new Task(LoadTopicActionBtn);
                 loadBtnTask.Start();
+
+                this.headDockPanel.Children.Remove(ComboxBoxPanel);
+                this.messageView.Load();
             }
             else if (this.messageView.Type == MessageViewType.User)
             {
                 this.TitleTB.Text = this.messageView.Argument["DisplayName"] as string;
                 this.SubTitleTB.Text = this.messageView.Argument["UserID"] as string;
+
+                new Task(LoadJoinedGroup).Start();
             }
+        }
+
+        private void GroupComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox SelectBox = (ComboBox)sender;
+            string groupID = ((DisplayMembership)SelectBox.SelectedItem).GroupID;
+            this.messageView.Argument["GroupID"] = groupID;
+            this.messageView.token = null;
             this.messageView.Load();
         }
     }

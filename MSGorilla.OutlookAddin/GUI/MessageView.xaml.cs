@@ -31,7 +31,7 @@ namespace MSGorilla.OutlookAddin.GUI
 
         public Dictionary<string, object> Argument;
 
-        string token = null;
+        public string token = null;
         public MessageView()
         {
             InitializeComponent();
@@ -82,7 +82,7 @@ namespace MSGorilla.OutlookAddin.GUI
             else if (Type == MessageViewType.User)
             {
                 return client.UserLine(this.Argument["UserID"] as string,
-                    "",
+                    this.Argument["GroupID"] as string,
                     10,
                     this.token);
             }
