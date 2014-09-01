@@ -98,17 +98,28 @@ namespace MSGorilla.WebAPI
         ///     "MsgCount": 0
         /// }
         /// </summary>
-        /// <param name="Name">name of the topic</param>
-        /// <param name="Description">description of the topic</param>
+        /// <param name="name">name of the topic</param>
+        /// <param name="group">group id</param>
+        /// <param name="description">description of the topic</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayTopic AddTopic(string Name, string Description)
+        public DisplayTopic AddTopic(string name, string group = null, string description = null)
         {
-            whoami();
+            string me = whoami();
+            if (string.IsNullOrEmpty(group))
+            {
+                group = MembershipHelper.DefaultGroup(me);
+            }
+            else
+            {
+                MembershipHelper.CheckMembership(group, me);
+            }
+
             Topic topic = new Topic();
-            topic.Name = Name;
-            topic.Description = Description;
+            topic.Name = name;
+            topic.Description = description;
             topic.MsgCount = 0;
+            topic.GroupID = group;
             var newtopic = _topicManager.AddTopic(topic);
             return new DisplayTopic(newtopic, IsFavouriteTopic(newtopic.Id));
         }
