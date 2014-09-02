@@ -164,7 +164,7 @@
                             break;
                     }
                 } else {
-                    self.counter.html(140 - self.input.val().length);
+                    self.counter.html(999 - self.input.val().length);
                     self.filterResults();
                 }
             });
