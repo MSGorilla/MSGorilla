@@ -11,7 +11,7 @@ using MSGorilla.Library.Models;
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.SqlModels;
 
-namespace MSGorilla.WebApi
+namespace MSGorilla.WebAPI
 {
     public class SchemaController : BaseController
     {
@@ -75,7 +75,9 @@ namespace MSGorilla.WebApi
         [HttpGet,HttpPost]
         public Schema PostSchema(string schemaID, string schemaContent)
         {
-            Schema schema = new Schema(schemaID, schemaContent);
+            Schema schema = new Schema();
+            schema.SchemaID = schemaID;
+            schema.SchemaContent = schemaContent;
             _schemaManager.PostSchema(schema);
             return schema;
         }

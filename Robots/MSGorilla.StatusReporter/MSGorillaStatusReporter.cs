@@ -19,7 +19,7 @@ namespace MSGorilla.StatusReporter
         public MSGorillaStatusReporter()
             : base()
         {
-            _client = new GorillaWebAPI("MSGorillaStatusReporter", "User@123");
+            _client = new GorillaWebAPI("MSGorillaStatusReporter", "*******");
         }
 
         public override void Report()
@@ -29,9 +29,9 @@ namespace MSGorilla.StatusReporter
             List<HistoryData> datas = _collector.LoadDataByDateUtc(DateTime.UtcNow.AddDays(-30), DateTime.UtcNow);
 
             Figure figure = new UserCountTrendFigure(datas);
-            _client.PostMessage(figure.ToString(), "chart-axis-singleaxis");
+            _client.PostMessage(figure.ToString(), null, "chart-axis-singleaxis");
             figure = new TopicTrendFigure(datas);
-            _client.PostMessage(figure.ToString(), "chart-axis-singleaxis");
+            _client.PostMessage(figure.ToString(), null, "chart-axis-singleaxis");
 
 
             if (datas[datas.Count - 1].CountOfMsgPostedByRobot == 0)
@@ -39,7 +39,7 @@ namespace MSGorilla.StatusReporter
                 datas.RemoveAt(datas.Count - 1);
             }
             figure = new RobotMsgTrendFigure(datas);
-            _client.PostMessage(figure.ToString(), "chart-axis-singleaxis");
+            _client.PostMessage(figure.ToString(), null, "chart-axis-singleaxis");
 
             Logger.Info("Draw topic, user and message trend on MSGorilla.");
         }

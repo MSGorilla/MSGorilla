@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using MSGorilla.Library.DAL;
+
 using MSGorilla.Library.Models.SqlModels;
 
 namespace MSGorilla.Library
 {
     public class NotifManager
     {
-        public NotificationCount FindUserNotif(string userid, MSGorillaContext _gorillaCtx)
+        public NotificationCount FindUserNotif(string userid, MSGorillaEntities _gorillaCtx)
         {
-            NotificationCount notifCount = _gorillaCtx.NotifCounts.Find(userid);
+            NotificationCount notifCount = _gorillaCtx.NotificationCounts.Find(userid);
             if (notifCount == null)
             {
                 notifCount = new NotificationCount();
@@ -21,7 +21,7 @@ namespace MSGorilla.Library
                 notifCount.UnreadAtlineMsgCount = notifCount.UnreadHomelineMsgCount = 0;
                 notifCount.UnreadOwnerlineMsgCount = notifCount.UnreadReplyCount = 0;
 
-                notifCount = _gorillaCtx.NotifCounts.Add(notifCount);
+                notifCount = _gorillaCtx.NotificationCounts.Add(notifCount);
                 _gorillaCtx.SaveChanges();
             }
             return notifCount;
@@ -29,9 +29,9 @@ namespace MSGorilla.Library
 
         public NotificationCount FindUserNotif(string userid)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                NotificationCount notifCount = _gorillaCtx.NotifCounts.Find(userid);
+                NotificationCount notifCount = _gorillaCtx.NotificationCounts.Find(userid);
                 if (notifCount == null)
                 {
                     notifCount = new NotificationCount();
@@ -39,7 +39,7 @@ namespace MSGorilla.Library
                     notifCount.UnreadAtlineMsgCount = notifCount.UnreadHomelineMsgCount = 0;
                     notifCount.UnreadOwnerlineMsgCount = notifCount.UnreadReplyCount = 0;
 
-                    notifCount = _gorillaCtx.NotifCounts.Add(notifCount);
+                    notifCount = _gorillaCtx.NotificationCounts.Add(notifCount);
                     _gorillaCtx.SaveChanges();
                 }
                 return notifCount;
@@ -48,7 +48,7 @@ namespace MSGorilla.Library
 
         public void incrementAtlineNotifCount(string userid)
         {
-            using(var _gorillaCtx = new MSGorillaContext())
+            using(var _gorillaCtx = new MSGorillaEntities())
             {
                 NotificationCount notif = FindUserNotif(userid, _gorillaCtx);
                 notif.UnreadAtlineMsgCount++;
@@ -58,7 +58,7 @@ namespace MSGorilla.Library
 
         public void incrementHomelineNotifCount(string userid)
         {
-            using(var _gorillaCtx = new MSGorillaContext())
+            using(var _gorillaCtx = new MSGorillaEntities())
             {
                 NotificationCount notif = FindUserNotif(userid, _gorillaCtx);
                 notif.UnreadHomelineMsgCount++;
@@ -68,7 +68,7 @@ namespace MSGorilla.Library
 
         public void incrementOwnerlineNotifCount(string userid)
         {
-            using(var _gorillaCtx = new MSGorillaContext())
+            using(var _gorillaCtx = new MSGorillaEntities())
             {
                 NotificationCount notif = FindUserNotif(userid, _gorillaCtx);
                 notif.UnreadOwnerlineMsgCount++;
@@ -78,7 +78,7 @@ namespace MSGorilla.Library
 
         public void incrementReplyNotifCount(string userid)
         {
-            using(var _gorillaCtx = new MSGorillaContext())
+            using(var _gorillaCtx = new MSGorillaEntities())
             {
                 NotificationCount notif = FindUserNotif(userid, _gorillaCtx);
                 notif.UnreadReplyCount++;
@@ -88,7 +88,7 @@ namespace MSGorilla.Library
 
         public void incrementImportantMsgCount(string userid)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 NotificationCount notif = FindUserNotif(userid, _gorillaCtx);
                 notif.UnreadImportantMsgCount++;
@@ -98,7 +98,7 @@ namespace MSGorilla.Library
 
         public void clearAtlineNotifCount(string userid)
         {
-            using(var _gorillaCtx = new MSGorillaContext())
+            using(var _gorillaCtx = new MSGorillaEntities())
             {
                 NotificationCount notif = FindUserNotif(userid, _gorillaCtx);
                 notif.UnreadAtlineMsgCount = 0;
@@ -107,7 +107,7 @@ namespace MSGorilla.Library
         }
         public void clearHomelineNotifCount(string userid)
         {
-            using(var _gorillaCtx = new MSGorillaContext())
+            using(var _gorillaCtx = new MSGorillaEntities())
             {
                 NotificationCount notif = FindUserNotif(userid, _gorillaCtx);
                 notif.UnreadHomelineMsgCount = 0;
@@ -117,7 +117,7 @@ namespace MSGorilla.Library
 
         public void clearOwnerlineNotifCount(string userid)
         {
-            using(var _gorillaCtx = new MSGorillaContext())
+            using(var _gorillaCtx = new MSGorillaEntities())
             {
                 NotificationCount notif = FindUserNotif(userid, _gorillaCtx);
                 notif.UnreadOwnerlineMsgCount = 0;
@@ -127,7 +127,7 @@ namespace MSGorilla.Library
 
         public void clearReplyNotifCount(string userid)
         {
-            using(var _gorillaCtx = new MSGorillaContext())
+            using(var _gorillaCtx = new MSGorillaEntities())
             {
                 NotificationCount notif = FindUserNotif(userid, _gorillaCtx);
                 notif.UnreadReplyCount = 0;
@@ -137,7 +137,7 @@ namespace MSGorilla.Library
 
         public void clearImportantMsgCount(string userid)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 NotificationCount notif = FindUserNotif(userid, _gorillaCtx);
                 notif.UnreadImportantMsgCount = 0;
@@ -147,7 +147,7 @@ namespace MSGorilla.Library
 
         public void clearAll(string userid)
         {
-            using(var _gorillaCtx = new MSGorillaContext())
+            using(var _gorillaCtx = new MSGorillaEntities())
             {
                 NotificationCount notif = FindUserNotif(userid, _gorillaCtx);
                 notif.UnreadOwnerlineMsgCount = 0;

@@ -37,6 +37,7 @@ namespace HelloWorld
                 catch (Exception e)
                 {
                     Logger.Error(e.StackTrace);
+                    Logger.Error(e.Message);
                     Thread.Sleep(30000);
                 }
             }
@@ -52,8 +53,18 @@ namespace HelloWorld
 
             while (true)
             {
-                replier.CheckReply();
-                Thread.Sleep(60000);
+                try
+                {
+                    replier.CheckReply();
+                    Thread.Sleep(60000);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error("Fail to check reply from MSGorilla.");
+                    Logger.Error(e.Message);
+                    Logger.Error(e.StackTrace);
+                    Thread.Sleep(60000);
+                }
             }
         }
         static void Main(string[] args)

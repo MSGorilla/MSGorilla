@@ -53,7 +53,7 @@ namespace MSGorilla.EmailMonitor
                 Logger.Debug(string.Format("Processing reply\n From: {0}\n Content:{1}", reply.User.Userid, reply.MessageContent));
                 try
                 {
-                    Message msg = _client.GetRawMessage(reply.MessageUser, reply.MessageID);
+                    Message msg = _client.GetRawMessage(reply.MessageID);
                     if (msg != null && !string.IsNullOrEmpty(msg.EventID))
                     {
                         _replySender.ReplyConversation(reply.User.Userid, reply.MessageContent, msg.EventID);

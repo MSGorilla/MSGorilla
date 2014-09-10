@@ -42,6 +42,7 @@ namespace MSGorilla.Library
         private NotifManager _notifManager;
         private TopicManager _topicManager;
         private RichMsgManager _richMsgManager;
+        private GroupManager _groupManager;
 
         public MessageManager()
         {
@@ -63,9 +64,10 @@ namespace MSGorilla.Library
             _notifManager = new NotifManager();
             _topicManager = new TopicManager();
             _richMsgManager = new RichMsgManager();
+            _groupManager = new GroupManager();
         }
 
-        static string GenerateTimestampConditionQuery(string userid, DateTime start, DateTime end)
+        static string GenerateTimestampConditionQuery(string userid, DateTime start, DateTime end, string groupID = null)
         {
             if (end == null)
             {
@@ -91,13 +93,14 @@ namespace MSGorilla.Library
                     string.Format("{0}_{1}", userid, Utils.ToAzureStorageDayBasedString(end)))
             );
 
+            string rowkeyStartWith = string.IsNullOrEmpty(groupID) ? "" : groupID + "_";
             query = TableQuery.CombineFilters(
                 query,
                 TableOperators.And,
                 TableQuery.GenerateFilterCondition(
                     "RowKey",
                     QueryComparisons.LessThan,
-                    Utils.NextKeyString(Utils.ToAzureStorageSecondBasedString(start)))
+                    Utils.NextKeyString(rowkeyStartWith + Utils.ToAzureStorageSecondBasedString(start)))
             );
 
             query = TableQuery.CombineFilters(
@@ -106,13 +109,13 @@ namespace MSGorilla.Library
                 TableQuery.GenerateFilterCondition(
                     "RowKey",
                     QueryComparisons.GreaterThan,
-                    Utils.ToAzureStorageSecondBasedString(end))
+                    rowkeyStartWith + Utils.ToAzureStorageSecondBasedString(end))
             );
 
             return query;
         }
 
-        static string GeneratePKStartWithConditionQuery(string startWith)
+        static string GenerateStartWithConditionQuery(string startWith, string propertyName = "PartitionKey")
         {
             if (!Utils.IsValidID(startWith))
             {
@@ -120,7 +123,7 @@ namespace MSGorilla.Library
             }
 
             string query = TableQuery.GenerateFilterCondition(
-                "PartitionKey",
+                propertyName,
                 QueryComparisons.LessThan,
                 Utils.NextKeyString(startWith));
 
@@ -128,7 +131,7 @@ namespace MSGorilla.Library
                 query,
                 TableOperators.And,
                 TableQuery.GenerateFilterCondition(
-                    "PartitionKey",
+                    propertyName,
                     QueryComparisons.GreaterThanOrEqual,
                     startWith
                 )
@@ -136,11 +139,11 @@ namespace MSGorilla.Library
             return query;
         }
 
-        public MessagePagination UserLine(string userid, DateTime start, DateTime end, int count = 25, TableContinuationToken continuationToken = null)
+        public MessagePagination UserLine(string userid, string groupID, DateTime start, DateTime end, int count = 25, TableContinuationToken continuationToken = null)
         {
             TableQuery<BaseMessageEntity> rangeQuery =
                 new TableQuery<BaseMessageEntity>().Where(
-                    GenerateTimestampConditionQuery(userid, start, end)
+                    GenerateTimestampConditionQuery(userid, start, end, groupID)
                 ).Take(count);
             TableQuerySegment<BaseMessageEntity> queryResult = _userline.ExecuteQuerySegmented(rangeQuery, continuationToken);
 
@@ -155,9 +158,14 @@ namespace MSGorilla.Library
             return ret;
         }
 
-        public MessagePagination UserLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
+        public MessagePagination UserLine(string userid, string groupID, int count = 25, TableContinuationToken continuationToken = null)
         {
-            string query = GeneratePKStartWithConditionQuery(userid + "_");
+            string query = GenerateStartWithConditionQuery(userid + "_");
+            query = TableQuery.CombineFilters(
+                query,
+                TableOperators.And,
+                GenerateStartWithConditionQuery(groupID + "_", "RowKey")
+                );
 
             TableQuery<BaseMessageEntity> tableQuery = new TableQuery<BaseMessageEntity>().Where(query).Take(count);
             TableQuerySegment<BaseMessageEntity> queryResult = _userline.ExecuteQuerySegmented(tableQuery, continuationToken);
@@ -194,7 +202,7 @@ namespace MSGorilla.Library
 
         public MessagePagination OwnerLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
         {
-            string query = GeneratePKStartWithConditionQuery(userid + "_");
+            string query = GenerateStartWithConditionQuery(userid + "_");
             TableQuery<BaseMessageEntity> tableQuery = new TableQuery<BaseMessageEntity>().Where(query).Take(count);
             TableQuerySegment<BaseMessageEntity> queryResult = _ownerline.ExecuteQuerySegmented(tableQuery, continuationToken);
 
@@ -230,7 +238,7 @@ namespace MSGorilla.Library
 
         public MessagePagination AtLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
         {
-            string query = GeneratePKStartWithConditionQuery(userid + "_");
+            string query = GenerateStartWithConditionQuery(userid + "_");
             TableQuery<BaseMessageEntity> tableQuery = new TableQuery<BaseMessageEntity>().Where(query).Take(count);
             TableQuerySegment<BaseMessageEntity> queryResult = _atline.ExecuteQuerySegmented(tableQuery, continuationToken);
 
@@ -245,11 +253,11 @@ namespace MSGorilla.Library
             return ret;
         }
 
-        public MessagePagination HomeLine(string userid, DateTime start, DateTime end, int count = 25, TableContinuationToken continuationToken = null)
+        public MessagePagination HomeLine(string userid, string groupID, DateTime start, DateTime end, int count = 25, TableContinuationToken continuationToken = null)
         {
             TableQuery<BaseMessageEntity> rangeQuery =
                 new TableQuery<BaseMessageEntity>().Where(
-                    GenerateTimestampConditionQuery(userid, start, end)
+                    GenerateTimestampConditionQuery(userid, start, end, groupID)
                 ).Take(count); ;
             TableQuerySegment<BaseMessageEntity> queryResult = _homeline.ExecuteQuerySegmented(rangeQuery, continuationToken);
 
@@ -264,9 +272,14 @@ namespace MSGorilla.Library
             return ret;
         }
 
-        public MessagePagination HomeLine(string userid, int count = 25, TableContinuationToken continuationToken = null)
+        public MessagePagination HomeLine(string userid, string groupID, int count = 25, TableContinuationToken continuationToken = null)
         {
-            string query = GeneratePKStartWithConditionQuery(userid + "_");
+            string query = GenerateStartWithConditionQuery(userid + "_");
+            query = TableQuery.CombineFilters(
+                query,
+                TableOperators.And,
+                GenerateStartWithConditionQuery(groupID + "_", "RowKey")
+                );
 
             TableQuery<BaseMessageEntity> tableQuery = new TableQuery<BaseMessageEntity>().Where(query).Take(count);
             TableQuerySegment<BaseMessageEntity> queryResult = _homeline.ExecuteQuerySegmented(tableQuery, continuationToken);
@@ -303,7 +316,7 @@ namespace MSGorilla.Library
 
         public MessagePagination TopicLine(string topicID, int count = 25, TableContinuationToken continuationToken = null)
         {
-            string query = GeneratePKStartWithConditionQuery(topicID + "_");
+            string query = GenerateStartWithConditionQuery(topicID + "_");
 
             TableQuery<BaseMessageEntity> tableQuery = new TableQuery<BaseMessageEntity>().Where(query).Take(count);
             TableQuerySegment<BaseMessageEntity> queryResult = _topicline.ExecuteQuerySegmented(tableQuery, continuationToken);
@@ -321,7 +334,7 @@ namespace MSGorilla.Library
 
         public List<Message> EventLine(string eventID)
         {
-            string query = GeneratePKStartWithConditionQuery(System.Web.HttpUtility.UrlEncode(eventID) + "_");
+            string query = GenerateStartWithConditionQuery(System.Web.HttpUtility.UrlEncode(eventID) + "_");
 
             TableQuery<BaseMessageEntity> rangeQuery = new TableQuery<BaseMessageEntity>().Where(query);
 
@@ -334,10 +347,10 @@ namespace MSGorilla.Library
             return msgs;
         }
 
-        public MessagePagination PublicSquareLine(int count = 25, TableContinuationToken continuationToken = null)
+        public MessagePagination PublicSquareLine(string groupID, int count = 25, TableContinuationToken continuationToken = null)
         {
             TableQuery<BaseMessageEntity> tableQuery =
-                new TableQuery<BaseMessageEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThan, "")).Take(count);
+                new TableQuery<BaseMessageEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThan, groupID + "_")).Take(count);
 
             TableQuerySegment<BaseMessageEntity> queryResult = _publicSquareLine.ExecuteQuerySegmented(tableQuery, continuationToken);
 
@@ -352,7 +365,7 @@ namespace MSGorilla.Library
             return ret;
         }
 
-        public MessagePagination PublicSquareLine(DateTime start, DateTime end, int count = 25, TableContinuationToken continuationToken = null)
+        public MessagePagination PublicSquareLine(string groupID, DateTime start, DateTime end, int count = 25, TableContinuationToken continuationToken = null)
         {
             if (end == null)
             {
@@ -366,7 +379,7 @@ namespace MSGorilla.Library
             string query = TableQuery.GenerateFilterCondition(
                 "PartitionKey",
                 QueryComparisons.LessThan,
-                Utils.NextKeyString(Utils.ToAzureStorageDayBasedString(start)));
+                groupID + "_" + Utils.NextKeyString(Utils.ToAzureStorageDayBasedString(start)));
 
             query = TableQuery.CombineFilters(
                 query,
@@ -374,7 +387,7 @@ namespace MSGorilla.Library
                 TableQuery.GenerateFilterCondition(
                     "PartitionKey",
                     QueryComparisons.GreaterThanOrEqual,
-                    Utils.ToAzureStorageDayBasedString(end))
+                    groupID + "_" + Utils.ToAzureStorageDayBasedString(end))
             );
 
             query = TableQuery.CombineFilters(
@@ -409,10 +422,32 @@ namespace MSGorilla.Library
             return ret;
         }
 
-        public Message GetRawMessage(string userid, string messageID)
+
+        public static TableOperation RetrieveUserlineMsgByID<TElement>(string messageID) where TElement : ITableEntity
         {
-            string pk = Message.ToMessagePK(userid, messageID);
-            TableOperation retrieveOperation = TableOperation.Retrieve<BaseMessageEntity>(pk, messageID);
+            try
+            {
+                string[] parts = messageID.Split('_');
+                double timespan = Double.Parse(parts[0]);
+                DateTime timestamp = DateTime.MaxValue.AddMilliseconds(0 - timespan);
+
+                string group = parts[1];
+                string userid = parts[2];
+
+                string pk = string.Format("{0}_{1}", userid, Utils.ToAzureStorageDayBasedString(timestamp, false));
+                string rk = string.Format("{0}_{1}", group, messageID);
+
+                return TableOperation.Retrieve<TElement>(pk, rk);
+            }
+            catch
+            {
+                throw new InvalidMessageIDException();
+            }
+        }
+
+        public Message GetRawMessage(string messageID)
+        {
+            TableOperation retrieveOperation = RetrieveUserlineMsgByID<BaseMessageEntity>(messageID);
 
             TableResult retrievedResult = _userline.Execute(retrieveOperation);
             if (retrievedResult.Result != null)
@@ -421,26 +456,6 @@ namespace MSGorilla.Library
                 return entity.ToMessage();
             }
             return null;
-        }
-
-        public MessageDetail GetMessageDetail(string userid, string messageID)
-        {
-            string pk = Message.ToMessagePK(userid, messageID);
-            TableOperation retrieveOperation = TableOperation.Retrieve<UserLineEntity>(pk, messageID);
-
-            MessageDetail msgd = null;
-            TableResult retrievedResult = _userline.Execute(retrieveOperation);
-            if (retrievedResult.Result != null)
-            {
-                UserLineEntity entity = (UserLineEntity)retrievedResult.Result;
-                //var msg = JsonConvert.DeserializeObject<Message>(entity.Content);
-                var msg = entity.ToMessage();
-                msgd = new MessageDetail(msg);
-                msgd.ReplyCount = entity.ReplyCount;
-                //tweet.RetweetCount = entity.RetweetCount;
-                msgd.Replies = GetAllReplies(entity.RowKey);
-            }
-            return msgd;
         }
 
         public List<Reply> GetAllReplies(string msgID)
@@ -456,10 +471,9 @@ namespace MSGorilla.Library
             return replies;
         }
 
-        public Message GetMessage(string msgUser, string msgID)
+        public Message GetMessage(string msgID)
         {
-            string pk = Message.ToMessagePK(msgUser, msgID);
-            TableOperation retreiveOperation = TableOperation.Retrieve<UserLineEntity>(pk, msgID);
+            TableOperation retreiveOperation = RetrieveUserlineMsgByID<UserLineEntity>(msgID);
             TableResult retreiveResult = _userline.Execute(retreiveOperation);
             UserLineEntity entity = ((UserLineEntity)retreiveResult.Result);
             if (entity == null)
@@ -470,7 +484,8 @@ namespace MSGorilla.Library
             return entity.ToMessage();
         }
 
-        public Message PostMessage(string userid, 
+        public Message PostMessage(string userid,
+                                    string groupID,
                                     string eventID, 
                                     string schemaID, 
                                     string[] owner, 
@@ -511,11 +526,12 @@ namespace MSGorilla.Library
             }
             foreach (string uid in atUserids)
             {
-                var temp = _accManager.FindUser(uid);
-                if(temp != null)
+                try
                 {
-                    validAtUsers.Add(temp.Userid);
+                    Membership member = _groupManager.CheckMembership(groupID, userid);
+                    validAtUsers.Add(member.MemberID);
                 }
+                catch { }
             }
 
             //merge topic from argument as well as message
@@ -534,7 +550,7 @@ namespace MSGorilla.Library
             }
 
             // create message
-            Message msg = new Message(userid, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray(), richMessageID, attachmentID, importance);
+            Message msg = new Message(userid, groupID, message, timestamp, eventID, schemaID, owner, validAtUsers.ToArray(), topic.ToArray(), richMessageID, attachmentID, importance);
             //insert into Userline
             TableOperation insertOperation = TableOperation.InsertOrReplace(new UserLineEntity(msg));
             _userline.Execute(insertOperation);
@@ -590,14 +606,15 @@ namespace MSGorilla.Library
             {
                 foreach (string topicName in message.TopicName)
                 {
-                    Topic topic = _topicManager.FindTopicByName(topicName);
+                    Topic topic = _topicManager.FindTopicByName(topicName, new string[]{message.Group});
                     if (topic == null)
                     {
                         topic = new Topic();
                         topic.Name = topicName;
                         topic.MsgCount = 0;
+                        topic.GroupID = message.Group;
                         _topicManager.AddTopic(topic);
-                        topic = _topicManager.FindTopicByName(topicName);
+                        topic = _topicManager.FindTopicByName(topicName, new string[] { message.Group });
                     }
 
                     insertOperation = TableOperation.InsertOrReplace(new TopicLine(message, topic.Id.ToString()));
@@ -607,12 +624,7 @@ namespace MSGorilla.Library
                     _topicManager.incrementUnreadMsgCountOfFavouriteTopic(topic.Id);
                 }
             }
-            
-            
-            //todo:
-            //The Userid of owner and AtUser may be ms alais or displayname instead of the
-            //real id in MSGorilla System.
-            //Should have a way to convert these names to Userid in our system
+
             if (message.Owner != null)
             {
                 foreach (string ownerid in message.Owner)
@@ -628,12 +640,23 @@ namespace MSGorilla.Library
             }
 
 
+            //insert into homeline
+            HashSet<string> groupMember = new HashSet<string>();
+            foreach (var member in _groupManager.GetAllGroupMember(message.Group))
+            {
+                groupMember.Add(member.MemberID.ToLower());
+            }
+
 
             List<UserProfile> followers = _accManager.Followers(message.User);
             //followers.Add(_accManager.FindUser(message.User));
             //speed tweet to followers
             foreach (UserProfile user in followers)
             {
+                if (!groupMember.Contains(user.Userid.ToLower()))
+                {
+                    continue;
+                }
                 HomeLineEntity entity = new HomeLineEntity(user.Userid, message);
                 insertOperation = TableOperation.InsertOrReplace(entity);
                 _homeline.Execute(insertOperation);
@@ -646,6 +669,5 @@ namespace MSGorilla.Library
                 }
             }
         }
-
     }
 }

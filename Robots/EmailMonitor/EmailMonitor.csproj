@@ -89,9 +89,9 @@
       <Project>{ad407f7a-f82c-4c44-98f9-c2145a5f4a50}</Project>
       <Name>MSGorilla.Library</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\MSGorillaWebAPIClient\MSGorillaWebAPIClient.csproj">
+    <ProjectReference Include="..\..\MSGorillaWebAPIClient\MSGorilla.WebAPIClient.csproj">
       <Project>{9b379a6d-8342-4b10-9f92-739fda720ba8}</Project>
-      <Name>MSGorillaWebAPIClient</Name>
+      <Name>MSGorilla.WebAPIClient</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

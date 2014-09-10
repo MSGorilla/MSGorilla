@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 using MSGorilla.Library.Models;
 using MSGorilla.Library;
-namespace MSGorilla.WebApi
+namespace MSGorilla.WebAPI
 {
     public class AttachmentController : BaseController
     {

@@ -16,6 +16,7 @@ using MSGorilla.Library.Models;
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.SqlModels;
 using MSGorilla.Library.Models.ViewModels;
+using MSGorilla.Utility;
 
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace MSGorilla.WebApi
+namespace MSGorilla.WebAPI
 {
     public class AccountController : BaseController
     {
@@ -136,39 +137,39 @@ namespace MSGorilla.WebApi
             }
         }
 
-        /// <summary>
-        /// Register a local account. Return the profile of the registered user.
-        /// User https tunnel for security reason.
-        /// 
-        /// Example output:
-        /// {
-        ///     "Userid": "newuser1",
-        ///     "DisplayName": "New user 1",
-        ///     "PortraitUrl": null,
-        ///     "Description": "test add new user",
-        ///     "FollowingsCount": 0,
-        ///     "FollowersCount": 0,
-        ///     "MessageCount": 0
-        /// }
-        /// </summary>
-        /// <param name="Username">user id, should only contain [0-9a-zA-Z\-]</param>
-        /// <param name="DisplayName">user display name</param>
-        /// <param name="Password">password of the user</param>
-        /// <param name="Description">description of the user</param>
-        /// <returns></returns>
-        [HttpGet, System.Web.Mvc.RequireHttps]
-        public UserProfile Register(string Username, string DisplayName, string Password, string Description)
-        {
-            UserProfile user = new UserProfile();
-            //account.Userid = 0;
-            user.Userid = Username;
-            user.DisplayName = DisplayName;
-            user.Password = Utils.MD5Encoding(Password);
-            user.Description = Description;
+        ///// <summary>
+        ///// Register a local account. Return the profile of the registered user.
+        ///// User https tunnel for security reason.
+        ///// 
+        ///// Example output:
+        ///// {
+        /////     "Userid": "newuser1",
+        /////     "DisplayName": "New user 1",
+        /////     "PortraitUrl": null,
+        /////     "Description": "test add new user",
+        /////     "FollowingsCount": 0,
+        /////     "FollowersCount": 0,
+        /////     "MessageCount": 0
+        ///// }
+        ///// </summary>
+        ///// <param name="Username">user id, should only contain [0-9a-zA-Z\-]</param>
+        ///// <param name="DisplayName">user display name</param>
+        ///// <param name="Password">password of the user</param>
+        ///// <param name="Description">description of the user</param>
+        ///// <returns></returns>
+        //[HttpGet, System.Web.Mvc.RequireHttps]
+        //private UserProfile Register(string Username, string DisplayName, string Password, string Description)
+        //{
+        //    UserProfile user = new UserProfile();
+        //    //account.Userid = 0;
+        //    user.Userid = Username;
+        //    user.DisplayName = DisplayName;
+        //    user.Password = Utils.MD5Encoding(Password);
+        //    user.Description = Description;
 
-            UserProfile createdUser = _accountManager.AddUser(user);
-            return createdUser;
-        }
+        //    UserProfile createdUser = _accountManager.AddUser(user);
+        //    return createdUser;
+        //}
 
         /// <summary>
         /// Update user profile. Return the profile after updated.
@@ -189,7 +190,7 @@ namespace MSGorilla.WebApi
         /// <param name="portraitUrl">portrait url of the user</param>
         /// <returns></returns>
         [HttpGet]
-        public UserProfile Update(string DisplayName, string Description, string portraitUrl)
+        public DisplayUserProfile Update(string DisplayName, string Description, string portraitUrl)
         {
             string userid = whoami();
             UserProfile user = _accountManager.FindUser(userid);
@@ -197,7 +198,7 @@ namespace MSGorilla.WebApi
             user.Description = Description;
             user.PortraitUrl = portraitUrl;
             _accountManager.UpdateUser(user);
-            return user;
+            return new DisplayUserProfile(user, IsFollowing(userid, userid));
         }
 
         /// <summary>
@@ -224,19 +225,6 @@ namespace MSGorilla.WebApi
             return new ActionResult();
         }
 
-        //public class RegisterModel
-        //{
-        //    public string Username { get; set; }
-        //    public string DisplayName { get; set; }
-        //    public string Password { get; set; }
-        //    public string Description { get; set; }
-        //}
-        //[HttpPost]
-        //public UserProfile Register(RegisterModel registerModel)
-        //{
-        //    return Register(registerModel.Username, registerModel.DisplayName, registerModel.Password, registerModel.Description);
-        //}
-
         /// <summary>
         /// Set current user following another user
         /// 
@@ -256,6 +244,12 @@ namespace MSGorilla.WebApi
             if (userid == null)
             {
                 throw new UserNotFoundException(userid);
+            }
+
+            if (user.IsRobot)
+            {
+                GroupManager groupManager = new GroupManager();
+                MembershipHelper.CheckMembership(groupManager.GetJoinedGroup(user.Userid)[0].GroupID, me);
             }
 
             Task<Boolean> ret = _accountManager.Follow(me, userid);
@@ -516,7 +510,7 @@ namespace MSGorilla.WebApi
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public NotificationCount GetNotificationCount()
+        public DisplayNotificationCount GetNotificationCount()
         {
             string me = whoami();
             return _notifManager.FindUserNotif(me);
@@ -537,7 +531,7 @@ namespace MSGorilla.WebApi
         /// <param name="userid">user id</param>
         /// <returns></returns>
         [HttpGet]
-        public NotificationCount GetNotificationCount(string userid)
+        public DisplayNotificationCount GetNotificationCount(string userid)
         {
             string me = whoami();
             if (string.IsNullOrEmpty(userid))
@@ -616,6 +610,19 @@ namespace MSGorilla.WebApi
             }
 
             return dispusers;
+        }
+
+        public static SimpleUserProfile GetSimpleUserProfile(string userid)
+        {
+            string key = CacheHelper.SimpleUserprofilePrefix + userid;
+            if (CacheHelper.Contains(key))
+            {
+                return CacheHelper.Get<SimpleUserProfile>(key);
+            }
+
+            SimpleUserProfile userprofile = new SimpleUserProfile(new AccountManager().FindUser(userid));
+            CacheHelper.Add<SimpleUserProfile>(key, userprofile);
+            return userprofile;
         }
     }
 }

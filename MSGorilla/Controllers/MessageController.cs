@@ -15,7 +15,7 @@ namespace MSGorilla.Views
         
         // GET: Search
         [TokenAuthAttribute]
-        public ActionResult Index(string user, string msgID)
+        public ActionResult Index(string msgID)
         {
             string myid = this.Session["userid"].ToString();
             UserProfile me = _accManager.FindUser(myid);
@@ -28,7 +28,6 @@ namespace MSGorilla.Views
                 msgID = "";
             }
             ViewBag.FeedId = msgID;
-            ViewBag.UserId = user;
 
             return View();
         }

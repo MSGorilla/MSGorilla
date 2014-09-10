@@ -4,14 +4,14 @@
 
 <script src="~/Scripts/echarts-plain.js"></script>
 <div class="main-container">
-
-
     <div class="contents-container">
         @Html.Partial("_AlertBoxPartial")
 
+        @Html.Partial("_PerfChartPartial")
+
         <div class="title-container">
             <h4>
-                @ViewBag.Title for "#<span class="bold">@ViewBag.Topic</span>#"
+                @ViewBag.Title for "#<span class="bold">@ViewBag.Topic</span># (@ViewBag.GroupName)"
                 @Html.Partial("_FeedFilterDropdownPartial")
                 @if (@ViewBag.TopicId >= 0)
                 {
@@ -22,6 +22,8 @@
         </div>
 
         @Html.Partial("_NotificationNavbarPartial")
+
+        @*@Html.Partial("_GroupNavbarPartial")*@
 
         @Html.Partial("_LoadFeedListPartial")
 

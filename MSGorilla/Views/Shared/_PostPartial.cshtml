@@ -1,15 +1,20 @@
 ﻿<div class="posts-newpost">
     <div class="newpost-input">
-        <textarea class="form-control" id="postmessage" rows="3" maxlength="140" placeholder="What's on your mind?"></textarea>
+        <textarea class="form-control" id="postmessage" rows="3" maxlength="999" placeholder="What's on your mind?"></textarea>
     </div>
     <div class="newpost-footer">
-        <span id="postmessage_counter" class="post-counter">140</span>
-        <button id="btn_post" onclick="PostMessage();" class="btn btn-primary post-btn" type="button" data-loading-text="Posting...">Post</button>
+        <span class="post-counter">To</span>
+        <select id="postmessage_groups" class="post-groupselect">
+            <option value="">Loading...</option>
+        </select>
+        <span id="postmessage_counter" class="post-counter">999</span>
+        <button id="btn_post" disabled="disabled" onclick="PostMessage();" class="btn btn-primary post-btn" type="button" data-loading-text="Posting...">Post</button>
     </div>
 </div>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(LoadPostGroupList());
+    $(function () {
         $("#postmessage").flexselect();
     });
 </script>

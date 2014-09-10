@@ -267,8 +267,7 @@ input[type="checkbox"].input-validation-error {
 }
 
 .pd-10 {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 10px;
 }
 
 .bold {
@@ -292,7 +291,7 @@ input[type="checkbox"].input-validation-error {
 }
 
 .search-bar {
-    max-width: 300px;
+    min-width: 300px;
 }
 
 .post-btn {
@@ -380,7 +379,7 @@ input[type="checkbox"].input-validation-error {
     border-right: 1px solid #dddddd;
 }
 
-.userlist-group {
+.userlist-group, .grouplist-group {
     padding-left: 0;
 }
 
@@ -397,52 +396,56 @@ input[type="checkbox"].input-validation-error {
     border: 1px solid #dddddd;
 }
 
-.user-card {
-    float: left;
-    width: 178px;
+.grouplist-group-item {
+    position: relative;
+    display: inline-block;
+    width: 176px;
     margin: 10px 10px 20px 10px;
     padding: 0px 0px 20px 0px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
     background-color: #f4f8f9;
     border: 1px solid #dddddd;
 }
 
-.user-card-info {
+.user-card-info, .group-card-info {
     padding: 15px;
     color: #8899a6;
 }
 
-    .user-card-info a {
+    .user-card-info a, .group-card-info a {
         color: #292f33;
         font-weight: 700;
     }
 
-.user-card-postinfo {
+.group-card-desp {
+    color: #333;
+    word-wrap: break-word;
+    height: 120px;
+    overflow: hidden;
+}
+
+.user-card-postinfo, .group-card-postinfo {
 }
 
 .user-popover-info {
-    
 }
 
 .user-popover-pic {
-    display:inline-block;
-    padding:5px;
+    display: inline-block;
+    padding: 5px;
 }
 
 .user-popover-content {
-    display:inline-block;
-    padding:5px;
+    display: inline-block;
+    padding: 5px;
 }
 
 .user-popover-postinfo {
-    margin-top:5px;
+    margin-top: 5px;
 }
 
 .user-popover-footer {
-    margin-top:10px;
-    text-align:right;
+    margin-top: 10px;
+    text-align: right;
 }
 
 .shortcut-container {
@@ -509,12 +512,18 @@ input[type="checkbox"].input-validation-error {
 }
 
 .post-counter {
-    margin-right: 5px;
     color: #8899a6;
     display: inline-block;
-    padding-left: 3px;
-    padding-right: 3px;
+    padding-left: 1px;
+    padding-right: 1px;
     text-align: right;
+}
+
+.post-groupselect {
+    color: #8899a6;
+    display: inline-block;
+    border: 1px solid #ccc;
+    width: 110px;
 }
 
 .spinner-loading {
@@ -555,6 +564,16 @@ input[type="checkbox"].input-validation-error {
     background-position-y: top;
 }
 
+.group-btn {
+    display: inline-block;
+    min-width: 80px;
+    vertical-align: baseline;
+    white-space: nowrap;
+    text-align: center;
+    float: right;
+    margin-right: 10px;
+}
+
 .like-btn {
     margin-left: 10px;
     display: inline-block;
@@ -573,7 +592,7 @@ input[type="checkbox"].input-validation-error {
     font-size: 11px;
     padding: 1px 5px;
     line-height: 1.5;
-    min-width: 50px;
+    min-width: 60px;
 }
 
 .follow-btn {
@@ -606,4 +625,7 @@ input[type="checkbox"].input-validation-error {
 
 .hidden {
     display: none;
+}
+
+.perf-chart {
 }

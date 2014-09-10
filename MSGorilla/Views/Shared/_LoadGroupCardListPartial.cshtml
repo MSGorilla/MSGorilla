@@ -1,0 +1,11 @@
+﻿<div>
+    <ul id="grouplist" class="grouplist-group">
+        <li id="loading_message" class="center-block txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+        @*autofill by js*@
+    </ul>
+</div>
+
+<script>
+        $(LoadGroups('@ViewBag.FeedCategory', '@ViewBag.FeedId'));
+</script>
+

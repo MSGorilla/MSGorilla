@@ -37,6 +37,12 @@ namespace MSGorilla.Library.Exceptions
             Description = string.Format("Invalid {0} ID. Please refer to http://msdn.microsoft.com/library/azure/dd179338.aspx", type);
             Code = 1001;
         }
+
+        public InvalidIDException(string id, string type)
+        {
+            Description = string.Format("{0} is not a valid {1} type. Only [0-9a-zAA-Z] is recommended.");
+            Code = 1001;
+        }
     }
 
     public class UserNotFoundException : MSGorillaBaseException
@@ -183,6 +189,105 @@ namespace MSGorilla.Library.Exceptions
         {
             Code = 6001;
             this.Description = Description;
+        }
+    }
+
+    public class GroupNotExistException : MSGorillaBaseException
+    {
+        public GroupNotExistException()
+        {
+            Description = "The specified group does not exist.";
+            Code = 6002;
+        }
+    }
+
+    public class UnauthroizedActionException : MSGorillaBaseException
+    {
+        public UnauthroizedActionException()
+        {
+            Description = "You're not authorized to perform this action. Contact the group admin";
+            Code = 6003;
+        }
+    }
+
+    public class UpdateRobotMembershipException : MSGorillaBaseException
+    {
+        public UpdateRobotMembershipException()
+        {
+            Description = "You can't change a robot's membership.";
+            Code = 6004;
+        }
+    }
+
+    public class UpdateRobotDefaultGroupException : MSGorillaBaseException
+    {
+        public UpdateRobotDefaultGroupException()
+        {
+            Description = "You can't change a robot's default group.";
+            Code = 6005;
+        }
+    }
+
+    public class TopicNotFoundException : MSGorillaBaseException
+    {
+        public TopicNotFoundException()
+        {
+            Description = "The specified topic not found.";
+            Code = 7001;
+        }
+    }
+
+    public class MetricDataSetNotFoundException : MSGorillaBaseException
+    {
+        public MetricDataSetNotFoundException()
+        {
+            Description = "The specified metric data not found.";
+            Code = 8001;
+        }
+    }
+
+    public class MetricRecordKeyTooLongException : MSGorillaBaseException
+    {
+        public const int MaxKeyLengthInByte = 2048;
+        public MetricRecordKeyTooLongException()
+        {
+            Description = string.Format("Metric record key length should be no long than {0} bytes.", MaxKeyLengthInByte);
+            Code = 8002;
+        }
+    }
+
+    public class MetricChartNotFoundException : MSGorillaBaseException
+    {
+        public MetricChartNotFoundException()
+        {
+            Description = "The specified metric chart not found.";
+            Code = 8003;
+        }
+    }
+
+    public class MetricGroupDismatchException : MSGorillaBaseException
+    {
+        public MetricGroupDismatchException()
+        {
+            Description = "The groups of metric chart and metric dataset are not the same.";
+            Code = 8004;
+        }
+    }
+
+    public class CategoryNotFoundException : MSGorillaBaseException
+    {
+        public CategoryNotFoundException()
+        {
+            Description = "The specified category doesn't exist.";
+            Code = 9001;
+        }
+    }
+    public class CategoryAlreadyExistException : MSGorillaBaseException
+    {
+        public CategoryAlreadyExistException(string name, string group)
+        {
+            Description = string.Format("A category named {0} already exist in group {1}", name, group);
+            Code = 9002;
         }
     }
 }

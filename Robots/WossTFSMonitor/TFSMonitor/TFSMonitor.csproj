@@ -55,9 +55,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\MSGorillaWebAPIClient\MSGorillaWebAPIClient.csproj">
+    <ProjectReference Include="..\..\..\MSGorillaWebAPIClient\MSGorilla.WebAPIClient.csproj">
       <Project>{9b379a6d-8342-4b10-9f92-739fda720ba8}</Project>
-      <Name>MSGorillaWebAPIClient</Name>
+      <Name>MSGorilla.WebAPIClient</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

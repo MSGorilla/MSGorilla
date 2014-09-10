@@ -12,25 +12,11 @@ using MSGorilla.Library.Models;
 using MSGorilla.Library.Models.ViewModels;
 using MSGorilla.Library.Exceptions;
 using MSGorilla.Library.Models.SqlModels;
+using MSGorilla.Utility;
 
 
-namespace MSGorilla.WebApi
+namespace MSGorilla.WebAPI
 {
-    public class DisplayTopic : Topic
-    {
-        [DataMember]
-        public bool IsLiked { get; private set; }
-
-        public DisplayTopic(Topic topic, bool isliked)
-        {
-            Id = topic.Id;
-            Name =topic.Name;
-            Description = topic.Description;
-            MsgCount = topic.MsgCount;
-            IsLiked = isliked;
-        }
-    }
-
     public class TopicController : BaseController
     {
         TopicManager _topicManager = new TopicManager();
@@ -51,7 +37,16 @@ namespace MSGorilla.WebApi
         [HttpGet]
         public DisplayTopic FindTopic(int topicid)
         {
-            return new DisplayTopic(_topicManager.FindTopic(topicid), IsFavouriteTopic(topicid));
+            string me = whoami();
+            Topic topic = _topicManager.FindTopic(topicid);
+            if(topic == null)
+            {
+                throw new TopicNotFoundException();
+            }
+            
+            MembershipHelper.CheckMembership(topic.GroupID, me);
+
+            return new DisplayTopic(topic , IsFavouriteTopic(topicid));
         }
 
         /// <summary>
@@ -74,19 +69,22 @@ namespace MSGorilla.WebApi
         /// ]
         /// </summary>
         /// <param name="keyword">key word</param>
+        /// <param name="group">group id list</param>
         /// <returns></returns>
         [HttpGet]
-        public List<DisplayTopic> SearchTopic(string keyword)
+        public List<DisplayTopic> SearchTopic(string keyword, [FromUri]string[] group = null)
         {
-            var topiclist = _topicManager.SearchTopic(keyword);
-            var disptopiclist = new List<DisplayTopic>();
+            string me = whoami();
+            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(me, group);
+            var topiclist = _topicManager.SearchTopic(keyword, joinedGroup);
+            //var disptopiclist = new List<DisplayTopic>();
 
-            foreach (var t in topiclist)
-            {
-                disptopiclist.Add(new DisplayTopic(t, IsFavouriteTopic(t.Id)));
-            }
+            //foreach (var t in topiclist)
+            //{
+            //    disptopiclist.Add(new DisplayTopic(t, IsFavouriteTopic(t.Id)));
+            //}
 
-            return disptopiclist;
+            return _topicManager.ToDisplayTopicList(topiclist, me);
         }
 
         /// <summary>
@@ -100,17 +98,28 @@ namespace MSGorilla.WebApi
         ///     "MsgCount": 0
         /// }
         /// </summary>
-        /// <param name="Name">name of the topic</param>
-        /// <param name="Description">description of the topic</param>
+        /// <param name="name">name of the topic</param>
+        /// <param name="group">group id</param>
+        /// <param name="description">description of the topic</param>
         /// <returns></returns>
         [HttpGet]
-        public DisplayTopic AddTopic(string Name, string Description)
+        public DisplayTopic AddTopic(string name, string group = null, string description = null)
         {
-            whoami();
+            string me = whoami();
+            if (string.IsNullOrEmpty(group))
+            {
+                group = MembershipHelper.DefaultGroup(me);
+            }
+            else
+            {
+                MembershipHelper.CheckMembership(group, me);
+            }
+
             Topic topic = new Topic();
-            topic.Name = Name;
-            topic.Description = Description;
+            topic.Name = name;
+            topic.Description = description;
             topic.MsgCount = 0;
+            topic.GroupID = group;
             var newtopic = _topicManager.AddTopic(topic);
             return new DisplayTopic(newtopic, IsFavouriteTopic(newtopic.Id));
         }
@@ -138,17 +147,13 @@ namespace MSGorilla.WebApi
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public List<DisplayTopic> GetAllTopic()
+        public List<DisplayTopic> GetAllTopic([FromUri]string[] group = null)
         {
-            var topiclist = _topicManager.GetAllTopics();
-            var disptopiclist = new List<DisplayTopic>();
+            string me = whoami();
+            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(me, group);
+            var topiclist = _topicManager.GetAllTopics(joinedGroup);
 
-            foreach (var t in topiclist)
-            {
-                disptopiclist.Add(new DisplayTopic(t, IsFavouriteTopic(t.Id)));
-            }
-
-            return disptopiclist;
+            return _topicManager.ToDisplayTopicList(topiclist, me);
         }
 
         /// <summary>
@@ -177,19 +182,16 @@ namespace MSGorilla.WebApi
         /// ]
         /// </summary>
         /// <param name="count">count of topic in the list</param>
+        /// <param name="group">group id list</param>
         /// <returns></returns>
         [HttpGet]
-        public List<DisplayTopic> HotTopics(int count = 5)
+        public List<DisplayTopic> HotTopics(int count = 5, [FromUri]string[] group = null)
         {
-            var topiclist = _topicManager.GetHotTopics(count);
-            var disptopiclist = new List<DisplayTopic>();
-
-            foreach (var t in topiclist)
-            {
-                disptopiclist.Add(new DisplayTopic(t, IsFavouriteTopic(t.Id)));
-            }
-
-            return disptopiclist;
+            string me = whoami();
+            string[] joinedGroup = MembershipHelper.CheckJoinedGroup(me, group);
+            var topiclist = _topicManager.GetHotTopics(joinedGroup, count);
+            
+            return _topicManager.ToDisplayTopicList(topiclist, me);
         }
 
         /// <summary>
@@ -203,10 +205,53 @@ namespace MSGorilla.WebApi
         /// </summary>
         /// <param name="topicID">id of the topic</param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet, HttpPost]
         public ActionResult AddFavouriteTopic(int topicID)
         {
+            string me = whoami();
+            Topic topic = _topicManager.FindTopic(topicID);
+            if (topic == null)
+            {
+                throw new TopicNotFoundException();
+            }
+            MembershipHelper.CheckMembership(topic.GroupID, me);
+
             _topicManager.AddFavouriteTopic(whoami(), topicID);
+            return new ActionResult();
+        }
+
+        /// <summary>
+        /// Add the topic into current user's favourite topic list 
+        /// 
+        /// Example output:
+        /// {
+        ///     "ActionResultCode": 0,
+        ///     "Message": "success"
+        /// }
+        /// </summary>
+        /// <param name="topic">topic name</param>
+        /// <param name="group">group id</param>
+        /// <returns></returns>
+        [HttpGet, HttpPost]
+        public ActionResult AddFavouriteTopic(string topic, string group = null)
+        {
+            string me = whoami();
+            Topic t = null;
+            if (string.IsNullOrEmpty(group))
+            {
+                t = _topicManager.FindTopicByName(topic, MembershipHelper.JoinedGroup(me));
+            }
+            else
+            {
+                MembershipHelper.CheckMembership(group, me);
+                t = _topicManager.FindTopicByName(topic, group);
+            }
+
+            if (t == null)
+            {
+                throw new TopicNotFoundException();
+            }
+            _topicManager.AddFavouriteTopic(whoami(), t.Id);
             return new ActionResult();
         }
 
@@ -225,6 +270,41 @@ namespace MSGorilla.WebApi
         public ActionResult RemoveFavouriteTopic(int topicID)
         {
             _topicManager.Remove(whoami(), topicID);
+            return new ActionResult();
+        }
+
+        /// <summary>
+        /// Remove the topic from the favourite topic list of current User
+        /// 
+        /// Example output:
+        /// {
+        ///     "ActionResultCode": 0,
+        ///     "Message": "success"
+        /// }
+        /// </summary>
+        /// <param name="topic">topic name</param>
+        /// <param name="group">group id</param>
+        /// <returns></returns>
+        [HttpGet, HttpDelete]
+        public ActionResult RemoveFavouriteTopic(string topic, string group = null)
+        {
+            string me = whoami();
+            Topic t = null;
+            if (string.IsNullOrEmpty(group))
+            {
+                t = _topicManager.FindTopicByName(topic, MembershipHelper.JoinedGroup(me));
+            }
+            else
+            {
+                MembershipHelper.CheckMembership(group, me);
+                t = _topicManager.FindTopicByName(topic, group);
+            }
+
+            if (t == null)
+            {
+                throw new TopicNotFoundException();
+            }
+            _topicManager.Remove(me, t.Id);
             return new ActionResult();
         }
 
@@ -291,15 +371,15 @@ namespace MSGorilla.WebApi
         }
 
         [HttpGet]
-        public int GetMyFavouriteTopicUnreadCount(string topic)
+        public int GetMyFavouriteTopicUnreadCount(string topic, string groupID)
         {
-            return GetUserFavouriteTopicUnreadCount(whoami(), topic);
+            return GetUserFavouriteTopicUnreadCount(whoami(), topic, groupID);
         }
 
         [HttpGet]
-        public int GetUserFavouriteTopicUnreadCount(string userid, string topic)
+        public int GetUserFavouriteTopicUnreadCount(string userid, string topic, string groupID)
         {
-            var t = _topicManager.FindTopicByName(topic);
+            var t = _topicManager.FindTopicByName(topic, groupID);
             if (t == null)
             {
                 return 0;
@@ -329,11 +409,13 @@ namespace MSGorilla.WebApi
         /// true
         /// </summary>
         /// <param name="topic">name of the topic, case insensitive</param>
+        /// <param name="group">group id list</param>
         /// <returns></returns>
         [HttpGet]
-        public bool IsFavouriteTopic(string topic)
+        public bool IsFavouriteTopic(string topic, [FromUri]string[] group)
         {
-            var t = _topicManager.FindTopicByName(topic);
+            group = MembershipHelper.CheckJoinedGroup(whoami(), group);
+            var t = _topicManager.FindTopicByName(topic, group);
             if (t == null)
             {
                 return false;

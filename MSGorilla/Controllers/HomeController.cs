@@ -18,7 +18,7 @@ namespace MSGorilla.Controllers
         AccountManager _accManager = new AccountManager();
 
         [TokenAuthAttribute]
-        public ActionResult Index()
+        public ActionResult Index(string group = null)
         {
             string myid = this.Session["userid"].ToString();
             UserProfile me = _accManager.FindUser(myid);
@@ -27,6 +27,15 @@ namespace MSGorilla.Controllers
 
             ViewBag.FeedCategory = "homeline";
             ViewBag.FeedId = me.Userid;
+
+            if (string.IsNullOrEmpty(group))
+            {
+                group = "";
+            }
+            ViewBag.Group = group;
+
+            ViewBag.PerfChartName = "perf_chart_test";
+
             return View();
         }
     }

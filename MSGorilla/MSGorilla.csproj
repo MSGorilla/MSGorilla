@@ -225,6 +225,8 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\DocumentController.cs" />
+    <Compile Include="Controllers\GroupController.cs" />
+    <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\WelcomeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
@@ -244,14 +246,19 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Controllers\SearchController.cs" />
+    <Compile Include="Utility\CacheHelper.cs" />
+    <Compile Include="Utility\MembershipHelper.cs" />
     <Compile Include="Utility\TokenCacheUtils.cs" />
     <Compile Include="Utility\XmlCommentDocumentationProvider.cs" />
     <Compile Include="WebAPI\AccountController.cs" />
     <Compile Include="WebAPI\AttachmentController.cs" />
     <Compile Include="WebAPI\BaseController.cs" />
+    <Compile Include="WebAPI\CategoryController.cs" />
+    <Compile Include="WebAPI\GroupController.cs" />
     <Compile Include="WebAPI\MessageController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="WebAPI\MetricChartController.cs" />
     <Compile Include="WebAPI\ReplyController.cs" />
     <Compile Include="WebAPI\SchemaController.cs" />
     <Compile Include="WebAPI\TopicController.cs" />
@@ -352,11 +359,24 @@
     <Content Include="Views\Shared\_AlertBoxPartial.cshtml" />
     <Content Include="Views\Shared\_LoadFeedListPartial.cshtml" />
     <Content Include="Views\Shared\_LoadUserCardListPartial.cshtml" />
+    <Content Include="Views\Shared\_GroupNavbarPartial.cshtml" />
+    <Content Include="Views\Group\Index.cshtml" />
+    <Content Include="Views\Shared\_LoadGroupCardListPartial.cshtml" />
+    <Content Include="Views\Shared\_SearchUserPartial.cshtml" />
+    <Content Include="Views\Shared\_SearchTopicPartial.cshtml" />
+    <Content Include="Views\Shared\_SearchPostPartial.cshtml" />
+    <Content Include="Views\Shared\_PerfChartPartial.cshtml" />
+    <Content Include="Views\Category\Index.cshtml" />
+    <Content Include="Views\Shared\_LoadCategoryFeedListPartial.cshtml" />
+    <Content Include="Views\Group\Manage.cshtml" />
+    <Content Include="Views\Shared\_LoadGroupMemberCardListPartial.cshtml" />
+    <Content Include="Views\Group\View.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\Attachment\" />
     <Folder Include="Views\HandleCustomError\" />
+    <Folder Include="Views\MetricChart\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

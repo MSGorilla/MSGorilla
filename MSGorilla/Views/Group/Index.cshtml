@@ -1,0 +1,26 @@
+﻿@{
+    ViewBag.Title = "Groups";
+}
+
+<div class="main-container">
+
+    <div class="contents-container">
+        @Html.Partial("_AlertBoxPartial")
+
+        <div class="block-container">
+            <div>
+                <h4 class="help-block">Groups</h4>
+            </div>
+
+            @Html.Partial("_LoadGroupCardListPartial")
+
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <div class="tools-container">
+        @Html.Partial("_MePartial")
+        @Html.Partial("_ShortcutPartial")
+    </div>
+
+</div>

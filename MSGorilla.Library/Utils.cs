@@ -55,7 +55,7 @@ namespace MSGorilla.Library
             {
                 timestamp = timestamp.ToUniversalTime();
             }
-            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalMilliseconds).ToString();
+            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalMilliseconds).ToString("D15");
             //return timestamp.ToUniversalTime().ToString("yyyyMMddHHmmss");
         }
 
@@ -65,7 +65,17 @@ namespace MSGorilla.Library
             {
                 timestamp = timestamp.ToUniversalTime();
             }
-            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalDays).ToString();
+            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalDays).ToString("D7");
+            //return timestamp.ToUniversalTime().ToString("yyyyMMdd");
+        }
+
+        public static string ToAzureStorageHourBasedString(DateTime timestamp, bool toUtc = true)
+        {
+            if (toUtc)
+            {
+                timestamp = timestamp.ToUniversalTime();
+            }
+            return ((long)DateTime.MaxValue.Subtract(timestamp).TotalHours).ToString();
             //return timestamp.ToUniversalTime().ToString("yyyyMMdd");
         }
 
@@ -89,11 +99,11 @@ namespace MSGorilla.Library
             }
 
             if (id.Contains('\\') ||
-                id.Contains('|') || 
+                id.Contains('|') ||
                 id.Contains(' ') ||
-                id.Contains('@') || 
-                id.Contains('?') || 
-                id.Contains('/') || 
+                id.Contains('@') ||
+                id.Contains('?') ||
+                id.Contains('/') ||
                 id.Contains('#') ||
                 id.Contains('\t') ||
                 id.Contains('\n') ||
@@ -155,6 +165,8 @@ namespace MSGorilla.Library
             }
             userprofile.Password = null;
             userprofile.FollowersCount = userprofile.FollowingsCount = 0;
+            userprofile.IsRobot = false;
+            userprofile.DefaultGroup = "microsoft";
             return userprofile;
         }
 
@@ -166,7 +178,7 @@ namespace MSGorilla.Library
                 return AtUser;
             }
 
-            Regex r = new Regex(@"(\s|^)@([0-9a-z-]+)(?=\s|$)", RegexOptions.IgnoreCase);
+            Regex r = new Regex(@"(\s|^)@([0-9a-z\-]+)(?=\s|$)", RegexOptions.IgnoreCase);
             MatchCollection matches = r.Matches(message);
 
             foreach (Match m in matches)
@@ -186,7 +198,7 @@ namespace MSGorilla.Library
                 return topicNames;
             }
 
-            Regex r = new Regex(@"(\s|^)#([\w][\w -\.,:&\*\+]*)?[\w]#(?=\s|$)", RegexOptions.IgnoreCase);
+            Regex r = new Regex(@"(\s|^)#([\w][\w \-\.,:&\*\+]*)?[\w]#(?=\s|$)", RegexOptions.IgnoreCase);
             //Regex r = new Regex(@"#(([\w \-]+(#{2})?)*[\w \-]+)#(\s|$)", RegexOptions.IgnoreCase);
             MatchCollection matches = r.Matches(message);
 
@@ -224,6 +236,58 @@ namespace MSGorilla.Library
             }
 
             return str.Split('|');
+        }
+
+        public static string Array2String<T>(T[] array)
+        {
+            if (array == null || array.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < (array.Length - 1); i++)
+            {
+                sb.Append(array[i].ToString());
+                sb.Append("|");
+            }
+            sb.Append(array[array.Length - 1]);
+            return sb.ToString();
+        }
+
+        public static int[] String2IntArray(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return new int[0];
+            }
+
+            var l = str.Split('|');
+            List<int> a = new List<int>();
+            foreach (var s in l)
+            {
+                a.Add(Convert.ToInt32(s));
+            }
+
+            return a.ToArray();
+        }
+
+        public delegate T String2T<T>(string s);
+        public static T[] String2Array<T>(string str, String2T<T> convert)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return new T[0];
+            }
+
+            var l = str.Split('|');
+            List<T> a = new List<T>();
+            foreach (var s in l)
+            {
+                a.Add(convert(s));
+            }
+
+            return a.ToArray<T>();
         }
 
         public static string Txt2Html(string text)
@@ -270,6 +334,20 @@ namespace MSGorilla.Library
             int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
             double num = Math.Round(bytes / Math.Pow(1024, place), 1);
             return (Math.Sign(byteCount) * num).ToString() + suf[place];
+        }
+
+        public static bool IsNullOrEmptyOrNone(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return true;
+            }
+            if (str.Equals("none", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

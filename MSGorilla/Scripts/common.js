@@ -14,19 +14,34 @@ function AjaxCall(type, async, apiurl, apidata, successCallback, errorCallback, 
         dataType: "json",
         async: async,
         success: function (data) {
-            if (!isNullOrEmpty(successCallback)) {
-                successCallback(data);
+            try {
+                if (!isNullOrEmpty(successCallback)) {
+                    successCallback(data);
+                }
+            }
+            catch (ex) {
+                showError(ex, msgboxid);
             }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message, msgboxid);
-            if (!isNullOrEmpty(errorCallback)) {
-                errorCallback(XMLHttpRequest, textStatus, errorThrown);
+            try {
+                showAjaxError(textStatus, errorThrown, XMLHttpRequest.responseJSON.ActionResultCode, XMLHttpRequest.responseJSON.Message, msgboxid);
+                if (!isNullOrEmpty(errorCallback)) {
+                    errorCallback(XMLHttpRequest, textStatus, errorThrown);
+                }
+            }
+            catch (ex) {
+                //showError(ex, msgboxid);
             }
         }
     }).always(function () {
-        if (!isNullOrEmpty(alwaysCallback)) {
-            alwaysCallback();
+        try {
+            if (!isNullOrEmpty(alwaysCallback)) {
+                alwaysCallback();
+            }
+        }
+        catch (ex) {
+            showError(ex, msgboxid);
         }
     });
 }
@@ -169,26 +184,26 @@ function cutCount(count) {
     return count;
 }
 
-function cutHtml(code, length, atusers, topics) {
+function cutHtml(code, length, atusers, topics, group) {
     if (isNullOrEmpty(code)) {
         return "";
     }
 
     if (code.length <= length) {
-        return encodeHtml(code, atusers, topics);
+        return encodeHtml(code, atusers, topics, group);
     }
     else {
         return txt2Html(code.substr(0, length - 3) + "...");
     }
 }
 
-function encodeUserid(code) {
+function encodeId(code) {
     code = code.replace(/@/mg, '_');
     code = code.replace(/\./mg, '_');
     return code;
 }
 
-function encodeHtml(code, atusers, topics) {
+function encodeHtml(code, atusers, topics, group) {
     code = txt2Html(code);
 
     // autolink http[s]
@@ -202,8 +217,8 @@ function encodeHtml(code, atusers, topics) {
 
     // autolink @user
     if (!isNullOrEmpty(atusers)) {
-        for (var key in atusers) {
-            var user = atusers[key];
+        for (var i = 0; i < atusers.length; i++) {
+            var user = atusers[i];
             var htmluser = txt2Html(user);
             code = code.replace(new RegExp("@" + htmluser, "gm"), ('<a href="/profile/index?user=' + encodeTxt(user) + '">@' + htmluser + '</a>'));
         }
@@ -223,10 +238,10 @@ function encodeHtml(code, atusers, topics) {
 
     // autolink #topic#
     if (!isNullOrEmpty(topics)) {
-        for (var key in topics) {
-            var topic = topics[key];
+        for (var i = 0; i < topics.length; i++) {
+            var topic = topics[i];
             var htmltopic = txt2Html(topic);
-            code = code.replace(new RegExp("#" + htmltopic + "#", "gm"), ('<a href="/topic/index?topic=' + encodeTxt(topic) + '">#' + htmltopic + '#</a>'));
+            code = code.replace(new RegExp("#" + htmltopic + "#", "gm"), ('<a href="/topic/index?topic=' + encodeTxt(topic) + "&group=" + encodeTxt(group) + '">#' + htmltopic + '#</a>'));
         }
 
         //strRegex = "#(([\\w \\-]+(#{2,})?)*[\\w \\-]+)#(\\s|$)";
@@ -258,6 +273,7 @@ var chart_axis_template = {
     },
     toolbox: {
         show: true,
+        y: 'center',
         orient: 'vertical',
         feature: {
             mark: {
@@ -328,6 +344,7 @@ var chart_scatter_template = {
     },
     toolbox: {
         show: true,
+        y: 'center',
         orient: 'vertical',
         feature: {
             mark: {
@@ -396,6 +413,7 @@ var chart_pie_template = {
     },
     toolbox: {
         show: true,
+        y: 'center',
         orient: 'vertical',
         feature: {
             mark: {
@@ -431,7 +449,7 @@ var chart_pie_template = {
     legend: {
         orient: 'vertical',
         x: 'left',
-        y: 'top',
+        y: 'center',
         data: []
     },
     series: []
@@ -477,8 +495,8 @@ function enhanceMessage(schema, mid, msg) {
                 option.legend.data = json.legend;
                 option.xAxis[0].data = json.xAxis;
                 option.series = json.yAxis;
-                for (var key in json.yAxis2) {
-                    var y2 = json.yAxis2[key];
+                for (var i = 0; i < json.yAxis2.length; i++) {
+                    var y2 = json.yAxis2[i];
                     y2.yAxisIndex = 1;
                     option.series.push(y2);
                 }
@@ -560,21 +578,31 @@ function PostMessage() {
     if (message.length === 0) {
         return;
     }
+    var group = $("#postmessage_groups").val();
+    var curgroup = $("#hd_current_group").val();
 
     var apiurl = "/api/message/postmessage";
-    var apidata = "message=" + message + "&importance=2"; // + "&schemaID=" + "chart-pie"
+    var apidata = "message=" + message + "&group=" + encodeTxt(group) + "&importance=2"; // + "&schemaID=" + "chart-pie"
 
     $("#btn_post").button('loading');
     AjaxPostAsync(
         apiurl,
         apidata,
         function (data) {
-            msgbox.val("");
-            // insert the new posted message
-            $("#feedlist").prepend(createFeed(data));
-            // render feed
-            initUserPopover("user_pic_" + data.ID, data.User.Userid);
-            // enhanceMessage(data.SchemaID, data.ID, data.MessageContent);  // user can not post schema data from webpage.
+            if (isNullOrEmpty(data)) {
+                showError("Failed to post message.");
+            }
+            else {
+                msgbox.val("");
+
+                if (group == curgroup) {
+                    // insert the new posted message
+                    $("#feedlist").prepend(createFeed(data));
+                    // render feed
+                    initUserPopover("user_pic_" + data.ID, data.User.Userid);
+                    // enhanceMessage(data.SchemaID, data.ID, data.MessageContent);  // user can not post schema data from webpage.
+                }
+            }
         },
         null,
         function () {
@@ -601,9 +629,9 @@ function PostReply(user, mid) {
 
     var apiurl = "/api/reply/postreply";
     var apidata = "message=" + message + "&messageUser=" + encodeTxt(user) + "&messageID=" + encodeTxt(mid);
-    for (var key in tousers) {
-        if (!isNullOrEmpty(tousers[key]))
-            apidata += "&to=" + encodeTxt(tousers[key]);
+    for (var i = 0; i < tousers.length; i++) {
+        if (!isNullOrEmpty(tousers[i]))
+            apidata += "&to=" + encodeTxt(tousers[i]);
     }
 
     $("#btn_reply_" + mid).button('loading');
@@ -611,10 +639,15 @@ function PostReply(user, mid) {
         apiurl,
         apidata,
         function (data) {
-            replybox.val("");
-            $("#replylist_" + mid).prepend(createReply(data));
-            // render feed
-            initUserPopover("user_pic_" + data.ID, data.User.Userid);
+            if (isNullOrEmpty(data)) {
+                showError("Failed to post reply.");
+            }
+            else {
+                replybox.val("");
+                $("#replylist_" + mid).prepend(createReply(data));
+                // render feed
+                initUserPopover("user_pic_" + data.ID, data.User.Userid);
+            }
         },
         null,
         function () {
@@ -636,23 +669,28 @@ function LoadMyInfo() {
         apiurl,
         "",
         function (data) {
-            var userid = data.Userid;
-            var username = data.DisplayName;
-            var picurl = data.PortraitUrl;
-            var desp = data.Description;
-            var postscount = data.MessageCount;
-            var followingcount = data.FollowingsCount;
-            var followerscount = data.FollowersCount;
-            if (isNullOrEmpty(picurl)) {
-                picurl = "/Content/Images/default_avatar.jpg";
+            if (isNullOrEmpty(data)) {
+                showError("Failed to load my info.");
             }
+            else {
+                var userid = data.Userid;
+                var username = data.DisplayName;
+                var picurl = data.PortraitUrl;
+                var desp = data.Description;
+                var postscount = data.MessageCount;
+                var followingcount = data.FollowingsCount;
+                var followerscount = data.FollowersCount;
+                if (isNullOrEmpty(picurl)) {
+                    picurl = "/Content/Images/default_avatar.jpg";
+                }
 
-            $("#my_id").html("@" + userid);
-            $("#my_name").html(username);
-            $("#my_pic").attr("src", picurl);
-            $("#my_posts").html(postscount);
-            $("#my_following").html(followingcount);
-            $("#my_followers").html(followerscount);
+                $("#my_id").html("@" + userid);
+                $("#my_name").html(username);
+                $("#my_pic").attr("src", picurl);
+                $("#my_posts").html(postscount);
+                $("#my_following").html(followingcount);
+                $("#my_followers").html(followerscount);
+            }
         }
     );
 }
@@ -683,28 +721,33 @@ function LoadUserInfo(user) {
         apiurl,
         apidata,
         function (data) {
-            var userid = data.Userid;
-            var username = data.DisplayName;
-            var picurl = data.PortraitUrl;
-            var desp = data.Description;
-            var postscount = data.MessageCount;
-            var followingcount = data.FollowingsCount;
-            var followerscount = data.FollowersCount;
-            var isFollowimg = data.IsFollowing;
-            if (isNullOrEmpty(picurl)) {
-                picurl = "/Content/Images/default_avatar.jpg";
+            if (isNullOrEmpty(data)) {
+                showError("Failed to load user info.");
             }
+            else {
+                var userid = data.Userid;
+                var username = data.DisplayName;
+                var picurl = data.PortraitUrl;
+                var desp = data.Description;
+                var postscount = data.MessageCount;
+                var followingcount = data.FollowingsCount;
+                var followerscount = data.FollowersCount;
+                var isFollowimg = data.IsFollowing;
+                if (isNullOrEmpty(picurl)) {
+                    picurl = "/Content/Images/default_avatar.jpg";
+                }
 
-            $("#user_id").html("@" + userid);
-            $("#user_name").html(username);
-            $("#user_name").attr("href", "/profile/index?user=" + userid);
-            $("#user_pic").attr("src", picurl);
-            $("#user_desp").html(desp);
-            $("#user_posts").html(postscount);
-            $("#user_following").html(followingcount);
-            $("#user_followers").html(followerscount);
+                $("#user_id").html("@" + userid);
+                $("#user_name").html(username);
+                $("#user_name").attr("href", "/profile/index?user=" + userid);
+                $("#user_pic").attr("src", picurl);
+                $("#user_desp").html(desp);
+                $("#user_posts").html(postscount);
+                $("#user_following").html(followingcount);
+                $("#user_followers").html(followerscount);
 
-            setUserFollowBtn("btn_userprofile_follow_" + encodeUserid(userid), userid, isFollowimg);
+                setUserFollowBtn("btn_userprofile_follow_" + encodeId(userid), userid, isFollowimg);
+            }
         }
     );
 }
@@ -762,7 +805,7 @@ function unfollowBtnMouseOver(btnid) {
     }
 
     btn.attr("class", "btn btn-danger follow-btn");
-    btn.text("Unfollow");
+    btn.text("- Unfollow");
 }
 
 function unfollowBtnMouseOut(btnid) {
@@ -781,7 +824,7 @@ function setFollowBtn(btnid, user, enabled) {
         return;
     }
 
-    btn.text("Follow");
+    btn.text("+ Follow");
     btn.attr("class", "btn btn-primary follow-btn");
     if (enabled) {
         btn.attr("onclick", "follow('" + btnid + "', '" + user + "');");
@@ -804,16 +847,21 @@ function follow(btnid, user) {
         apiurl,
         apidata,
         function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                setUnfollowBtn(btnid, user, true);
-                // refresh user info 
-                LoadUserInfo();
-                LoadMyInfo();
+            if (isNullOrEmpty(data)) {
+                showError("Failed to follow user.");
             }
             else {
-                showError(msg);
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setUnfollowBtn(btnid, user, true);
+                    // refresh user info 
+                    LoadUserInfo();
+                    LoadMyInfo();
+                }
+                else {
+                    showError(msg);
+                }
             }
         }
     );
@@ -829,22 +877,27 @@ function unfollow(btnid, user) {
         apiurl,
         apidata,
         function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                setFollowBtn(btnid, user, true);
-                // refresh user info 
-                LoadUserInfo();
-                LoadMyInfo();
+            if (isNullOrEmpty(data)) {
+                showError("Failed to unfollow user.");
             }
             else {
-                showError(msg);
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setFollowBtn(btnid, user, true);
+                    // refresh user info 
+                    LoadUserInfo();
+                    LoadMyInfo();
+                }
+                else {
+                    showError(msg);
+                }
             }
         }
     );
 }
 
-function LoadUsers(category, user) {
+function LoadUsers(category, id) {
     var listdiv = $("#userlist");
     if (listdiv.length == 0) {
         return;
@@ -852,18 +905,21 @@ function LoadUsers(category, user) {
 
     var apiurl = "";
     var apidata = "";
-    if (isNullOrEmpty(category))
-        apiurl = "/api/account/user";
-    else if (category == "following")
+    if (category == "following") {
         apiurl = "/api/account/followings";
-    else if (category == "followers")
-        apiurl = "/api/account/followers";
-    else {
-        showError("Illegal operation.");
-        return;
+        apidata = "userid=" + encodeTxt(id);
     }
-    if (!isNullOrEmpty(user)) {
-        apidata = "userid=" + encodeTxt(user);
+    else if (category == "followers") {
+        apiurl = "/api/account/followers";
+        apidata = "userid=" + encodeTxt(id);
+    }
+    else if (category == "viewgroup") {
+        apiurl = "/api/group/getallgroupmember"
+        apidata = "groupID=" + encodeTxt(id);
+    }
+    else {
+        showError("Illegal operation.", "loading_message_userlist");
+        return;
     }
 
     AjaxGetAsync(
@@ -871,7 +927,7 @@ function LoadUsers(category, user) {
         apidata,
         function (data) {
             if (isNullOrEmpty(data) || data.length == 0) {
-                showMessage("No content.");
+                showMessage("No content.", "loading_message_userlist");
             }
             else {
                 // clear list
@@ -879,11 +935,17 @@ function LoadUsers(category, user) {
 
                 // create list
                 $.each(data, function (index, item) {
+                    if (category == "viewgroup") {
+                        item = item.User;
+                    }
                     listdiv.append(createUserCard(item));
-                    setUserFollowBtn("btn_user_follow_" + encodeUserid(item.Userid), item.Userid, item.IsFollowing);
+                    setUserFollowBtn("btn_user_follow_" + encodeId(item.Userid), item.Userid, item.IsFollowing);
                 })
             }
-        }
+        },
+        null,
+        null,
+        "loading_message_userlist"
     );
 }
 
@@ -905,18 +967,18 @@ function createUserCard(data) {
     output = "  <li class='userlist-group-item'>"
            + "    <div class='user-card-info'>"
            + "      <div class='ma-btm-10'>"
-           + "        <img class='img-rounded' id='user_pic_" + encodeUserid(userid) + "' src='" + picurl + "' width='100' height='100' />"
+           + "        <img class='img-rounded' id='user_pic_" + encodeId(userid) + "' src='" + picurl + "' width='100' height='100' />"
            + "      </div>"
            + "      <div>"
-           + "        <a class='fullname' id='user_name_" + encodeUserid(userid) + "' href='/profile/index?user=" + encodeTxt(userid) + "'>" + username + "</a>"
+           + "        <a class='fullname' id='user_name_" + encodeId(userid) + "' href='/profile/index?user=" + encodeTxt(userid) + "'>" + username + "</a>"
            + "      </div>"
            + "      <div>"
-           + "        <span class='username' id='user_id_" + encodeUserid(userid) + "'>@" + userid + "</span>"
+           + "        <span class='username' id='user_id_" + encodeId(userid) + "'>@" + userid + "</span>"
            + "      </div>"
            + "    </div>"
            + "    <div class='user-card-postinfo'>"
            + "      <div class='btn-group btn-group-justified'>"
-           + "        <a class='btn btn-default follow-btn' id='btn_user_follow_" + encodeUserid(userid) + "'>&nbsp;</a>"
+           + "        <a class='btn btn-default follow-btn' id='btn_user_follow_" + encodeId(userid) + "'>&nbsp;</a>"
            + "      </div>"
            + "    </div>"
            + "  </li>";
@@ -940,7 +1002,11 @@ function initUserPopover(eid, user) {
                 apiurl,
                 apidata,
                 function (data) {
-                    output = createUserPopover(data);
+                    if (isNullOrEmpty(data)) {
+                    }
+                    else {
+                        output = createUserPopover(data);
+                    }
                 }
             );
 
@@ -992,11 +1058,11 @@ function createUserPopover(data) {
            + "    <div class='user-popover-footer'>";
 
     if (isFollowing == 0) {
-        output += "<a class='btn btn-primary follow-btn' id='btn_userpopover_follow_" + encodeUserid(userid) + "' onclick='follow(\"btn_userpopover_follow_" + encodeUserid(userid) + "\", \"" + userid + "\");'>Follow</a>";
+        output += "<a class='btn btn-primary follow-btn' id='btn_userpopover_follow_" + encodeId(userid) + "' onclick='follow(\"btn_userpopover_follow_" + encodeId(userid) + "\", \"" + userid + "\");'>+ Follow</a>";
     } else if (isFollowing == 1) {
-        output += "<a class='btn btn-success follow-btn' id='btn_userpopover_follow_" + encodeUserid(userid) + "' onclick='unfollow(\"btn_userpopover_follow_" + encodeUserid(userid) + "\", \"" + userid + "\");' onmouseover='unfollowBtnMouseOver(\"btn_userpopover_follow_" + encodeUserid(userid) + "\");' onmouseout='unfollowBtnMouseOut(\"btn_userpopover_follow_" + encodeUserid(userid) + "\");' >Following</a>";
+        output += "<a class='btn btn-success follow-btn' id='btn_userpopover_follow_" + encodeId(userid) + "' onclick='unfollow(\"btn_userpopover_follow_" + encodeId(userid) + "\", \"" + userid + "\");' onmouseover='unfollowBtnMouseOver(\"btn_userpopover_follow_" + encodeId(userid) + "\");' onmouseout='unfollowBtnMouseOut(\"btn_userpopover_follow_" + encodeId(userid) + "\");' >Following</a>";
     } else {  // -1: myself
-        output += "<a class='btn btn-info follow-btn' id='btn_userpopover_follow_" + encodeUserid(userid) + "' href='/account/manage'>Edit profile</a>";
+        output += "<a class='btn btn-info follow-btn' id='btn_userpopover_follow_" + encodeId(userid) + "' href='/account/manage'>Edit profile</a>";
     }
 
     output += "    </div>"
@@ -1007,8 +1073,8 @@ function createUserPopover(data) {
 
 
 // feed function
-function LoadMessage(user, mid) {
-    if (isNullOrEmpty(user) || isNullOrEmpty(mid)) {
+function LoadMessage(mid) {
+    if (isNullOrEmpty(mid)) {
         showError("Illegal operation.");
         return;
     }
@@ -1019,7 +1085,7 @@ function LoadMessage(user, mid) {
     }
 
     var apiurl = "/api/message/getdisplaymessage";
-    var apidata = "msgUser=" + encodeTxt(user) + "&msgID=" + encodeTxt(mid);
+    var apidata = "msgID=" + encodeTxt(mid);
 
     AjaxGetAsync(
         apiurl,
@@ -1061,21 +1127,22 @@ var feed_filters = [
 
 var isLoadFeeds = false;
 
-function FilterFeeds(category, id, filter) {
+function FilterFeeds(filter) {
     if (isLoadFeeds) return;    // if it is loading, skip this time.
 
-    for (var f in feed_filters) {
-        if (feed_filters[f] == filter) {
+    for (var i = 0; i < feed_filters.length; i++) {
+        if (feed_filters[i] == filter) {
             $("#feedfilter_" + filter).addClass("active");
             $("#feedfilter_title").text($("#feedfilter_" + filter).text());
-            LoadFeeds(category, id, filter);
+            $("#hd_filter").val(filter);
+            LoadFeeds(true);
         } else {
-            $("#feedfilter_" + feed_filters[f]).removeClass("active");
+            $("#feedfilter_" + feed_filters[i]).removeClass("active");
         }
     }
 }
 
-function LoadFeeds(category, id, filter) {
+function LoadFeeds(isReload) {
     if (isLoadFeeds) return;    // if it is loading, skip this time.
     isLoadFeeds = true;
 
@@ -1086,21 +1153,51 @@ function LoadFeeds(category, id, filter) {
 
     var apiurl = "";
     var apidata = "";
+    var category = "";
+    var id = "";
+    var group = "";
+    var filter = "";
     var token = "";
     var count = 0;
 
-    if (isNullOrEmpty(filter)) { // page load or load more, don't reload
-        token = $("#hd_token").val();
+    // get paras from page
+    if ($("#hd_feed_category").length > 0) {
+        category = $("#hd_feed_category").val();
+    }
+    if ($("#hd_feed_id").length > 0) {
+        id = $("#hd_feed_id").val();
+    }
+    if ($("#hd_current_group").length > 0) {
+        group = $("#hd_current_group").val();
+    }
+    if ($("#hd_filter").length > 0) {
         filter = $("#hd_filter").val();
     }
-    else {  // click on filter btn, need reload, clear current feeds and add loading gif
+    if ($("#hd_token").length > 0) {
+        token = $("#hd_token").val();
+    }
+    if ($("#hd_newcount").length > 0) {
+        count = $("#hd_newcount").val();
+    }
+
+    if (isReload == true) { // reload
+        token = "";
         $("#hd_token").val(token);
-        $("#hd_filter").val(filter);
+        count = getNotificationCount(category, id, group); // homeline not supported yet.
+        $("#hd_newcount").val(count);
 
         listdiv.empty();
         listdiv.append("<li id='loading_message' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
     }
+    else { // load more
+        if (token == "nomore") {
+            // already no more feeds, don't load any more
+            isLoadFeeds = false;
+            return;
+        }
+    }
 
+    // get
     if (category == "homeline") {
         apiurl = "/api/message/homeline";
         apidata = "userid=" + encodeTxt(id);
@@ -1146,6 +1243,15 @@ function LoadFeeds(category, id, filter) {
         return;
     }
 
+    if (!isNullOrEmpty(group)) {   // set group value
+        if (isNullOrEmpty(apidata)) {
+            apidata = "group=" + group;
+        }
+        else {
+            apidata += "&group=" + group;
+        }
+    }
+
     if (!isNullOrEmpty(filter)) {   // set filter value
         if (isNullOrEmpty(apidata)) {
             apidata = "filter=" + filter;
@@ -1155,25 +1261,13 @@ function LoadFeeds(category, id, filter) {
         }
     }
 
-    if (isNullOrEmpty(token)) { // first time load, not load more
-        count = getNotificationCount(category, id);
-        $("#hd_newcount").val(count);
-    }
-    else {    // load more
-        if (token == "nomore") {
-            // already no more feeds, don't load any more
-            isLoadFeeds = false;
-            return;
-        }
-
+    if (!isNullOrEmpty(token)) { // set token value
         if (isNullOrEmpty(apidata)) {
             apidata = "token=" + token;
         }
         else {
             apidata += "&token=" + token;
         }
-
-        count = $("#hd_newcount").val();
     }
 
     AjaxGetAsync(
@@ -1265,6 +1359,8 @@ function createFeed(data, hideOpenBtn) {
     var topics = data.TopicName;
     var attach = data.Attachment;
     var importence = data.Importance;
+    var group = data.Group;
+
     if (type == "reply") {
         var mid = data.MessageID;
         var muser = data.MessageUser;
@@ -1304,15 +1400,15 @@ function createFeed(data, hideOpenBtn) {
     if (!isNullOrEmpty(owners)) {
         output += "    <div class='newpost-input'>";
         output += "      <span class=''>Owned by: </span>";
-        for (var key in owners) {
-            output += "  <a href='/profile/index?user=" + encodeTxt(owners[key]) + "'>@" + owners[key] + "</a>&nbsp;";
+        for (var i = 0; i < owners.length; i++) {
+            output += "  <a href='/profile/index?user=" + encodeTxt(owners[i]) + "'>@" + owners[i] + "</a>&nbsp;";
         }
         output += "    </div>";
     }
 
     // message
     if (!isNullOrEmpty(msg)) {
-        output += "    <div id='message_" + id + "' class='newpost-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
+        output += "    <div id='message_" + id + "' class='newpost-input'>" + encodeHtml(msg, atusers, topics, group) + "</div>";
     }
 
     // richmsg
@@ -1326,8 +1422,8 @@ function createFeed(data, hideOpenBtn) {
     // attachment
     if (!isNullOrEmpty(attach)) {
         output += "    <div class='newpost-input'><span class=''>Attachments: </span>";
-        for (var key in attach) {
-            output += "  <a class='btn btn-link btn-xs' onclick='showAttach(\"" + attach[key].AttachmentID + "\", \"" + attach[key].Filetype + "\", \"" + id + "\");' >" + attach[key].Filename + " (" + attach[key].Filesize + ")</a>&nbsp;";
+        for (var i = 0; i < attach.length; i++) {
+            output += "  <a class='btn btn-link btn-xs' onclick='showAttach(\"" + attach[i].AttachmentID + "\", \"" + attach[i].Filetype + "\", \"" + id + "\");' >" + attach[i].Filename + " (" + attach[i].Filesize + ")</a>&nbsp;";
         }
         output += "    </div>";
         output += "    <div id='attachment_" + id + "' class='newpost-input' style='display:none;'></div>";
@@ -1337,7 +1433,8 @@ function createFeed(data, hideOpenBtn) {
     output += "        <div class='newpost-footer'>";
     // open btn
     if (hideOpenBtn != true) {
-        output += "      <a id='btn_open_msg_" + id + "' class='btn btn-link btn-sm' target='_blank' href='/Message/Index?user=" + encodeTxt(muser) + "&msgID=" + encodeTxt(mid) + "'>Open</a>";
+        //output += "      <a id='btn_open_msg_" + id + "' class='btn btn-link btn-sm' target='_blank' href='/Message/Index?user=" + encodeTxt(muser) + "&msgID=" + encodeTxt(mid) + "'>Open</a>";
+        output += "      <a id='btn_open_msg_" + id + "' class='btn btn-link btn-sm' target='_blank' href='/Message/Index?msgID=" + encodeTxt(mid) + "'>Open</a>";
     }
     // richmsg btn
     if (!isNullOrEmpty(richmsgid)) {
@@ -1359,9 +1456,9 @@ function createFeed(data, hideOpenBtn) {
         if (!isNullOrEmpty(owners)) {   // reply to owners if owners exist.
             replyto = "";
             replytostring = "";
-            for (var key in owners) {
-                replyto += owners[key] + ";";
-                replytostring += " @" + owners[key];
+            for (var i = 0; i < owners.length; i++) {
+                replyto += owners[i] + ";";
+                replytostring += " @" + owners[i];
             }
         }
 
@@ -1496,7 +1593,7 @@ function showMessageModel(mid, user) {
     $("#MessageModal").modal();
 
     var apiurl = "/api/message/getdisplaymessage";
-    var apidata = "msgUser=" + encodeTxt(user) + "&msgID=" + encodeTxt(mid);
+    var apidata = "msgID=" + encodeTxt(mid);
 
     AjaxGetAsync(
         apiurl,
@@ -1579,32 +1676,36 @@ function LoadReplies(mid) {
             // clear list
             replydiv.empty();
 
-            // create reply list
-            $.each(data, function (index, item) {
-                if (index < newcount) {
-                    replydiv.append(createReply(item));
-                }
-                else {
-                    replyolderdiv.append(createReply(item));
-                }
-                totlecount++;
+            if (isNullOrEmpty(data) || data.length == 0) {
+            }
+            else {
+                // create reply list
+                $.each(data, function (index, item) {
+                    if (index < newcount) {
+                        replydiv.append(createReply(item));
+                    }
+                    else {
+                        replyolderdiv.append(createReply(item));
+                    }
+                    totlecount++;
 
-                // render feed
-                initUserPopover("user_pic_" +item.ID, item.User.Userid);
-                // if msg is empty, show richmsg instead
-                if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" +item.ID).length > 0) {
-                    $("#rich_message_" +item.ID).collapse('show');
-                    showRichMsg(item.RichMessageID, item.ID);
-                }
-            })
+                    // render feed
+                    initUserPopover("user_pic_" + item.ID, item.User.Userid);
+                    // if msg is empty, show richmsg instead
+                    if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
+                        $("#rich_message_" + item.ID).collapse('show');
+                        showRichMsg(item.RichMessageID, item.ID);
+                    }
+                })
 
-            if (totlecount > newcount) {
-                var morecount = totlecount - newcount;
-                if (morecount > 1)
-                    showmorebtn.text("Show " + morecount + " older replies.");
-                else
-                    showmorebtn.text("Show " + morecount + " older reply.");
-                showmorebtn.show();
+                if (totlecount > newcount) {
+                    var morecount = totlecount - newcount;
+                    if (morecount > 1)
+                        showmorebtn.text("Show " + morecount + " older replies.");
+                    else
+                        showmorebtn.text("Show " + morecount + " older reply.");
+                    showmorebtn.show();
+                }
             }
         },
         function (XMLHttpRequest, textStatus, errorThrown) {
@@ -1644,6 +1745,7 @@ function createReply(data) {
     var topics = data.TopicName;
     var attach = data.Attachment;
     var importence = data.Importance;
+    var group = data.Group;
     var mid = data.MessageID;
     var muser = data.MessageUser;
     if (isNullOrEmpty(picurl)) {
@@ -1677,15 +1779,15 @@ function createReply(data) {
     if (!isNullOrEmpty(owners)) {
         output += "  <div class='reply-input'>";
         output += "    <span class=''>Owned by: </span>";
-        for (var key in owners) {
-            output += "<a href='/profile/index?user=" + encodeTxt(owners[key]) + "'>@" + owners[key] + "</a>&nbsp;";
+        for (var i = 0; i < owners.length; i++) {
+            output += "<a href='/profile/index?user=" + encodeTxt(owners[i]) + "'>@" + owners[i] + "</a>&nbsp;";
         }
         output += "  </div>";
     }
 
     // message
     if (!isNullOrEmpty(msg)) {
-        output += "  <div id='message_" + id + "' class='reply-input'>" + encodeHtml(msg, atusers, topics) + "</div>";
+        output += "  <div id='message_" + id + "' class='reply-input'>" + encodeHtml(msg, atusers, topics, group) + "</div>";
     }
 
     // richmsg
@@ -1699,8 +1801,8 @@ function createReply(data) {
     // attachment
     if (!isNullOrEmpty(attach)) {
         output += "  <div class='reply-input'><span class=''>Attachments: </span>";
-        for (var key in attach) {
-            output += "<a class='btn btn-link btn-xs' onclick='showAttach(\"" + attach[key].AttachmentID + "\", \"" + attach[key].Filetype + "\", \"" + id + "\");' >" + attach[key].Filename + " (" + attach[key].Filesize + ")</a>&nbsp;";
+        for (var i = 0; i < attach.length; i++) {
+            output += "<a class='btn btn-link btn-xs' onclick='showAttach(\"" + attach[i].AttachmentID + "\", \"" + attach[i].Filetype + "\", \"" + id + "\");' >" + attach[i].Filename + " (" + attach[i].Filesize + ")</a>&nbsp;";
         }
         output += "  </div>";
         output += "  <div id='attachment_" + id + "' class='reply-input' style='display:none;'></div>";
@@ -1744,8 +1846,11 @@ function SearchTopic(keyword) {
     var apiurl = "";
     var apidata = "";
 
-    if (isNullOrEmpty(keyword))
-        apiurl = "/api/topic/getalltopic";
+    if (isNullOrEmpty(keyword)) {
+        showMessage("No keyword.", "loading_message_searchtopic");
+        return;
+        //apiurl = "/api/topic/getalltopic";
+    }
     else {
         apiurl = "/api/topic/searchtopic";
         apidata = "keyword=" + encodeTxt(keyword);
@@ -1756,7 +1861,7 @@ function SearchTopic(keyword) {
         apidata,
         function (data) {
             if (isNullOrEmpty(data) || data.length == 0) {
-                showMessage("No content.");
+                showMessage("No content.", "loading_message_searchtopic");
             }
             else {
                 // clear list
@@ -1769,12 +1874,16 @@ function SearchTopic(keyword) {
                     var topicdesp = item.Description;
                     var topiccount = item.MsgCount;
                     var isliked = item.IsLiked;
+                    var group = item.GroupID;
 
-                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount));
+                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount, group));
                     setTopicLikeBtn("btn_topic_like_" + topicid, topicid, isliked);
                 })
             }
-        }
+        },
+        null,
+        null,
+        "loading_message_searchtopic"
     );
 }
 
@@ -1787,8 +1896,11 @@ function SearchUser(keyword) {
     var apiurl = "";
     var apidata = "";
 
-    if (isNullOrEmpty(keyword))
-        apiurl = "/api/account/user";
+    if (isNullOrEmpty(keyword)) {
+        showMessage("No keyword.", "loading_message_searchuser");
+        return;
+        //apiurl = "/api/account/user";
+    }
     else {
         apiurl = "/api/account/searchuser";
         apidata = "keyword=" + encodeTxt(keyword);
@@ -1808,7 +1920,7 @@ function SearchUser(keyword) {
                 // create user list
                 $.each(data, function (index, item) {
                     listdiv.append(createUserCard(item));
-                    setUserFollowBtn("btn_user_follow_" + encodeUserid(item.Userid), item.Userid, item.IsFollowing);
+                    setUserFollowBtn("btn_user_follow_" + encodeId(item.Userid), item.Userid, item.IsFollowing);
                 })
             }
         },
@@ -1818,13 +1930,203 @@ function SearchUser(keyword) {
     );
 }
 
+function SearchMessage(keyword) {
+    var searchid_ele = $("#hd_result_id");
+    if (searchid_ele.length == 0) {
+        return;
+    }
 
-// notification count function and short cut function
-function getNotificationCount(category, id) {
+    var apiurl = "";
+    var apidata = "";
+
+    if (isNullOrEmpty(keyword)) {
+        showMessage("No keyword.", "loading_message_searchpost");
+        return;
+        //apiurl = "/api/topic/getalltopic";
+    }
+    else if (keyword.length < 4) {
+        showMessage("Too short keyword.", "loading_message_searchpost");
+        return;
+    }
+    else {
+        apiurl = "/api/message/searchmessage";
+        apidata = "keyword=" + encodeTxt(keyword);
+    }
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                searchid_ele.val("");
+                $("#hd_token").val("");
+                $("#searchpost_message").html("");
+
+                showMessage("No content.", "loading_message_searchpost");
+            }
+            else {
+                var resultid = data.ResultId;
+                var searchdate = data.SearchDate;
+                var searchtime = data.TakenTime;
+                var resultcount = data.ResultsCount;
+
+                searchid_ele.val(resultid);
+                $("#hd_token").val("");
+                $("#searchpost_message").html("- found " + resultcount + " results in " + searchtime + " second(s) at " + DateFormat(searchdate));
+
+                LoadSearchMessageResults(true);
+            }
+        },
+        null,
+        null,
+        "loading_message_searchpost"
+    );
+}
+
+function LoadSearchMessageResults(isReload) {
+    if (isLoadFeeds) return;    // if it is loading, skip this time.
+    isLoadFeeds = true;
+
+    var listdiv = $("#feedlist");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var apiurl = "";
+    var apidata = "";
+    var resultid = "";
+    var token = "";
+    var group = "";
+    var filter = "";
+
+    // get paras from page
+    if ($("#hd_result_id").length > 0) {
+        resultid = $("#hd_result_id").val();
+    }
+    if ($("#hd_current_group").length > 0) {
+        group = $("#hd_current_group").val();
+    }
+    if ($("#hd_filter").length > 0) {
+        filter = $("#hd_filter").val();
+    }
+    if ($("#hd_token").length > 0) {
+        token = $("#hd_token").val();
+    }
+
+    // no result id , than do nothing.
+    if (isNullOrEmpty(resultid)) {
+        isLoadFeeds = false;
+        return;
+    }
+
+    if (isReload == true) { // reload
+        token = "";
+        $("#hd_token").val(token);
+
+        listdiv.empty();
+        listdiv.append("<li id='loading_message' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
+    }
+    else { // load more
+        if (token == "nomore") {
+            // already no more feeds, don't load any more
+            isLoadFeeds = false;
+            return;
+        }
+    }
+
+    // get
+    apiurl = "/api/message/searchmessageresults";
+    apidata = "searchId=" + encodeTxt(resultid);
+
+    if (!isNullOrEmpty(group)) {   // set group value
+        if (isNullOrEmpty(apidata)) {
+            apidata = "group=" + group;
+        }
+        else {
+            apidata += "&group=" + group;
+        }
+    }
+
+    if (!isNullOrEmpty(filter)) {   // set filter value
+        if (isNullOrEmpty(apidata)) {
+            apidata = "filter=" + filter;
+        }
+        else {
+            apidata += "&filter=" + filter;
+        }
+    }
+
+    if (!isNullOrEmpty(token)) { // set token value
+        if (isNullOrEmpty(apidata)) {
+            apidata = "token=" + token;
+        }
+        else {
+            apidata += "&token=" + token;
+        }
+    }
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            var nexttoken = null;
+            if (isNullOrEmpty(data) || data.message.length == 0) {
+                showMessage("No content.", "loading_message_searchpost");
+            }
+            else {
+                nexttoken = data.continuationToken;
+                data = data.message
+
+                // clear feed list
+                if (isNullOrEmpty(token)) {
+                    // clear loading message at the first time 
+                    listdiv.empty();
+                }
+
+                // create feed list
+                $.each(data, function (index, item) {
+                    listdiv.append(createFeed(item));
+
+                    // render feed
+                    initUserPopover("user_pic_" + item.ID, item.User.Userid);
+                    enhanceMessage(item.SchemaID, item.ID, item.MessageContent);
+                    // if msg is empty, show richmsg instead
+                    if (isNullOrEmpty(item.MessageContent) && $("#rich_message_" + item.ID).length > 0) {
+                        $("#rich_message_" + item.ID).collapse('show');
+                        showRichMsg(item.RichMessageID, item.ID);
+                    }
+                })
+            }
+
+            if (isNullOrEmpty(nexttoken)) {
+                $("#lbl_seemore").html("");
+                $("#hd_token").val("nomore");
+            }
+            else {
+                $("#lbl_seemore").html("<span class='spinner-loading'></span> Loading more...");
+                $("#hd_token").val(nexttoken);
+            }
+
+            isLoadFeeds = false;
+        },
+        function (XMLHttpRequest, textStatus, errorThrown) {
+            $("#lbl_seemore").html("");
+            $("#hd_token").val("nomore");
+
+            isLoadFeeds = false;
+        },
+        null,
+        "loading_message_searchpost"
+    );
+}
+
+
+// notification count function and shortcut function
+function getNotificationCount(category, id, group) {
     if (category != "atline"
         && category != "ownerline"
         && category != "replyline"
-        && category != "homeline"
+        // && category != "homeline" // homeline not supported yet.
         && category != "topicline"
         ) {
         return 0;
@@ -1834,7 +2136,7 @@ function getNotificationCount(category, id) {
 
     if (category == "topicline") {
         var apiurl = "/api/topic/getmyfavouritetopicunreadcount";
-        var apidata = "topic=" + encodeTxt(id);
+        var apidata = "topic=" + encodeTxt(id) + "&groupID=" + encodeTxt(group);
 
         AjaxGetSync(
             apiurl,
@@ -1906,7 +2208,7 @@ function UpdateNotificationCountTimer() {
 
 function UpdateNotificationCount() {
     if ($("#shortcut_homeline_count").length == 0
-        && $("#home_reply_count").length == 0
+        && $("#notification_navbar_reply_count").length == 0
         && $("#nav_home_count").length == 0) {
         return;
     }
@@ -1937,9 +2239,9 @@ function UpdateNotificationCount() {
                 $("#shortcut_notification_count").html(notificationCount);
 
                 // notification navbar count
-                $("#home_reply_count").html(replyCount);
-                $("#home_atline_count").html(atlineCount);
-                $("#home_ownerline_count").html(ownerlineCount);
+                $("#notification_navbar_reply_count").html(replyCount);
+                $("#notification_navbar_atline_count").html(atlineCount);
+                $("#notification_navbar_ownerline_count").html(ownerlineCount);
 
                 // menu navbar count
                 if (homelineCount > 0)
@@ -1975,26 +2277,31 @@ function LoadHotTopics() {
         apiurl,
         apidata,
         function (data) {
-            // clear list
-            listdiv.empty();
+            if (isNullOrEmpty(data) || data.length == 0) {
+            }
+            else {
+                // clear list
+                listdiv.empty();
 
-            // create list
-            $.each(data, function (index, item) {
-                var output = "";
-                var topicid = item.Id;
-                var topicname = item.Name;
-                var topicdesp = item.Description;
-                var topiccount = item.MsgCount;
-                var isliked = item.IsLiked;
+                // create list
+                $.each(data, function (index, item) {
+                    var output = "";
+                    var topicid = item.Id;
+                    var topicname = item.Name;
+                    var topicdesp = item.Description;
+                    var topiccount = item.MsgCount;
+                    var isliked = item.IsLiked;
+                    var group = item.GroupID;
 
-                output = "<li class='sub-list-group-item'>"
-                        + "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
-                        + "  <span class='badge'>" + topiccount + "</span>"
-                        + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>"
-                        + "</li>"
-                listdiv.append(output);
-                setTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid, isliked);
-            })
+                    output = "<li class='sub-list-group-item'>"
+                            + "  <a class='btn btn-default like-btn' id='shortcut_btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
+                            + "  <span class='badge'>" + topiccount + "</span>"
+                            + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>"
+                            + "</li>"
+                    listdiv.append(output);
+                    setTopicLikeBtn("shortcut_btn_topic_like_" + topicid, topicid, isliked);
+                })
+            }
         },
         null,
         null,
@@ -2004,7 +2311,8 @@ function LoadHotTopics() {
 
 function LoadMyFavoriteTopics() {
     var listdiv = $("#favorite_collapse");
-    if (listdiv.length == 0) {
+    var navlist = $("#notification_favorite_navbar");
+    if (listdiv.length == 0 && navlist.length == 0) {
         return;
     }
 
@@ -2015,33 +2323,109 @@ function LoadMyFavoriteTopics() {
         apiurl,
         apidata,
         function (data) {
-            // clear list
-            listdiv.empty();
-            var navlist = $("#home_nav_list");
-            navlist.empty();
+            if (isNullOrEmpty(data) || data.length == 0) {
+            }
+            else {
+                // clear list
+                listdiv.empty();
+                navlist.empty();
 
-            $.each(data, function (index, item) {
-                var output = "";
-                var userid = item.userid;
-                var topicid = item.topicID;
-                var unreadcount = item.UnreadMsgCount;
-                var topicname = item.topicName;
-                var topicdesp = item.topicDescription;
-                var topiccount = item.topicMsgCount;
+                $.each(data, function (index, item) {
+                    var output = "";
+                    var userid = item.userid;
+                    var topicid = item.topicID;
+                    var unreadcount = item.UnreadMsgCount;
+                    var topicname = item.topicName;
+                    var topicdesp = item.topicDescription;
+                    var topiccount = item.topicMsgCount;
+                    var group = item.GroupID;
 
-                // shortcut panel
-                output += "<li class='sub-list-group-item'>";
-                output += "  <span class='badge'>" + unreadcount + "</span>";
-                output += "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>";
-                output += "</li>";
-                listdiv.append(output);
+                    // shortcut panel
+                    if (listdiv.length > 0) {
+                        output += "<li class='sub-list-group-item'>";
+                        output += "  <span class='badge'>" + unreadcount + "</span>";
+                        output += "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>";
+                        output += "</li>";
+                        listdiv.append(output);
+                    }
 
-                // homepage 
-                if (unreadcount > 0 && navlist.length > 0) {
-                    output = "<a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a> ";
-                    navlist.append(output);
+                    // notification navbar 
+                    if (unreadcount > 0 && navlist.length > 0) {
+                        output = "<a class='btn btn-link btn-xs' href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "# <span class='badge'>" + unreadcount + "</span></a> ";
+                        navlist.append(output);
+                    }
+                })
+            }
+        },
+        null,
+        null,
+        "no_message_box"
+    );
+}
+
+function LoadMyCategories() {
+    var listdiv = $("#category_collapse");
+    var navlist = $("#notification_category_navbar");
+    if (listdiv.length == 0 && navlist.length == 0) {
+        return;
+    }
+
+    var apiurl = "/api/category/getmycategory";
+    var apidata = "";
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+            }
+            else {
+                // clear list
+                listdiv.empty();
+                navlist.empty();
+
+                var categories = {};
+                var totalcategorycount = 0;
+
+                $.each(data, function (index, item) {
+                    var id = item.ID;
+                    var name = item.Name;
+                    var groupid = item.GroupID;
+                    var description = item.Description;
+                    var creater = item.Creater;
+                    var createtimestamp = item.CreateTimestamp;
+                    var eventcount = item.EventCount;
+
+                    if (isNullOrEmpty(categories[name])) {
+                        categories[name] = eventcount;
+                    }
+                    else {
+                        categories[name] += eventcount;
+                    }
+                })
+
+                for (var name in categories) {
+                    var output = "";
+                    // shortcut panel
+                    if (listdiv.length > 0) {
+                        output += "<li class='sub-list-group-item'>";
+                        output += "  <span class='badge'>" + categories[name] + "</span>";
+                        output += "  <a href='/category/index?category=" + encodeTxt(name) + "'>" + name + "</a>";
+                        output += "</li>";
+                        listdiv.append(output);
+                    }
+
+                    // notification navbar 
+                    if (navlist.length > 0) {
+                        output = "<a class='btn btn-link btn-xs' href='/category/index?category=" + encodeTxt(name) + "'>" + name + " <span class='badge'>" + categories[name] + "</span></a> ";
+                        navlist.append(output);
+                    }
+
+                    totalcategorycount += categories[name];
                 }
-            })
+
+                $("#shortcut_category_count").html(totalcategorycount);
+            }
         },
         null,
         null,
@@ -2149,13 +2533,26 @@ function LoadUserFavoriteTopics(user) {
                     var topicdesp = item.topicDescription;
                     var topiccount = item.topicMsgCount;
                     var isliked = item.IsLiked;
+                    var group = item.GroupID;
 
-                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount));
+                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount, group));
                     setTopicLikeBtn("btn_topic_like_" + topicid, topicid, isliked);
                 })
             }
         }
     );
+}
+
+function createTopic(topicid, topicname, topicdesp, topiccount, group) {
+    var output = "";
+
+    output = "<li class='list-group-item'>"
+           + "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
+           + "  <span class='badge'>" + topiccount + "</span>"
+           + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>"
+           + "</li>"
+
+    return output;
 }
 
 function setTopicLikeBtn(btnid, topicid, isLiked) {
@@ -2201,7 +2598,7 @@ function unlikeBtnMouseOver(btnid) {
     }
 
     btn.attr("class", "btn btn-danger like-btn");
-    btn.text("Unlike");
+    btn.text("- Unlike");
 }
 
 function unlikeBtnMouseOut(btnid) {
@@ -2220,7 +2617,7 @@ function setLikeBtn(btnid, topicid, enabled) {
         return;
     }
 
-    btn.text("Like");
+    btn.text("+ Like");
     btn.attr("class", "btn btn-primary like-btn");
     if (enabled) {
         btn.attr("onclick", "like('" + btnid + "', '" + topicid + "');");
@@ -2243,15 +2640,20 @@ function like(btnid, topicid) {
         apiurl,
         apidata,
         function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                setUnlikeBtn(btnid, topicid, true);
-                // refresh topic info
-                LoadMyFavoriteTopics();
+            if (isNullOrEmpty(data)) {
+                showError("Failed to like topic.");
             }
             else {
-                showError(msg);
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setUnlikeBtn(btnid, topicid, true);
+                    // refresh topic info
+                    LoadMyFavoriteTopics();
+                }
+                else {
+                    showError(msg);
+                }
             }
         }
     );
@@ -2267,30 +2669,23 @@ function unlike(btnid, topicid) {
         apiurl,
         apidata,
         function (data) {
-            var code = data.ActionResultCode;
-            var msg = data.Message;
-            if (code == "0") {
-                setLikeBtn(btnid, topicid, true);
-                // refresh topic info
-                LoadMyFavoriteTopics();
+            if (isNullOrEmpty(data)) {
+                showError("Failed to unlike topic.");
             }
             else {
-                showError(msg);
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setLikeBtn(btnid, topicid, true);
+                    // refresh topic info
+                    LoadMyFavoriteTopics();
+                }
+                else {
+                    showError(msg);
+                }
             }
         }
     );
-}
-
-function createTopic(topicid, topicname, topicdesp, topiccount) {
-    var output = "";
-
-    output = "<li class='list-group-item'>"
-           + "  <a class='btn btn-default like-btn' id='btn_topic_like_" + topicid + "' style='display:none'>&nbsp;</a>"
-           + "  <span class='badge'>" + topiccount + "</span>"
-           + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>"
-           + "</li>"
-
-    return output;
 }
 
 
@@ -2303,6 +2698,14 @@ function RefreshWelcomePageTimer() {
 function RefreshWelcomePage() {
     // load new
     refreshWelcomeNew();
+    refreshWelcomeCategories();
+
+    // load my favorites
+    refreshWelcomeFavorites();
+    // load hot topics
+    refreshWelcomeHotTopics();
+    // load active users
+    refreshWelcomeActiveUsers();
 
     // load notifications
     refreshWelcomeMentionsFeeds();
@@ -2311,12 +2714,6 @@ function RefreshWelcomePage() {
 
     // load latest feeds
     refreshWelcomeLatestFeeds();
-
-    // load hot topics
-    refreshWelcomeHotTopics();
-
-    // load active users
-    refreshWelcomeActiveUsers();
 }
 
 function refreshWelcomeNew() {
@@ -2325,20 +2722,14 @@ function refreshWelcomeNew() {
         return;
     }
 
-    listdiv.empty();
-    listdiv.append("<li id='loading_message_new' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
-
     // notifications
     var apiurl = "/api/account/getnotificationcount";
     var apidata = "";
 
-    AjaxGetSync(
+    AjaxGetAsync(
         apiurl,
         apidata,
         function (data) {
-            // clear list
-            listdiv.empty();
-
             if (isNullOrEmpty(data)) {
                 // do nothing
             }
@@ -2351,23 +2742,9 @@ function refreshWelcomeNew() {
                 var userid = data.Userid;
                 var notificationCount = ownerlineCount + replyCount + atlineCount;
 
-                output = "<li class='list-group-item'>"
-                       + "  <span class='badge'>" + replyCount + "</span>"
-                       + "  <a href='/Notification/index?category=replyline'>Replies</a>"
-                       + "</li>"
-                listdiv.prepend(output);
-
-                output = "<li class='list-group-item'>"
-                       + "  <span class='badge'>" + ownerlineCount + "</span>"
-                       + "  <a href='/Notification/index?category=ownerline'>My Owns</a>"
-                       + "</li>"
-                listdiv.prepend(output);
-
-                output = "<li class='list-group-item'>"
-                       + "  <span class='badge'>" + atlineCount + "</span>"
-                       + "  <a href='/Notification/index?category=atline'>Mentions</a>"
-                       + "</li>"
-                listdiv.prepend(output);
+                $("#welcome_new_reply_count").html(replyCount);
+                $("#welcome_new_atline_count").html(atlineCount);
+                $("#welcome_new_ownerline_count").html(ownerlineCount);
 
                 // menu navbar count
                 if (homelineCount > 0)
@@ -2383,23 +2760,94 @@ function refreshWelcomeNew() {
         },
         null,
         null,
-        "loading_message_new"
+        "no_message_box"
     );
+}
+
+function refreshWelcomeCategories() {
+    var listdiv = $("#welcome_new_categories_list");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var apiurl = "/api/category/getmycategory";
+    var apidata = "";
+
+    listdiv.empty();
+    listdiv.append("<li id='loading_message_categories' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            // clear list
+            listdiv.empty();
+
+            if (isNullOrEmpty(data) || data.length == 0) {
+            }
+            else {
+                var categories = {};
+
+                $.each(data, function (index, item) {
+                    var id = item.ID;
+                    var name = item.Name;
+                    var groupid = item.GroupID;
+                    var description = item.Description;
+                    var creater = item.Creater;
+                    var createtimestamp = item.CreateTimestamp;
+                    var eventcount = item.EventCount;
+
+                    if (isNullOrEmpty(categories[name])) {
+                        categories[name] = eventcount;
+                    }
+                    else {
+                        categories[name] += eventcount;
+                    }
+                })
+
+                for (var name in categories) {
+                    var output = "";
+
+                    output += "<li class='list-group-item'>";
+                    output += "  <span class='badge'>" + categories[name] + "</span>";
+                    output += "  <a href='/category/index?category=" + encodeTxt(name) + "'>" + name + "</a>";
+                    output += "</li>";
+                    listdiv.append(output);
+                }
+            }
+        },
+        null,
+        null,
+        "loading_message_categories"
+    );
+}
+
+function refreshWelcomeFavorites() {
+    var listdiv = $("#welcome_new_favorites_list");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var apiurl = "/api/topic/getmyfavouritetopic";
+    var apidata = "";
+
+    listdiv.empty();
+    listdiv.append("<li id='loading_message_favorites' class='list-group-item txtaln-c'><span class='spinner-loading'></span> Loading...</li>");
 
     // my topics
-    var maxcount = 15;
-
-    apiurl = "/api/topic/getmyfavouritetopic";
-    apidata = "";
+    var maxcount = 99;
 
     AjaxGetAsync(
         apiurl,
         apidata,
         function (data) {
             if (isNullOrEmpty(data) || data.length == 0) {
-                // do nothing
+                showMessage("No content.", "loading_message_favorites");
             }
             else {
+                // clear list
+                listdiv.empty();
+
                 // create my topic
                 $.each(data, function (index, item) {
                     var output = "";
@@ -2409,11 +2857,12 @@ function refreshWelcomeNew() {
                     var topicname = item.topicName;
                     var topicdesp = item.topicDescription;
                     var topiccount = item.topicMsgCount;
+                    var group = item.GroupID;
 
                     if (unreadcount > 0) {
                         output = "<li class='list-group-item'>"
                                + "  <span class='badge'>" + unreadcount + "</span>"
-                               + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "'>#" + topicname + "#</a>"
+                               + "  <a href='/topic/index?topic=" + encodeTxt(topicname) + "&group=" + encodeTxt(group) + "'>#" + topicname + "#</a>"
                                + "</li>";
                         listdiv.append(output);
                     }
@@ -2426,7 +2875,7 @@ function refreshWelcomeNew() {
         },
         null,
         null,
-        "loading_message_new"
+        "loading_message_favorites"
     );
 }
 
@@ -2461,8 +2910,9 @@ function refreshWelcomeHotTopics() {
                     var topicdesp = item.Description;
                     var topiccount = item.MsgCount;
                     var isliked = item.IsLiked;
+                    var group = item.GroupID;
 
-                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount));
+                    listdiv.append(createTopic(topicid, topicname, topicdesp, topiccount, group));
                     setTopicLikeBtn("btn_topic_like_" + topicid, topicid, isliked);
                 })
             }
@@ -2512,7 +2962,7 @@ function refreshWelcomeActiveUsers() {
                     }
 
                     output = "<li class='list-group-item'>"
-                           + "  <a class='btn btn-default follow-btn' id='btn_user_follow_" + encodeUserid(userid) + "' style='display:none'>&nbsp;</a>"
+                           + "  <a class='btn btn-default follow-btn' id='btn_user_follow_" + encodeId(userid) + "' style='display:none'>&nbsp;</a>"
                            + "  <span class='badge'>" + postscount + "</span>"
                            + "  <img class='img-rounded' src='" + picurl + "' width='25' height='25' />"
                            + "  <a class='fullname' href='/profile/index?user=" + encodeTxt(userid) + "'>" + username + "</a>"
@@ -2520,7 +2970,7 @@ function refreshWelcomeActiveUsers() {
                            + "</li>";
 
                     listdiv.append(output);
-                    setUserFollowBtn("btn_user_follow_" + encodeUserid(userid), userid, isFollowing);
+                    setUserFollowBtn("btn_user_follow_" + encodeId(userid), userid, isFollowing);
                 })
             }
         },
@@ -2614,6 +3064,8 @@ function refreshWelcomeFeeds(listdiv, apiurl, apidata, msgLength) {
                     var topics = item.TopicName;
                     var attach = item.Attachment;
                     var importence = item.Importance;
+                    var group = item.Group;
+
                     if (type == "reply") {
                         var mid = item.MessageID;
                         var muser = item.MessageUser;
@@ -2626,11 +3078,11 @@ function refreshWelcomeFeeds(listdiv, apiurl, apidata, msgLength) {
                            + "  <a class='fr' target='_blank' href='/Message/Index?user=" + encodeTxt(muser) + "&msgID=" + encodeTxt(mid) + "'>Open</a>"
                            + "  <a class='fullname' href='/profile/index?user=" + encodeTxt(user) + "'>" + username + "</a>"
                            + "  <span class='username'> - " + Time2Now(posttime) + "</span>"
-                           + "  <p class='break-word'>" + cutHtml(msg, msgLength, atusers, topics) + "</p>"
+                           + "  <p class='break-word'>" + cutHtml(msg, msgLength, atusers, topics, group) + "</p>"
                            + "</li>";
 
                     listdiv.append(output);
-                })
+                });
             }
         },
         function (XMLHttpRequest, textStatus, errorThrown) {
@@ -2638,5 +3090,1183 @@ function refreshWelcomeFeeds(listdiv, apiurl, apidata, msgLength) {
             listdiv.append("<li class='list-group-item txtaln-c'>" + XMLHttpRequest.responseJSON.Message + "</li>");
         }
     );
+}
+
+
+// Group
+function LoadMyGroupNavbar() {
+    var listdiv = $("#group_navabar");
+    if (listdiv.length == 0) {
+        return;
+    }
+    var setdefaultbtn = $("#btn_set_default_group");
+    var curgroup = $("#hd_current_group").val();
+
+    var apiurl = "/api/group/getjoinedgroup";
+    var apidata = "";
+
+    AjaxGetSync(
+        apiurl,
+        apidata,
+        function (data) {
+            // clear list
+            listdiv.empty();
+            setdefaultbtn.hide();
+
+            if (isNullOrEmpty(data) || data.length == 0) {
+                // do nothing
+            }
+            else {
+                // create list
+                $.each(data, function (index, item) {
+                    var output = "";
+                    var groupid = item.GroupID;
+                    var displayname = item.DisplayName;
+                    var description = item.Description;
+                    var isopen = item.IsOpen;
+                    var memberid = item.MemberID;
+                    var role = item.Role;
+                    var curgroup = $("#hd_current_group").val();
+
+                    if (index == 0) {   // first is default
+                        $("#hd_default_group").val(groupid);
+                        if (isNullOrEmpty(curgroup)) {
+                            $("#hd_current_group").val(groupid);
+                        }
+                    }
+
+                    output = "<li id='group_navbar_" + encodeId(groupid) + "'>"
+                           + "  <a href= 'javascript:void(0);' onclick='switchCurrentGroup(\"" + groupid + "\");'>" + displayname + "</a>"
+                           + "</li>";
+
+                    listdiv.append(output);
+                });
+
+                // active current group tab
+                curgroup = $("#hd_current_group").val();
+                var curtab = $("#group_navbar_" + encodeId(curgroup));
+                if (curtab.length > 0) {
+                    curtab.addClass("active");
+                }
+                else {
+                    listdiv.children[0].addClass("active");
+                }
+            }
+        },
+        null,
+        null,
+        "no_message_box"
+    );
+}
+
+function switchCurrentGroup(gid) {
+    if (isLoadFeeds) return;    // if it is loading, skip this time.
+
+    var listdiv = $("#group_navabar");
+    if (listdiv.length == 0) {
+        return;
+    }
+    var setdefaultbtn = $("#btn_set_default_group");
+    var defaultgroup = $("#hd_default_group").val();
+
+    var items = listdiv.children("li");
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        if (item.id == ("group_navbar_" + gid)) {
+            item.classList.add("active");
+            $("#hd_current_group").val(gid);
+            LoadFeeds(true);
+        }
+        else {
+            item.classList.remove("active");
+        }
+    }
+
+    if (gid == defaultgroup) {
+        setdefaultbtn.hide();
+    }
+    else {
+        setdefaultbtn.show();
+    }
+}
+
+function LoadPostGroupList() {
+    var listdiv = $("#postmessage_groups");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var apiurl = "/api/group/getjoinedgroup";
+    var apidata = "";
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            // disable post btn
+            $("#btn_post").attr("disabled", "disabled");
+            // clear list
+            listdiv.empty();
+
+            if (isNullOrEmpty(data) || data.length == 0) {
+                // do nothing
+            }
+            else {
+                // create list
+                $.each(data, function (index, item) {
+                    var output = "";
+                    var groupid = item.GroupID;
+                    var displayname = item.DisplayName;
+                    var description = item.Description;
+                    var isopen = item.IsOpen;
+                    var memberid = item.MemberID;
+                    var role = item.Role;
+
+                    output = "<option value='" + groupid + "'>" + displayname + "</option>";
+                    listdiv.append(output);
+                });
+
+                // enable post btn
+                $("#btn_post").removeAttr("disabled");
+            }
+        },
+        null,
+        null,
+        "no_message_box"
+    );
+}
+
+function SetDefaultGroup() {
+    var curgroup = $("#hd_current_group").val();
+    if (isNullOrEmpty(curgroup)) {
+        return;
+    }
+    var btn = $("#btn_set_default_group");
+
+    var apiurl = "/api/group/setdefaultgroup";
+    var apidata = "group=" + encodeTxt(curgroup);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                showError("Failed to set default group.");
+            }
+            else {
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    $("#hd_default_group").val(curgroup);
+                    btn.hide();
+                }
+                else {
+                    showError(msg);
+                }
+            }
+        }
+    );
+}
+
+function LoadGroups(category, group) {
+    var listdiv = $("#grouplist");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var apiurl = "";
+    var apidata = "";
+    if (isNullOrEmpty(category) || category == "allgroups")
+        apiurl = "/api/group/getallgroup";
+    else if (category == "joinedgroups")
+        apiurl = "/api/group/getjoinedgroup";
+    else if (category == "ownedgroups")
+        apiurl = "/api/group/getownedgroup";
+    else {
+        showError("Illegal operation.");
+        return;
+    }
+    if (!isNullOrEmpty(group)) {
+        apidata = "groupid=" + encodeTxt(group);
+    }
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+                showMessage("No content.");
+            }
+            else {
+                // clear list
+                listdiv.empty();
+
+                // create list
+                $.each(data, function (index, item) {
+                    listdiv.append(createGroupCard(item));
+                    setGroupJoinBtn("btn_group_join_" + encodeId(item.GroupID), item.GroupID, item.IsOpen, item.Status);
+                })
+            }
+        }
+    );
+}
+
+function createGroupCard(data) {
+    var output = "";
+    var groupid = data.GroupID;
+    var groupname = data.DisplayName;
+    var picurl = "";
+    var desp = data.Description;
+    var isopen = data.IsOpen;
+    var status = data.Status;
+
+    if (isNullOrEmpty(picurl)) {
+        picurl = "/Content/Images/default_avatar.jpg";
+    }
+
+    output = "  <li class='grouplist-group-item'>"
+           + "    <div class='group-card-info'>"
+           //+ "      <div class='ma-btm-10'>"
+           //+ "        <img class='img-rounded' id='group_pic_" + encodeId(groupid) + "' src='" + picurl + "' width='100' height='100' />"
+           //+ "      </div>"
+           + "      <div>"
+           + "        <a class='fullname' id='group_name_" + encodeId(groupid) + "' href='/Group/View?group=" + encodeTxt(groupid) + "'>" + groupname + "</a>"
+           + "      </div>";
+
+    output += "     <div>"
+    if (isopen) {
+        output += "   <span>(Open group)</span>";
+    }
+    else {
+        output += "   <span>(Private group)</span>";
+    }
+    output += "     </div>"
+           + "      <div class='group-card-desp'>"
+           + "        <span id='group_id_" + encodeId(groupid) + "'>" + desp + "</span>"
+           + "      </div>"
+           + "    </div>"
+           + "    <div class='group-card-postinfo'>"
+           + "      <div class='btn-group btn-group-justified'>"
+           + "        <a class='btn btn-default join-btn' id='btn_group_join_" + encodeId(groupid) + "'>&nbsp;</a>"
+           + "      </div>"
+           + "    </div>"
+           + "  </li>";
+
+    return output;
+}
+
+function setGroupJoinBtn(btnid, group, isopen, status) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    if (isopen) {
+        if (status == "Not Joined") {
+            setJoinBtn(btnid, group, true);
+        } else if (status == "Joined") {
+            setLeaveBtn(btnid, group, true);
+        } else if (status == "Pending") {
+            setPendingBtn(btnid, group, true);
+        } else if (status == "Admin") {
+            setAdminBtn(btnid, group, true);
+        }
+    }
+    else {  // not open
+        if (status == "Not Joined") {
+            setApplyBtn(btnid, group, true);
+        } else if (status == "Joined") {
+            setApplyLeaveBtn(btnid, group, true);
+        } else if (status == "Pending") {
+            setPendingBtn(btnid, group, true);
+        } else if (status == "Admin") {
+            setAdminBtn(btnid, group, true);
+        }
+    }
+}
+
+function setCloseBtn(btnid, group) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Not open");
+    btn.attr("class", "btn btn-info join-btn");
+    btn.attr("href", "javascript:void(0)");
+    btn.show();
+}
+
+function setPendingBtn(btnid, group) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Waiting for approval");
+    btn.attr("class", "btn btn-info join-btn");
+    btn.attr("href", "javascript:void(0)");
+    btn.show();
+}
+
+function setAdminBtn(btnid, group, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Manage");
+    btn.attr("class", "btn btn-info join-btn");
+    if (enabled) {
+        btn.attr("onclick", "window.open('/group/manage?group=" + encodeTxt(group) + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
+    btn.show();
+}
+
+function setLeaveBtn(btnid, group, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Joined");
+    btn.attr("class", "btn btn-success join-btn");
+    if (enabled) {
+        btn.attr("onclick", "leave('" + btnid + "', '" + group + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "leaveBtnMouseOver('" + btnid + "');")
+    btn.attr("onmouseout", "leaveBtnMouseOut('" + btnid + "');")
+    btn.show();
+}
+
+function leaveBtnMouseOver(btnid) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-danger join-btn");
+    btn.text("- Leave");
+}
+
+function leaveBtnMouseOut(btnid) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-success join-btn");
+    btn.text("Joined");
+}
+
+function setJoinBtn(btnid, group, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("+ Join");
+    btn.attr("class", "btn btn-primary join-btn");
+    if (enabled) {
+        btn.attr("onclick", "join('" + btnid + "', '" + group + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
+    btn.show();
+}
+
+function setApplyBtn(btnid, group, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("+ Apply");
+    btn.attr("class", "btn btn-primary join-btn");
+    if (enabled) {
+        btn.attr("onclick", "apply('" + btnid + "', '" + group + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
+    btn.show();
+}
+
+function setApplyLeaveBtn(btnid, group, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("Joined");
+    btn.attr("class", "btn btn-success join-btn");
+    if (enabled) {
+        btn.attr("onclick", "applyleave('" + btnid + "', '" + group + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "leaveBtnMouseOver('" + btnid + "');")
+    btn.attr("onmouseout", "leaveBtnMouseOut('" + btnid + "');")
+    btn.show();
+}
+
+function join(btnid, group) {
+    setLeaveBtn(btnid, group, false);
+
+    var apiurl = "/api/group/joingroup";
+    var apidata = "groupid=" + encodeTxt(group);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                showError("Failed to join group.");
+            }
+            else {
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setLeaveBtn(btnid, group, true);
+                }
+                else {
+                    showError(msg);
+                }
+            }
+        }
+    );
+}
+
+function leave(btnid, group) {
+    setJoinBtn(btnid, group, false);
+
+    var apiurl = "/api/group/leavegroup";
+    var apidata = "groupid=" + encodeTxt(group);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                showError("Failed to leave group.");
+            }
+            else {
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setJoinBtn(btnid, group, true);
+                }
+                else {
+                    showError(msg);
+                }
+            }
+        }
+    );
+}
+
+function apply(btnid, group) {
+    setPendingBtn(btnid, group);
+
+    var apiurl = "/api/group/joingroup";
+    var apidata = "groupid=" + encodeTxt(group);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                showError("Failed to join group.");
+            }
+            else {
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setPendingBtn(btnid, group);
+                }
+                else {
+                    showError(msg);
+                }
+            }
+        }
+    );
+}
+
+function applyleave(btnid, group) {
+    setApplyBtn(btnid, group, false);
+
+    var apiurl = "/api/group/leavegroup";
+    var apidata = "groupid=" + encodeTxt(group);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                showError("Failed to leave group.");
+            }
+            else {
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setApplyBtn(btnid, group, true);
+                }
+                else {
+                    showError(msg);
+                }
+            }
+        }
+    );
+}
+
+function LoadGroupMembers(category, groupid) {
+    var listdiv = $("#userlist");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    if (isNullOrEmpty(category) || isNullOrEmpty(groupid)) {
+        showError("Illegal operation.", "loading_message_groupmembers");
+        return;
+    }
+
+    var apiurl = "/api/group/getallgroupmember"
+    var apidata = "groupID=" + encodeTxt(groupid);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+                showMessage("No content.", "loading_message_groupmembers");
+            }
+            else {
+                // clear list
+                listdiv.empty();
+
+                // create list
+                $.each(data, function (index, item) {
+                    var groupid = item.GroupID;
+                    var user = item.User;
+                    var role = item.Role;
+
+                    listdiv.append(createGroupMemberCard(user, groupid));
+                    setGroupMemberBtn("btn_member_manage_" + encodeId(user.Userid), user.Userid, groupid, role);
+                })
+            }
+        },
+        null,
+        null,
+        "loading_message_groupmembers"
+    );
+}
+
+function createGroupMemberCard(data, groupid) {
+    var output = "";
+    var userid = data.Userid;
+    var username = data.DisplayName;
+    var picurl = data.PortraitUrl;
+    var desp = data.Description;
+    var postscount = data.MessageCount;
+    var followingcount = data.FollowingsCount;
+    var followerscount = data.FollowersCount;
+    var isFollowing = data.IsFollowing;
+
+    if (isNullOrEmpty(picurl)) {
+        picurl = "/Content/Images/default_avatar.jpg";
+    }
+
+    output = "  <li class='userlist-group-item'>"
+           + "    <div class='user-card-info'>"
+           + "      <div class='ma-btm-10'>"
+           + "        <img class='img-rounded' id='user_pic_" + encodeId(userid) + "' src='" + picurl + "' width='100' height='100' />"
+           + "      </div>"
+           + "      <div>"
+           + "        <a class='fullname' id='user_name_" + encodeId(userid) + "' href='/profile/index?user=" + encodeTxt(userid) + "'>" + username + "</a>"
+           + "      </div>"
+           + "      <div>"
+           + "        <span class='username' id='user_id_" + encodeId(userid) + "'>@" + userid + "</span>"
+           + "      </div>"
+           + "    </div>"
+           + "    <div class='user-card-postinfo'>"
+           + "      <div class='btn-group btn-group-justified'>"
+           + "        <a class='btn btn-danger groupmember-btn' id='btn_member_manage_" + encodeId(userid) + "');'></a>"
+           + "      </div>"
+           + "    </div>"
+           + "  </li>";
+
+    return output;
+}
+
+function setGroupMemberBtn(btnid, userid, groupid, role) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    if (role == "pending") {    // waiting for approval
+        setApproveMemberBtn(btnid, userid, groupid, role, true);
+    }
+    else if (!isNullOrEmpty(role)) { // member
+        setRemoveMemberBtn(btnid, userid, groupid, role, true);
+    }
+    else {  // not a memeber
+        setAddMemberBtn(btnid, userid, groupid, "user", true);
+    }
+}
+
+function setRemoveMemberBtn(btnid, userid, groupid, role, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text(role.toUpperCase());
+    btn.attr("class", "btn btn-success groupmemeber-btn");
+    if (enabled) {
+        btn.attr("onclick", "removeMember('" + btnid + "', '" + userid + "', '" + groupid + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "removeMemberBtnMouseOver('" + btnid + "');")
+    btn.attr("onmouseout", "removeMemberBtnMouseOut('" + btnid + "', '" + role + "');")
+    btn.show();
+}
+
+function removeMemberBtnMouseOver(btnid) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-danger groupmember-btn");
+    btn.text("- Remove");
+}
+
+function removeMemberBtnMouseOut(btnid, role) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.attr("class", "btn btn-success groupmember-btn");
+    btn.text(role.toUpperCase());
+}
+
+function setAddMemberBtn(btnid, userid, groupid, role, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("+ Add");
+    btn.attr("class", "btn btn-primary groupmember-btn");
+    if (enabled) {
+        btn.attr("onclick", "addMember('" + btnid + "', '" + userid + "', '" + groupid + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
+    btn.show();
+}
+
+function setApproveMemberBtn(btnid, userid, groupid, role, enabled) {
+    var btn = $("#" + btnid);
+    if (btn.length == 0) {
+        return;
+    }
+
+    btn.text("+ Approve");
+    btn.attr("class", "btn btn-primary groupmember-btn");
+    if (enabled) {
+        btn.attr("onclick", "addMember('" + btnid + "', '" + userid + "', '" + groupid + "');");
+    }
+    else {
+        btn.attr("onclick", "");
+    }
+    btn.attr("onmouseover", "")
+    btn.attr("onmouseout", "")
+    btn.show();
+}
+
+function addMember(btnid, userid, groupid) {
+    setRemoveMemberBtn(btnid, userid, groupid, "user", false);
+
+    var apiurl = "/api/group/addmember";
+    var apidata = "userid=" + encodeTxt(userid) + "&groupID=" + encodeTxt(groupid);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                showError("Failed to add member to group.");
+            }
+            else {
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setRemoveMemberBtn(btnid, userid, groupid, "user", true);
+                }
+                else {
+                    showError(msg);
+                }
+            }
+        }
+    );
+}
+
+function removeMember(btnid, userid, groupid) {
+    setAddMemberBtn(btnid, userid, groupid, "user", false);
+
+    var apiurl = "/api/group/removemember";
+    var apidata = "userid=" + encodeTxt(userid) + "&groupID=" + encodeTxt(groupid);
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data)) {
+                showError("Failed to remove member from group.");
+            }
+            else {
+                var code = data.ActionResultCode;
+                var msg = data.Message;
+                if (code == "0") {
+                    setAddMemberBtn(btnid, userid, groupid, "user", true);
+                }
+                else {
+                    showError(msg);
+                }
+            }
+        }
+    );
+}
+
+
+
+
+
+
+
+
+
+
+// performance chart
+var chart_axis_perf_template = {
+    tooltip: {
+        trigger: 'axis'
+    },
+    toolbox: {
+        show: true,
+        y: 'center',
+        orient: 'vertical',
+        feature: {
+            mark: {
+                show: true,
+                title: {
+                    mark: 'New markline',
+                    markUndo: 'Erase markline',
+                    markClear: 'Clear all marklines'
+                },
+            },
+            magicType: {
+                show: true,
+                title: {
+                    line: 'Line view',
+                    bar: 'Bar view',
+                    stack: 'Stack view',
+                    tiled: 'Tiled view'
+                },
+                type: ['line', 'bar', 'stack', 'tiled']
+            },
+            dataZoom: {
+                show: true,
+                title: {
+                    dataZoom: 'Data zoom',
+                    dataZoomReset: 'Data zoom reset'
+                }
+            },
+            dataView: {
+                show: true,
+                title: 'Data view',
+                readOnly: false
+            },
+            restore: {
+                show: true,
+                title: 'Restore'
+            },
+            saveAsImage: {
+                show: true,
+                title: 'Save as image',
+                lang: ['Right click and save']
+            }
+        }
+    },
+    dataZoom: {
+        show: true,
+        realtime: true,
+        start: 50,
+        end: 100
+    },
+    calculable: true,
+    backgroundColor: '#fff',
+    title: {
+        text: '',
+        subtext: '',
+        x: 'center'
+    },
+    legend: {
+        x: 'left',
+        y: 'top',
+        data: []
+    },
+    xAxis: [
+        {
+            type: 'category',
+            data: []
+        }
+    ],
+    yAxis: [
+        {
+            type: 'value',
+        },
+        {
+            type: 'value',
+        }
+    ],
+    series: []
+};
+
+function LoadPerfChart(chartname, chartdivid) {
+    var chartdiv = $("#" + chartdivid);
+    if (chartdiv.length == 0 || isNullOrEmpty(chartname)) {
+        return;
+    }
+
+    var apiurl = "/api/metricchart/trygetchart";
+    //var apiurl = "/api/metricchart/getchart";
+    var apidata = "chartName=" + encodeTxt(chartname);
+    var option = chart_axis_perf_template;
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.DataSet.length == 0) {
+                // no chart
+                chartdiv.hide();
+            }
+            else {
+                var name = data.Name;
+                var title = data.Title;
+                var subtitle = data.SubTitle;
+                var groupid = data.GroupID;
+                var dataset = data.DataSet;
+                var alldata = {
+                    xAxis: [],
+                    series: []
+                };
+
+                // set title
+                option.title.text = title;
+                if (!isNullOrEmpty(subtitle)) {
+                    option.title.subtext = subtitle;
+                }
+
+                // get dataset
+                $.each(dataset, function (index, item) {
+                    var id = item.ID;
+                    var legend = item.Legend;
+                    var type = item.Type;
+                    var mid = item.MetricDataSetID;
+                    var xdata = [];
+                    var xydata = {};
+
+                    apiurl = "/api/metricchart/retrivelastestdatarecord";
+                    apidata = "id=" + encodeTxt(mid) + "&count=365";
+
+                    // get xydata of dataset
+                    AjaxGetSync(
+                        apiurl,
+                        apidata,
+                        function (data) {
+                            if (isNullOrEmpty(data) || data.length == 0) {
+                                // no data
+                                return;
+                            }
+                            else {
+                                $.each(data, function (index, item) {
+                                    xdata.push(item.Key);
+                                    xydata[item.Key] = item.Value;
+                                });
+                            }
+                        },
+                        null,
+                        null,
+                        "no_message_box"
+                    );
+
+                    // set legend
+                    option.legend.data.push(legend);
+
+                    // add data to alldata
+                    alldata.xAxis = alldata.xAxis.concat(xdata);
+                    alldata.series.push({
+                        legend: legend,
+                        type: type,
+                        xydata: xydata
+                    });
+
+                });
+
+                // merge xAxis data
+                option.xAxis[0].data = uniqueArray(alldata.xAxis);
+                option.xAxis[0].data.sort(dateSortFunc);
+
+                // merge series data
+                for (var i in alldata.series) {
+                    var serie = alldata.series[i];
+                    var l = serie.legend;
+                    var t = serie.type;
+                    var d = serie.xydata;
+                    var y = [];
+
+                    for (var j in option.xAxis[0].data) {
+                        var x = option.xAxis[0].data[j];
+                        if (isNullOrEmpty(d[x])) {
+                            y.push(0);
+                        }
+                        else {
+                            y.push(d[x]);
+                        }
+                    }
+
+                    option.series.push({
+                        name: l,
+                        type: t,
+                        data: y,
+                        //markPoint: {
+                        //    data: [
+                        //        { type: 'max', name: 'Max' },
+                        //        { type: 'min', name: 'Min' }
+                        //    ]
+                        //},
+                        //markLine: {
+                        //    data: [
+                        //        { type: 'average', name: 'Average' }
+                        //    ]
+                        //}
+                    });
+                }
+
+                // draw chart
+                try {
+                    if (chartdiv.height() < 400)
+                        chartdiv.height(400);
+                    chartdiv.show();
+
+                    var chart = echarts.init(chartdiv[0]);
+                    chart.setOption(option);
+                }
+                catch (ex) {
+                    chartdiv.hide();
+                    showError(ex);
+                }
+            }
+        },
+        function () {
+            chartdiv.hide();
+        },
+        null,
+        "no_message_box"
+    );
+}
+
+function dateSortFunc(str1, str2) {
+    var date1 = new Date(str1);
+    var date2 = new Date(str2);
+
+    if (date1 > date2) {
+        return 1;
+    }
+    else if (date1 < date2) {
+        return -1;
+    }
+    else {
+        return 0;
+    }
+}
+
+function uniqueArray(data) {
+    data = data || [];
+    var a = {};
+    for (var i = 0; i < data.length; i++) {
+        var v = data[i];
+        if (typeof (a[v]) == 'undefined') {
+            a[v] = 1;
+        }
+    };
+    data.length = 0;
+    for (var i in a) {
+        data[data.length] = i;
+    }
+    return data;
+}
+
+function addfakedata() {
+    for (var i = 0; i < 30; i++) {
+        AjaxGetSync(
+            "/api/metricchart/insertrecord",
+            "id=7&key=" + i + "&value=" + (Math.random() * 100)
+        );
+        AjaxGetSync(
+            "/api/metricchart/insertrecord",
+            "id=8&key=" + i + "&value=" + (Math.random() * 100)
+        );
+        AjaxGetSync(
+            "/api/metricchart/insertrecord",
+            "id=9&key=" + i + "&value=" + (Math.random() * 100)
+        );
+    }
+}
+
+// category function
+function LoadCategoryFeeds() {
+    var listdiv = $("#feedlist");
+    if (listdiv.length == 0) {
+        return;
+    }
+
+    var apiurl = "";
+    var apidata = "";
+    var category = "";
+    var group = "";
+
+    // get paras from page
+    if ($("#hd_category_name").length > 0) {
+        category = $("#hd_category_name").val();
+    }
+    if ($("#hd_current_group").length > 0) {
+        group = $("#hd_current_group").val();
+    }
+
+    // get
+    if (isNullOrEmpty(category)) {
+        apiurl = "/api/category/RetriveAllCategoryMessage";
+        if (!isNullOrEmpty(group)) {   // set group value
+            apidata = "group=" + group;
+        }
+    }
+    else {
+        if (!isNullOrEmpty(group)) {   // set group value
+            apiurl = "/api/category/retrivecategorymessage";
+            apidata = "name=" + encodeTxt(category);
+            apidata += "&group=" + group;
+        }
+        else {
+            apiurl = "/api/category/retrivecategorymessagebyname";
+            apidata = "name=" + encodeTxt(category);
+        }
+    }
+
+    AjaxGetAsync(
+        apiurl,
+        apidata,
+        function (data) {
+            if (isNullOrEmpty(data) || data.length == 0) {
+                showMessage("No content.");
+            }
+            else {
+                // clear feed list
+                listdiv.empty();
+
+                // create feed list
+                $.each(data, function (index, item) {
+                    listdiv.append(createCategoryFeed(item));
+                    initUserPopover("user_pic_" + item.ID, item.NotifyTo.Userid);
+                })
+            }
+        }
+    );
+}
+
+function createCategoryFeed(data) {
+    var output = "";
+    var id = data.ID;
+    var fromuser = data.User;
+    var user = data.NotifyTo.Userid;
+    var username = data.NotifyTo.DisplayName;
+    var picurl = data.NotifyTo.PortraitUrl;
+    var userdesp = data.NotifyTo.Description;
+    var posttime = data.PostTime;
+    var group = data.Group.GroupID;
+    var groupname = data.Group.DisplayName;
+    var cid = data.CategoryID;
+    var cname = data.CategoryName;
+    var events = data.EventIDs;
+    var msg = "";
+
+    if (isNullOrEmpty(picurl)) {
+        picurl = "/Content/Images/default_avatar.jpg";
+    }
+
+    // create msg
+    if (!isNullOrEmpty(events)) {
+        msg = "You got " + events.count + " to-do events.";
+        for (var e in events) {
+            msg += "<a class='btn btn-link' href='/Event/index?eventid=" + encodeTxt(e) + "'>" + e + "</a>";
+        }
+    }
+    else {
+        msg = "You have no to-do event now.";
+    }
+
+    output += "  <li id='feed_" + id + "' class='list-group-item'>";
+    output += "    <div>"
+
+    // user pic
+    output += "      <div class='feed-pic'>";
+    output += "        <button class='btn btn-img' type='button' id='user_pic_" + id + "' href='javascript:void(0);'>";
+    output += "          <img class='img-rounded' src='" + picurl + "' width='100' height='100'/>";
+    output += "        </button>";
+    output += "      </div>";
+
+    output += "      <div class='feed-content'>";
+
+    // user name and post time
+    output += "        <div class='newpost-header'>";
+    output += "          <a id='username_" + id + "' class='fullname' href='/profile/index?user=" + encodeTxt(user) + "'>" + username + "</a>&nbsp;";
+    output += "          <span class='badge'>@" + user + "&nbsp;-&nbsp;" + Time2Now(posttime) + "</span>&nbsp;-&nbsp;";
+    output += "          <a href='/category/index?category=" + encodeTxt(cname) + "&group=" + group + "'>" + cname + " (" + groupname + ")</a>&nbsp;";
+    output += "        </div>";
+
+    // message
+    if (!isNullOrEmpty(msg)) {
+        output += "    <div id='message_" + id + "' class='newpost-input'>" + msg + "</div>";
+    }
+
+    output += "      </div>";
+
+    output += "    </div>";
+    output += "  </li>";
+
+    return output;
 }
 

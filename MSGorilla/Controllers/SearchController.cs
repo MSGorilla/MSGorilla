@@ -23,8 +23,9 @@ namespace MSGorilla.Views
             ViewBag.Myid = me.Userid;
             ViewBag.Me = me;
 
-            ViewBag.FeedCategory = "topicline";
+            ViewBag.FeedCategory = "search";
 
+            keyword = keyword.Trim();
             if (string.IsNullOrEmpty(keyword))
             {
                 keyword = "";

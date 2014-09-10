@@ -8,32 +8,32 @@ using System.Diagnostics;
 using MSGorilla.Library.Models;
 using MSGorilla.Library.Models.SqlModels;
 using MSGorilla.Library.Exceptions;
-using MSGorilla.Library.DAL;
 
 namespace MSGorilla.Library
 {
     public class AccountManager
     {
-        //private MSGorillaContext _gorillaCtx;
+        //private MSGorillaEntities _gorillaCtx;
         public AccountManager(){
-            //_accountCtx = new MSGorillaContext();
+            //_accountCtx = new MSGorillaEntities();
         }
 
         public List<UserProfile> GetActiveUsers(int count)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                return _gorillaCtx.Users.SqlQuery(
-                    @"select top({0}) Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from [UserProfile] order by MessageCount desc",
-                    new object[] { count }
-                ).ToList();
+                return _gorillaCtx.UserProfiles.OrderByDescending(user => user.MessageCount).Take(count).ToList();
+                //return _gorillaCtx.UserProfiles.SqlQuery(
+                //    @"select top({0}) * from [UserProfile] order by MessageCount desc",
+                //    new object[] { count }
+                //).ToList();
             }
         }
 
         public List<UserProfile> GetAllUsers(){
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                return _gorillaCtx.Users.ToList();
+                return _gorillaCtx.UserProfiles.ToList();
             }            
         }
 
@@ -44,9 +44,9 @@ namespace MSGorilla.Library
                 return false;
             }
 
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                UserProfile user = _gorillaCtx.Users.Find(userid);
+                UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
 
                 if (user.Password == null)
                 {
@@ -62,17 +62,17 @@ namespace MSGorilla.Library
 
         public UserProfile FindUser(string userid)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                return _gorillaCtx.Users.Find(userid);
+                return _gorillaCtx.UserProfiles.Find(userid);
             }            
         }
 
         public List<UserProfile> SearchUser(string keyword)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                var users = _gorillaCtx.Users.Where(u => u.Userid.Contains(keyword));
+                var users = _gorillaCtx.UserProfiles.Where(u => u.Userid.Contains(keyword));
                 return users.ToList<UserProfile>();
             }            
         }
@@ -84,15 +84,15 @@ namespace MSGorilla.Library
                 throw new InvalidIDException("User");
             }
 
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                UserProfile temp = _gorillaCtx.Users.Find(user.Userid);
+                UserProfile temp = _gorillaCtx.UserProfiles.Find(user.Userid);
                 if (temp != null)
                 {
                     throw new UserAlreadyExistException(user.Userid);
                 }
                 user.MessageCount = 0;
-                _gorillaCtx.Users.Add(user);
+                _gorillaCtx.UserProfiles.Add(user);
                 _gorillaCtx.SaveChanges();
                 return user;
             }            
@@ -100,9 +100,9 @@ namespace MSGorilla.Library
 
         public UserProfile UpdateUser(UserProfile user)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                UserProfile originUser = _gorillaCtx.Users.Find(user.Userid);
+                UserProfile originUser = _gorillaCtx.UserProfiles.Find(user.Userid);
                 if (originUser == null)
                 {
                     throw new UserNotFoundException(user.Userid);
@@ -116,16 +116,16 @@ namespace MSGorilla.Library
 
                 _gorillaCtx.SaveChanges();
 
-                return _gorillaCtx.Users.Find(user.Userid);
+                return _gorillaCtx.UserProfiles.Find(user.Userid);
             }
         }
 
         public async Task<Boolean> Follow(string userid, string followingUserid)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                UserProfile user = _gorillaCtx.Users.Find(userid);
-                UserProfile followingUser = _gorillaCtx.Users.Find(followingUserid);
+                UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
+                UserProfile followingUser = _gorillaCtx.UserProfiles.Find(followingUserid);
                 if (user == null || followingUser == null)
                 {
                     throw new UserNotFoundException(string.Format("{0} or {1}", userid, followingUserid));
@@ -152,15 +152,15 @@ namespace MSGorilla.Library
 
         public async Task<Boolean> UnFollow(string userid, string followingUserid)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 Subscription f = _gorillaCtx.Subscriptions.Where(ff => ff.Userid == userid && ff.FollowingUserid == followingUserid).FirstOrDefault();
                 if (f != null)
                 {
                     _gorillaCtx.Subscriptions.Remove(f);
 
-                    UserProfile user = _gorillaCtx.Users.Find(userid);
-                    UserProfile followingUser = _gorillaCtx.Users.Find(followingUserid);
+                    UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
+                    UserProfile followingUser = _gorillaCtx.UserProfiles.Find(followingUserid);
                     user.FollowingsCount--;
                     followingUser.FollowersCount--;
 
@@ -172,55 +172,69 @@ namespace MSGorilla.Library
 
         public List<UserProfile> Followings(string userid)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                UserProfile user = _gorillaCtx.Users.Find(userid);
+                UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
                 if (user == null)
                 {
                     throw new UserNotFoundException(userid);
                 }
 
-                return _gorillaCtx.Users.SqlQuery(
-                    @"select FollowingUserid as Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from (
-	                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from 
-		                [Subscription] f
-		                join
-		                [UserProfile] u
-		                on f.FollowingUserid = u.Userid 
-		                ) ff 
-	                where ff.userid = {0}",
-                        new object[] { userid }
-                    ).ToList();
+                return  (
+                            from u in _gorillaCtx.UserProfiles join su in _gorillaCtx.Subscriptions 
+                                on u.Userid equals su.FollowingUserid 
+                                where su.Userid == userid select u
+                        ).ToList<UserProfile>();
+
+//                return _gorillaCtx.UserProfiles.SqlQuery(
+//                    @"select FollowingUserid as Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount, IsRobot from (
+//	                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount, IsRobot from 
+//		                [Subscription] f
+//		                join
+//		                [UserProfile] u
+//		                on f.FollowingUserid = u.Userid 
+//		                ) ff 
+//	                where ff.userid = {0}",
+//                        new object[] { userid }
+//                    ).ToList();
             }
         }
 
         public List<UserProfile> Followers(string userid)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                UserProfile user = _gorillaCtx.Users.Find(userid);
+                UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
                 if (user == null)
                 {
                     throw new UserNotFoundException(userid);
                 }
 
-                return _gorillaCtx.Users.SqlQuery(
-                    @"select Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from (
-		                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from 
-			                [Subscription] f
-			                join
-			                [UserProfile] u
-			                on f.Userid = u.Userid 
-	                ) ff 
-	                where ff.FollowingUserid = {0}",
-                        new object[] { userid }
-                    ).ToList();
+                return (
+                            from u in _gorillaCtx.UserProfiles
+                            join su in _gorillaCtx.Subscriptions
+                                on u.Userid equals su.Userid
+                            where su.FollowingUserid == userid
+                            select u
+                        ).ToList<UserProfile>();
+
+//                return _gorillaCtx.UserProfiles.SqlQuery(
+//                    @"select Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from (
+//		                select f.FollowingUserid, f.Userid, DisplayName, PortraitUrl, Description, FollowingsCount, FollowersCount, Password, MessageCount from 
+//			                [Subscription] f
+//			                join
+//			                [UserProfile] u
+//			                on f.Userid = u.Userid 
+//	                ) ff 
+//	                where ff.FollowingUserid = {0}",
+//                        new object[] { userid }
+//                    ).ToList();
             }
         }
 
         public bool IsFollowing(string userid, string followingUserID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 if (_gorillaCtx.Subscriptions.Where(f => f.Userid == userid && f.FollowingUserid == followingUserID).ToList().Count > 0)
                 {
@@ -232,12 +246,12 @@ namespace MSGorilla.Library
 
         public void DeleteUser(string userid)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                UserProfile user = _gorillaCtx.Users.Find(userid);
+                UserProfile user = _gorillaCtx.UserProfiles.Find(userid);
                 if (user != null)
                 {
-                    _gorillaCtx.Users.Remove(user);
+                    _gorillaCtx.UserProfiles.Remove(user);
                     _gorillaCtx.SaveChanges();
                 }
                 else

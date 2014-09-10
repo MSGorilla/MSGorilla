@@ -4,26 +4,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using MSGorilla.Library.DAL;
+
 using MSGorilla.Library.Models.SqlModels;
 using MSGorilla.Library.Models.ViewModels;
 namespace MSGorilla.Library
 {
     public class TopicManager
     {
-        //private MSGorillaContext _gorillaCtx;
+        //private MSGorillaEntities _gorillaCtx;
 
-        public List<Topic> GetAllTopics()
+        public List<Topic> GetAllTopics(string[] groups)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            if (groups == null || groups.Length == 0)
             {
-                return _gorillaCtx.Topics.ToList();
+                return new List<Topic>();
+            }
+
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                return _gorillaCtx.Topics.Where(topic => groups.Any(groupID => topic.GroupID == groupID)).ToList();
             }
         }
 
         public Topic AddTopic(Topic topic)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 topic = _gorillaCtx.Topics.Add(topic);
                 _gorillaCtx.SaveChanges();
@@ -31,22 +36,9 @@ namespace MSGorilla.Library
             }
         }
 
-        public void incrementTopicCount(string topicID)
-        {
-            using (var _gorillaCtx = new MSGorillaContext())
-            {
-                Topic topic = FindTopic(topicID, _gorillaCtx);
-                if (topic != null)
-                {
-                    topic.MsgCount++;
-                    _gorillaCtx.SaveChanges();
-                }
-            }
-        }
-
         public void incrementTopicCount(int topicID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 Topic topic = FindTopic(topicID, _gorillaCtx);
                 if (topic != null)
@@ -59,9 +51,9 @@ namespace MSGorilla.Library
 
         public void clearUnreadMsgCountOfFavouriteTopic(string userid, int topicID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                FavouriteTopic ftopic = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).FirstOrDefault();
+                FavouriteTopic ftopic = _gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).FirstOrDefault();
                 if (ftopic != null)
                 {
                     ftopic.UnreadMsgCount = 0;
@@ -72,7 +64,7 @@ namespace MSGorilla.Library
 
         public void incrementUnreadMsgCountOfFavouriteTopic(int topicID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 _gorillaCtx.Database.ExecuteSqlCommand(
                     "update [favouritetopic] set UnreadMsgcount = UnreadMsgcount  + 1 where topicid={0}",
@@ -80,42 +72,14 @@ namespace MSGorilla.Library
             }
         }
 
-        public Topic FindTopic(string topicID, MSGorillaContext _gorillaCtx = null)
+        public Topic FindTopicByName(string name, string groupID)
         {
-            Topic ret = null;
-            if (_gorillaCtx == null)
-            {
-                using (_gorillaCtx = new MSGorillaContext())
-                {
-
-                    try
-                    {
-                        ret = _gorillaCtx.Topics.Find(int.Parse(topicID));
-                    }
-                    catch
-                    {
-                    }
-                    return ret;
-                }
-            }
-            try
-            {
-                ret = _gorillaCtx.Topics.Find(int.Parse(topicID));
-            }
-            catch
-            {
-            }
-            return ret;
-        }
-
-        public Topic FindTopicByName(string name)
-        {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
                 Topic ret = null;
                 try
                 {
-                    ret = _gorillaCtx.Topics.Where(topic => topic.Name == name).Single();
+                    ret = _gorillaCtx.Topics.Where(topic => topic.Name == name && groupID == topic.GroupID).Single();
                 }
                 catch
                 {
@@ -125,53 +89,82 @@ namespace MSGorilla.Library
             }
         }
 
-        public Topic FindTopic(int topicID, MSGorillaContext _gorillaCtx = null)
+        public Topic FindTopicByName(string name, string[] groupIDs)
         {
-            if (_gorillaCtx == null)
+            if (groupIDs == null || groupIDs.Length == 0)
             {
-                _gorillaCtx = new MSGorillaContext();
+                return null;
             }
-            return _gorillaCtx.Topics.Find(topicID);
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                Topic ret = null;
+                try
+                {
+                    ret = _gorillaCtx.Topics.Where(topic => topic.Name == name && groupIDs.Any(groupID => groupID == topic.GroupID)).Single();
+                }
+                catch
+                {
+
+                }
+                return ret;
+            }
         }
 
-        public List<Topic> SearchTopic(string keyword)
+        public Topic FindTopic(int topicID, MSGorillaEntities _gorillaCtx = null)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            if (_gorillaCtx != null)
             {
-                return _gorillaCtx.Topics.Where(topic => topic.Name.Contains(keyword)).ToList();
+                return _gorillaCtx.Topics.Find(topicID);
+                
+            }
+            using (_gorillaCtx = new MSGorillaEntities())
+            {
+                return _gorillaCtx.Topics.Find(topicID);
             }
         }
 
-        public List<Topic> GetHotTopics(int count = 5)
+        public List<Topic> SearchTopic(string keyword, string[] groupIDs)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            if (groupIDs == null || groupIDs.Length == 0)
             {
-                return _gorillaCtx.Topics.SqlQuery(
-                    @"select top({0}) id, name, description, msgcount from [topic] ORDER BY msgcount desc",
-                    new object[] { count }
-                ).ToList();
+                return new List<Topic>();
+            }
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                return _gorillaCtx.Topics.Where
+                    (
+                        topic => topic.Name.Contains(keyword) 
+                            && groupIDs.Any(groupID => groupID == topic.GroupID)
+                    ).ToList();
+            }
+        }
+
+        public List<Topic> GetHotTopics(string[] groupIDs, int count = 5)
+        {
+            if (groupIDs == null || groupIDs.Length == 0)
+            {
+                return new List<Topic>();
+            }
+
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                return _gorillaCtx.Topics.Where(
+                   topic => groupIDs.Any(groupid => groupid == topic.GroupID)
+                ).OrderByDescending(topic => topic.MsgCount).Take(count).ToList();
             }
         }
 
         public void AddFavouriteTopic(string userid, int topicID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                if (_gorillaCtx.Users.Find(userid) == null)
-                {
-                    return;
-                }
-                if (_gorillaCtx.Topics.Find(topicID) == null)
-                {
-                    return;
-                }
-                if (_gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).Count() == 0)
+                if (_gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).Count() == 0)
                 {
                     FavouriteTopic ftopic = new FavouriteTopic();
                     ftopic.TopicID = topicID;
                     ftopic.Userid = userid;
                     ftopic.UnreadMsgCount = 0;
-                    _gorillaCtx.favouriteTopic.Add(ftopic);
+                    _gorillaCtx.FavouriteTopics.Add(ftopic);
                     _gorillaCtx.SaveChanges();
                 }
             }
@@ -179,19 +172,19 @@ namespace MSGorilla.Library
 
         public void Remove(string userid, int topicID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                List<FavouriteTopic> finds = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).ToList();
-                _gorillaCtx.favouriteTopic.RemoveRange(finds);
+                List<FavouriteTopic> finds = _gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).ToList();
+                _gorillaCtx.FavouriteTopics.RemoveRange(finds);
                 _gorillaCtx.SaveChanges();
             }
         }
 
         public List<DisplayFavouriteTopic> GetFavouriteTopic(string userid)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                List<FavouriteTopic> topics = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid)).ToList();
+                List<FavouriteTopic> topics = _gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid)).ToList();
                 List<DisplayFavouriteTopic> dtopic = new List<DisplayFavouriteTopic>();
 
                 foreach (FavouriteTopic t in topics)
@@ -204,9 +197,9 @@ namespace MSGorilla.Library
 
         public int GetFavouriteTopicUnreadCount(string userid, int topicid)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                FavouriteTopic topic = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID.Equals(topicid)).FirstOrDefault();
+                FavouriteTopic topic = _gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid) && f.TopicID.Equals(topicid)).FirstOrDefault();
                 if (topic != null)
                     return topic.UnreadMsgCount;
 
@@ -217,14 +210,37 @@ namespace MSGorilla.Library
 
         public bool IsFavouriteTopic(string userid, int topicID)
         {
-            using (var _gorillaCtx = new MSGorillaContext())
+            using (var _gorillaCtx = new MSGorillaEntities())
             {
-                FavouriteTopic ftopic = _gorillaCtx.favouriteTopic.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).FirstOrDefault();
-                if (ftopic != null)
+                return IsFavouriteTopic(userid, topicID, _gorillaCtx);
+            }
+        }
+
+        public bool IsFavouriteTopic(string userid, int topicID, MSGorillaEntities _gorillaCtx)
+        {
+            FavouriteTopic ftopic = _gorillaCtx.FavouriteTopics.Where(f => f.Userid.Equals(userid) && f.TopicID == topicID).FirstOrDefault();
+            if (ftopic != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public List<DisplayTopic> ToDisplayTopicList(IEnumerable<Topic> topics, string userid)
+        {
+            using (var _gorillaCtx = new MSGorillaEntities())
+            {
+                HashSet<int> likedTopicID = new HashSet<int>();
+                foreach(var fa in _gorillaCtx.UserProfiles.Find(userid).FavouriteTopics.ToArray())
                 {
-                    return true;
+                    likedTopicID.Add(fa.TopicID);
                 }
-                return false;
+                List<DisplayTopic> list = new List<DisplayTopic>();
+                foreach (Topic topic in topics)
+                {
+                    list.Add(new DisplayTopic(topic, likedTopicID.Contains(topic.Id)));
+                }
+                return list;
             }
         }
     }

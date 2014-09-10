@@ -1,0 +1,16 @@
+﻿<div class="title-container">
+    <span class="help-block">Topics for "#<span class="bold">@ViewBag.SearchKeyword</span>#"</span>
+</div>
+
+<div>
+    <ul id="topiclist" class='list-group'>
+        <li id="loading_message_searchtopic" class="list-group-item txtaln-c"><span class="spinner-loading"></span> Loading...</li>
+        @*autofill by js*@
+    </ul>
+</div>
+
+<script>
+    $(SearchTopic('@ViewBag.SearchKeyword'));
+</script>
+
+
