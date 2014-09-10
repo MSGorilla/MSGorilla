@@ -14,12 +14,10 @@ namespace MSGorilla.Library.Models.SqlModels
     public class Group
     {
         [Key, DataMember]
-        public string GroupID { get; set; }
+        public string Id { get; set; }
         [DataMember]
-        public string DisplayName { get; set; }
+        public string Name { get; set; }
         [DataMember]
         public string Description { get; set; }
-        [DataMember]
-        public bool IsOpen { get; set; }
     }
 }
