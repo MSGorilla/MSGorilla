@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.Diagnostics;
 
 namespace MSGorilla.IMAPServer
 {
@@ -34,7 +35,7 @@ namespace MSGorilla.IMAPServer
             TcpListener imapServer = new TcpListener(this.IP, Port);
 
             imapServer.Start();
-            Console.WriteLine(string.Format("Start imap server on {0}:{1}", IP.ToString(), Port));
+            Trace.TraceInformation("Start imap server on {0}:{1}", IP.ToString(), Port);
             while (this.Running)
             {
                 TcpClient client = imapServer.AcceptTcpClient();

@@ -67,8 +67,8 @@ namespace MSGorilla.MailStore
                     msg.MessageContent,
                     msg.Group,
                     msg.PostTime,
-                    msg.User,
                     toUser,
+                    msg.User,
                     richMessage
                 );
         }

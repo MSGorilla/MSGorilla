@@ -56,7 +56,7 @@
       <Setting name="StorageConnectionString" />
     </ConfigurationSettings>
   </WorkerRole>
-  <WorkerRole name="MSGorilla.IMAPServerInstance" vmsize="Small">
+  <WorkerRole name="MSGorilla.IMAPServerInstance" vmsize="Large">
     <Imports>
       <Import moduleName="Diagnostics" />
       <Import moduleName="RemoteAccess" />

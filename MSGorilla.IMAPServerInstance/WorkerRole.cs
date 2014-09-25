@@ -22,6 +22,8 @@ namespace MSGorilla.IMAPServerInstance
             // This is a sample worker implementation. Replace with your logic.
             Trace.TraceInformation("MSGorilla.IMAPServerInstance entry point called");
 
+            new Thread(new ThreadStart(smtpServer.Start)).Start();
+
             server.Start();
         }
 

@@ -14,60 +14,6 @@ namespace MSGorilla.IMAPServer
 {
     class Program
     {
-        public static void SimpleSMTPLoginServer()
-        {
-            IPAddress myIP = IPAddress.Parse("127.0.0.1");
-            //构造一个TcpListener(IP地址,端口)对象,TCP服务端  
-            TcpListener smtpServer = new TcpListener(myIP, 25);
-
-            //开始监听  
-            smtpServer.Start();
-            Console.WriteLine("Waiting a smtp client...");
-
-
-            while (true)
-            {
-                //构造TCP客户端:接受连接请求  
-                TcpClient client = smtpServer.AcceptTcpClient();
-                Console.WriteLine("Client connected...");
-
-                try
-                {
-                    //构造NetworkStream类,该类用于获取和操作网络流  
-                    NetworkStream stream = client.GetStream();
-
-                    //读数据流对象  
-                    StreamReader sr = new StreamReader(stream);
-                    //写数据流对象  
-                    StreamWriter sw = new StreamWriter(stream);
-
-                    sw.WriteLine("220 smtp.example.com ESMTP Postfix");
-                    sw.Flush();
-
-                    while (true)
-                    {
-                        string line = sr.ReadLine();
-                        Console.WriteLine("SMTP Client: " + line);
-
-                        sw.WriteLine("250 OK");
-                        sw.Flush();
-                    }
-                }
-
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    Console.WriteLine(e.StackTrace);
-                    break;
-                }
-                finally
-                {
-                    client.Close();
-                }
-            }
-        }
-
-
         static void Main(string[] args)
         {
             //BaseCommand cmd = new BaseCommand();

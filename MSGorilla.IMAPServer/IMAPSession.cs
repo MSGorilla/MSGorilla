@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.IO;
+using System.Diagnostics;
 
 using MSGorilla.IMAPServer.State;
 using MSGorilla.IMAPServer.Command;
@@ -57,7 +58,7 @@ namespace MSGorilla.IMAPServer
                     {
                         break;
                     }
-                    Console.WriteLine("C->S: " + line);
+                    //Console.WriteLine("C->S: " + line);
 
                     Type cmdType;
                     BaseCommand cmd = this._parser.Parse(line, out cmdType);
@@ -112,8 +113,10 @@ namespace MSGorilla.IMAPServer
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
-                    Console.WriteLine(e.StackTrace);
+                    Trace.TraceError(e.Message);
+                    Trace.TraceError(e.StackTrace);
+                    //Console.WriteLine(e.Message);
+                    //Console.WriteLine(e.StackTrace);
                 }
             }
 
@@ -123,7 +126,7 @@ namespace MSGorilla.IMAPServer
         public void AppendResponse(BaseResponse response)
         {
             _writer.WriteLine(response.ToString());
-            Console.WriteLine("[{0}]S->C: {1}", DateTime.Now, response.ToString());
+            //Console.WriteLine("[{0}]S->C: {1}", DateTime.Now, response.ToString());
         }
 
         public void Flush()

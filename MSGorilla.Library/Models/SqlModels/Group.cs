@@ -14,14 +14,6 @@ namespace MSGorilla.Library.Models.SqlModels
     
     public partial class Group
     {
-<<<<<<< HEAD
-        [Key, DataMember]
-        public string Id { get; set; }
-        [DataMember]
-        public string Name { get; set; }
-        [DataMember]
-        public string Description { get; set; }
-=======
         public Group()
         {
             this.Memberships = new HashSet<Membership>();
@@ -43,6 +35,5 @@ namespace MSGorilla.Library.Models.SqlModels
         public virtual ICollection<UserProfile> UserProfiles { get; set; }
         public virtual ICollection<MetricChart> MetricCharts { get; set; }
         public virtual ICollection<Category> Categories { get; set; }
->>>>>>> origin/master
     }
 }
