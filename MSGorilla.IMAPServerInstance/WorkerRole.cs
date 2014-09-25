@@ -16,6 +16,7 @@ namespace MSGorilla.IMAPServerInstance
     public class WorkerRole : RoleEntryPoint
     {
         IMAPServer.IMAPServer server;
+        IMAPServer.FakeSmtpServer smtpServer;
         public override void Run()
         {
             // This is a sample worker implementation. Replace with your logic.
@@ -30,7 +31,7 @@ namespace MSGorilla.IMAPServerInstance
             ServicePointManager.DefaultConnectionLimit = 10000;
             IPAddress addr = Dns.Resolve(Dns.GetHostName()).AddressList[0];
             server = new IMAPServer.IMAPServer(addr, 143);
-
+            smtpServer = new FakeSmtpServer(addr, 25);
 
             // For information on handling configuration changes
             // see the MSDN topic at http://go.microsoft.com/fwlink/?LinkId=166357.
