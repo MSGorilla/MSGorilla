@@ -38,12 +38,20 @@
     <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="MSGorilla.IMAPServerInstanceContent\" />
+    <Folder Include="MSGorilla.MailDispatcherContent\" />
     <Folder Include="MSGorilla.SpiderContent\" />
     <Folder Include="MSGorilla.WorkerContent" />
     <Folder Include="MSGorillaContent\" />
     <Folder Include="Profiles" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="MSGorilla.IMAPServerInstanceContent\diagnostics.wadcfg">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="MSGorilla.MailDispatcherContent\diagnostics.wadcfg">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="MSGorilla.SpiderContent\diagnostics.wadcfg">
       <SubType>Content</SubType>
     </Content>
@@ -55,6 +63,22 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MSGorilla.IMAPServerInstance\MSGorilla.IMAPServerInstance.csproj">
+      <Name>MSGorilla.IMAPServerInstance</Name>
+      <Project>{d1724637-7cb7-4332-9c86-a4cbea6277ff}</Project>
+      <Private>True</Private>
+      <RoleType>Worker</RoleType>
+      <RoleName>MSGorilla.IMAPServerInstance</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
+    <ProjectReference Include="..\MSGorilla.MailDispatcher\MSGorilla.MailDispatcher.csproj">
+      <Name>MSGorilla.MailDispatcher</Name>
+      <Project>{40c65c59-df53-4f93-a2c0-9abad588da0e}</Project>
+      <Private>True</Private>
+      <RoleType>Worker</RoleType>
+      <RoleName>MSGorilla.MailDispatcher</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
     <ProjectReference Include="..\MSGorilla.Spider\MSGorilla.Spider.csproj">
       <Name>MSGorilla.Spider</Name>
       <Project>{937fbb53-0920-4e15-b201-394699879a87}</Project>

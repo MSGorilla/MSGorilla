@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8A67D357-F1AB-4273-9A97-EDF8E0EE6639}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MSGorillaIMAPServer</RootNamespace>
+    <AssemblyName>MSGorillaIMAPServer</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.Edm, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.Edm.5.6.0\lib\net40\Microsoft.Data.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.OData, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.OData.5.6.0\lib\net40\Microsoft.Data.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.Services.Client, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.Services.Client.5.6.0\lib\net40\Microsoft.Data.Services.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Storage, Version=3.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\WindowsAzure.Storage.3.2.0\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Spatial, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Spatial.5.6.0\lib\net40\System.Spatial.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Command\AppendCommand.cs" />
+    <Compile Include="Command\AuthenticateCommand.cs" />
+    <Compile Include="Command\BaseCommand.cs" />
+    <Compile Include="Command\CapabilityCommand.cs" />
+    <Compile Include="Command\CheckCommand.cs" />
+    <Compile Include="Command\CloseCommand.cs" />
+    <Compile Include="Command\CommandName.cs" />
+    <Compile Include="Command\CommandParser.cs" />
+    <Compile Include="Command\CopyCommand.cs" />
+    <Compile Include="Command\CreateCommand.cs" />
+    <Compile Include="Command\DeleteCommand.cs" />
+    <Compile Include="Command\ExamineCommand.cs" />
+    <Compile Include="Command\ExpungeCommand.cs" />
+    <Compile Include="Command\FetchCommand.cs" />
+    <Compile Include="Command\IUIDCommand.cs" />
+    <Compile Include="Command\ListCommand.cs" />
+    <Compile Include="Command\LoginCommand.cs" />
+    <Compile Include="Command\LogoutCommand.cs" />
+    <Compile Include="Command\LsubCommand.cs" />
+    <Compile Include="Command\MessageIDList.cs" />
+    <Compile Include="Command\NoopCommand.cs" />
+    <Compile Include="Command\RenameCommand.cs" />
+    <Compile Include="Command\SearchCommand.cs" />
+    <Compile Include="Command\SelectCommand.cs" />
+    <Compile Include="Command\StartTLSCommand.cs" />
+    <Compile Include="Command\StatusCommand.cs" />
+    <Compile Include="Command\StoreCommand.cs" />
+    <Compile Include="Command\SubscribeCommand.cs" />
+    <Compile Include="Command\UnsubscribeCommand.cs" />
+    <Compile Include="DataType\FetchDataList.cs" />
+    <Compile Include="FakeSmtpServer.cs" />
+    <Compile Include="Helper\StringHelper.cs" />
+    <Compile Include="IMAPServer.cs" />
+    <Compile Include="IMAPService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="IMAPService.Designer.cs">
+      <DependentUpon>IMAPService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IMAPSession.cs" />
+    <Compile Include="MSGorillaHelper.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Response\BaseResponse.cs" />
+    <Compile Include="Response\CapabilityResponse.cs" />
+    <Compile Include="Response\ExistResponse.cs" />
+    <Compile Include="Response\FetchResponse.cs" />
+    <Compile Include="Response\FlagResponse.cs" />
+    <Compile Include="Response\ListResponse.cs" />
+    <Compile Include="Response\LsubResponse.cs" />
+    <Compile Include="Response\RecentResponse.cs" />
+    <Compile Include="Response\SearchResponse.cs" />
+    <Compile Include="Response\ServerStatusResponse.cs" />
+    <Compile Include="Response\StatusResponse.cs" />
+    <Compile Include="State\AuthenticatedState.cs" />
+    <Compile Include="State\BaseState.cs" />
+    <Compile Include="State\ConnectedState.cs" />
+    <Compile Include="State\LogoutState.cs" />
+    <Compile Include="State\SelectedState.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MSGorilla.Library\MSGorilla.Library.csproj">
+      <Project>{ad407f7a-f82c-4c44-98f9-c2145a5f4a50}</Project>
+      <Name>MSGorilla.Library</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MSGorilla.MailStore\MSGorilla.MailStore.csproj">
+      <Project>{fe3de28d-333c-4663-bd5a-4a4236a1999d}</Project>
+      <Name>MSGorilla.MailStore</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

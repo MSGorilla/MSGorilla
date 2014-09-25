@@ -85,9 +85,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MSGorilla.Library\MSGorilla.Library.csproj">
-      <Project>{ad407f7a-f82c-4c44-98f9-c2145a5f4a50}</Project>
-      <Name>MSGorilla.Library</Name>
+    <ProjectReference Include="..\..\MSGorilla.Library.Model\MSGorilla.Library.Model.csproj">
+      <Project>{75db99e9-d282-48ea-8ff0-3ee45d8acd5e}</Project>
+      <Name>MSGorilla.Library.Model</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\MSGorillaWebAPIClient\MSGorilla.WebAPIClient.csproj">
       <Project>{9b379a6d-8342-4b10-9f92-739fda720ba8}</Project>

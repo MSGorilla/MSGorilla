@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="MSGorillaMailModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="MailBox">
+          <Key>
+            <PropertyRef Name="MailboxID" />
+          </Key>
+          <Property Name="MailboxID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Userid" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Path" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Exist" Type="int" Nullable="false" />
+          <Property Name="Recent" Type="int" Nullable="false" />
+          <Property Name="UidValidity" Type="int" Nullable="false" />
+          <Property Name="UidNext" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="MailMessage">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MailboxID" Type="int" Nullable="false" />
+          <Property Name="Uid" Type="int" Nullable="false" />
+          <Property Name="SequenceNumber" Type="int" Nullable="false" />
+          <Property Name="MSGorillaMessageID" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="Recent" Type="bit" Nullable="false" />
+          <Property Name="Seen" Type="bit" Nullable="false" />
+          <Property Name="Important" Type="int" Nullable="false" />
+          <Property Name="Timestamp" Type="datetimeoffset" Precision="7" Nullable="false" />
+          <Property Name="Size" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_MailMessage_0">
+          <End Role="MailBox" Type="Self.MailBox" Multiplicity="1" />
+          <End Role="MailMessage" Type="Self.MailMessage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MailBox">
+              <PropertyRef Name="MailboxID" />
+            </Principal>
+            <Dependent Role="MailMessage">
+              <PropertyRef Name="MailboxID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="MSGorillaMailModelStoreContainer">
+          <EntitySet Name="MailBox" EntityType="Self.MailBox" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MailMessage" EntityType="Self.MailMessage" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_MailMessage_0" Association="Self.FK_MailMessage_0">
+            <End Role="MailBox" EntitySet="MailBox" />
+            <End Role="MailMessage" EntitySet="MailMessage" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="MSGorillaMailModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="MailBox">
+          <Key>
+            <PropertyRef Name="MailboxID" />
+          </Key>
+          <Property Name="MailboxID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Userid" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Path" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Exist" Type="Int32" Nullable="false" />
+          <Property Name="Recent" Type="Int32" Nullable="false" />
+          <Property Name="UidValidity" Type="Int32" Nullable="false" />
+          <Property Name="UidNext" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="MailMessages" Relationship="Self.FK_MailMessage_0" FromRole="MailBox" ToRole="MailMessage" />
+        </EntityType>
+        <EntityType Name="MailMessage">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MailboxID" Type="Int32" Nullable="false" />
+          <Property Name="Uid" Type="Int32" Nullable="false" />
+          <Property Name="SequenceNumber" Type="Int32" Nullable="false" />
+          <Property Name="MSGorillaMessageID" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Recent" Type="Boolean" Nullable="false" />
+          <Property Name="Seen" Type="Boolean" Nullable="false" />
+          <Property Name="Important" Type="Int32" Nullable="false" />
+          <Property Name="Timestamp" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <Property Name="Size" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="MailBox" Relationship="Self.FK_MailMessage_0" FromRole="MailMessage" ToRole="MailBox" />
+        </EntityType>
+        <Association Name="FK_MailMessage_0">
+          <End Role="MailBox" Type="Self.MailBox" Multiplicity="1" />
+          <End Role="MailMessage" Type="Self.MailMessage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MailBox">
+              <PropertyRef Name="MailboxID" />
+            </Principal>
+            <Dependent Role="MailMessage">
+              <PropertyRef Name="MailboxID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="MSGorillaMailEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="MailBoxes" EntityType="Self.MailBox" />
+          <EntitySet Name="MailMessages" EntityType="Self.MailMessage" />
+          <AssociationSet Name="FK_MailMessage_0" Association="Self.FK_MailMessage_0">
+            <End Role="MailBox" EntitySet="MailBoxes" />
+            <End Role="MailMessage" EntitySet="MailMessages" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="MSGorillaMailModelStoreContainer" CdmEntityContainer="MSGorillaMailEntities">
+          <EntitySetMapping Name="MailBoxes">
+            <EntityTypeMapping TypeName="MSGorillaMailModel.MailBox">
+              <MappingFragment StoreEntitySet="MailBox">
+                <ScalarProperty Name="MailboxID" ColumnName="MailboxID" />
+                <ScalarProperty Name="Userid" ColumnName="Userid" />
+                <ScalarProperty Name="Path" ColumnName="Path" />
+                <ScalarProperty Name="Exist" ColumnName="Exist" />
+                <ScalarProperty Name="Recent" ColumnName="Recent" />
+                <ScalarProperty Name="UidValidity" ColumnName="UidValidity" />
+                <ScalarProperty Name="UidNext" ColumnName="UidNext" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MailMessages">
+            <EntityTypeMapping TypeName="MSGorillaMailModel.MailMessage">
+              <MappingFragment StoreEntitySet="MailMessage">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="MailboxID" ColumnName="MailboxID" />
+                <ScalarProperty Name="Uid" ColumnName="Uid" />
+                <ScalarProperty Name="SequenceNumber" ColumnName="SequenceNumber" />
+                <ScalarProperty Name="MSGorillaMessageID" ColumnName="MSGorillaMessageID" />
+                <ScalarProperty Name="Recent" ColumnName="Recent" />
+                <ScalarProperty Name="Seen" ColumnName="Seen" />
+                <ScalarProperty Name="Important" ColumnName="Important" />
+                <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
+                <ScalarProperty Name="Size" ColumnName="Size" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

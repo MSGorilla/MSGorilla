@@ -24,7 +24,7 @@ namespace MSGorilla.WebAPI.Client
             _password = password;
             _generateAuthHeader();
         }
-        static string _rootUri = Constant.UriRoot;
+        string _rootUri = Constant.UriRoot;
 
         private void _generateAuthHeader()
         {

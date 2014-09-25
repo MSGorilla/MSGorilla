@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MSGorilla.WebAPI.Client;
 using Microsoft.Exchange.WebServices.Data;
 using MSGorilla.EmailMonitor.Sql;
-using MSGorilla.Library.Models.ViewModels;
+//using MSGorilla.Library.Models.ViewModels;
 using Newtonsoft.Json;
 using mshtml;
 
@@ -18,6 +19,24 @@ namespace MSGorilla.EmailMonitor
         public MSGorillaEmailReporter(string username, string password)
         {
             _client = new GorillaWebAPI(username, password);
+        }
+
+        public static string CaseInsenstiveReplace(string originalString, string oldValue, string newValue)
+        {
+            Regex regEx = new Regex(oldValue,
+               RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            return regEx.Replace(originalString, newValue);
+        }
+
+        public static String BytesToString(long byteCount)
+        {
+            string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
+            if (byteCount == 0)
+                return "0" + suf[0];
+            long bytes = Math.Abs(byteCount);
+            int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
+            double num = Math.Round(bytes / Math.Pow(1024, place), 1);
+            return (Math.Sign(byteCount) * num).ToString() + suf[place];
         }
 
         public void Report(EmailMessage email)
@@ -43,11 +62,11 @@ namespace MSGorilla.EmailMonitor
             }
         }
 
-        public MSGorilla.Library.Models.Attachment UploadAttachment2MSGorilla(FileAttachment attachment)
+        public MSGorilla.Library.Models.ViewModels.Attachment UploadAttachment2MSGorilla(FileAttachment attachment)
         {
             string filename = attachment.Name;
             attachment.Load(filename);
-            MSGorilla.Library.Models.Attachment att = _client.UploadAttachment(filename);
+            MSGorilla.Library.Models.ViewModels.Attachment att = _client.UploadAttachment(filename);
             System.IO.File.Delete(filename);
             return att;
         }
@@ -55,7 +74,7 @@ namespace MSGorilla.EmailMonitor
         public string UploadAttachment(string html, EmailMessage email)
         {
             string body = email.Body;
-            List<MSGorilla.Library.Models.Attachment> fileAtts = new List<Library.Models.Attachment>();
+            List<MSGorilla.Library.Models.ViewModels.Attachment> fileAtts = new List<Library.Models.ViewModels.Attachment>();
 
             foreach (Attachment attachment in email.Attachments)
             {
@@ -65,13 +84,13 @@ namespace MSGorilla.EmailMonitor
                     if (string.IsNullOrEmpty(fileAttachment.ContentId))
                     {
                         //real attachment
-                        MSGorilla.Library.Models.Attachment att = UploadAttachment2MSGorilla(fileAttachment);
+                        MSGorilla.Library.Models.ViewModels.Attachment att = UploadAttachment2MSGorilla(fileAttachment);
                         fileAtts.Add(att);
                     }
                     else if (html.Contains(fileAttachment.ContentId))
                     {
                         //Figure attachment in mail body
-                        MSGorilla.Library.Models.Attachment att = UploadAttachment2MSGorilla(fileAttachment);
+                        MSGorilla.Library.Models.ViewModels.Attachment att = UploadAttachment2MSGorilla(fileAttachment);
                         html = html.Replace("cid:" + fileAttachment.ContentId, 
                             "/api/attachment/Download?attachmentID=" + att.AttachmentID);
                     }
@@ -82,23 +101,23 @@ namespace MSGorilla.EmailMonitor
             if (fileAtts.Count > 0)
             {
                 string tag = CreateAttachmentTag(fileAtts);
-                html = MSGorilla.Library.Utils.CaseInsenstiveReplace(
+                html = CaseInsenstiveReplace(
                         html, "<div class=WordSection1>", "<div class=WordSection1>" + tag);
             }
 
             return html;
         }
 
-        public static string CreateAttachmentTag(List<MSGorilla.Library.Models.Attachment> fileAtts)
+        public static string CreateAttachmentTag(List<MSGorilla.Library.Models.ViewModels.Attachment> fileAtts)
         {
             string attachmentTemplate = "<a href=\"/api/attachment/Download?attachmentID={0}\">{1}({2})</a>";
             StringBuilder attachments = new StringBuilder("");
-            foreach (MSGorilla.Library.Models.Attachment attach in fileAtts)
+            foreach (MSGorilla.Library.Models.ViewModels.Attachment attach in fileAtts)
             {
                 attachments.Append(string.Format(attachmentTemplate, 
                     attach.AttachmentID, 
                     attach.Filename,
-                    MSGorilla.Library.Utils.BytesToString(attach.Filesize)));
+                    BytesToString(attach.Filesize)));
             }
 
             return "<div>" + 
@@ -131,7 +150,7 @@ namespace MSGorilla.EmailMonitor
 
             string tag = CreateEmailTag(email);
 
-            return MSGorilla.Library.Utils.CaseInsenstiveReplace(
+            return CaseInsenstiveReplace(
                 html, "<div class=WordSection1>", "<div class=WordSection1>" + tag);
         }
 
@@ -213,7 +232,7 @@ namespace MSGorilla.EmailMonitor
             htmlBody = CreateMailRichMessage(htmlBody, email);
 
             string result = _client.PostMessage("none", null, "none", email.ConversationId, null, null, null, htmlBody, null);
-            DisplayMessage displayMessage = JsonConvert.DeserializeObject<DisplayMessage>(result);
+            MSGorilla.Library.Models.ViewModels.DisplayMessage displayMessage = JsonConvert.DeserializeObject<MSGorilla.Library.Models.ViewModels.DisplayMessage>(result);
 
             Sql.Conversation conv = new Sql.Conversation();
             conv.ConversationID = email.ConversationId;

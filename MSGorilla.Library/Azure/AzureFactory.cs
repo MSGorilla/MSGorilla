@@ -40,7 +40,8 @@ namespace MSGorilla.Library.Azure
         public enum MSGorillaQueue
         {
             Dispatcher,
-            SearchEngineSpider
+            SearchEngineSpider,
+            MailMessage
         }
 
         public enum MSGorillaBlobContainer
@@ -88,6 +89,7 @@ namespace MSGorilla.Library.Azure
             _queueDict = new Dictionary<MSGorillaQueue, string>();
             _queueDict.Add(MSGorillaQueue.Dispatcher, "messagequeue");
             _queueDict.Add(MSGorillaQueue.SearchEngineSpider, "spider");
+            _queueDict.Add(MSGorillaQueue.MailMessage, "mailmessage");
 
             // init blob container dict
             _containerDict = new Dictionary<MSGorillaBlobContainer, string>();

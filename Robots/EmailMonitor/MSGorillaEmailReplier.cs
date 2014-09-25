@@ -7,7 +7,6 @@ using MSGorilla.WebAPI.Client;
 using MSGorilla.EmailMonitor.Sql;
 using MSGorilla.Library.Models;
 using MSGorilla.Library.Models.ViewModels;
-using MSGorilla.Library.Models.SqlModels;
 
 
 

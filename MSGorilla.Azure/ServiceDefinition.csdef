@@ -9,6 +9,9 @@
     <ConfigurationSettings>
       <Setting name="StorageConnectionString" />
     </ConfigurationSettings>
+    <Endpoints>
+      <InputEndpoint name="Endpoint1" protocol="tcp" port="10100" />
+    </Endpoints>
   </WorkerRole>
   <WebRole name="MSGorilla" vmsize="ExtraLarge">
     <Sites>
@@ -43,5 +46,27 @@
     <ConfigurationSettings>
       <Setting name="StorageConnectionString" />
     </ConfigurationSettings>
+  </WorkerRole>
+  <WorkerRole name="MSGorilla.MailDispatcher" vmsize="Small">
+    <Imports>
+      <Import moduleName="Diagnostics" />
+      <Import moduleName="RemoteAccess" />
+    </Imports>
+    <ConfigurationSettings>
+      <Setting name="StorageConnectionString" />
+    </ConfigurationSettings>
+  </WorkerRole>
+  <WorkerRole name="MSGorilla.IMAPServerInstance" vmsize="Small">
+    <Imports>
+      <Import moduleName="Diagnostics" />
+      <Import moduleName="RemoteAccess" />
+    </Imports>
+    <ConfigurationSettings>
+      <Setting name="StorageConnectionString" />
+    </ConfigurationSettings>
+    <Endpoints>
+      <InputEndpoint name="smtp" protocol="tcp" port="25" localPort="25" />
+      <InputEndpoint name="imap" protocol="tcp" port="143" localPort="143" />
+    </Endpoints>
   </WorkerRole>
 </ServiceDefinition>
