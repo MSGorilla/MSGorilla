@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 namespace MSGorilla.IMAPServer.Command
 {
     [CommandName("COPY")]
-    public class CopyCommand : BaseCommand, IUIDCommand
+    public class CopyCommand : BaseCommand, IMailProcessCommand
     {
         public bool IsUIDCommand { get; set; }
+        public MessageIDList MessageID { get; set; }
     }
 }

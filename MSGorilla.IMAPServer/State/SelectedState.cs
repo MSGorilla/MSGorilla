@@ -195,7 +195,7 @@ namespace MSGorilla.IMAPServer.State
 
         #region Fetch Command
 
-        private List<MailMessage> GetMailMessagesFromCmd(FetchCommand cmd)
+        private List<MailMessage> GetMailMessagesFromCmd(IMailProcessCommand cmd)
         {
             List<MailMessage> mails = new List<MailMessage>();
             using (var ctx = new MSGorillaMailEntities())
@@ -241,9 +241,8 @@ namespace MSGorilla.IMAPServer.State
             return mails;
         }
 
-        private static FetchDataItem CreateFlagDateItem(MailMessage mail)
+        public static string CreateFlaggedString(MailMessage mail)
         {
-            FetchDataItem item = new FetchDataItem(FetchDataItemType.Flags);
             StringBuilder flags = new StringBuilder("(");
             if (mail.Recent)
             {
@@ -257,7 +256,13 @@ namespace MSGorilla.IMAPServer.State
             {
                 flags.Append("\\Seen");
             }
-            item.Text = flags.ToString().TrimEnd() + ")";
+            return flags.ToString().TrimEnd() + ")";
+        }
+
+        private static FetchDataItem CreateFlagDateItem(MailMessage mail)
+        {
+            FetchDataItem item = new FetchDataItem(FetchDataItemType.Flags);
+            item.Text = CreateFlaggedString(mail);
             return item;
         }
 
@@ -309,7 +314,7 @@ namespace MSGorilla.IMAPServer.State
                     case FetchDataItemType.Fast:
                         break;
                     case FetchDataItemType.Flags:
-                        response.Items.Add(CreateFlagDateItem(mail));
+                        response.Items.Add(new FetchDataItem(FetchDataItemType.Flags, CreateFlaggedString(mail)));
                         break;
                     case FetchDataItemType.Full:
                         break;
@@ -388,14 +393,105 @@ namespace MSGorilla.IMAPServer.State
                 );
         }
 
+        #region Store Command
+
+        private void Store(StoreCommand cmd, List<MailMessage> mails)
+        {
+            using (var ctx = new MSGorillaMailEntities())
+            {
+                foreach (var mail in mails)
+                {
+                    var curMail = ctx.MailMessages.Find(mail.ID);
+                    if (cmd.Action == StoreCommand.ActionType.AddFlag)
+                    {
+                        AddFlags(curMail, cmd.Flags);
+                    }
+                    else if (cmd.Action == StoreCommand.ActionType.RemoveFlag)
+                    {
+                        RemoveFlags(curMail, cmd.Flags);
+                    }
+                    else
+                    {
+                        SetFlags(curMail, cmd.Flags);
+                    }
+
+                    if (cmd.IsSilent == false)
+                    {
+                        FetchResponse response = new FetchResponse(curMail.SequenceNumber);
+                        response.Items.Add(new FetchDataItem(FetchDataItemType.Flags, CreateFlaggedString(curMail)));
+                        this.Session.AppendResponse(response);
+                    }
+                }
+
+                ctx.SaveChanges();
+            }
+        }
+
+        private void RemoveFlags(MailMessage mail, List<FlagType> flags)
+        {
+            foreach (var flag in flags)
+            {
+                switch (flag)
+                {
+                    case FlagType.Seen:
+                        mail.Seen = false;
+                        break;
+                    case FlagType.Flagged:
+                        mail.Important = 2;
+                        break;
+                    case FlagType.Recent:
+                        mail.Recent = false;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void AddFlags(MailMessage mail, List<FlagType> flags)
+        {
+            foreach (var flag in flags)
+            {
+                switch (flag)
+                {
+                    case FlagType.Seen:
+                        mail.Seen = true;
+                        break;
+                    case FlagType.Flagged:
+                        mail.Important = 0;
+                        break;
+                    case FlagType.Recent:
+                        mail.Recent = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void SetFlags(MailMessage mail, List<FlagType> flags)
+        {
+            mail.Important = 2;
+            mail.Recent = false;
+            mail.Seen = false;
+            AddFlags(mail, flags);
+        }
+
         public override void ProcessStoreCommand(StoreCommand cmd)
         {
+            List<MailMessage> mails = GetMailMessagesFromCmd(cmd);
+
+            Store(cmd, mails);
+
             this.Session.AppendResponse(
                     new ServerStatusResponse(cmd.Tag,
-                        ServerStatusResponseType.NO,
-                        "STORE unsupportted.")
+                        ServerStatusResponseType.OK,
+                        "STORE completed")
                 );
         }
+
+        #endregion
+
         public override void ProcessCopyCommand(CopyCommand cmd)
         {
             this.Session.AppendResponse(

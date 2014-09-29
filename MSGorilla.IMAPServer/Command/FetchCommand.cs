@@ -9,14 +9,12 @@ using MSGorilla.IMAPServer.DataType;
 namespace MSGorilla.IMAPServer.Command
 {
     [CommandName("FETCH")]
-    public class FetchCommand : BaseCommand, IUIDCommand
+    public class FetchCommand : BaseCommand, IMailProcessCommand
     {
         public bool IsUIDCommand { get; set; }
-
-        public MessageIDList MessageID { get; private set; }
+        public MessageIDList MessageID { get; set; }
         public FetchDataList fetchData { get; private set; }
 
-        //Todo many many things
         public override void Parse(string Tag, string Data)
         {
             base.Parse(Tag, Data);

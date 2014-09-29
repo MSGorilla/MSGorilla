@@ -91,6 +91,7 @@
     <Compile Include="Command\ExamineCommand.cs" />
     <Compile Include="Command\ExpungeCommand.cs" />
     <Compile Include="Command\FetchCommand.cs" />
+    <Compile Include="Command\IMailProcessCommand.cs" />
     <Compile Include="Command\IUIDCommand.cs" />
     <Compile Include="Command\ListCommand.cs" />
     <Compile Include="Command\LoginCommand.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="Command\SubscribeCommand.cs" />
     <Compile Include="Command\UnsubscribeCommand.cs" />
     <Compile Include="DataType\FetchDataList.cs" />
+    <Compile Include="DataType\FlagType.cs" />
     <Compile Include="FakeSmtpServer.cs" />
     <Compile Include="Helper\StringHelper.cs" />
     <Compile Include="IMAPServer.cs" />

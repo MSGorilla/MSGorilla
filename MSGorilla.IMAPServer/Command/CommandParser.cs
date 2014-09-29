@@ -71,7 +71,6 @@ namespace MSGorilla.IMAPServer.Command
                     type = (Type)handlers[tokens[1].Trim().ToUpper()];
                     cmd = (BaseCommand)Activator.CreateInstance(type);
                     cmd.Parse(tokens[0], tokens.Length == 2 ? String.Empty : tokens[2]);
-                    
                 }
                 return cmd;
             }
