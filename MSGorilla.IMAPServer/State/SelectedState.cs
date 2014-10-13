@@ -118,6 +118,9 @@ namespace MSGorilla.IMAPServer.State
                     case SearchItemType.Seen:
                         sql.Append(" and seen=1");
                         break;
+                    case SearchItemType.Deleted:
+                        sql.Append(" and deleted=1");
+                        break;
                     case SearchItemType.SentBefore:
                         timestamp = DateTime.Parse(item.Argument);                        
                         sql.Append(" and Timestamp < ");
@@ -254,7 +257,11 @@ namespace MSGorilla.IMAPServer.State
             }
             if (mail.Seen)
             {
-                flags.Append("\\Seen");
+                flags.Append("\\Seen ");
+            }
+            if (mail.Deleted)
+            {
+                flags.Append("\\Deleted");
             }
             return flags.ToString().TrimEnd() + ")";
         }
