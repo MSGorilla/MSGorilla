@@ -24,6 +24,7 @@ namespace MSGorilla.MailStore
         public int Important { get; set; }
         public System.DateTimeOffset Timestamp { get; set; }
         public int Size { get; set; }
+        public bool Deleted { get; set; }
     
         public virtual MailBox MailBox { get; set; }
     }

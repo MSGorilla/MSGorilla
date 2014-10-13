@@ -41,7 +41,7 @@ namespace MSGorilla.IMAPServer.State
                     cmd.Tag,
                     ServerStatusResponseType.OK,
                     "SELECT completed",
-                    new ResponseCode(ResponseCodeType.READONLY))
+                    new ResponseCode(ResponseCodeType.READWRITE))
                 );
         }
 

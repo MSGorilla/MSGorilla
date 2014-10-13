@@ -55,9 +55,7 @@ namespace MSGorilla.IMAPServer
             //    session.CommandLoop();
             //}
 
-            IPAddress addr = Dns.Resolve(Dns.GetHostName()).AddressList[0];
-
-            FakeSmtpServer smtpServer = new FakeSmtpServer(addr, 25);
+            FakeSmtpServer smtpServer = new FakeSmtpServer(IPAddress.Any, 25);
             new Thread(new ThreadStart(smtpServer.Start)).Start();
 
             //Thread smtp = new Thread(SimpleSMTPLoginServer);
@@ -65,7 +63,7 @@ namespace MSGorilla.IMAPServer
 
             //IPAddress myIP = IPAddress.Parse("127.0.0.1");
 
-            IMAPServer server = new IMAPServer(addr, 143);
+            IMAPServer server = new IMAPServer(IPAddress.Any, 143);
             server.Start();
 
 

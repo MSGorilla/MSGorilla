@@ -13,6 +13,7 @@ namespace MSGorilla.MailStore
         {
             this.Userid = userid;
             this.CreateMailboxIfNotExist("Inbox");
+            this.CreateMailboxIfNotExist("Deleted Items");
         }
 
         public List<MailBox> GetAllMailbox(MSGorillaMailEntities ctx)
@@ -194,6 +195,7 @@ namespace MSGorilla.MailStore
             message.MSGorillaMessageID = msgorillaMessageID;
             message.Recent = true;
             message.Seen = false;
+            message.Deleted = false;
             message.SequenceNumber = mailbox.Exist + 1;
             message.Uid = mailbox.UidNext;
             message.Important = importance;

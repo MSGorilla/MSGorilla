@@ -442,6 +442,9 @@ namespace MSGorilla.IMAPServer.State
                     case FlagType.Recent:
                         mail.Recent = false;
                         break;
+                    case FlagType.Deleted:
+                        mail.Deleted = false;
+                        break;
                     default:
                         break;
                 }
@@ -463,6 +466,9 @@ namespace MSGorilla.IMAPServer.State
                     case FlagType.Recent:
                         mail.Recent = true;
                         break;
+                    case FlagType.Deleted:
+                        mail.Deleted = true;
+                        break;
                     default:
                         break;
                 }
@@ -474,6 +480,7 @@ namespace MSGorilla.IMAPServer.State
             mail.Important = 2;
             mail.Recent = false;
             mail.Seen = false;
+            mail.Deleted = false;
             AddFlags(mail, flags);
         }
 

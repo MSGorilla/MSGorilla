@@ -31,6 +31,7 @@
           <Property Name="Important" Type="int" Nullable="false" />
           <Property Name="Timestamp" Type="datetimeoffset" Precision="7" Nullable="false" />
           <Property Name="Size" Type="int" Nullable="false" />
+          <Property Name="Deleted" Type="bit" Nullable="false" />
         </EntityType>
         <Association Name="FK_MailMessage_0">
           <End Role="MailBox" Type="Self.MailBox" Multiplicity="1" />
@@ -84,6 +85,7 @@
           <Property Name="Timestamp" Type="DateTimeOffset" Nullable="false" Precision="7" />
           <Property Name="Size" Type="Int32" Nullable="false" />
           <NavigationProperty Name="MailBox" Relationship="Self.FK_MailMessage_0" FromRole="MailMessage" ToRole="MailBox" />
+          <Property Name="Deleted" Type="Boolean" Nullable="false" />
         </EntityType>
         <Association Name="FK_MailMessage_0">
           <End Role="MailBox" Type="Self.MailBox" Multiplicity="1" />
@@ -127,6 +129,7 @@
           <EntitySetMapping Name="MailMessages">
             <EntityTypeMapping TypeName="MSGorillaMailModel.MailMessage">
               <MappingFragment StoreEntitySet="MailMessage">
+                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="MailboxID" ColumnName="MailboxID" />
                 <ScalarProperty Name="Uid" ColumnName="Uid" />
