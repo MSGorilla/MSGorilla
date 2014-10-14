@@ -17,8 +17,8 @@ namespace MSGorilla.Library.Azure
         static DateTime CheckTimestamp = DateTime.Parse("2014-10-14 16:00:00");
 
         //static DateTime PartitionTimestamp = DateTime.Now;
-        CloudTable AzureTable { get; set; }
-        CloudTable WossTable { get; set; }
+        public CloudTable AzureTable { get; private set; }
+        public CloudTable WossTable { get; private set; }
 
         //Uncompleted
         public static bool Equal(DynamicTableEntity a, DynamicTableEntity b)

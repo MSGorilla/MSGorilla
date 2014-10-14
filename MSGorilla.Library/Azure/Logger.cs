@@ -40,7 +40,7 @@ namespace MSGorilla.Library.Azure
         static Logger()
         {
             var client = AzureFactory.AzureStorageAccount.CreateCloudTableClient();
-            exceptionTable = client.GetTableReference("awtableexceptions");
+            exceptionTable = client.GetTableReference("AWTableExceptions");
             exceptionTable.CreateIfNotExists();
         }
 
@@ -54,7 +54,7 @@ namespace MSGorilla.Library.Azure
             TableOperation insertOperation = TableOperation.InsertOrMerge(exception);
             exceptionTable.Execute(insertOperation);
 
-            Console.WriteLine(JsonConvert.SerializeObject(exception));
+            //Console.WriteLine(JsonConvert.SerializeObject(exception));
         }
     }
 }

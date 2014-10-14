@@ -55,7 +55,7 @@ namespace MSGorilla.StatusReporter
 
         public int GetUserPostMessageCountByDateUtc(string userid, DateTime date)
         {
-            CloudTable userline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Userline);
+            CloudTable userline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Userline).AzureTable;
 
             string query = TableQuery.GenerateFilterCondition(
                 "PartitionKey",
@@ -74,7 +74,7 @@ namespace MSGorilla.StatusReporter
             int count = 0;
             List<string> robitID = GetCurrentRobotID();
 
-            CloudTable userline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Userline);
+            CloudTable userline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Userline).AzureTable;
             foreach (string userid in robitID)
             {
                 try
