@@ -24,14 +24,14 @@ namespace MSGorilla.Library
     public class MessageManager
     {
         private const int DefaultTimelineQueryDayRange = 3;
-        private CloudTable _homeline;
-        private CloudTable _userline;
-        private CloudTable _eventline;
-        private CloudTable _ownerline;
-        private CloudTable _atline;
-        private CloudTable _publicSquareLine;
-        private CloudTable _topicline;
-        private CloudTable _reply;
+        private AWCloudTable _homeline;
+        private AWCloudTable _userline;
+        private AWCloudTable _eventline;
+        private AWCloudTable _ownerline;
+        private AWCloudTable _atline;
+        private AWCloudTable _publicSquareLine;
+        private AWCloudTable _topicline;
+        private AWCloudTable _reply;
 
         private CloudQueue _queue;
         private CloudQueue _spiderqueue;
@@ -451,7 +451,7 @@ namespace MSGorilla.Library
         {
             TableOperation retrieveOperation = RetrieveUserlineMsgByID<BaseMessageEntity>(messageID);
 
-            TableResult retrievedResult = _userline.Execute(retrieveOperation);
+            TableResult retrievedResult = _userline.ExecuteRetriveOperation(retrieveOperation);
             if (retrievedResult.Result != null)
             {
                 BaseMessageEntity entity = (BaseMessageEntity)retrievedResult.Result;
@@ -476,7 +476,7 @@ namespace MSGorilla.Library
         public Message GetMessage(string msgID)
         {
             TableOperation retreiveOperation = RetrieveUserlineMsgByID<UserLineEntity>(msgID);
-            TableResult retreiveResult = _userline.Execute(retreiveOperation);
+            TableResult retreiveResult = _userline.ExecuteRetriveOperation(retreiveOperation);
             UserLineEntity entity = ((UserLineEntity)retreiveResult.Result);
             if (entity == null)
             {

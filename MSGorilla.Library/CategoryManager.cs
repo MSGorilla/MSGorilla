@@ -16,7 +16,7 @@ namespace MSGorilla.Library
 {
     public class CategoryManager
     {
-        private CloudTable _categoryMsgTable = AzureFactory.GetTable(AzureFactory.MSGorillaTable.CategoryMessage);
+        private AWCloudTable _categoryMsgTable = AzureFactory.GetTable(AzureFactory.MSGorillaTable.CategoryMessage);
 
         public Category CreateCategory(string name, string groupID, string creater, string description = null)
         {
@@ -98,8 +98,8 @@ namespace MSGorilla.Library
         public CategoryMessage UpdateCategoryMessage(string[] eventIDs, string from, string to, Category category, DateTime timestamp)
         {
             CategoryMessage message = new CategoryMessage(eventIDs, from, to, category, timestamp);
-            TableOperation insertOper = TableOperation.InsertOrReplace((CategoryMessageEntity)message);
-            _categoryMsgTable.Execute(insertOper);
+            TableOperation insertOperation = TableOperation.InsertOrReplace((CategoryMessageEntity)message);
+            _categoryMsgTable.Execute(insertOperation);
             return message;
         }
 

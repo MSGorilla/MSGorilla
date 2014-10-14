@@ -80,5 +80,36 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
                 );
             return message;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == this)
+            {
+                return true;
+            }
+            if (! (obj is BaseMessageEntity))
+            {
+                return false;
+            }
+
+            BaseMessageEntity entity = obj as BaseMessageEntity;
+            return Equals(this.PartitionKey, entity.PartitionKey) &&
+                Equals(this.RowKey, entity.RowKey) &&
+                Equals(this.User, entity.User) &&
+                Equals(this.Group, entity.Group) &&
+                Equals(this.ID, entity.ID) &&
+                Equals(this.EventID, entity.EventID) &&
+                Equals(this.SchemaID, entity.SchemaID) &&
+                Equals(this.Owner, entity.Owner) &&
+                Equals(this.AtUser, entity.AtUser) &&
+                Equals(this.TopicName, entity.TopicName) &&
+                Equals(this.MessageContent, entity.MessageContent) &&
+                Equals(this.PostTime, entity.PostTime) &&
+                Equals(this.RichMessageID, entity.RichMessageID) &&
+                Equals(this.AttachmentID, entity.AttachmentID) &&
+                Equals(this.Content, entity.Content) &&
+                Equals(this.AttachmentID, entity.AttachmentID) &&
+                Equals(this.Importance, entity.Importance);
+        }
     }
 }

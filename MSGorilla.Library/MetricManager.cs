@@ -108,7 +108,7 @@ namespace MSGorilla.Library
 
     public class MetricManager
     {
-        private CloudTable _metricData;
+        private AWCloudTable _metricData;
 
         public MetricManager()
         {
@@ -249,7 +249,7 @@ namespace MSGorilla.Library
                 else
                 {
                     //retrive the last entity
-                    TableResult result = _metricData.Execute(
+                    TableResult result = _metricData.ExecuteRetriveOperation(
                         TableOperation.Retrieve<DynamicTableEntity>(
                             id.ToString(), 
                             ((data.RecordCount / MetricEntity.MaxMetricRecord) * MetricEntity.MaxMetricRecord).ToString(RowKeyFormat)
@@ -261,8 +261,8 @@ namespace MSGorilla.Library
 
                 //insert new data record
                 mentity.Put(key, value, DateTime.UtcNow);
-                TableOperation operation = TableOperation.InsertOrReplace(mentity.ToITableEntity());
-                _metricData.Execute(operation);
+                TableOperation insertOperation = TableOperation.InsertOrReplace(mentity.ToITableEntity());
+                _metricData.Execute(insertOperation);
 
                 data.RecordCount++;
                 _gorillaCtx.SaveChanges();
@@ -298,7 +298,7 @@ namespace MSGorilla.Library
                     ((endIndex / MetricEntity.MaxMetricRecord) * MetricEntity.MaxMetricRecord).ToString(RowKeyFormat))
                 );
 
-            TableQuery rangeQuery = new TableQuery().Where(query);
+            TableQuery<DynamicTableEntity> rangeQuery = new TableQuery<DynamicTableEntity>().Where(query);
             foreach (DynamicTableEntity entity in _metricData.ExecuteQuery(rangeQuery))
             {
                 MetricEntity mentity = new MetricEntity(entity);

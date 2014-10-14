@@ -8,6 +8,7 @@
     </Imports>
     <ConfigurationSettings>
       <Setting name="StorageConnectionString" />
+      <Setting name="WossStorageConnectionString" />
     </ConfigurationSettings>
     <Endpoints>
       <InputEndpoint name="Endpoint1" protocol="tcp" port="10100" />
@@ -30,6 +31,7 @@
     </Imports>
     <ConfigurationSettings>
       <Setting name="StorageConnectionString" />
+      <Setting name="WossStorageConnectionString" />
     </ConfigurationSettings>
     <Certificates>
       <Certificate name="Msgorilla" storeLocation="LocalMachine" storeName="My" />
@@ -45,6 +47,7 @@
     </Imports>
     <ConfigurationSettings>
       <Setting name="StorageConnectionString" />
+      <Setting name="WossStorageConnectionString" />
     </ConfigurationSettings>
   </WorkerRole>
   <WorkerRole name="MSGorilla.MailDispatcher" vmsize="Small">
@@ -54,6 +57,7 @@
     </Imports>
     <ConfigurationSettings>
       <Setting name="StorageConnectionString" />
+      <Setting name="WossStorageConnectionString" />
     </ConfigurationSettings>
   </WorkerRole>
   <WorkerRole name="MSGorilla.IMAPServerInstance" vmsize="Large">
@@ -63,6 +67,7 @@
     </Imports>
     <ConfigurationSettings>
       <Setting name="StorageConnectionString" />
+      <Setting name="WossStorageConnectionString" />
     </ConfigurationSettings>
     <Endpoints>
       <InputEndpoint name="smtp" protocol="tcp" port="25" localPort="25" />

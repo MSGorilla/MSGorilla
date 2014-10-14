@@ -30,5 +30,22 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             return new MessageIdentity(MessageUserId, MessageId);
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == this)
+            {
+                return true;
+            }
+            if (!(obj is SearchResultEntity))
+            {
+                return false;
+            }
+
+            SearchResultEntity entity = obj as SearchResultEntity;
+            return Equals(this.PartitionKey, entity.PartitionKey) &&
+                Equals(this.RowKey, entity.RowKey) &&
+                Equals(this.MessageId, entity.MessageId) &&
+                Equals(this.MessageUserId, entity.MessageUserId);
+        }
     }
 }

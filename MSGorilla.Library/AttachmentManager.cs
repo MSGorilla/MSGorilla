@@ -23,7 +23,7 @@ namespace MSGorilla.Library
 {
     public class AttachmentManager
     {
-        private CloudTable _attachment;
+        private AWCloudTable _attachment;
         private CloudBlobContainer _blobcontainer;
         private static string _policyName = "MySASPolicy";
 
@@ -131,7 +131,7 @@ namespace MSGorilla.Library
             string pk = split[0];
             string rk = split[1];
             TableOperation retrieveOperation = TableOperation.Retrieve<AttachmentEntity>(pk, rk);
-            TableResult retrievedResult = _attachment.Execute(retrieveOperation);
+            TableResult retrievedResult = _attachment.ExecuteRetriveOperation(retrieveOperation);
 
             if (retrievedResult.Result == null)
             {

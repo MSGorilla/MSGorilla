@@ -23,5 +23,24 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             StatisticalTime = DateTime.UtcNow;
             Count = count;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == this)
+            {
+                return true;
+            }
+            if (!(obj is StatisticsEntity))
+            {
+                return false;
+            }
+
+            StatisticsEntity entity = obj as StatisticsEntity;
+            return Equals(this.PartitionKey, entity.PartitionKey) &&
+                Equals(this.RowKey, entity.RowKey) &&
+                Equals(this.Category, entity.Category) &&
+                Equals(this.StatisticalTime, entity.StatisticalTime) &&
+                Equals(this.Count, entity.Count);
+        }
     }
 }

@@ -49,5 +49,26 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
         }
 
         public WordIndexEntity() { }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == this)
+            {
+                return true;
+            }
+            if (!(obj is WordIndexEntity))
+            {
+                return false;
+            }
+
+            WordIndexEntity entity = obj as WordIndexEntity;
+            return Equals(this.PartitionKey, entity.PartitionKey) &&
+                Equals(this.RowKey, entity.RowKey) &&
+                Equals(this.Word, entity.Word) &&
+                Equals(this.MessageUserId, entity.MessageUserId) &&
+                Equals(this.MessageId, entity.MessageId) &&
+                Equals(this.WordCount, entity.WordCount) &&
+                Equals(this.WordPositions, entity.WordPositions);
+        }
     }
 }

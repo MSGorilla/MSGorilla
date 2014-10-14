@@ -49,5 +49,29 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
 
             return entity;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (this == obj)
+            {
+                return true;
+            }
+            if (!(obj is CategoryMessageEntity))
+            {
+                return false;
+            }
+
+            CategoryMessageEntity entity = obj as CategoryMessageEntity;
+            return Equals(this.PartitionKey, entity.PartitionKey) &&
+                Equals(this.RowKey, entity.RowKey) &&
+                Equals(this.User, entity.User) &&
+                Equals(this.ID, entity.ID) &&
+                Equals(this.PostTime, entity.PostTime) &&
+                Equals(this.Group, entity.Group) &&
+                Equals(this.CategoryName, entity.CategoryName) &&
+                Equals(this.CategoryID, entity.CategoryID) &&
+                Equals(this.NotifyTo, entity.NotifyTo) &&
+                Equals(this.EventIDs, entity.EventIDs);
+        }
     }
 }

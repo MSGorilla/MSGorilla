@@ -23,10 +23,11 @@ namespace MSGorilla.Library
 {
     public class ReplyManager
     {
-        private CloudTable _reply;
-        private CloudTable _replyNotification;
-        private CloudTable _replyArchive;
-        private CloudTable _userline;
+        private AWCloudTable _reply;
+        private AWCloudTable _replyNotification;
+        private AWCloudTable _replyArchive;
+        private AWCloudTable _userline;
+
         private AccountManager _accManager;
         private NotifManager _notifManager;
         private RichMsgManager _richMsgManager;
@@ -173,9 +174,9 @@ namespace MSGorilla.Library
                 }
                 //notif user
                 ReplyNotificationEntifity notifEntity = new ReplyNotificationEntifity(userid, reply);
-                TableOperation insert = TableOperation.Insert(notifEntity);
-                _replyNotification.Execute(insert);
-                _replyArchive.Execute(insert);
+                insertOperation = TableOperation.Insert(notifEntity);
+                _replyNotification.Execute(insertOperation);
+                _replyArchive.Execute(insertOperation);
 
                 _notifManager.incrementReplyNotifCount(userid);
             }            

@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-using System.Configuration;
+
 
 namespace MSGorilla.Library.Azure
 {
@@ -49,20 +51,64 @@ namespace MSGorilla.Library.Azure
             Attachment
         }
 
-        private static CloudStorageAccount _storageAccount;
+        public static CloudStorageAccount AzureStorageAccount { get; private set; }
+        public static CloudStorageAccount WossStorageAccount { get; private set; }
+
         private static Dictionary<MSGorillaTable, string> _tableDict;
         private static Dictionary<MSGorillaQueue, string> _queueDict;
         private static Dictionary<MSGorillaBlobContainer, string> _containerDict;
+        private static Dictionary<MSGorillaTable, AWCloudTable> _tableCache;
+
+        public static string GetConnectionString(string key)
+        {
+            try
+            {
+                string connectionString = CloudConfigurationManager.GetSetting(key);
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    var settings = ConfigurationManager.ConnectionStrings[key];
+                    if (settings != null)
+                    {
+                        connectionString = settings.ConnectionString;
+                    }
+                }
+                return connectionString;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            
+        }
 
         static AzureFactory()
         {
             // init storage account
-            string connectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
-            if (string.IsNullOrEmpty(connectionString))
+            string connectionString = GetConnectionString("StorageConnectionString");
+            AzureStorageAccount = CloudStorageAccount.Parse(connectionString);
+            WossStorageAccount = null;
+
+            //check whether enable woss storage or not
+            connectionString = GetConnectionString("WossStorageConnectionString");
+            if (!string.IsNullOrEmpty(connectionString) &&
+                !connectionString.Equals("UseDevelopmentStorage=true", StringComparison.InvariantCultureIgnoreCase))
             {
-                connectionString = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
+                try
+                {
+                    WossStorageAccount = CloudStorageAccount.Parse(connectionString);
+                    if (WossStorageAccount.Equals(AzureStorageAccount))
+                    {
+                        WossStorageAccount = null;
+                    }
+                }
+                catch (Exception)
+                {
+                    Trace.TraceError("Fail to parse woss storage account string: " + connectionString);
+                    WossStorageAccount = null;
+                }                
             }
-            _storageAccount = CloudStorageAccount.Parse(connectionString);
+
+            _tableCache = new Dictionary<MSGorillaTable, AWCloudTable>();
 
             // init table dict
             _tableDict = new Dictionary<MSGorillaTable, string>();
@@ -96,17 +142,40 @@ namespace MSGorilla.Library.Azure
             _containerDict.Add(MSGorillaBlobContainer.Attachment, "attachment");
         }
 
-        public static CloudTable GetTable(MSGorillaTable table)
+        public static AWCloudTable GetTable(MSGorillaTable table)
         {
-            var client = _storageAccount.CreateCloudTableClient();
-            var aztable = client.GetTableReference(_tableDict[table]);
+            if (_tableCache.ContainsKey(table))
+            {
+                return _tableCache[table];
+            }
+
+            var client = AzureStorageAccount.CreateCloudTableClient();
+            CloudTable aztable = client.GetTableReference(_tableDict[table]);
             aztable.CreateIfNotExists();
-            return aztable;
+            CloudTable wosstable = null;
+
+            if (WossStorageAccount != null)
+            {
+                client = WossStorageAccount.CreateCloudTableClient();
+                wosstable = client.GetTableReference(_tableDict[table]);
+                try
+                {
+                    wosstable.Create();
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceError("Fail to create woss table: " + wosstable.Uri);
+                }
+            }
+
+            AWCloudTable awTable = new AWCloudTable(aztable, wosstable);
+            _tableCache[table] = awTable;
+            return awTable;
         }
 
         public static CloudQueue GetQueue(MSGorillaQueue queue)
         {
-            var client = _storageAccount.CreateCloudQueueClient();
+            var client = AzureStorageAccount.CreateCloudQueueClient();
             var azqueue = client.GetQueueReference(_queueDict[queue]);
             azqueue.CreateIfNotExists();
             return azqueue;
@@ -114,7 +183,7 @@ namespace MSGorilla.Library.Azure
 
         public static CloudBlobContainer GetBlobContainer(MSGorillaBlobContainer container)
         {
-            var client = _storageAccount.CreateCloudBlobClient();
+            var client = AzureStorageAccount.CreateCloudBlobClient();
             var azcontainer = client.GetContainerReference(_containerDict[container]);
             azcontainer.CreateIfNotExists();
             return azcontainer;

@@ -28,5 +28,25 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             this.PartitionKey = resultId;
             this.RowKey = resultId;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == this)
+            {
+                return true;
+            }
+            if (!(obj is SearchHistoryEntity))
+            {
+                return false;
+            }
+
+            SearchHistoryEntity entity = obj as SearchHistoryEntity;
+            return Equals(this.PartitionKey, entity.PartitionKey) &&
+                Equals(this.RowKey, entity.RowKey) &&
+                Equals(this.ResultId, entity.ResultId) &&
+                Equals(this.LastSearchDateUTC, entity.LastSearchDateUTC) &&
+                Equals(this.TakenTime, entity.TakenTime) &&
+                Equals(this.ResultsCount, entity.ResultsCount);
+        }
     }
 }
