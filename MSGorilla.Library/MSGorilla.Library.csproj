@@ -85,7 +85,9 @@
   <ItemGroup>
     <Compile Include="AccountManager.cs" />
     <Compile Include="AttachmentManager.cs" />
-    <Compile Include="Azure\AWCloudTable.cs" />
+    <Compile Include="Azure\AWCloudTable.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Azure\AWDataMismatchException.cs" />
     <Compile Include="Azure\AzureFactory.cs" />
     <Compile Include="Azure\Logger.cs" />
