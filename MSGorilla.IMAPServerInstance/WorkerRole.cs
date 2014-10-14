@@ -31,7 +31,7 @@ namespace MSGorilla.IMAPServerInstance
         {
             // Set the maximum number of concurrent connections 
             ServicePointManager.DefaultConnectionLimit = 10000;
-            IPAddress addr = Dns.Resolve(Dns.GetHostName()).AddressList[0];
+            IPAddress addr = IPAddress.Any;
             server = new IMAPServer.IMAPServer(addr, 143);
             smtpServer = new FakeSmtpServer(addr, 25);
 
