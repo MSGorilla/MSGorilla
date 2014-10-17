@@ -32,6 +32,7 @@
         <EntityTypeShape EntityType="MSGorillaModel.Category" Width="1.5" PointX="7.75" PointY="9.375" />
         <AssociationConnector Association="MSGorillaModel.FK_Category_0" />
         <AssociationConnector Association="MSGorillaModel.FK_Category_1" />
+        <EntityTypeShape EntityType="MSGorillaModel.AWException" Width="1.5" PointX="1.125" PointY="9.125" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

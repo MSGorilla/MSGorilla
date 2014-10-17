@@ -5,6 +5,23 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="MSGorillaModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="AWException">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Timestamp" Type="datetimeoffset" Precision="7" Nullable="false" />
+          <Property Name="Table" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Function" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="ExceptionType" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="ExceptionMsg" Type="nvarchar(max)" />
+          <Property Name="StackTrace" Type="nvarchar(max)" />
+          <Property Name="HttpStatusCode" Type="int" />
+          <Property Name="ServiceRequestID" Type="nvarchar" MaxLength="64" />
+          <Property Name="PartitionKey" Type="nvarchar" MaxLength="128" />
+          <Property Name="RowKey" Type="nvarchar" MaxLength="128" />
+          <Property Name="LastResultXml" Type="nvarchar(max)" />
+        </EntityType>
         <EntityType Name="Category">
           <Key>
             <PropertyRef Name="ID" />
@@ -328,6 +345,7 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="MSGorillaModelStoreContainer">
+          <EntitySet Name="AWException" EntityType="Self.AWException" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Chart_DataSet" EntityType="Self.Chart_DataSet" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FavouriteTopic" EntityType="Self.FavouriteTopic" Schema="dbo" store:Type="Tables" />
@@ -704,6 +722,7 @@
             <End Role="Group" EntitySet="Groups" />
             <End Role="Category" EntitySet="Categories" />
           </AssociationSet>
+          <EntitySet Name="AWExceptions" EntityType="MSGorillaModel.AWException" />
         </EntityContainer>
         <Association Name="FK_UserProfile_DefaultGroup">
           <End Type="MSGorillaModel.Group" Role="Group" Multiplicity="1" />
@@ -831,6 +850,23 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="AWException">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Timestamp" Type="DateTimeOffset" Nullable="false" Precision="7" />
+          <Property Name="Table" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Function" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="ExceptionType" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="ExceptionMsg" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="StackTrace" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="HttpStatusCode" Type="Int32" />
+          <Property Name="ServiceRequestID" Type="String" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Name="PartitionKey" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="RowKey" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="LastResultXml" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -967,6 +1003,24 @@
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="GroupID" ColumnName="GroupID" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AWExceptions">
+            <EntityTypeMapping TypeName="MSGorillaModel.AWException">
+              <MappingFragment StoreEntitySet="AWException">
+                <ScalarProperty Name="LastResultXml" ColumnName="LastResultXml" />
+                <ScalarProperty Name="RowKey" ColumnName="RowKey" />
+                <ScalarProperty Name="PartitionKey" ColumnName="PartitionKey" />
+                <ScalarProperty Name="ServiceRequestID" ColumnName="ServiceRequestID" />
+                <ScalarProperty Name="HttpStatusCode" ColumnName="HttpStatusCode" />
+                <ScalarProperty Name="StackTrace" ColumnName="StackTrace" />
+                <ScalarProperty Name="ExceptionMsg" ColumnName="ExceptionMsg" />
+                <ScalarProperty Name="ExceptionType" ColumnName="ExceptionType" />
+                <ScalarProperty Name="Function" ColumnName="Function" />
+                <ScalarProperty Name="Table" ColumnName="Table" />
+                <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>

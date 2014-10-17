@@ -15,7 +15,7 @@ namespace MSGorilla.Library
     public class RichMsgManager
     {
         private AWCloudTable _richMsg;
-        private static int _blockSize
+        public static int BlockSize
         {
             get { return 32 * 1024; }
         }
@@ -34,25 +34,25 @@ namespace MSGorilla.Library
             entity.Properties["RichMsgID"] = new EntityProperty(string.Format("{0};{1}", entity.PartitionKey, entity.RowKey));
 
             byte[] stringRawByte = System.Text.UTF8Encoding.UTF8.GetBytes(richMsg);
-            if (stringRawByte.Length > 31 * _blockSize)
+            if (stringRawByte.Length > 31 * BlockSize)
             {
                 throw new RichMessageTooLongException();
             }
             entity.Properties["RichMsgSize"] = new EntityProperty(stringRawByte.Length);
             
-            int blockCount = (stringRawByte.Length - 1)/_blockSize + 1;
+            int blockCount = (stringRawByte.Length - 1)/BlockSize + 1;
             for(int i = 0; i < blockCount; i++)
             {
                 int size = 0;
                 if(i == (blockCount - 1))
                 {
-                    size = stringRawByte.Length % _blockSize;
+                    size = stringRawByte.Length % BlockSize;
                 }
                 else{
-                    size = _blockSize;
+                    size = BlockSize;
                 }
                 byte[] temp = new byte[size];
-                Array.Copy(stringRawByte, _blockSize * i, temp, 0, size);
+                Array.Copy(stringRawByte, BlockSize * i, temp, 0, size);
                 entity.Properties["Block" + i] = new EntityProperty(temp);
             }
 
@@ -61,8 +61,6 @@ namespace MSGorilla.Library
 
         public string PostRichMessage(string userid, DateTime timestamp, string richMsg)
         {
-            //RichMessageEntity entity = new RichMessageEntity(userid, timestamp, richMsg);
-
             DynamicTableEntity richMsgEntity = CreateRichMessageEntity(userid, timestamp, richMsg);
             TableOperation insertOperation = TableOperation.InsertOrReplace(richMsgEntity);
             _richMsg.Execute(insertOperation);
@@ -99,20 +97,20 @@ namespace MSGorilla.Library
                 int size = entity.Properties["RichMsgSize"].Int32Value.Value;
                 byte[] stringRawByte = new byte[size];
 
-                int blockCount = (size - 1) / _blockSize + 1;
+                int blockCount = (size - 1) / BlockSize + 1;
                 for (int i = 0; i < blockCount; i++)
                 {
                     int blockSize = 0;
                     if (i == (blockCount - 1))
                     {
-                        blockSize = size % _blockSize;
+                        blockSize = size % BlockSize;
                     }
                     else
                     {
-                        blockSize = _blockSize;
+                        blockSize = BlockSize;
                     }
 
-                    Array.Copy(entity.Properties["Block" + i].BinaryValue, 0, stringRawByte, i * _blockSize, blockSize);
+                    Array.Copy(entity.Properties["Block" + i].BinaryValue, 0, stringRawByte, i * BlockSize, blockSize);
                 }
                 return System.Text.Encoding.UTF8.GetString(stringRawByte);
             }

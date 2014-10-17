@@ -14,7 +14,7 @@ namespace MSGorilla.Library.Azure
     public class AWCloudTable
     {
         //Timestamp when finish the feature, only check entities after the timestamp
-        static DateTime CheckTimestamp = DateTime.Parse("2014-10-14 16:00:00");
+        static DateTime CheckTimestamp = DateTime.Parse("2014-10-17T08:00:00Z");
 
         //static DateTime PartitionTimestamp = DateTime.Now;
         public CloudTable AzureTable { get; private set; }
@@ -164,16 +164,29 @@ namespace MSGorilla.Library.Azure
             TableRequestOptions requestOptions = null, 
             OperationContext operationContext = null)
         {
-            TableResult ret = this.AzureTable.Execute(operation, requestOptions, operationContext);
+            TableResult ret = null;
+            try
+            {
+                ret = this.AzureTable.Execute(operation, requestOptions, operationContext);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, DateTime.Now, this.AzureTable.StorageUri.ToString(), "Execute", operationContext);
+            }
+
+
             if (this.WossTable != null)
             {
+                OperationContext opContext = new OperationContext();
                 try
                 {
-                    this.WossTable.Execute(operation, requestOptions, operationContext);
+                    TableResult result = this.WossTable.Execute(operation, requestOptions, opContext);
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, DateTime.Now, this.WossTable.StorageUri.ToString(), "Execute");
+                    //opContext.LastResult.ServiceRequestID;
+                    //opContext
+                    Logger.Error(e, DateTime.Now, this.WossTable.StorageUri.ToString(), "Execute", opContext);
                 }
             }
             
@@ -190,14 +203,15 @@ namespace MSGorilla.Library.Azure
 
             if (ret.Result != null && this.WossTable != null)
             {
+                OperationContext opContext = new OperationContext();
                 try
                 {
-                    TableResult wossret = this.WossTable.Execute(operation, requestOptions, operationContext);
+                    TableResult wossret = this.WossTable.Execute(operation, requestOptions, opContext);
                     Check(ret.Result as ITableEntity, wossret.Result as ITableEntity);
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, DateTime.Now, this.WossTable.StorageUri.ToString(), "ExecuteRetriveOperation");
+                    Logger.Error(e, DateTime.Now, this.WossTable.StorageUri.ToString(), "ExecuteRetriveOperation", opContext);
                 }
             }
 
@@ -217,15 +231,16 @@ namespace MSGorilla.Library.Azure
             List<TElement> azureEntities = ret.ToList<TElement>();
             if (azureEntities.Count > 0 && this.WossTable != null)
             {
+                OperationContext opContext = new OperationContext();
                 try
                 {
-                    var wossret = this.WossTable.ExecuteQuerySegmented<TElement>(query, token, requestOptions, operationContext);
+                    var wossret = this.WossTable.ExecuteQuerySegmented<TElement>(query, token, requestOptions, opContext);
                     List<TElement> wossEntities = wossret.ToList<TElement>();
                     Check(azureEntities, wossEntities);
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, DateTime.Now, this.WossTable.StorageUri.ToString(), "ExecuteQuerySegmented<TElement>");
+                    Logger.Error(e, DateTime.Now, this.WossTable.StorageUri.ToString(), "ExecuteQuerySegmented<TElement>", opContext);
                 }
             }
 
@@ -244,15 +259,16 @@ namespace MSGorilla.Library.Azure
             List<TElement> azureEntities = ret.ToList<TElement>();
             if (azureEntities.Count > 0 && this.WossTable != null)
             {
+                OperationContext opContext = new OperationContext();
                 try
                 {
-                    var wossret = this.WossTable.ExecuteQuery<TElement>(query, requestOptions, operationContext);
+                    var wossret = this.WossTable.ExecuteQuery<TElement>(query, requestOptions, opContext);
                     List<TElement> wossEntities = wossret.ToList<TElement>();
                     Check(azureEntities, wossEntities);
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, DateTime.Now, this.WossTable.StorageUri.ToString(), "ExecuteQuery<TElement>");
+                    Logger.Error(e, DateTime.Now, this.WossTable.StorageUri.ToString(), "ExecuteQuery<TElement>", opContext);
                 }
             }
 

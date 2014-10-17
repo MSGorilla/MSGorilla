@@ -119,6 +119,9 @@
     <Compile Include="Models\Reply.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\MessageDetail.cs" />
+    <Compile Include="Models\SqlModels\AWException.cs">
+      <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\SqlModels\Category.cs">
       <DependentUpon>MSGorillaDbModel.tt</DependentUpon>
     </Compile>

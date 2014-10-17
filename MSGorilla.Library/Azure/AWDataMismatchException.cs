@@ -12,7 +12,7 @@ namespace MSGorilla.Library.Azure
 {
     public class AWDataMismatchException : Exception
     {
-        static string Serialize(ITableEntity entity)
+        public static string Serialize(ITableEntity entity)
         {
             if (entity == null)
             {
@@ -25,6 +25,9 @@ namespace MSGorilla.Library.Azure
 
             DynamicTableEntity dentity = entity as DynamicTableEntity;
             StringBuilder sb = new StringBuilder("{");
+            sb.Append(string.Format("\"PartitionKey\": \"{0}\",", entity.PartitionKey));
+            sb.Append(string.Format("\"RowKey\": \"{0}\",", entity.RowKey));
+            sb.Append(string.Format("\"Timestamp\": \"{0:u}\",", entity.Timestamp));
 
             foreach (var pair in dentity.Properties)
             {
