@@ -13,10 +13,6 @@ namespace MSGorilla.Library.Azure
 {
     public class AWCloudTable
     {
-        //Timestamp when finish the feature, only check entities after the timestamp
-        static DateTime CheckTimestamp = DateTime.Parse("2014-10-17T08:00:00Z");
-
-        //static DateTime PartitionTimestamp = DateTime.Now;
         public CloudTable AzureTable { get; private set; }
         public CloudTable WossTable { get; private set; }
 
@@ -105,10 +101,6 @@ namespace MSGorilla.Library.Azure
             {
                 return;
             }
-            if (azureEntity.Timestamp < CheckTimestamp)
-            {
-                return;
-            }
             if (!Equal(azureEntity, wossEntity))
             {
                 throw new AWDataMismatchException(azureEntity, wossEntity);
@@ -127,10 +119,7 @@ namespace MSGorilla.Library.Azure
                 azure = new List<ITableEntity>();
                 foreach (var entity in azureEntities)
                 {
-                    if (entity.Timestamp >= CheckTimestamp)
-                    {
-                        azure.Add(entity);
-                    }
+                    azure.Add(entity);
                 }
             }
             if (wossEntities != null)
@@ -138,10 +127,7 @@ namespace MSGorilla.Library.Azure
                 woss = new List<ITableEntity>();
                 foreach (var entity in wossEntities)
                 {
-                    if (entity.Timestamp >= CheckTimestamp)
-                    {
-                        azure.Add(entity);
-                    }
+                    woss.Add(entity);
                 }
             }
             if (!Equal(azure, woss))

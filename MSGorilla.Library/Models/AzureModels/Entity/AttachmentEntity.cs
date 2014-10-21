@@ -52,5 +52,26 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             attachment.Filesize = this.Filesize;
             return attachment;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == this)
+            {
+                return true;
+            }
+            if (obj == null || !(obj is AttachmentEntity))
+            {
+                return false;
+            }
+
+            AttachmentEntity attachment = obj as AttachmentEntity;
+            return Equals(this.AttachmentID, attachment.AttachmentID) &&
+                Equals(this.FileID, attachment.FileID) &&
+                Equals(this.Uploader, attachment.Uploader) &&
+                Equals(this.UploadTimestamp, attachment.UploadTimestamp) &&
+                Equals(this.Filename, attachment.Filename) &&
+                Equals(this.Filetype, attachment.Filetype) &&
+                Equals(this.Filesize, attachment.Filesize);
+        }
     }
 }

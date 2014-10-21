@@ -85,7 +85,7 @@ namespace MSGorilla.Library.Azure
 
         static string ErrorMessage(List<ITableEntity> azureEntities, List<ITableEntity> wossEntities)
         {
-            StringBuilder sb = new StringBuilder("Entity query resukt mismatch between azure and woss table:\r\n");
+            StringBuilder sb = new StringBuilder("Entity query result mismatch between azure and woss table:\r\n");
             if (azureEntities == null || azureEntities.Count == 0)
             {
                 sb.Append("Count of Azure entity is 0\r\n");

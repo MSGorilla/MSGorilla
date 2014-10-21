@@ -57,6 +57,10 @@ namespace MSGorilla.OutlookAddin
             richMessage = richMessage.Replace("\\r", "");
             richMessage = richMessage.Replace("\\n", "");
             richMessage = richMessage.Replace("\\'", "'");
+            richMessage = richMessage.Replace(
+                "/api/attachment/Download?attachmentID=",
+                "https://msgorilla.cloudapp.net/api/attachment/Download?attachmentID="
+                );
 
             return richMessage;
         }

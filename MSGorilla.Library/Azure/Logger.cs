@@ -53,7 +53,7 @@ namespace MSGorilla.Library.Azure
         //private static AccountManager _accManager;
         //private static TopicManager _topicManager;
 
-        private static System.IO.StreamWriter file = new System.IO.StreamWriter("c:\\msgorilla.log.txt");
+        private static System.IO.StreamWriter file;
 
         static Logger()
         {
@@ -66,6 +66,14 @@ namespace MSGorilla.Library.Azure
             //_homeline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Homeline).AzureTable;
             //_publicline = AzureFactory.GetTable(AzureFactory.MSGorillaTable.PublicSquareLine).AzureTable;
             //_accManager = new AccountManager();
+            try
+            {
+                file = new System.IO.StreamWriter("msgorilla.log.txt");
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         public static void Error(Exception e, 
@@ -113,9 +121,11 @@ namespace MSGorilla.Library.Azure
         private static void LogError(Object exception)
         {
             AWException excep = exception as AWException;
-            file.WriteLine(JsonConvert.SerializeObject(excep));
-            file.Flush();
-
+            if (file != null)
+            {
+                file.WriteLine(JsonConvert.SerializeObject(excep));
+                file.Flush();
+            }
 
             using (var ctx = new MSGorillaEntities())
             {

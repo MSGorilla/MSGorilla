@@ -13,7 +13,6 @@ using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Blob;
 
 
-
 namespace MSGorilla.Library.Azure
 {
     public static class AzureFactory
@@ -74,8 +73,9 @@ namespace MSGorilla.Library.Azure
                 }
                 return connectionString;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger.Error(e, DateTime.Now, "Initial", "GetConnectionString");
                 return null;
             }
             
@@ -164,7 +164,10 @@ namespace MSGorilla.Library.Azure
                 }
                 catch (Exception e)
                 {
-                    Trace.TraceError("Fail to create woss table: " + wosstable.Uri);
+                    if (!(e is StorageException && e.InnerException != null && e.InnerException.Message.Equals("The remote server returned an error: (409) Conflict.")))
+                    {
+                        Logger.Error(e, DateTime.Now, wosstable.Uri.ToString(), "CreateTable");
+                    }                        
                 }
             }
 

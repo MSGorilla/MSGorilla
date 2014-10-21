@@ -23,7 +23,6 @@ namespace MSGorilla.IMAPServerInstance
             Trace.TraceInformation("MSGorilla.IMAPServerInstance entry point called");
 
             new Thread(new ThreadStart(smtpServer.Start)).Start();
-
             server.Start();
         }
 

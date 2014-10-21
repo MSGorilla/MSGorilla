@@ -46,7 +46,7 @@ namespace MSGorilla.IMAPServer.Response
 
         public FetchDataItemType Type;
         public string Text;
-        public string ToString()
+        public override string ToString()
         {
             return string.Format("{0} {1}", FetchDataItemType2String(this.Type), this.Text);
         }
