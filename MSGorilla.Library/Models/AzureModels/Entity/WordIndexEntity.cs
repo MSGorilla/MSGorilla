@@ -28,7 +28,8 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             ///MessageSnapshot = GenarateMessageSnapshot(word, posList, msgWords);
 
             DateTime createdDate = DateTime.UtcNow;
-            this.PartitionKey = string.Format("{0}_{1}", Word,
+            this.PartitionKey = string.Format("{0}_{1}", 
+                Word.Length <= 350 ? Word : Word.Substring(0, 350),
                 Utils.ToAzureStorageDayBasedString(createdDate));
             this.RowKey = Utils.ToAzureStorageSecondBasedString(createdDate) + "_" + MessageId;
         }
