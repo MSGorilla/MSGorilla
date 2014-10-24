@@ -14,7 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using MSGorilla.WebAPI.Client;
-using MSGorilla.Library.Models.ViewModels;
+using MSGorilla.WebAPI.Models.ViewModels;
 
 namespace MSGorilla.OutlookAddin.GUI
 {

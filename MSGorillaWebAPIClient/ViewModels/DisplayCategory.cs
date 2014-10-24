@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MSGorilla.Library.Models.ViewModels
+namespace MSGorilla.WebAPI.Models.ViewModels
 {
     public partial class DisplayCategory
     {

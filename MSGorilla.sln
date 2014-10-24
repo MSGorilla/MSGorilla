@@ -35,8 +35,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.Spider", "MSGoril
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.SearchTest", "MSGorilla.SearchTest\MSGorilla.SearchTest.csproj", "{62B2758F-4100-46F2-A669-7B9D056C64DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.Library.Model", "MSGorilla.Library.Model\MSGorilla.Library.Model.csproj", "{75DB99E9-D282-48EA-8FF0-3EE45D8ACD5E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.OutlookAddin", "MSGorilla.OutlookAddin\MSGorilla.OutlookAddin.csproj", "{D396C186-583B-4B70-ADC5-D8840537034B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.MailStore", "MSGorilla.MailStore\MSGorilla.MailStore.csproj", "{FE3DE28D-333C-4663-BD5A-4A4236A1999D}"
@@ -46,6 +44,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.MailDispatcher", "MSGorilla.MailDispatcher\MSGorilla.MailDispatcher.csproj", "{40C65C59-DF53-4F93-A2C0-9ABAD588DA0E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.IMAPServerInstance", "MSGorilla.IMAPServerInstance\MSGorilla.IMAPServerInstance.csproj", "{D1724637-7CB7-4332-9C86-A4CBEA6277FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WossTableMonitor", "Robots\WossTableMonitor\WossTableMonitor.csproj", "{841ACB03-24F7-4FC7-AD97-DB011DC9EC41}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -187,16 +187,6 @@ Global
 		{62B2758F-4100-46F2-A669-7B9D056C64DF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{62B2758F-4100-46F2-A669-7B9D056C64DF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{62B2758F-4100-46F2-A669-7B9D056C64DF}.Release|Win32.ActiveCfg = Release|Any CPU
-		{75DB99E9-D282-48EA-8FF0-3EE45D8ACD5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{75DB99E9-D282-48EA-8FF0-3EE45D8ACD5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{75DB99E9-D282-48EA-8FF0-3EE45D8ACD5E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{75DB99E9-D282-48EA-8FF0-3EE45D8ACD5E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{75DB99E9-D282-48EA-8FF0-3EE45D8ACD5E}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{75DB99E9-D282-48EA-8FF0-3EE45D8ACD5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{75DB99E9-D282-48EA-8FF0-3EE45D8ACD5E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{75DB99E9-D282-48EA-8FF0-3EE45D8ACD5E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{75DB99E9-D282-48EA-8FF0-3EE45D8ACD5E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{75DB99E9-D282-48EA-8FF0-3EE45D8ACD5E}.Release|Win32.ActiveCfg = Release|Any CPU
 		{D396C186-583B-4B70-ADC5-D8840537034B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D396C186-583B-4B70-ADC5-D8840537034B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D396C186-583B-4B70-ADC5-D8840537034B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -247,6 +237,16 @@ Global
 		{D1724637-7CB7-4332-9C86-A4CBEA6277FF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{D1724637-7CB7-4332-9C86-A4CBEA6277FF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{D1724637-7CB7-4332-9C86-A4CBEA6277FF}.Release|Win32.ActiveCfg = Release|Any CPU
+		{841ACB03-24F7-4FC7-AD97-DB011DC9EC41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{841ACB03-24F7-4FC7-AD97-DB011DC9EC41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{841ACB03-24F7-4FC7-AD97-DB011DC9EC41}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{841ACB03-24F7-4FC7-AD97-DB011DC9EC41}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{841ACB03-24F7-4FC7-AD97-DB011DC9EC41}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{841ACB03-24F7-4FC7-AD97-DB011DC9EC41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{841ACB03-24F7-4FC7-AD97-DB011DC9EC41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{841ACB03-24F7-4FC7-AD97-DB011DC9EC41}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{841ACB03-24F7-4FC7-AD97-DB011DC9EC41}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{841ACB03-24F7-4FC7-AD97-DB011DC9EC41}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -260,9 +260,9 @@ Global
 		{1C1B176A-EA93-4840-B658-9B1B8FB0C483} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
 		{CD53861C-C74A-48B6-8349-63314CFC26B1} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
 		{E6E93222-7D5F-422F-8DFE-D0FDBA190AE8} = {94440E61-6FD0-4124-AE55-02DE73EF2613}
-		{75DB99E9-D282-48EA-8FF0-3EE45D8ACD5E} = {94440E61-6FD0-4124-AE55-02DE73EF2613}
 		{D396C186-583B-4B70-ADC5-D8840537034B} = {91E68305-6459-4BB4-87D0-4E5A42ACDFED}
 		{FE3DE28D-333C-4663-BD5A-4A4236A1999D} = {91E68305-6459-4BB4-87D0-4E5A42ACDFED}
 		{8A67D357-F1AB-4273-9A97-EDF8E0EE6639} = {91E68305-6459-4BB4-87D0-4E5A42ACDFED}
+		{841ACB03-24F7-4FC7-AD97-DB011DC9EC41} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
 	EndGlobalSection
 EndGlobal

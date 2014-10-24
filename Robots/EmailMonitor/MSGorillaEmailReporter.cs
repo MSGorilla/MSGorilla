@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using MSGorilla.WebAPI.Client;
 using Microsoft.Exchange.WebServices.Data;
 using MSGorilla.EmailMonitor.Sql;
-//using MSGorilla.Library.Models.ViewModels;
+//using MSGorilla.WebAPI.Models.ViewModels;
 using Newtonsoft.Json;
 using mshtml;
 
@@ -62,11 +62,11 @@ namespace MSGorilla.EmailMonitor
             }
         }
 
-        public MSGorilla.Library.Models.ViewModels.Attachment UploadAttachment2MSGorilla(FileAttachment attachment)
+        public MSGorilla.WebAPI.Models.ViewModels.Attachment UploadAttachment2MSGorilla(FileAttachment attachment)
         {
             string filename = attachment.Name;
             attachment.Load(filename);
-            MSGorilla.Library.Models.ViewModels.Attachment att = _client.UploadAttachment(filename);
+            MSGorilla.WebAPI.Models.ViewModels.Attachment att = _client.UploadAttachment(filename);
             System.IO.File.Delete(filename);
             return att;
         }
@@ -74,7 +74,7 @@ namespace MSGorilla.EmailMonitor
         public string UploadAttachment(string html, EmailMessage email)
         {
             string body = email.Body;
-            List<MSGorilla.Library.Models.ViewModels.Attachment> fileAtts = new List<Library.Models.ViewModels.Attachment>();
+            List<MSGorilla.WebAPI.Models.ViewModels.Attachment> fileAtts = new List<MSGorilla.WebAPI.Models.ViewModels.Attachment>();
 
             foreach (Attachment attachment in email.Attachments)
             {
@@ -84,13 +84,13 @@ namespace MSGorilla.EmailMonitor
                     if (string.IsNullOrEmpty(fileAttachment.ContentId))
                     {
                         //real attachment
-                        MSGorilla.Library.Models.ViewModels.Attachment att = UploadAttachment2MSGorilla(fileAttachment);
+                        MSGorilla.WebAPI.Models.ViewModels.Attachment att = UploadAttachment2MSGorilla(fileAttachment);
                         fileAtts.Add(att);
                     }
                     else if (html.Contains(fileAttachment.ContentId))
                     {
                         //Figure attachment in mail body
-                        MSGorilla.Library.Models.ViewModels.Attachment att = UploadAttachment2MSGorilla(fileAttachment);
+                        MSGorilla.WebAPI.Models.ViewModels.Attachment att = UploadAttachment2MSGorilla(fileAttachment);
                         html = html.Replace("cid:" + fileAttachment.ContentId, 
                             "/api/attachment/Download?attachmentID=" + att.AttachmentID);
                     }
@@ -108,11 +108,11 @@ namespace MSGorilla.EmailMonitor
             return html;
         }
 
-        public static string CreateAttachmentTag(List<MSGorilla.Library.Models.ViewModels.Attachment> fileAtts)
+        public static string CreateAttachmentTag(List<MSGorilla.WebAPI.Models.ViewModels.Attachment> fileAtts)
         {
             string attachmentTemplate = "<a href=\"/api/attachment/Download?attachmentID={0}\">{1}({2})</a>";
             StringBuilder attachments = new StringBuilder("");
-            foreach (MSGorilla.Library.Models.ViewModels.Attachment attach in fileAtts)
+            foreach (MSGorilla.WebAPI.Models.ViewModels.Attachment attach in fileAtts)
             {
                 attachments.Append(string.Format(attachmentTemplate, 
                     attach.AttachmentID, 
@@ -232,7 +232,7 @@ namespace MSGorilla.EmailMonitor
             htmlBody = CreateMailRichMessage(htmlBody, email);
 
             string result = _client.PostMessage("none", null, "none", email.ConversationId, null, null, null, htmlBody, null);
-            MSGorilla.Library.Models.ViewModels.DisplayMessage displayMessage = JsonConvert.DeserializeObject<MSGorilla.Library.Models.ViewModels.DisplayMessage>(result);
+            MSGorilla.WebAPI.Models.ViewModels.DisplayMessage displayMessage = JsonConvert.DeserializeObject<MSGorilla.WebAPI.Models.ViewModels.DisplayMessage>(result);
 
             Sql.Conversation conv = new Sql.Conversation();
             conv.ConversationID = email.ConversationId;

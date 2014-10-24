@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MSGorilla.Library.Models;
 
-namespace MSGorilla.Library.Models.ViewModels
+namespace MSGorilla.WebAPI.Models.ViewModels
 {
     public partial class DisplayMessagePagination
     {

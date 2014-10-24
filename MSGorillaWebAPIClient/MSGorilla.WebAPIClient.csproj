@@ -49,12 +49,24 @@
     </Compile>
     <Compile Include="MSGorillaException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MSGorilla.Library.Model\MSGorilla.Library.Model.csproj">
-      <Project>{75db99e9-d282-48ea-8ff0-3ee45d8acd5e}</Project>
-      <Name>MSGorilla.Library.Model</Name>
-    </ProjectReference>
+    <Compile Include="ViewModels\Attachment.cs" />
+    <Compile Include="ViewModels\DisplayCategory.cs" />
+    <Compile Include="ViewModels\DisplayCategoryMessage.cs" />
+    <Compile Include="ViewModels\DisplayChartDataSet.cs" />
+    <Compile Include="ViewModels\DisplayFavouriteTopic.cs" />
+    <Compile Include="ViewModels\DisplayGroup.cs" />
+    <Compile Include="ViewModels\DisplayMembership.cs" />
+    <Compile Include="ViewModels\DisplayMetricChart.cs" />
+    <Compile Include="ViewModels\DisplayMetricDataSet.cs" />
+    <Compile Include="ViewModels\DisplayNotificationCount.cs" />
+    <Compile Include="ViewModels\DisplayTopic.cs" />
+    <Compile Include="ViewModels\DisplayUserProfile.cs" />
+    <Compile Include="ViewModels\MembershipView.cs" />
+    <Compile Include="ViewModels\Message.cs" />
+    <Compile Include="ViewModels\MessageModels.cs" />
+    <Compile Include="ViewModels\NotificationCount.cs" />
+    <Compile Include="ViewModels\ReplyModels.cs" />
+    <Compile Include="ViewModels\SimpleUserProfile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

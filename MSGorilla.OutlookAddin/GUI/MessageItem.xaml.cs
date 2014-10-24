@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
-using MSGorilla.Library.Models.ViewModels;
+using MSGorilla.WebAPI.Models.ViewModels;
 using MSGorilla.OutlookAddin;
 
 

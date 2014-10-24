@@ -8,7 +8,7 @@ using System.IO;
 using System.Runtime.Serialization;
 
 
-namespace MSGorilla.Library.Models
+namespace MSGorilla.WebAPI.Models.ViewModels
 {
     public class Message
     {

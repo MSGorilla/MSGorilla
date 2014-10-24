@@ -1,5 +1,4 @@
-﻿using MSGorilla.Library.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-using MSGorilla.Library.Models.ViewModels;
+using MSGorilla.WebAPI.Models.ViewModels;
 
 namespace MSGorilla.WebAPI.Client
 {

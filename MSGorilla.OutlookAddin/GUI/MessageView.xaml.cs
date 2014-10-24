@@ -15,7 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using System.Collections.ObjectModel;
-using MSGorilla.Library.Models.ViewModels;
+using MSGorilla.WebAPI.Models.ViewModels;
 using MSGorilla.WebAPI.Client;
 using System.Globalization;
 using System.Diagnostics;

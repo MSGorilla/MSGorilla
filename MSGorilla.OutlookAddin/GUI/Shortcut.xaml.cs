@@ -15,8 +15,8 @@ using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Threading;
 
-using MSGorilla.Library.Models;
-using MSGorilla.Library.Models.ViewModels;
+using MSGorilla.WebAPI.Models;
+using MSGorilla.WebAPI.Models.ViewModels;
 using MSGorilla.WebAPI.Client;
 
 namespace MSGorilla.OutlookAddin.GUI

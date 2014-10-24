@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MSGorilla.Library.Models.ViewModels
+namespace MSGorilla.WebAPI.Models.ViewModels
 {
     public partial class NotificationCount
     {

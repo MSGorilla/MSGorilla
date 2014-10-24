@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
 
-namespace MSGorilla.Library.Models.ViewModels
+namespace MSGorilla.WebAPI.Models.ViewModels
 {
     public partial class DisplayUserProfile
     {

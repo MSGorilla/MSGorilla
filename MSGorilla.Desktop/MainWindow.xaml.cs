@@ -16,7 +16,7 @@ using System.Threading;
 using System.Diagnostics;
 
 using MSGorilla.WebAPI.Client;
-using MSGorilla.Library.Models.SqlModels;
+using MSGorilla.WebAPI.Models.ViewModels;
 
 namespace MSGorilla.Desktop
 {
@@ -290,7 +290,7 @@ namespace MSGorilla.Desktop
 
         public GorillaStatusHelper(string userid)
         {
-            _client = new GorillaWebAPI("ShareAccount", "********");
+            _client = new GorillaWebAPI("ShareAccount", "!QAZxsw2#EDCvfr4");
             this.Userid = userid;
         }
 
