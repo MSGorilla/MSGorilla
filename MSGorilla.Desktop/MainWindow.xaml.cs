@@ -290,7 +290,7 @@ namespace MSGorilla.Desktop
 
         public GorillaStatusHelper(string userid)
         {
-            _client = new GorillaWebAPI("ShareAccount", "!QAZxsw2#EDCvfr4");
+            _client = new GorillaWebAPI("ShareAccount", "********");
             this.Userid = userid;
         }
 
