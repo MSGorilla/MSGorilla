@@ -151,19 +151,21 @@ namespace MSGorilla.Library.Azure
             OperationContext operationContext = null)
         {
             TableResult ret = null;
+            DateTimeOffset startTime = DateTimeOffset.UtcNow;
             try
             {
                 ret = this.AzureTable.Execute(operation, requestOptions, operationContext);
             }
             catch (Exception e)
             {
-                Logger.Error(e, DateTime.Now, this.AzureTable.StorageUri.ToString(), "Execute", operationContext);
+                Logger.Error(e, startTime, DateTime.Now, this.AzureTable.StorageUri.ToString(), "Execute", operationContext);
             }
 
 
             if (this.WossTable != null)
             {
                 OperationContext opContext = new OperationContext();
+                startTime = DateTimeOffset.UtcNow;
                 try
                 {
                     TableResult result = this.WossTable.Execute(operation, requestOptions, opContext);
@@ -172,7 +174,7 @@ namespace MSGorilla.Library.Azure
                 {
                     //opContext.LastResult.ServiceRequestID;
                     //opContext
-                    Logger.Error(e, DateTime.Now, this.WossTable.StorageUri.ToString(), "Execute", opContext);
+                    Logger.Error(e, startTime, DateTime.Now, this.WossTable.StorageUri.ToString(), "Execute", opContext);
                 }
             }
             
@@ -190,6 +192,7 @@ namespace MSGorilla.Library.Azure
             if (ret.Result != null && this.WossTable != null)
             {
                 OperationContext opContext = new OperationContext();
+                DateTimeOffset startTime = DateTimeOffset.UtcNow;
                 try
                 {
                     TableResult wossret = this.WossTable.Execute(operation, requestOptions, opContext);
@@ -197,7 +200,7 @@ namespace MSGorilla.Library.Azure
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, DateTime.Now, this.WossTable.StorageUri.ToString(), "ExecuteRetriveOperation", opContext);
+                    Logger.Error(e, startTime, DateTime.Now, this.WossTable.StorageUri.ToString(), "ExecuteRetriveOperation", opContext);
                 }
             }
 
@@ -218,6 +221,7 @@ namespace MSGorilla.Library.Azure
             if (azureEntities.Count > 0 && this.WossTable != null)
             {
                 OperationContext opContext = new OperationContext();
+                DateTimeOffset startTime = DateTimeOffset.UtcNow;
                 try
                 {
                     var wossret = this.WossTable.ExecuteQuerySegmented<TElement>(query, token, requestOptions, opContext);
@@ -226,7 +230,7 @@ namespace MSGorilla.Library.Azure
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, DateTime.Now, this.WossTable.StorageUri.ToString(), "ExecuteQuerySegmented<TElement>", opContext);
+                    Logger.Error(e, startTime, DateTime.Now, this.WossTable.StorageUri.ToString(), "ExecuteQuerySegmented<TElement>", opContext);
                 }
             }
 
@@ -246,6 +250,7 @@ namespace MSGorilla.Library.Azure
             if (azureEntities.Count > 0 && this.WossTable != null)
             {
                 OperationContext opContext = new OperationContext();
+                DateTimeOffset startTime = DateTimeOffset.UtcNow;
                 try
                 {
                     var wossret = this.WossTable.ExecuteQuery<TElement>(query, requestOptions, opContext);
@@ -254,7 +259,7 @@ namespace MSGorilla.Library.Azure
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, DateTime.Now, this.WossTable.StorageUri.ToString(), "ExecuteQuery<TElement>", opContext);
+                    Logger.Error(e, startTime, DateTime.Now, this.WossTable.StorageUri.ToString(), "ExecuteQuery<TElement>", opContext);
                 }
             }
 

@@ -75,7 +75,7 @@ namespace MSGorilla.Library.Azure
             }
             catch (Exception e)
             {
-                Logger.Error(e, DateTime.Now, "Initial", "GetConnectionString");
+                Logger.Error(e, DateTimeOffset.UtcNow, DateTime.Now, "Initial", "GetConnectionString");
                 return null;
             }
             
@@ -158,6 +158,7 @@ namespace MSGorilla.Library.Azure
             {
                 client = WossStorageAccount.CreateCloudTableClient();
                 wosstable = client.GetTableReference(_tableDict[table]);
+                DateTimeOffset startTime = DateTimeOffset.UtcNow;
                 try
                 {
                     wosstable.Create();
@@ -166,7 +167,7 @@ namespace MSGorilla.Library.Azure
                 {
                     if (!(e is StorageException && e.InnerException != null && e.InnerException.Message.Equals("The remote server returned an error: (409) Conflict.")))
                     {
-                        Logger.Error(e, DateTime.Now, wosstable.Uri.ToString(), "CreateTable");
+                        Logger.Error(e, startTime, DateTime.Now, wosstable.Uri.ToString(), "CreateTable");
                     }                        
                 }
             }

@@ -77,8 +77,8 @@ namespace MSGorilla.Library.Azure
             }
             else
             {
-                sb.Append("Azure entity is " + wossEntity.GetType() + ":\r\n");
-                sb.Append(Serialize(azureEntity));
+                sb.Append("Woss entity is " + wossEntity.GetType() + ":\r\n");
+                sb.Append(Serialize(wossEntity));
             }
             return sb.ToString();
         }
