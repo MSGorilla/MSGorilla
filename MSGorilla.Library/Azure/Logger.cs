@@ -36,6 +36,18 @@ namespace MSGorilla.Library.Azure
             }
         }
 
+        public static string RequestResult2XMLString(RequestResult reqResult)
+        {
+            using (TextWriter writer = new StringWriter())
+            {
+                using (XmlWriter xmlWriter = XmlWriter.Create(writer))
+                {
+                    reqResult.WriteXml(xmlWriter);
+                }
+                return writer.ToString();
+            }
+        }
+
         public static void Error(Exception e, 
             DateTimeOffset requestStartTime,
             DateTime timestamp, 
@@ -67,15 +79,19 @@ namespace MSGorilla.Library.Azure
             {
                 exception.HttpStatusCode = opCtx.LastResult.HttpStatusCode;
                 exception.ServiceRequestID = opCtx.LastResult.ServiceRequestID;
+                exception.LastResultXml = RequestResult2XMLString(opCtx.LastResult);
+            }
 
-                using (TextWriter writer = new StringWriter())
+            if (opCtx.RequestResults != null && opCtx.RequestResults.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (var reqResult in opCtx.RequestResults)
                 {
-                    using (XmlWriter xmlWriter = XmlWriter.Create(writer))
-                    {
-                        opCtx.LastResult.WriteXml(xmlWriter);
-                    }
-                    exception.LastResultXml = writer.ToString();
+                    sb.Append(RequestResult2XMLString(reqResult));
+                    sb.Append("\r\n==============================\r\n");
                 }
+
+                exception.RequestResults = sb.ToString();
             }
 
             //Create a new thread to insert log and publish event message

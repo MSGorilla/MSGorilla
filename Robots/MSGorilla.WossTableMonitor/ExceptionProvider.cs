@@ -12,6 +12,7 @@ namespace MSGorilla.WossTableMonitor
     {
         public enum FunctionName{
             Execute,
+            ExecuteQuery,
             ExecuteQuerySegmented,
             ExecuteRetriveOperation
         }
@@ -19,7 +20,7 @@ namespace MSGorilla.WossTableMonitor
         public static int GetExceptionCount(FunctionName func)
         {
             string funcName = func.ToString();
-            if (funcName.Equals("ExecuteQuerySegmented"))
+            if (func == FunctionName.ExecuteQuery || func == FunctionName.ExecuteQuerySegmented)
             {
                 funcName += "<TElement>";
             }

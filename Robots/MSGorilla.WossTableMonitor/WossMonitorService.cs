@@ -25,6 +25,7 @@ namespace MSGorilla.WossTableMonitor
         private DisplayMetricDataSet execDataset;
         private DisplayMetricDataSet retriveDataset;
         private DisplayMetricDataSet queryDataset;
+        private DisplayMetricDataSet querySegmentedDataset;
 
         private static System.Timers.Timer serviceTimer = null;
         public WossMonitorService()
@@ -56,6 +57,11 @@ namespace MSGorilla.WossTableMonitor
                 Category,
                 GroupID);
             queryDataset = client.QueryMetricDataSet(
+                ExceptionProvider.FunctionName.ExecuteQuery.ToString(),
+                Counter,
+                Category,
+                GroupID);
+            querySegmentedDataset = client.QueryMetricDataSet(
                 ExceptionProvider.FunctionName.ExecuteQuerySegmented.ToString(),
                 Counter,
                 Category,
@@ -81,8 +87,12 @@ namespace MSGorilla.WossTableMonitor
                 Logger.Info(string.Format("{0} exceptions recorded in Function: {1}", count, ExceptionProvider.FunctionName.ExecuteRetriveOperation));
 
                 count = ExceptionProvider.GetExceptionCount(ExceptionProvider.FunctionName.ExecuteQuerySegmented);
-                client.InsertMetricRecord(queryDataset, key, count);
+                client.InsertMetricRecord(querySegmentedDataset, key, count);
                 Logger.Info(string.Format("{0} exceptions recorded in Function: {1}", count, ExceptionProvider.FunctionName.ExecuteQuerySegmented));
+
+                count = ExceptionProvider.GetExceptionCount(ExceptionProvider.FunctionName.ExecuteQuery);
+                client.InsertMetricRecord(queryDataset, key, count);
+                Logger.Info(string.Format("{0} exceptions recorded in Function: {1}", count, ExceptionProvider.FunctionName.ExecuteQuery));
             }
             catch (Exception e)
             {

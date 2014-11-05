@@ -22,6 +22,7 @@
           <Property Name="RowKey" Type="nvarchar" MaxLength="128" />
           <Property Name="LastResultXml" Type="nvarchar(max)" />
           <Property Name="RequestStartTime" Type="datetimeoffset" Precision="7" />
+          <Property Name="RequestResults" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="Category">
           <Key>
@@ -868,6 +869,7 @@
           <Property Name="RowKey" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="LastResultXml" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="RequestStartTime" Type="DateTimeOffset" Precision="7" />
+          <Property Name="RequestResults" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -1012,6 +1014,7 @@
           <EntitySetMapping Name="AWExceptions">
             <EntityTypeMapping TypeName="MSGorillaModel.AWException">
               <MappingFragment StoreEntitySet="AWException">
+                <ScalarProperty Name="RequestResults" ColumnName="RequestResults" />
                 <ScalarProperty Name="RequestStartTime" ColumnName="RequestStartTime" />
                 <ScalarProperty Name="LastResultXml" ColumnName="LastResultXml" />
                 <ScalarProperty Name="RowKey" ColumnName="RowKey" />
