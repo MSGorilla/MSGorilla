@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.IMAPServerInstanc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.WossTableMonitor", "Robots\MSGorilla.WossTableMonitor\MSGorilla.WossTableMonitor.csproj", "{AB735D85-98F8-45FD-BB70-3E6D9F1E62F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.TFSBugTrendMonitor", "Robots\MSGorilla.TFSBugTrendMonitor\MSGorilla.TFSBugTrendMonitor.csproj", "{150011E4-0E25-4838-A6BB-1FB72D112641}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -247,6 +249,16 @@ Global
 		{AB735D85-98F8-45FD-BB70-3E6D9F1E62F8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{AB735D85-98F8-45FD-BB70-3E6D9F1E62F8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{AB735D85-98F8-45FD-BB70-3E6D9F1E62F8}.Release|Win32.ActiveCfg = Release|Any CPU
+		{150011E4-0E25-4838-A6BB-1FB72D112641}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{150011E4-0E25-4838-A6BB-1FB72D112641}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{150011E4-0E25-4838-A6BB-1FB72D112641}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{150011E4-0E25-4838-A6BB-1FB72D112641}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{150011E4-0E25-4838-A6BB-1FB72D112641}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{150011E4-0E25-4838-A6BB-1FB72D112641}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{150011E4-0E25-4838-A6BB-1FB72D112641}.Release|Any CPU.Build.0 = Release|Any CPU
+		{150011E4-0E25-4838-A6BB-1FB72D112641}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{150011E4-0E25-4838-A6BB-1FB72D112641}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{150011E4-0E25-4838-A6BB-1FB72D112641}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -264,5 +276,6 @@ Global
 		{FE3DE28D-333C-4663-BD5A-4A4236A1999D} = {91E68305-6459-4BB4-87D0-4E5A42ACDFED}
 		{8A67D357-F1AB-4273-9A97-EDF8E0EE6639} = {91E68305-6459-4BB4-87D0-4E5A42ACDFED}
 		{AB735D85-98F8-45FD-BB70-3E6D9F1E62F8} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
+		{150011E4-0E25-4838-A6BB-1FB72D112641} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
 	EndGlobalSection
 EndGlobal

@@ -92,6 +92,7 @@
     <Compile Include="Azure\AzureFactory.cs" />
     <Compile Include="Azure\Logger.cs" />
     <Compile Include="CategoryManager.cs" />
+    <Compile Include="CounterManager.cs" />
     <Compile Include="GroupManager.cs" />
     <Compile Include="MetricManager.cs" />
     <Compile Include="MException\MException.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Models\AzureModels\Entity\AttachmentEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\BaseReplyEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\CategoryMessageEntity.cs" />
+    <Compile Include="Models\AzureModels\Entity\CounterSetEntity.cs" />
     <Compile Include="Models\AzureModels\Entity\EventLineEntity.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -116,6 +118,8 @@
     <Compile Include="Models\AzureModels\Entity\UserLineEntity.cs" />
     <Compile Include="Models\AzureModels\Queue\QueueMessage.cs" />
     <Compile Include="Models\CategoryMessage.cs" />
+    <Compile Include="Models\CounterRecord.cs" />
+    <Compile Include="Models\CounterSet.cs" />
     <Compile Include="Models\Reply.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\MessageDetail.cs" />
@@ -176,6 +180,10 @@
     <Compile Include="Models\ViewModels\DisplayCategory.cs" />
     <Compile Include="Models\ViewModels\DisplayCategoryMessage.cs" />
     <Compile Include="Models\ViewModels\DisplayChartDataSet.cs" />
+    <Compile Include="Models\ViewModels\DisplayCounter.cs" />
+    <Compile Include="Models\ViewModels\DisplayCounterChart.cs" />
+    <Compile Include="Models\ViewModels\DisplayCounterRecords.cs" />
+    <Compile Include="Models\ViewModels\DisplayCounterSet.cs" />
     <Compile Include="Models\ViewModels\DisplayFavouriteTopic.cs" />
     <Compile Include="Models\ViewModels\DisplayGroup.cs" />
     <Compile Include="Models\ViewModels\DisplayMembership.cs" />
@@ -236,6 +244,10 @@
     <ProjectReference Include="..\MSGorilla.SearchEngine\MSGorilla.SearchEngine.csproj">
       <Project>{e6e93222-7d5f-422f-8dfe-d0fdba190ae8}</Project>
       <Name>MSGorilla.SearchEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MSGorillaWebAPIClient\MSGorilla.WebAPIClient.csproj">
+      <Project>{9b379a6d-8342-4b10-9f92-739fda720ba8}</Project>
+      <Name>MSGorilla.WebAPIClient</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

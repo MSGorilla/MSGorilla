@@ -1,0 +1,216 @@
+﻿
+@{
+    ViewBag.Title = "PerfCounter";
+}
+
+<div class="contents-container">
+    @Html.Partial("_AlertBoxPartial")
+    <a href="/counter/chart?group=msgorilladev&name=test&path=Average-Point">test</a>
+    <a href="/counter/chart?group=msgorilladev&name=bugtrendtest&path=BugTrend">bugtrendtest</a>
+    <div class="title-container">
+        <h4>
+            @ViewBag.Title
+        </h4>
+    </div>
+
+    <input id="hd_current_group" type="hidden" value="" />
+
+    @Html.Partial("_GroupNavbarPartial")
+
+    <div id="countersets" class="block-container" style=" display:none;background:white;">
+        <div>
+            <h2> Name </h2>
+            <h4> Description......Last updated by 2014-11-13T03:30:19.1372125Z, total 100 records</h4>
+            <p></p>
+            <p></p>
+            <div>
+                <h4>Entry</h4>
+                <a href="/counter/chart?group=msgorilladev&name=test&path=Average-Point">test</a>
+                <a href="/counter/chart?group=msgorilladev&name=bugtrendtest&path=BugTrend">bugtrendtest</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tools-container">
+    @Html.Partial("_MePartial")
+    @Html.Partial("_PostPartial")
+    @Html.Partial("_FeedFilterPartial")
+    @Html.Partial("_ShortcutPartial")
+</div>
+
+<script>
+    // Group
+    function LoadChartGroupNavbar() {
+        var listdiv = $("#group_navabar");
+        if (listdiv.length == 0) {
+            return;
+        }
+        var setdefaultbtn = $("#btn_set_default_group");
+        var curgroup = $("#hd_current_group").val();
+
+        var apiurl = "/api/group/getjoinedgroup";
+        var apidata = "";
+
+        AjaxGetSync(
+            apiurl,
+            apidata,
+            function (data) {
+                // clear list
+                listdiv.empty();
+                setdefaultbtn.hide();
+
+                if (isNullOrEmpty(data) || data.length == 0) {
+                    // do nothing
+                }
+                else {
+                    // create list
+                    $.each(data, function (index, item) {
+                        var output = "";
+                        var groupid = item.GroupID;
+                        var displayname = item.DisplayName;
+                        var description = item.Description;
+                        var isopen = item.IsOpen;
+                        var memberid = item.MemberID;
+                        var role = item.Role;
+                        var curgroup = $("#hd_current_group").val();
+
+                        if (index == 0) {   // first is default
+                            $("#hd_default_group").val(groupid);
+                            if (isNullOrEmpty(curgroup)) {
+                                $("#hd_current_group").val(groupid);
+                            }
+                        }
+
+                        output = "<li id='group_navbar_" + encodeId(groupid) + "'>"
+                               + "  <a href= 'javascript:void(0);' onclick='switchCurrentChartGroup(\"" + groupid + "\");'>" + displayname + "</a>"
+                               + "</li>";
+
+                        listdiv.append(output);
+                    });
+
+                    // active current group tab
+                    curgroup = $("#hd_current_group").val();
+                    var curtab = $("#group_navbar_" + encodeId(curgroup));
+                    if (curtab.length > 0) {
+                        curtab.addClass("active");
+                    }
+                    else {
+                        listdiv.children[0].addClass("active");
+                    }
+
+                    LoadCounterSets();
+                }
+            },
+            null,
+            null,
+            "no_message_box"
+        );
+    }
+
+    function switchCurrentChartGroup(gid) {
+        var listdiv = $("#group_navabar");
+        if (listdiv.length == 0) {
+            return;
+        }
+        var setdefaultbtn = $("#btn_set_default_group");
+        var defaultgroup = $("#hd_default_group").val();
+
+        var items = listdiv.children("li");
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            if (item.id == ("group_navbar_" + gid)) {
+                item.classList.add("active");
+                $("#hd_current_group").val(gid);
+                LoadCounterSets();
+            }
+            else {
+                item.classList.remove("active");
+            }
+        }
+
+        if (gid == defaultgroup) {
+            setdefaultbtn.hide();
+        }
+        else {
+            setdefaultbtn.show();
+        }
+    }
+
+    function LoadCounterSets() {
+        $("#countersets").empty();
+        var group = $("#hd_current_group").val();
+
+        var apiurl = '/api/counter/GetCounterSetByGroup';
+        var apidata = 'group=' + encodeTxt(group);
+
+        AjaxGetAsync(
+            apiurl,
+            apidata,
+            function (data) {
+                if (data.length == 0) {
+                    $("#countersets").append(jQuery("<h1>").text("Oops, No Counters Found!"));
+                    $("#countersets").show();
+                }
+                else {
+                    for (var i = 0; i < data.length; i++) {
+                        AppendCounterSet(data[i]);
+                    }
+                    $("#countersets").show();
+                }
+                
+            },
+            function (data) {
+                alert("something wrong");
+            },
+            null,
+            "no_message_box"
+            );
+    }
+
+    function CreateCounterChartUrl(group, name, path) {
+        var url = "/counter/chart?group=<group>&name=<name>&path=<path>";
+        url = url.replace(/<group>/g, encodeTxt(group));
+        url = url.replace(/<name>/g, encodeTxt(name));
+        url = url.replace(/<path>/g, encodeTxt(path));
+        return url;
+    }
+
+    template = "<div>"
+             + "    <h2> <<<name>>> </h2>"
+             + "    <h4> <<<description>>></h4>"
+             + "    <h4> Last updated by <<<timestamp>>>, total <<<count>>> records</h4>"
+             + "    <p></p><p></p>"
+             + "    <div>"
+             + "        <<<links>>>"
+             + "    </div>"
+             + "</div>";
+    
+    function AppendCounterSet(data){
+        var str = template.replace(/<<<name>>>/g, data['Name']);
+        str = str.replace(/<<<description>>>/g, data['Description']);
+        str = str.replace(/<<<timestamp>>>/g, data['LastUpdateTime']);
+        str = str.replace(/<<<count>>>/g, data['RecordCount']);
+
+        var links = "";
+        for(var i = 0; i < data['Entry'].length; i++){
+            var link = '<a href="<<<url>>>"><<<path>>></a>';
+            link = link.replace(/<<<url>>>/g, CreateCounterChartUrl(data['Group'], data['Name'], data['Entry'][i]['Path']));
+            link = link.replace(/<<<path>>>/g, data['Entry'][i]['Path']);
+            links += link;
+        }
+        str = str.replace(/<<<links>>>/g, links);
+        $("#countersets").append(str);
+    }
+
+
+    //function ShowCounterSet(data) {
+    //    for(int i = 0; i < data.length; i++){
+
+    //    }
+    //}
+
+    $(LoadChartGroupNavbar());
+    //$(LoadFeeds(true));
+</script>
+

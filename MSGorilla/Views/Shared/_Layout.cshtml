@@ -57,6 +57,14 @@
                     {
                         <li>@Html.ActionLink("Ω Me", "Index", "Profile")</li>
                     }
+                    @if (ViewBag.Title == "Counter")
+                    {
+                        <li class="active">@Html.ActionLink("* PerfCounter", "Index", "Counter")</li>
+                    }
+                    else
+                    {
+                        <li>@Html.ActionLink("* PerfCounter", "Index", "Counter")</li>
+                    }
                     @if (ViewBag.Title == "API Doc")
                     {
                         <li class="active">@Html.ActionLink("? API Doc", "Index", "Document")</li>

@@ -41,6 +41,8 @@ namespace MSGorilla.WebAPI.Client
         public static string UriIsFavouriteTopic = "/Topic/IsFavouriteTopic?topic={0}&group={1}";
         public static string UriAddFavouriteTopic = "/Topic/AddFavouriteTopic?topic={0}&group={1}";
         public static string UriRemoveFavouriteTopic = "/Topic/RemoveFavouriteTopic?topic={0}&group={1}";
+
+        public static string UriInsertCounterRecord = "/Counter/InsertRecord?name={0}&group={1}";
     }
 
     public class MessageModel

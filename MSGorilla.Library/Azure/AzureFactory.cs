@@ -35,7 +35,9 @@ namespace MSGorilla.Library.Azure
             Statistics,
             WordsIndex,
             SearchResults,
-            SearchHistory
+            SearchHistory,
+            CounterSet,
+            CounterRecord,
         }
 
         public enum MSGorillaQueue
@@ -130,6 +132,8 @@ namespace MSGorilla.Library.Azure
             _tableDict.Add(MSGorillaTable.WordsIndex, "WordsIndex");
             _tableDict.Add(MSGorillaTable.SearchResults, "SearchResults");
             _tableDict.Add(MSGorillaTable.SearchHistory, "SearchHistory");
+            _tableDict.Add(MSGorillaTable.CounterSet, "CounterSet");
+            _tableDict.Add(MSGorillaTable.CounterRecord, "CounterRecord");
 
             // init queue dict
             _queueDict = new Dictionary<MSGorillaQueue, string>();

@@ -7,8 +7,11 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 using MSGorilla.WebAPI.Models.ViewModels;
+using MSGorilla.Library.Models;
 
 namespace MSGorilla.WebAPI.Client
 {
@@ -461,6 +464,21 @@ namespace MSGorilla.WebAPI.Client
             request.Headers["Authorization"] = _authHeader;
             HttpWebResponse response = GetResponseFromMSGorilla(request);
             string ret = _readResponseContent(response);
+        }
+
+        public void InsertCounterRecord(CounterRecord record, string name, string group = "")
+        {
+            string url = string.Format(_rootUri + Constant.UriInsertCounterRecord, name, group);
+
+            WebClient myWebClient = new WebClient();
+            myWebClient.Headers.Add("Authorization:" + _authHeader);
+
+            using(MemoryStream  mstream = new MemoryStream())
+            {
+                new BinaryFormatter().Serialize(mstream, record);
+                byte[] bin = mstream.ToArray();
+                myWebClient.UploadData(url, bin);
+            }
         }
     }
 }

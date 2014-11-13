@@ -290,4 +290,31 @@ namespace MSGorilla.Library.Exceptions
             Code = 9002;
         }
     }
+
+    public class CounterTooLargeException : MSGorillaBaseException
+    {
+        public CounterTooLargeException()
+        {
+            Description = "The size of serialized counter should not be larger than 992kb";
+            Code = 10001;
+        }
+    }
+
+    public class CounterSetNotFoundException : MSGorillaBaseException
+    {
+        public CounterSetNotFoundException()
+        {
+            Description = "The specified counter set not found.";
+            Code = 10002;
+        }
+    }
+
+    public class CounterSetAlreadyExistException : MSGorillaBaseException
+    {
+        public CounterSetAlreadyExistException()
+        {
+            Description = "The specified counter set already exist.";
+            Code = 10003;
+        }
+    }
 }

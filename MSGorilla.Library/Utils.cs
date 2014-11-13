@@ -349,5 +349,77 @@ namespace MSGorilla.Library
 
             return false;
         }
+
+
+        public const int BlockSize = 32 * 1024;
+        /// <summary>
+        /// Max attached size is 31*32kb
+        /// return success or fail
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="rawData"></param>
+        /// <returns></returns>
+        public static bool AttachBin2Entity(DynamicTableEntity entity, byte[] rawData)
+        {
+            if (rawData == null)
+            {
+                return true;
+            }
+
+            if (rawData.Length > 31 * BlockSize)
+            {
+                return false;
+            }
+
+            entity.Properties["BinSize"] = new EntityProperty(rawData.Length);
+            int blockCount = (rawData.Length - 1) / BlockSize + 1;
+            for (int i = 0; i < blockCount; i++)
+            {
+                int size = 0;
+                if (i == (blockCount - 1))
+                {
+                    size = rawData.Length % BlockSize;
+                }
+                else
+                {
+                    size = BlockSize;
+                }
+                byte[] temp = new byte[size];
+                Array.Copy(rawData, BlockSize * i, temp, 0, size);
+                entity.Properties["BinBlock" + i] = new EntityProperty(temp);
+            }
+
+            return true;
+        }
+
+        public static byte[] GetBinFromEntity(DynamicTableEntity entity)
+        {
+            if(entity == null || 
+                !entity.Properties.ContainsKey("BinSize") || 
+                entity.Properties["BinSize"].Int32Value < 0)
+            {
+                return null;
+            }
+
+            int size = entity.Properties["BinSize"].Int32Value.Value;
+            byte[] rawBytes = new byte[size];
+
+            int blockCount = (size - 1) / BlockSize + 1;
+            for (int i = 0; i < blockCount; i++)
+            {
+                int blockSize = 0;
+                if (i == (blockCount - 1))
+                {
+                    blockSize = size % BlockSize;
+                }
+                else
+                {
+                    blockSize = BlockSize;
+                }
+                Array.Copy(entity.Properties["BinBlock" + i].BinaryValue, 0, rawBytes, i * BlockSize, blockSize);
+            }
+
+            return rawBytes;
+        }
     }
 }

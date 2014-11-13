@@ -1,0 +1,266 @@
+﻿@using MSGorilla.Models
+@{
+    ViewBag.Title = "chart";
+}
+
+@model MSGorilla.Models.PerfCounterModel
+
+<h1>@Model.Path</h1>
+<div>
+    <div id="perf_chart_div" class="block-container perf-chart" style="display:none;background:white;">
+    </div>
+    
+    <div id="related_counters" class="block-container" style=" display:none;background:white;">
+        <h3>Related Counters</h3>
+    </div>
+</div>
+
+<script src="~/Scripts/echarts-plain.js"></script>
+<script>
+    perf_option = {
+        title: {
+            text: ''
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            data: []
+        },
+        toolbox: {
+            show: true,
+            y: 'center',
+            orient: 'vertical',
+            feature: {
+                mark: {
+                    show: true,
+                    title: {
+                        mark: 'New markline',
+                        markUndo: 'Erase markline',
+                        markClear: 'Clear all marklines'
+                    },
+                },
+                magicType: {
+                    show: true,
+                    title: {
+                        line: 'Line view',
+                        bar: 'Bar view',
+                        stack: 'Stack view',
+                        tiled: 'Tiled view'
+                    },
+                    type: ['line', 'bar', 'stack', 'tiled']
+                },
+                dataZoom: {
+                    show: true,
+                    title: {
+                        dataZoom: 'Data zoom',
+                        dataZoomReset: 'Data zoom reset'
+                    }
+                },
+                dataView: {
+                    show: true,
+                    title: 'Data view',
+                    readOnly: false
+                },
+                restore: {
+                    show: true,
+                    title: 'Restore'
+                },
+                saveAsImage: {
+                    show: true,
+                    title: 'Save as image',
+                    lang: ['Right click and save']
+                }
+            }
+        },
+        calculable: true,
+        backgroundColor: '#fff',
+        dataZoom: {
+            show: true,
+            realtime: true,
+            start: 50,
+            end: 100
+        },
+        xAxis: [
+            {
+                type: 'category',
+                data: []
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value',
+            }
+        ],
+        series: [
+        ]
+    };
+    chartdiv = $("#perf_chart_div");
+
+    function Path2Name(path) {
+        return path.split('.').pop();
+    }
+
+    function LoadDataAsync(data, group, name) {
+        // show related counter link
+        for (i = 0; i < data['RelatedCounter'].length; i++) {
+            var div = jQuery('<div>');
+
+            //create chart link
+            var p = data['RelatedCounter'][i]["Path"];
+            var url = "chart?group=" + encodeTxt(group) +
+                "&name=" + encodeTxt(name) +
+                "&path=" + encodeTxt(p);
+            var link = jQuery('<a>').attr('href', url).text(p);           
+            div.append(link);
+
+            //create load button if it's the same type with maincounter
+            if (data['RelatedCounter'][i]['Type'] === data['MainCounter']['Type'])
+            {
+                var button = jQuery('<button>').attr('class', 'btn btn-primary post-btn').text('Load');
+                button.attr('id', 'button' + i);
+                var func = 'LoadRelatedCounter("<btnid>", "<group>", "<name>", "<path>")';
+                func = func.replace(/<btnid>/g, 'button' + i);
+                func = func.replace(/<group>/g, group);
+                func = func.replace(/<name>/g, name);
+                func = func.replace(/<path>/g, p);
+                button.attr('onclick', func);
+                div.append(button);
+            }
+
+            $("#related_counters").append(div);
+            $("#related_counters").show();
+        }
+
+        // load current counter
+        var path = data['MainCounter']['Path'];
+        var apiurl = '/api/counter/GetLatestCounterRecord';
+        var apidata = "group=" + encodeTxt(group) + "&name=" + encodeTxt(name) + "&path=" + encodeTxt(path);
+        mainRecords = $.ajax({ url: apiurl + '?' + apidata, async: false }).responseText;
+        mainRecords = JSON.parse(mainRecords);
+
+        perf_option.title.text = data["Title"];
+
+        serie = {
+            name: Path2Name(path),
+            type: "line",
+            data: []
+        };
+        perf_option["legend"]["data"].push(Path2Name(path));
+        for (i = 0; i < mainRecords['Records'].length; i++) {
+            perf_option.xAxis[0].data.push(mainRecords['Records'][i]["Key"]);
+            serie.data.push(mainRecords['Records'][i]["Value"]);
+        }
+        perf_option.series.push(serie);
+
+        chart.setOption(perf_option);
+        chart.hideLoading();
+
+        ////aotumatically load all related counter with the same type
+        //for (var i = 0; i < data['RelatedCounter'].length; i++) {
+        //    var relatedCounter = data['RelatedCounter'][i];
+        //    if (relatedCounter['Type'] === data['MainCounter']['Type']) {
+        //        apidata = "group=" + encodeTxt(group) +
+        //            "&name=" + encodeTxt(name) +
+        //            "&path=" + encodeTxt(relatedCounter['Path']);
+        //        AjaxGetAsync(
+        //            apiurl,
+        //            apidata,
+        //            function (data) {
+        //                var path = relatedCounter['Path'];
+        //                MergePerfCounter(data, path);
+        //            },
+        //            null,
+        //            null,
+        //            "no_message_box"
+        //            );
+        //    }
+        //}
+    }
+
+    function LoadRelatedCounter(buttonID, group, name, path) {
+        var apiurl = '/api/counter/GetLatestCounterRecord';
+        var apidata = "group=" + encodeTxt(group) +
+                    "&name=" + encodeTxt(name) +
+                    "&path=" + encodeTxt(path);
+        AjaxGetAsync(
+            apiurl,
+            apidata,
+            function (data) {
+                MergePerfCounter(data, path);
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            },
+            function (data) {
+                alert("Fail, something wrong!");
+            },
+            null,
+            "no_message_box"
+            );
+        $("#" + buttonID).hide();
+    }
+
+    function MergePerfCounter(data, path) {
+        kvDict = {};
+        for (var i = 0; i < data['Records'].length; i++) {
+            kvDict[data['Records'][i]['Key']] = data['Records'][i]['Value'];
+        }
+
+        serie = {
+            name: Path2Name(data['Path']),
+            type: "line",
+            data: []
+        };
+        
+        var lastValue = 0;
+        for (i = 0; i < perf_option.xAxis[0].data.length; i++) {
+            var key = perf_option.xAxis[0].data[i];
+            if (kvDict[key] == null) {
+                serie.data.push(lastValue);
+            }
+            else {
+                serie.data.push(kvDict[key]);
+                lastValue = kvDict[key];
+            }
+        }
+
+        perf_option.series.push(serie);
+        perf_option["legend"]["data"].push(Path2Name(data['Path']));
+        chart.setOption(perf_option);
+    }
+    
+    function LoadCounterChart(group, name, path) {
+        path = path.replace(/&amp;/g, '&');
+        // draw chart
+        try {
+            if (chartdiv.height() < 500)
+                chartdiv.height(500);
+            chartdiv.show();
+            chart = echarts.init(chartdiv[0]);
+            chart.showLoading();
+
+            var apiurl = '/api/counter/GetCounterChart';
+            
+            var apidata = "group=" + encodeTxt(group) + "&name=" + encodeTxt(name) + "&path=" + encodeTxt(path);
+            AjaxGetAsync(
+                apiurl,
+                apidata,
+                function (data) {
+                    LoadDataAsync(data, group, name);                    
+                },
+                function () {
+                    chartdiv.hide();
+                    alert("Fail to get counter chart");
+                },
+                null,
+                "no_message_box"
+                );
+        }
+        catch (ex) {
+            chartdiv.hide();
+            showError(ex);
+        }
+    }
+
+
+    LoadCounterChart('@Model.Group', '@Model.Name', '@Model.Path');
+</script>
