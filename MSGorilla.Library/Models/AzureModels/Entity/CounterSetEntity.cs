@@ -24,7 +24,7 @@ namespace MSGorilla.Library.Models.AzureModels.Entity
             CounterSetEntity entity = new CounterSetEntity();
             entity.PartitionKey = counterset.Group;
             entity.RowKey = counterset.Name;
-            entity.Description = counterset.Name;
+            entity.Description = counterset.Description;
             entity.LastUpdateTimestamp = counterset.LastUpdateTime;
             entity.RecordCount = counterset.RecordCount;
             return entity;

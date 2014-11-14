@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Timers;
 using System.Net;
 using System.Net.Security;
 
@@ -18,6 +18,7 @@ namespace MSGorilla.TFSBugTrendMonitor
 {
     class Program
     {
+        static TFSBugTrendMonitor monitor;
         public static string DisplayName2Alias(string name)
         {
             return name;
@@ -32,63 +33,37 @@ namespace MSGorilla.TFSBugTrendMonitor
                     { return true; }
                 );
 
-            GorillaWebAPI client = new GorillaWebAPI("user1", "111111");
-
-            DateTime now = DateTime.Now;
-            TFSBugProvider bugProvider = TFSBugProvider.GetInstance();
-            for (int i = 60; i >= 0; i--)
+            try
             {
-                DateTime timestamp = now.AddDays(0 - i);
-                var wic = bugProvider.GetAllWossBugsUntil(timestamp);
+                monitor = new TFSBugTrendMonitor();
 
-                CounterRecord.ComplexValue cv = TreeBuilder.BuildCVTree(wic);
-                CounterRecord record = new CounterRecord(timestamp.Date.ToString("yyyy-MM-dd"));
-                record.Value.RelatedValues.Add(cv);
+                monitor.Work();
 
-                client.InsertCounterRecord(record, "bugtrendtest", "msgorilladev");
-                Console.WriteLine(record.Key);
+                System.Timers.Timer timer = new System.Timers.Timer(1000.0f * 60 * 10); // 1 day later
+                // Hook up the Elapsed event for the timer. 
+                timer.Elapsed += OnTimedEvent;
+                timer.Enabled = true;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+                Logger.Error(e.StackTrace);
             }
 
+            
+        }
 
-
-
-
-            //TreeBuilder.BuildCVTree(wic);
-            //for (int i = 0; i < 100; i++)
-            //{
-            //    Console.WriteLine(
-            //        TFSBugProvider.QueryBugCount(
-            //        wic, 
-            //        TFSBugProvider.State.Active, 
-            //        "Stress", 
-            //        TFSBugProvider.Category.Table, 
-            //        "Sijia Huang"));
-            //}
-
-            //foreach (var user in TFSBugProvider.GetCreaters(wic))
-            //{
-            //    Console.WriteLine(user);
-            //}
+        private static void OnTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            try
+            {
+                monitor.Work();
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception.Message);
+                Logger.Error(exception.StackTrace);
+            }
         }
     }
 }
-
-
-//var openTrendMetric = (from WorkItem wi in workItems
-//                       group wi by wi.CreatedBy into gBugs
-//                       select new
-//                       {
-//                           BugOwner = gBugs.Key,
-//                           BugCount = gBugs.Count()
-//                       });
-//try
-//{
-//    string counter = string.Format("Bug {0} Trend", ops);
-
-
-//    foreach (var instance in openTrendMetric)
-//    {
-//        Console.WriteLine(instance);
-
-//    }
-//}

@@ -9,6 +9,7 @@ using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
+using System.IO;
 
 using MSGorilla.Library.Azure;
 using MSGorilla.Library.Models;
@@ -23,14 +24,14 @@ namespace MSGorilla.MailDispatcher
 {
     public class WorkerRole : RoleEntryPoint
     {
-        private MemoryCache _mailboxCache = new MemoryCache("mailbox");
-        private MemoryCache _mailStoreCache = new MemoryCache("mailstore");
-        private Dictionary<string, string> _groupID2Name = new Dictionary<string, string>();
+        private MemoryCache _mailboxCache;
+        private MemoryCache _mailStoreCache;
+        private Dictionary<string, string> _groupID2Name;
 
-        private TopicManager _topicManager = new TopicManager();
-        private GroupManager _groupManager = new GroupManager();
-        private AccountManager _accountManager = new AccountManager();
-        private RichMsgManager _richMsgManager = new RichMsgManager();
+        private TopicManager _topicManager;
+        private GroupManager _groupManager;
+        private AccountManager _accountManager;
+        private RichMsgManager _richMsgManager;
 
         string GetGroupDisplayName(string groupID)
         {
@@ -208,7 +209,15 @@ namespace MSGorilla.MailDispatcher
         {
             Trace.TraceInformation("MSGorilla.MailDispatcher entry point called");
 
-            CloudQueue _queue = AzureFactory.GetQueue(AzureFactory.MSGorillaQueue.MailMessage);
+            _mailboxCache = new MemoryCache("mailbox");
+            _mailStoreCache = new MemoryCache("mailstore");
+            _groupID2Name = new Dictionary<string, string>();
+            _topicManager = new TopicManager();
+            _groupManager = new GroupManager();
+            _accountManager = new AccountManager();
+            _richMsgManager = new RichMsgManager();
+
+            CloudQueue _queue = AzureFactory.GetQueue(AzureFactory.MSGorillaQueue.MailMessage);;
 
             while (true)
             {

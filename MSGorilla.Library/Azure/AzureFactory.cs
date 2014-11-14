@@ -132,7 +132,7 @@ namespace MSGorilla.Library.Azure
             _tableDict.Add(MSGorillaTable.WordsIndex, "WordsIndex");
             _tableDict.Add(MSGorillaTable.SearchResults, "SearchResults");
             _tableDict.Add(MSGorillaTable.SearchHistory, "SearchHistory");
-            _tableDict.Add(MSGorillaTable.CounterSet, "CounterSet");
+            _tableDict.Add(MSGorillaTable.CounterSet, "CounterSets");
             _tableDict.Add(MSGorillaTable.CounterRecord, "CounterRecord");
 
             // init queue dict
@@ -163,15 +163,17 @@ namespace MSGorilla.Library.Azure
                 client = WossStorageAccount.CreateCloudTableClient();
                 wosstable = client.GetTableReference(_tableDict[table]);
                 DateTimeOffset startTime = DateTimeOffset.UtcNow;
+
+                OperationContext opContext = new OperationContext();
                 try
                 {
-                    wosstable.Create();
+                    wosstable.Create(null, opContext);
                 }
                 catch (Exception e)
                 {
                     if (!(e is StorageException && e.InnerException != null && e.InnerException.Message.Equals("The remote server returned an error: (409) Conflict.")))
                     {
-                        Logger.Error(e, startTime, DateTime.Now, wosstable.Uri.ToString(), "CreateTable");
+                        Logger.Error(e, startTime, DateTime.Now, wosstable.Uri.ToString(), "CreateTable", opContext);
                     }                        
                 }
             }

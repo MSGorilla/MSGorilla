@@ -38,11 +38,15 @@ namespace MSGorilla.WebAPI
             foreach(CounterSet cs in css)
             {
                 DisplayCounterSet dcs = new DisplayCounterSet(cs);
-                CounterRecord record = _counterManager.GetSingleCounterRecord(cs.Group, cs.Name, cs.RecordCount - 1);
-                foreach (var cv in record.Value.RelatedValues)
+                if (cs.RecordCount > 0)
                 {
-                    dcs.Entry.Add(new DisplayCounter(cv.Name, cv.Type));
+                    CounterRecord record = _counterManager.GetSingleCounterRecord(cs.Group, cs.Name, cs.RecordCount - 1);
+                    foreach (var cv in record.Value.RelatedValues)
+                    {
+                        dcs.Entry.Add(new DisplayCounter(cv.Name, cv.Type));
+                    }
                 }
+                
                 dcss.Add(dcs);
             }
             return dcss;
