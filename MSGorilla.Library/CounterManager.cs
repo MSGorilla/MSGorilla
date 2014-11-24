@@ -143,10 +143,15 @@ namespace MSGorilla.Library
                 try
                 {
                     CounterSetEntity counterSet = GetCounterSet(groupID, name);
+                    if (counterSet == null)
+                    {
+                        throw new CounterSetNotFoundException();
+                    }
+
                     id = counterSet.RecordCount;
                     counterSet.RecordCount++;
 
-                    TableOperation updateOperation = TableOperation.Replace(counterSet);
+                    TableOperation updateOperation = TableOperation.InsertOrReplace(counterSet);
                     _counterSet.Execute(updateOperation);
 
                     break;

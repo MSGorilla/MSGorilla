@@ -26,31 +26,27 @@ namespace MSGorilla.TFSBugTrendMonitor
 
         static void Main(string[] args)
         {
-            Constant.UriRoot = "http://localhost:14061/api";
-            ServicePointManager.ServerCertificateValidationCallback =
-                new RemoteCertificateValidationCallback(
-                    delegate
-                    { return true; }
-                );
-
             try
             {
+                Logger.Info("Service started.");
                 monitor = new TFSBugTrendMonitor();
-
                 monitor.Work();
 
                 System.Timers.Timer timer = new System.Timers.Timer(1000.0f * 60 * 10); // 1 day later
                 // Hook up the Elapsed event for the timer. 
                 timer.Elapsed += OnTimedEvent;
                 timer.Enabled = true;
+
+                while (Console.ReadKey().KeyChar != 'q')
+                {
+                    Console.WriteLine("Press q to exit");
+                }
             }
             catch (Exception e)
             {
                 Logger.Error(e.Message);
                 Logger.Error(e.StackTrace);
             }
-
-            
         }
 
         private static void OnTimedEvent(Object source, ElapsedEventArgs e)

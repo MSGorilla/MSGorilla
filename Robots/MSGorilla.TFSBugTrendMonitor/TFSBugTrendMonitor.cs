@@ -59,6 +59,7 @@ namespace MSGorilla.TFSBugTrendMonitor
                 return;
             }
 
+            Logger.Info("Get latest data.");
             TFSBugProvider bugProvider = TFSBugProvider.GetInstance();
             var wic = bugProvider.GetAllWossBugsUntil(current);
 
@@ -66,13 +67,16 @@ namespace MSGorilla.TFSBugTrendMonitor
             CounterRecord record = new CounterRecord(current.Date.ToString("yyyy-MM-dd"));
             record.Value.RelatedValues.Add(cv);
 
+            Logger.Info("Update BugDailyTrend.");
             client.InsertCounterRecord(record, "BugDailyTrend", "woss");
             if (current.DayOfWeek == DayOfWeek.Sunday)
             {
+                Logger.Info("Update BugWeeklyTrend.");
                 client.InsertCounterRecord(record, "BugWeeklyTrend", "woss");
             }
             if (current.Day == 1)
             {
+                Logger.Info("Update BugMonthlyTrend.");
                 client.InsertCounterRecord(record, "BugMonthlyTrend", "woss");
             }
 
