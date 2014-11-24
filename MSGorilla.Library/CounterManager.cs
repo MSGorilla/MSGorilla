@@ -15,8 +15,8 @@ namespace MSGorilla.Library
 {
     public class CounterManager
     {
-        private AWCloudTable _counterSet;
-        private AWCloudTable _counterRecord;
+        private CloudTable _counterSet;
+        private CloudTable _counterRecord;
 
         static string ToRecordPK(string groupID, string name)
         {
@@ -54,7 +54,7 @@ namespace MSGorilla.Library
         public CounterSetEntity GetCounterSet(string groupID, string name)
         {
             TableOperation retrieveOperation = TableOperation.Retrieve<CounterSetEntity>(groupID, name);
-            TableResult result = _counterSet.ExecuteRetriveOperation(retrieveOperation);
+            TableResult result = _counterSet.Execute(retrieveOperation);
             if (result.Result == null)
             {
                 return null;
@@ -84,7 +84,7 @@ namespace MSGorilla.Library
                 ToRecordRK(number));
             
             return CounterRecordHelper.ParseEntity(
-                _counterRecord.ExecuteRetriveOperation(retrieveOperation).Result as DynamicTableEntity
+                _counterRecord.Execute(retrieveOperation).Result as DynamicTableEntity
                 );
         }
 
@@ -143,10 +143,15 @@ namespace MSGorilla.Library
                 try
                 {
                     CounterSetEntity counterSet = GetCounterSet(groupID, name);
+                    if (counterSet == null)
+                    {
+                        throw new CounterSetNotFoundException();
+                    }
+
                     id = counterSet.RecordCount;
                     counterSet.RecordCount++;
 
-                    TableOperation updateOperation = TableOperation.Replace(counterSet);
+                    TableOperation updateOperation = TableOperation.InsertOrReplace(counterSet);
                     _counterSet.Execute(updateOperation);
 
                     break;

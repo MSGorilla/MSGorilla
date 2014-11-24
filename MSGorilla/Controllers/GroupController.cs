@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web;
 using System.Web.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 using MSGorilla.Filters;
 using MSGorilla.Library;
@@ -80,5 +81,50 @@ namespace MSGorilla.Controllers
 
             return View();
         }
+
+        [TokenAuthAttribute]
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        [System.Web.Mvc.HttpPost]
+        public ActionResult Create(CreateGroupViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                new MSGorilla.WebAPI.GroupController().CreateGroup(
+                    model.GroupID, model.DisplayName, model.Description, model.IsOpen
+                    );
+                return RedirectToAction("View", "Group", new { group = model.GroupID });
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError("", e.Message);
+                return View(model);
+            }
+        }
+    }
+
+    public class CreateGroupViewModel
+    {
+        [Required]
+        [Display(Name = "Group ID")]
+        public string GroupID { get; set; }
+
+        [Required]
+        [Display(Name = "Open Group")]
+        public bool IsOpen { get; set; }
+
+        [Display(Name = "Display Name")]
+        public string DisplayName { get; set; }
+
+        [Display(Name = "Description")]
+        public string Description { get; set; }
     }
 }

@@ -23,10 +23,10 @@ namespace MSGorilla.Library
 {
     public class ReplyManager
     {
-        private AWCloudTable _reply;
-        private AWCloudTable _replyNotification;
-        private AWCloudTable _replyArchive;
-        private AWCloudTable _userline;
+        private CloudTable _reply;
+        private CloudTable _replyNotification;
+        private CloudTable _replyArchive;
+        private CloudTable _userline;
 
         private AccountManager _accManager;
         private NotifManager _notifManager;

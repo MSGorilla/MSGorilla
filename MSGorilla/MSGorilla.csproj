@@ -98,8 +98,8 @@
     <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Diagnostics, Version=2.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <Private>True</Private>
+    <Reference Include="Microsoft.WindowsAzure.Diagnostics">
+      <HintPath>C:\Program Files\Microsoft SDKs\Azure\.NET SDK\v2.5\bin\plugins\Diagnostics\Microsoft.WindowsAzure.Diagnostics.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=2.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Private>False</Private>
@@ -280,6 +280,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Images\default_avatar_bk.jpg" />
+    <Content Include="Content\Images\reqHeader.png" />
     <Content Include="Content\Images\slide-01.png" />
     <Content Include="Content\Images\slide-02.png" />
     <Content Include="Content\Images\slide-03.png" />
@@ -302,6 +303,7 @@
     <Content Include="Content\WOFF\k3k702ZOKiLJc3WVjuplzHhCUOGz7vYGh680lGh-uXM.woff" />
     <Content Include="Content\WOFF\PRmiXeptR36kaC0GEAetxjqR_3kx9_hJXbbyU8S6IN0.woff" />
     <Content Include="Content\WOFF\xjAJXh38I15wypJXxuGMBobN6UDyHWBl620a-IRfuBk.woff" />
+    <None Include="Properties\PublishProfiles\iis.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\common.js" />
     <Content Include="Scripts\echarts-plain.js" />
@@ -388,6 +390,7 @@
     <Content Include="Views\Group\View.cshtml" />
     <Content Include="Views\Counter\Index.cshtml" />
     <Content Include="Views\Counter\chart.cshtml" />
+    <Content Include="Views\Group\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -23,6 +23,7 @@ namespace MSGorilla.Controllers
     public class AccountController : Controller
     {
         AccountManager _accManager = new AccountManager();
+        GroupManager _groupManager = new GroupManager();
 
         public AccountController()
             : this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext())))
@@ -131,12 +132,13 @@ namespace MSGorilla.Controllers
                     newUser.FollowersCount = newUser.FollowingsCount = newUser.MessageCount = 0;
                     newUser.Password = Utils.MD5Encoding(password);
                     newUser.PortraitUrl = "/Content/Images/default_avatar.jpg";
+                    newUser.DefaultGroup = "default";
 
                     var result = _accManager.AddUser(newUser);
                     if (result != null)
                     {
                         SignIn(result, false);
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Index", "");
                     }
                     else
                     {

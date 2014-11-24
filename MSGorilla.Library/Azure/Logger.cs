@@ -30,7 +30,7 @@ namespace MSGorilla.Library.Azure
             {
                 file = new System.IO.StreamWriter("msgorilla.log.txt");
             }
-            catch (Exception e)
+            catch
             {
 
             }

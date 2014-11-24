@@ -53,12 +53,11 @@ namespace MSGorilla.Library.Azure
         }
 
         public static CloudStorageAccount AzureStorageAccount { get; private set; }
-        public static CloudStorageAccount WossStorageAccount { get; private set; }
 
         private static Dictionary<MSGorillaTable, string> _tableDict;
         private static Dictionary<MSGorillaQueue, string> _queueDict;
         private static Dictionary<MSGorillaBlobContainer, string> _containerDict;
-        private static Dictionary<MSGorillaTable, AWCloudTable> _tableCache;
+        private static Dictionary<MSGorillaTable, CloudTable> _tableCache;
 
         public static string GetConnectionString(string key)
         {
@@ -88,29 +87,8 @@ namespace MSGorilla.Library.Azure
             // init storage account
             string connectionString = GetConnectionString("StorageConnectionString");
             AzureStorageAccount = CloudStorageAccount.Parse(connectionString);
-            WossStorageAccount = null;
 
-            //check whether enable woss storage or not
-            connectionString = GetConnectionString("WossStorageConnectionString");
-            if (!string.IsNullOrEmpty(connectionString) &&
-                !connectionString.Equals("UseDevelopmentStorage=true", StringComparison.InvariantCultureIgnoreCase))
-            {
-                try
-                {
-                    WossStorageAccount = CloudStorageAccount.Parse(connectionString);
-                    if (WossStorageAccount.Equals(AzureStorageAccount))
-                    {
-                        WossStorageAccount = null;
-                    }
-                }
-                catch (Exception)
-                {
-                    Trace.TraceError("Fail to parse woss storage account string: " + connectionString);
-                    WossStorageAccount = null;
-                }                
-            }
-
-            _tableCache = new Dictionary<MSGorillaTable, AWCloudTable>();
+            _tableCache = new Dictionary<MSGorillaTable, CloudTable>();
 
             // init table dict
             _tableDict = new Dictionary<MSGorillaTable, string>();
@@ -146,7 +124,7 @@ namespace MSGorilla.Library.Azure
             _containerDict.Add(MSGorillaBlobContainer.Attachment, "attachment");
         }
 
-        public static AWCloudTable GetTable(MSGorillaTable table)
+        public static CloudTable GetTable(MSGorillaTable table)
         {
             if (_tableCache.ContainsKey(table))
             {
@@ -155,47 +133,63 @@ namespace MSGorilla.Library.Azure
 
             var client = AzureStorageAccount.CreateCloudTableClient();
             CloudTable aztable = client.GetTableReference(_tableDict[table]);
-            aztable.CreateIfNotExists();
-            CloudTable wosstable = null;
 
-            if (WossStorageAccount != null)
+            OperationContext ctx = new OperationContext();
+            try
             {
-                client = WossStorageAccount.CreateCloudTableClient();
-                wosstable = client.GetTableReference(_tableDict[table]);
-                DateTimeOffset startTime = DateTimeOffset.UtcNow;
-
-                OperationContext opContext = new OperationContext();
-                try
+                aztable.Create(null, ctx);
+            }
+            catch (Exception e)
+            {
+                if (!(e is StorageException && e.InnerException != null && e.InnerException.Message.Equals("The remote server returned an error: (409) Conflict.")))
                 {
-                    wosstable.Create(null, opContext);
-                }
-                catch (Exception e)
-                {
-                    if (!(e is StorageException && e.InnerException != null && e.InnerException.Message.Equals("The remote server returned an error: (409) Conflict.")))
-                    {
-                        Logger.Error(e, startTime, DateTime.Now, wosstable.Uri.ToString(), "CreateTable", opContext);
-                    }                        
+                    throw e;
                 }
             }
 
-            AWCloudTable awTable = new AWCloudTable(aztable, wosstable);
-            _tableCache[table] = awTable;
-            return awTable;
+            _tableCache[table] = aztable;
+            return aztable;
         }
 
-        public static CloudQueue GetQueue(MSGorillaQueue queue)
+        public static EmulatedCloudQueue GetQueue(MSGorillaQueue queue)
         {
-            var client = AzureStorageAccount.CreateCloudQueueClient();
-            var azqueue = client.GetQueueReference(_queueDict[queue]);
-            azqueue.CreateIfNotExists();
-            return azqueue;
+            //var client = AzureStorageAccount.CreateCloudQueueClient();
+            //var azqueue = client.GetQueueReference(_queueDict[queue]);
+            //azqueue.CreateIfNotExists();
+            //return azqueue;
+            return new EmulatedCloudQueue(_queueDict[queue]);
         }
 
         public static CloudBlobContainer GetBlobContainer(MSGorillaBlobContainer container)
         {
             var client = AzureStorageAccount.CreateCloudBlobClient();
             var azcontainer = client.GetContainerReference(_containerDict[container]);
-            azcontainer.CreateIfNotExists();
+
+            Exception exception = null;
+            for (int i = 0; i < 10; i++)
+            {
+                try
+                {
+                    azcontainer.Create();
+                    exception = null;
+                    break;
+                }
+                catch (Exception e)
+                {
+                    exception = e;
+                    if (e is StorageException && e.InnerException != null 
+                        && e.InnerException.Message.Equals("The remote server returned an error: (409) Conflict."))
+                    {
+                        exception = null;
+                        break;
+                    }
+                }
+            }
+            if (exception != null)
+            {
+                throw exception;
+            }
+
             return azcontainer;
         }
     }

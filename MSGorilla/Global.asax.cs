@@ -24,7 +24,7 @@ namespace MSGorilla
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
-            FederatedAuthentication.ServiceConfigurationCreated += this.OnServiceConfigurationCreated; 
+            //FederatedAuthentication.ServiceConfigurationCreated += this.OnServiceConfigurationCreated; 
 
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
@@ -40,25 +40,25 @@ namespace MSGorilla
                 new XmlCommentDocumentationProvider(HttpContext.Current.Server.MapPath("~/bin/MSGorilla.XML")));
         }
 
-        private void OnServiceConfigurationCreated(object sender, ServiceConfigurationCreatedEventArgs e)
-        {
-            // Use the <serviceCertificate> to protect the cookies that 
-            // are sent to the client.
-            List<CookieTransform> sessionTransforms =
-                new List<CookieTransform>(
-                    new CookieTransform[] 
-            {
-                new DeflateCookieTransform(), 
-                new RsaEncryptionCookieTransform(
-                    e.ServiceConfiguration.ServiceCertificate),
-                new RsaSignatureCookieTransform(
-                    e.ServiceConfiguration.ServiceCertificate)  
-            });
-            SessionSecurityTokenHandler sessionHandler =
-                new SessionSecurityTokenHandler(sessionTransforms.AsReadOnly());
+        //private void OnServiceConfigurationCreated(object sender, ServiceConfigurationCreatedEventArgs e)
+        //{
+        //    // Use the <serviceCertificate> to protect the cookies that 
+        //    // are sent to the client.
+        //    List<CookieTransform> sessionTransforms =
+        //        new List<CookieTransform>(
+        //            new CookieTransform[] 
+        //    {
+        //        new DeflateCookieTransform(), 
+        //        new RsaEncryptionCookieTransform(
+        //            e.ServiceConfiguration.ServiceCertificate),
+        //        new RsaSignatureCookieTransform(
+        //            e.ServiceConfiguration.ServiceCertificate)  
+        //    });
+        //    SessionSecurityTokenHandler sessionHandler =
+        //        new SessionSecurityTokenHandler(sessionTransforms.AsReadOnly());
 
-            e.ServiceConfiguration.SecurityTokenHandlers.AddOrReplace(sessionHandler);
-        }
+        //    e.ServiceConfiguration.SecurityTokenHandlers.AddOrReplace(sessionHandler);
+        //}
 
         protected void Application_PostAuthorizeRequest()
         {

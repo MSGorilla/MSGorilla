@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
+using System.Web.UI;
 
 using MSGorilla.Library.Azure;
 using MSGorilla.Library.Exceptions;
@@ -23,7 +24,7 @@ namespace MSGorilla.Library
 {
     public class AttachmentManager
     {
-        private AWCloudTable _attachment;
+        private CloudTable _attachment;
         private CloudBlobContainer _blobcontainer;
         private static string _policyName = "MySASPolicy";
 
@@ -34,6 +35,7 @@ namespace MSGorilla.Library
         {
             get
             {
+                return "";
                 if (string.IsNullOrEmpty(_sasToken))
                 {
                     _tokenGeneratedTimestamp = DateTime.UtcNow;
@@ -53,24 +55,24 @@ namespace MSGorilla.Library
             _attachment = AzureFactory.GetTable(AzureFactory.MSGorillaTable.Attachment);
             _blobcontainer = AzureFactory.GetBlobContainer(AzureFactory.MSGorillaBlobContainer.Attachment);
 
-            BlobContainerPermissions blobPermissions = new BlobContainerPermissions();
+            //BlobContainerPermissions blobPermissions = new BlobContainerPermissions();
 
-            blobPermissions.SharedAccessPolicies.Add(_policyName, new SharedAccessBlobPolicy()
-            {
-                // To ensure SAS is valid immediately, don’t set start time.
-                // This way, you can avoid failures caused by small clock differences.
-                SharedAccessExpiryTime = DateTime.UtcNow.AddHours(1),
-                Permissions = SharedAccessBlobPermissions.Read
-            });
+            //blobPermissions.SharedAccessPolicies.Add(_policyName, new SharedAccessBlobPolicy()
+            //{
+            //    // To ensure SAS is valid immediately, don’t set start time.
+            //    // This way, you can avoid failures caused by small clock differences.
+            //    SharedAccessExpiryTime = DateTime.UtcNow.AddHours(1),
+            //    Permissions = SharedAccessBlobPermissions.Read
+            //});
 
-            // The public access setting explicitly specifies that 
-            // the container is private, so that it can't be accessed anonymously.
-            blobPermissions.PublicAccess = BlobContainerPublicAccessType.Off;
+            //// The public access setting explicitly specifies that 
+            //// the container is private, so that it can't be accessed anonymously.
+            //blobPermissions.PublicAccess = BlobContainerPublicAccessType.Off;
 
-            // Set the permission policy on the container.
-            _blobcontainer.SetPermissions(blobPermissions);
+            //// Set the permission policy on the container.
+            //_blobcontainer.SetPermissions(blobPermissions);
 
-            // Get the shared access signature to share with users.
+            //// Get the shared access signature to share with users.
         }
 
         
@@ -131,7 +133,7 @@ namespace MSGorilla.Library
             string pk = split[0];
             string rk = split[1];
             TableOperation retrieveOperation = TableOperation.Retrieve<AttachmentEntity>(pk, rk);
-            TableResult retrievedResult = _attachment.ExecuteRetriveOperation(retrieveOperation);
+            TableResult retrievedResult = _attachment.Execute(retrieveOperation);
 
             if (retrievedResult.Result == null)
             {
@@ -147,13 +149,26 @@ namespace MSGorilla.Library
             {
                 throw new AttachmentNotFoundException();
             }
-            CloudBlockBlob blockBlob = _blobcontainer.GetBlockBlobReference(attachment.FileID);
-            if (!blockBlob.Exists())
+
+            string filepath = string.Format("{0}/Content/{1}", System.Web.HttpContext.Current.Server.MapPath("/"), attachment.FileID);
+            if (!File.Exists(filepath))
             {
-                throw new AttachmentNotFoundException();
+                CloudBlockBlob blockBlob = _blobcontainer.GetBlockBlobReference(attachment.FileID);
+                //if (!blockBlob.Exists())
+                //{
+                //    throw new AttachmentNotFoundException();
+                //}
+                blockBlob.DownloadToFile(filepath, FileMode.Create);
             }
 
-            return blockBlob.OpenRead();
+            return new FileStream(filepath, FileMode.Open);
+
+            //CloudBlockBlob blockBlob = _blobcontainer.GetBlockBlobReference(attachment.FileID);
+            //if (!blockBlob.Exists())
+            //{
+            //    throw new AttachmentNotFoundException();
+            //}
+            //return blockBlob.OpenRead();
         }
 
         public string GetDownloadLink(Attachment attachment)
@@ -164,7 +179,10 @@ namespace MSGorilla.Library
             }
             CloudBlockBlob blockBlob = _blobcontainer.GetBlockBlobReference(attachment.FileID);
 
-            return blockBlob.Uri.ToString() + this.SASToken;
+            blockBlob.DownloadToFile(attachment.FileID, FileMode.Create);
+            return attachment.FileID;
+
+            //return blockBlob.Uri.ToString() + this.SASToken;
         }
 
         //public static string GenerateAttachmentID(string uploader, string guid, DateTime timestamp)

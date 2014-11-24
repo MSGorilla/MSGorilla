@@ -16,7 +16,7 @@ namespace MSGorilla.Library
 {
     public class CategoryManager
     {
-        private AWCloudTable _categoryMsgTable = AzureFactory.GetTable(AzureFactory.MSGorillaTable.CategoryMessage);
+        private CloudTable _categoryMsgTable = AzureFactory.GetTable(AzureFactory.MSGorillaTable.CategoryMessage);
 
         public Category CreateCategory(string name, string groupID, string creater, string description = null)
         {

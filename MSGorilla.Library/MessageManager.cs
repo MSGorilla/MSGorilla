@@ -24,18 +24,18 @@ namespace MSGorilla.Library
     public class MessageManager
     {
         private const int DefaultTimelineQueryDayRange = 3;
-        private AWCloudTable _homeline;
-        private AWCloudTable _userline;
-        private AWCloudTable _eventline;
-        private AWCloudTable _ownerline;
-        private AWCloudTable _atline;
-        private AWCloudTable _publicSquareLine;
-        private AWCloudTable _topicline;
-        private AWCloudTable _reply;
+        private CloudTable _homeline;
+        private CloudTable _userline;
+        private CloudTable _eventline;
+        private CloudTable _ownerline;
+        private CloudTable _atline;
+        private CloudTable _publicSquareLine;
+        private CloudTable _topicline;
+        private CloudTable _reply;
 
-        private CloudQueue _queue;
-        private CloudQueue _spiderqueue;
-        private CloudQueue _mailMessageQueue;
+        private EmulatedCloudQueue _queue;
+        private EmulatedCloudQueue _spiderqueue;
+        private EmulatedCloudQueue _mailMessageQueue;
 
         private AccountManager _accManager;
         private AttachmentManager _attManager;
@@ -451,7 +451,7 @@ namespace MSGorilla.Library
         {
             TableOperation retrieveOperation = RetrieveUserlineMsgByID<BaseMessageEntity>(messageID);
 
-            TableResult retrievedResult = _userline.ExecuteRetriveOperation(retrieveOperation);
+            TableResult retrievedResult = _userline.Execute(retrieveOperation);
             if (retrievedResult.Result != null)
             {
                 BaseMessageEntity entity = (BaseMessageEntity)retrievedResult.Result;
@@ -476,7 +476,7 @@ namespace MSGorilla.Library
         public Message GetMessage(string msgID)
         {
             TableOperation retreiveOperation = RetrieveUserlineMsgByID<UserLineEntity>(msgID);
-            TableResult retreiveResult = _userline.ExecuteRetriveOperation(retreiveOperation);
+            TableResult retreiveResult = _userline.Execute(retreiveOperation);
             UserLineEntity entity = ((UserLineEntity)retreiveResult.Result);
             if (entity == null)
             {
@@ -563,9 +563,11 @@ namespace MSGorilla.Library
 
             //insert into QueueMessage
             //QueueMessage queueMessage = new QueueMessage(QueueMessage.TypeMessage, msg.ToJsonString());
-            _queue.AddMessage(msg.toAzureCloudQueueMessage());
-            _spiderqueue.AddMessage(msg.toAzureCloudQueueMessage());
-            _mailMessageQueue.AddMessage(msg.toAzureCloudQueueMessage());
+            //_queue.AddMessage(msg.toAzureCloudQueueMessage());
+            //_spiderqueue.AddMessage(msg.toAzureCloudQueueMessage());
+            //_mailMessageQueue.AddMessage(msg.toAzureCloudQueueMessage());
+            _queue.AddMessage(JsonConvert.SerializeObject(msg));
+            _spiderqueue.AddMessage(JsonConvert.SerializeObject(msg));
 
             user.MessageCount++;
             _accManager.UpdateUser(user);

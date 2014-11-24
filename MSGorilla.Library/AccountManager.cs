@@ -92,8 +92,15 @@ namespace MSGorilla.Library
                     throw new UserAlreadyExistException(user.Userid);
                 }
                 user.MessageCount = 0;
+                if (string.IsNullOrEmpty(user.DefaultGroup))
+                {
+                    user.DefaultGroup = "default";
+                }
                 _gorillaCtx.UserProfiles.Add(user);
                 _gorillaCtx.SaveChanges();
+
+                new GroupManager().AddMember(user.DefaultGroup, user.Userid);
+
                 return user;
             }            
         }

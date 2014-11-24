@@ -18,14 +18,14 @@ namespace MSGorilla.Library
 {
     public class StatisticsManager
     {
-        private AWCloudTable _homeline;
-        private AWCloudTable _userline;
-        private AWCloudTable _eventline;
-        private AWCloudTable _ownerline;
-        private AWCloudTable _atline;
-        private AWCloudTable _publicSquareLine;
-        private AWCloudTable _topicline;
-        private AWCloudTable _reply;
+        private CloudTable _homeline;
+        private CloudTable _userline;
+        private CloudTable _eventline;
+        private CloudTable _ownerline;
+        private CloudTable _atline;
+        private CloudTable _publicSquareLine;
+        private CloudTable _topicline;
+        private CloudTable _reply;
 
         private AccountManager _accManager;
         private AttachmentManager _attManager;

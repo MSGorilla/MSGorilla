@@ -25,35 +25,36 @@ namespace MSGorilla.Spider
         public override void Run()
         {
             // This is a sample worker implementation. Replace with your logic.
-            Trace.TraceInformation("MSGorilla.Spider entry point called");
+            MSGorilla.Library.Logger.Info("MSGorilla.Spider entry point called");
 
-            CloudQueue _queue = AzureFactory.GetQueue(AzureFactory.MSGorillaQueue.SearchEngineSpider);
+            EmulatedCloudQueue _queue = AzureFactory.GetQueue(AzureFactory.MSGorillaQueue.SearchEngineSpider);
             SearchManager _manager = new SearchManager();
 
             while (true)
             {
                 try
                 {
-                    CloudQueueMessage message = null;
+                    string message = null;
                     while ((message = _queue.GetMessage()) == null)
                     {
                         Thread.Sleep(10000);
                     }
 
-                    _queue.UpdateMessage(message,
-                        TimeSpan.FromSeconds(60.0),  // Make it visible immediately.
-                        MessageUpdateFields.Visibility);
+                    //_queue.UpdateMessage(message,
+                    //    TimeSpan.FromSeconds(60.0),  // Make it visible immediately.
+                    //    MessageUpdateFields.Visibility);
 
-                    Message msg = JsonConvert.DeserializeObject<Message>(message.AsString);
+                    Message msg = JsonConvert.DeserializeObject<Message>(message);
                     //string content = (string)mess.Content;
                     //Message tweet = JsonConvert.DeserializeObject<Message>(content);
 
                     _manager.SpideMessage(msg);
-                    _queue.DeleteMessage(message);
+                    //_queue.DeleteMessage(message);
                 }
                 catch (Exception e)
                 {
-                    Trace.TraceError("Exception in worker role", e.StackTrace);
+                    MSGorilla.Library.Logger.Error("Exception in worker role");
+                    MSGorilla.Library.Logger.Error(e.StackTrace);
                 }
             }
         }

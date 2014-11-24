@@ -1062,7 +1062,7 @@ function createUserPopover(data) {
     } else if (isFollowing == 1) {
         output += "<a class='btn btn-success follow-btn' id='btn_userpopover_follow_" + encodeId(userid) + "' onclick='unfollow(\"btn_userpopover_follow_" + encodeId(userid) + "\", \"" + userid + "\");' onmouseover='unfollowBtnMouseOver(\"btn_userpopover_follow_" + encodeId(userid) + "\");' onmouseout='unfollowBtnMouseOut(\"btn_userpopover_follow_" + encodeId(userid) + "\");' >Following</a>";
     } else {  // -1: myself
-        output += "<a class='btn btn-info follow-btn' id='btn_userpopover_follow_" + encodeId(userid) + "' href='/account/manage'>Edit profile</a>";
+        //output += "<a class='btn btn-info follow-btn' id='btn_userpopover_follow_" + encodeId(userid) + "' href='/account/manage'>Edit profile</a>";
     }
 
     output += "    </div>"

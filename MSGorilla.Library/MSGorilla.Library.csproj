@@ -61,8 +61,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\WindowsAzure.Storage.3.2.0\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -85,15 +85,13 @@
   <ItemGroup>
     <Compile Include="AccountManager.cs" />
     <Compile Include="AttachmentManager.cs" />
-    <Compile Include="Azure\AWCloudTable.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Azure\AWDataMismatchException.cs" />
     <Compile Include="Azure\AzureFactory.cs" />
+    <Compile Include="Azure\EmulatedCloudQueue.cs" />
     <Compile Include="Azure\Logger.cs" />
     <Compile Include="CategoryManager.cs" />
     <Compile Include="CounterManager.cs" />
     <Compile Include="GroupManager.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="MetricManager.cs" />
     <Compile Include="MException\MException.cs" />
     <Compile Include="Models\ActionResult.cs" />
@@ -213,6 +211,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="3rd-Party-Lib\Newtonsoft.Json.dll" />
+    <Content Include="Models\SqlModels\initialize.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

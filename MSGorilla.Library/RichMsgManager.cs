@@ -14,7 +14,7 @@ namespace MSGorilla.Library
 {
     public class RichMsgManager
     {
-        private AWCloudTable _richMsg;
+        private CloudTable _richMsg;
         public static int BlockSize
         {
             get { return 32 * 1024; }
@@ -81,7 +81,7 @@ namespace MSGorilla.Library
 
             TableOperation retrieveOperation = TableOperation.Retrieve<DynamicTableEntity>(split[0], split[1]);
 
-            TableResult retrievedResult = _richMsg.ExecuteRetriveOperation(retrieveOperation);
+            TableResult retrievedResult = _richMsg.Execute(retrieveOperation);
             if (retrievedResult.Result != null)
             {
                 DynamicTableEntity entity = (DynamicTableEntity)retrievedResult.Result;

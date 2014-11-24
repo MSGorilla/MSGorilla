@@ -108,7 +108,7 @@ namespace MSGorilla.Library
 
     public class MetricManager
     {
-        private AWCloudTable _metricData;
+        private CloudTable _metricData;
 
         public MetricManager()
         {
@@ -249,7 +249,7 @@ namespace MSGorilla.Library
                 else
                 {
                     //retrive the last entity
-                    TableResult result = _metricData.ExecuteRetriveOperation(
+                    TableResult result = _metricData.Execute(
                         TableOperation.Retrieve<DynamicTableEntity>(
                             id.ToString(), 
                             ((data.RecordCount / MetricEntity.MaxMetricRecord) * MetricEntity.MaxMetricRecord).ToString(RowKeyFormat)

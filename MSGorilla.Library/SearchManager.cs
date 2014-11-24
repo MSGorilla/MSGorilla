@@ -32,9 +32,9 @@ namespace MSGorilla.Library
         private readonly string Separator = Environment.NewLine;
         private readonly double SearchDelaySeconds = 600;
 
-        private AWCloudTable _wordsIndexTable = null;
-        private AWCloudTable _searchResultsTable = null;
-        private AWCloudTable _searchHistoryTable = null;
+        private CloudTable _wordsIndexTable = null;
+        private CloudTable _searchResultsTable = null;
+        private CloudTable _searchHistoryTable = null;
 
         /// <summary>Stemmer to use</summary>
         private IStemming _stemmer = new PorterStemmer();
@@ -462,7 +462,7 @@ namespace MSGorilla.Library
 
         private SearchResult GetSearchHistory(string searchId)
         {
-            TableResult result = _searchHistoryTable.ExecuteRetriveOperation(TableOperation.Retrieve<SearchHistoryEntity>(searchId, searchId));
+            TableResult result = _searchHistoryTable.Execute(TableOperation.Retrieve<SearchHistoryEntity>(searchId, searchId));
             SearchHistoryEntity entity = result.Result as SearchHistoryEntity;
             if (entity != null)
             {
