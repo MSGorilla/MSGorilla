@@ -393,7 +393,11 @@ namespace MSGorilla.Library
             using (var _gorillaCtx = new MSGorillaEntities())
             {
                 robot.IsRobot = true;
-                new AccountManager().AddUser(robot);
+                try
+                {
+                    new AccountManager().AddUser(robot);
+                }
+                catch (UpdateRobotMembershipException e) { } 
 
                 Membership member = new Membership();
                 member.GroupID = groupID;
