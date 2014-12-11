@@ -20,12 +20,17 @@ namespace MSGorilla.WebAPI.Client
         private string _userName;
         private string _password;
         private string _authHeader;
-        public GorillaWebAPI(string username, string password)
+        public GorillaWebAPI(string username, string password, string endpointUri = null)
         {
             _userName = username;
             _password = password;
             _generateAuthHeader();
-        }
+            if (endpointUri != null)
+            {
+                _rootUri = endpointUri;
+            }
+        } 
+
         string _rootUri = Constant.UriRoot;
 
         private void _generateAuthHeader()
