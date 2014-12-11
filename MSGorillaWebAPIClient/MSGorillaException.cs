@@ -27,10 +27,11 @@ namespace MSGorilla.WebAPI.Client
                 return _description;
             }
         }
-        public MSGorillaException(string text, Exception innerException) : base(
-            JObject.Parse(text)["Message"].Value<string>(),
-            innerException = null
-            )
+        public MSGorillaException(string text, Exception innerException)
+            : base(
+                JObject.Parse(text)["Message"].Value<string>(),
+                innerException = null
+                )
         {
             JObject obj = JObject.Parse(text);
             _code = obj["ActionResultCode"].Value<int>();
