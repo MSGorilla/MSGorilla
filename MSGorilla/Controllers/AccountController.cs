@@ -25,6 +25,25 @@ namespace MSGorilla.Controllers
         AccountManager _accManager = new AccountManager();
         GroupManager _groupManager = new GroupManager();
 
+        private static bool EnableRegistration = true;
+
+        static AccountController()
+        {
+            string val = ConfigurationManager.AppSettings["msgorilla:registration"];
+            if (val == null || val.ToLower() == "enable")
+            {
+                EnableRegistration = true;
+            }
+            else if (val.ToLower() == "disable")
+            {
+                EnableRegistration = false;
+            }
+            else
+            {
+                throw new ArgumentException("Invalid appSettings->msgorilla:Registration. Should be enable or disable.");
+            }
+        }
+
         public AccountController()
             : this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext())))
         {
@@ -125,6 +144,11 @@ namespace MSGorilla.Controllers
 
                 try
                 {
+                    if (!EnableRegistration)
+                    {
+                        throw new Exception("Registration is disabled.");
+                    }
+
                     string userid = model.UserName;
                     string password = model.Password;
                     var newUser =  new UserProfile();
