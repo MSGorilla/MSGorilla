@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla", "MSGorilla\MSGorilla.csproj", "{47634D5A-C567-4EDB-963E-A0F9B79F27E2}"
 EndProject
@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TFSMonitor", "Robots\WossTF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.Desktop", "MSGorilla.Desktop\MSGorilla.Desktop.csproj", "{516BD150-2AA8-480F-AB36-74D6B3E3DFB3}"
 EndProject
-Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "MSGorilla.Azure", "MSGorilla.Azure\MSGorilla.Azure.ccproj", "{EDD1F231-0E54-4449-A9EE-0EDD51B33EBF}"
+Project("{2B9991BB-E522-30BD-AEAA-44A7C0A198E8}") = "MSGorilla.Azure", "MSGorilla.Azure\MSGorilla.Azure.ccproj", "{EDD1F231-0E54-4449-A9EE-0EDD51B33EBF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.StatusReporter", "Robots\MSGorilla.StatusReporter\MSGorilla.StatusReporter.csproj", "{1C1B176A-EA93-4840-B658-9B1B8FB0C483}"
 EndProject
@@ -48,6 +48,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.WossTableMonitor", "Robots\MSGorilla.WossTableMonitor\MSGorilla.WossTableMonitor.csproj", "{AB735D85-98F8-45FD-BB70-3E6D9F1E62F8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.TFSBugTrendMonitor", "Robots\MSGorilla.TFSBugTrendMonitor\MSGorilla.TFSBugTrendMonitor.csproj", "{150011E4-0E25-4838-A6BB-1FB72D112641}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSGorilla.YahooStockReporter", "MSGorilla.YahooStockReporter\MSGorilla.YahooStockReporter.csproj", "{8D268EC4-8225-4701-85B4-C380688E1858}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -259,6 +261,16 @@ Global
 		{150011E4-0E25-4838-A6BB-1FB72D112641}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{150011E4-0E25-4838-A6BB-1FB72D112641}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{150011E4-0E25-4838-A6BB-1FB72D112641}.Release|Win32.ActiveCfg = Release|Any CPU
+		{8D268EC4-8225-4701-85B4-C380688E1858}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D268EC4-8225-4701-85B4-C380688E1858}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D268EC4-8225-4701-85B4-C380688E1858}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8D268EC4-8225-4701-85B4-C380688E1858}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8D268EC4-8225-4701-85B4-C380688E1858}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{8D268EC4-8225-4701-85B4-C380688E1858}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D268EC4-8225-4701-85B4-C380688E1858}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D268EC4-8225-4701-85B4-C380688E1858}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8D268EC4-8225-4701-85B4-C380688E1858}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8D268EC4-8225-4701-85B4-C380688E1858}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -277,5 +289,6 @@ Global
 		{8A67D357-F1AB-4273-9A97-EDF8E0EE6639} = {91E68305-6459-4BB4-87D0-4E5A42ACDFED}
 		{AB735D85-98F8-45FD-BB70-3E6D9F1E62F8} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
 		{150011E4-0E25-4838-A6BB-1FB72D112641} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
+		{8D268EC4-8225-4701-85B4-C380688E1858} = {4AB4CA94-1356-49A3-8CCD-B6B41C0280F1}
 	EndGlobalSection
 EndGlobal
