@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MSGorilla.YahooStockReporter
 {
-    class StockData
+    public class StockData
     {
         //tmp += "<Symbol>&lt;span style='color:red'&gt;" +
         //symbols[i].ToUpper() +

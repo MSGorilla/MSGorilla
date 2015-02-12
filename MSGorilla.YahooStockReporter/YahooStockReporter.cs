@@ -11,14 +11,14 @@ using System.Timers;
 
 namespace MSGorilla.YahooStockReporter
 {
-    class YahooStockReporter
+    public class YahooStockReporter
     {
         private Timer _dataCollectTimer;
         private Timer _dataPostTimer;
         private string _stocks = "YHOO+GOOG+MSFT";
-        Dictionary<string, Dictionary<DateTime, StockData>> _stockDataSet = new Dictionary<string, Dictionary<DateTime, StockData>>();
-        GorillaWebAPI _client;
-        Object _lock = new object();
+        private Dictionary<string, Dictionary<DateTime, StockData>> _stockDataSet = new Dictionary<string, Dictionary<DateTime, StockData>>();
+        private GorillaWebAPI _client;
+        private Object _lock = new object();
 
         public YahooStockReporter()
         {
@@ -40,12 +40,12 @@ namespace MSGorilla.YahooStockReporter
             DateTime now = DateTime.UtcNow;
             DateTime firstRunTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute + 1, 0);
             TimeSpan interval = firstRunTime - now;
-            _dataCollectTimer.Interval = interval.Milliseconds;
+            _dataCollectTimer.Interval = interval.TotalMilliseconds;
             _dataCollectTimer.Start();
 
-            firstRunTime = new DateTime(now.Year, now.Month, now.Day, now.Hour + 1, 0, 0);
+            firstRunTime = new DateTime(now.Year, now.Month, now.Day, now.Hour + 1, 0, 30);
             interval = firstRunTime - now;
-            _dataPostTimer.Interval = interval.Milliseconds;
+            _dataPostTimer.Interval = interval.TotalMilliseconds;
             _dataPostTimer.Start();
         }
 
@@ -116,6 +116,7 @@ namespace MSGorilla.YahooStockReporter
 
                     content = strm.ReadLine().Replace("\"", "");
                     string[] contents = content.ToString().Split(',');
+                    Console.WriteLine("Get Data : " + content);
 
                     // If contents[2] = "N/A". the stock symbol is invalid.
                     if (contents[2] == "N/A")
@@ -165,6 +166,17 @@ namespace MSGorilla.YahooStockReporter
                                 dataList.Add(data.Date, data);
                             }
                         }
+
+                        // Post alert
+                        if (Math.Abs(data.ChangeInPercent) >= 1)
+                        {
+                            string message = string.Format(
+@"Stock Price Alert:
+The price change of {0} reached {1:c} ({2}%) at {3}",
+                                           data.Symbol, data.Change, data.ChangeInPercent, data.Date.ToShortTimeString());
+                            _client.PostMessage(message, null, "none", "none", new string[] { "Stock", "Stock " + data.Symbol });
+                            Console.WriteLine(message);
+                        }
                     }
                 }
 
@@ -180,7 +192,7 @@ namespace MSGorilla.YahooStockReporter
             return true;
         }
 
-        private bool DoDataPost()
+        public bool DoDataPost()
         {
             // Check paremeters
             if (_stocks == "")
@@ -190,15 +202,35 @@ namespace MSGorilla.YahooStockReporter
 
             try
             {
-                foreach (var dataSet in _stockDataSet)
+                lock (_lock)
                 {
+                    foreach (var dataSet in _stockDataSet)
+                    {
+                        string symbol = dataSet.Key;
+                        Dictionary<DateTime, StockData> data = dataSet.Value;
 
-                    // Create figure
-                    Figure figure = new Figure(dataSet.Key, DateTime.UtcNow.ToString(), dataSet.Value);
+                        if (data.Count > 1)
+                        {
+                            // Create figure
+                            StockFigure figure = new StockFigure(symbol, DateTime.UtcNow.ToString(), data);
+                            List<double> price = new List<double>();
+                            List<double> volumn = new List<double>();
+                            foreach (var d in data)
+                            {
+                                price.Add(d.Value.Last);
+                                volumn.Add(d.Value.Volumn);
+                            }
 
-                    // Post 
-                    _client.PostMessage(figure.ToString(), null, "chart-axis-singleaxis");
+                            figure.Addline("Volumn", "bar", volumn);
+                            figure.Addline2("Price", "line", price);
 
+                            // Post 
+                            string message = figure.ToString();
+                            _client.PostMessage(message, null, "chart-axis-doubleaxes", "none", new string[] { "Stock", "Stock " + symbol });
+                            Console.WriteLine(message);
+                        }
+                    }
+                    _stockDataSet.Clear();
                 }
             }
             catch (Exception e)
@@ -212,54 +244,5 @@ namespace MSGorilla.YahooStockReporter
 
     }
 
-
-    public class Figure
-    {
-        public class FigureYAxis
-        {
-            public string name { get; set; }
-            public string type { get; set; }
-            public List<double> data { get; set; }
-            public FigureYAxis(string n, string t)
-            {
-                name = n;
-                type = t;
-            }
-        }
-
-        public string title { get; set; }
-        public string subtitle { get; set; }
-        public List<string> legend { get; set; }
-        public List<string> xAxis { get; set; }
-        public List<FigureYAxis> yAxis { get; set; }
-
-        public Figure(string title, string subtitle, Dictionary<DateTime, StockData> data)
-        {
-            this.title = title;
-            this.subtitle = subtitle;
-            this.legend = new List<string>();
-            this.xAxis = new List<string>();
-            this.yAxis = new List<FigureYAxis>();
-
-            foreach (var d in data)
-            {
-                xAxis.Add(string.Format("{0:yyyy-MM-dd}", d.Key));
-            }
-        }
-
-        protected void Addline(string name, string type, List<double> count)
-        {
-            FigureYAxis yaxis = new FigureYAxis(name, type);
-            yaxis.data = count;
-
-            this.yAxis.Add(yaxis);
-            this.legend.Add(name);
-        }
-
-        public string ToString()
-        {
-            return JsonConvert.SerializeObject(this);
-        }
-    }
 
 }
